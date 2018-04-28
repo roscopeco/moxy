@@ -78,7 +78,7 @@ public final class TypesAndDescriptors {
   public static final char OBJECT_PRIMITIVE_INTERNAL_NAME = 'L';
 
   public static String sanitiseTypeNameForMemberName(final String descriptor) {
-    return descriptor.replaceAll("[./\\(\\);]", "");
+    return descriptor.replaceAll("[./;]", "");
   }
   
   public static String makeMethodReturnFieldName(final String name, final String desc) {

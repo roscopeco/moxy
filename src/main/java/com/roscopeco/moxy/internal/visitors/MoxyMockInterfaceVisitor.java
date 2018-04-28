@@ -49,14 +49,7 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
   
   @Override
   public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {    
-    // Generate field for method return value
-    if (!VOID_TYPE.equals(Type.getReturnType(desc).toString())) {
-      FieldVisitor fv = this.cv.visitField(ACC_PRIVATE | ACC_SYNTHETIC, 
-                                           super.makeMethodReturnFieldName(name, desc),                                          
-                                           Type.getReturnType(desc).toString(), 
-                                           null, null);
-      fv.visitEnd();
-    }
+    super.generateMethodReturnField(name, desc);
     
     // Do the mocking
     return new MoxyMockingMethodVisitor(this.cv.visitMethod(

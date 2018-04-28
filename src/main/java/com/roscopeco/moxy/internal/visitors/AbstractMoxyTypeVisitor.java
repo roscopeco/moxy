@@ -6,6 +6,7 @@ import static org.objectweb.asm.Opcodes.*;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 
 /**
@@ -32,14 +33,6 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
     return newClassInternalName;
   }
   
-  private String sanitiseTypeNameForMemberName(final String descriptor) {
-    return descriptor.replaceAll("[./\\(\\);]", "");
-  }
-  
-  protected String makeMethodReturnFieldName(final String name, final String desc) {
-    return name + sanitiseTypeNameForMemberName(desc);
-  }
-
   @Override
   public void visitEnd() {
     this.generateSupportFields();
@@ -70,7 +63,7 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   }
   
   void generateNullConstructor(String superClassInternalName, String superDescriptor) {
-    MethodVisitor mv = this.cv.visitMethod(ACC_PUBLIC, INIT_NAME, VOID_VOID_DESCRIPTOR, null, EMPTY_STRING_ARRAY);
+    MethodVisitor mv = this.cv.visitMethod(ACC_PRIVATE, INIT_NAME, VOID_VOID_DESCRIPTOR, null, EMPTY_STRING_ARRAY);
     mv.visitCode();
     mv.visitVarInsn(ALOAD, 0);
     mv.visitInsn(DUP);
@@ -85,7 +78,7 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   }
   
   void generateSupportFields() {
-    FieldVisitor fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL, SUPPORT_ENGINE_FIELD_NAME, MOXY_ASM_ENGINE_DESCRIPTOR, null, null);
+    FieldVisitor fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_ENGINE_FIELD_NAME, MOXY_ASM_ENGINE_DESCRIPTOR, null, null);
     fv.visitEnd();
   }
   
@@ -104,6 +97,26 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
     mv.visitFieldInsn(GETFIELD, newClassInternalName, SUPPORT_ENGINE_FIELD_NAME, MOXY_ASM_ENGINE_DESCRIPTOR);
     mv.visitInsn(ARETURN);
     mv.visitEnd();    
+  }
+  
+  private String sanitiseTypeNameForMemberName(final String descriptor) {
+    return descriptor.replaceAll("[./\\(\\);]", "");
+  }
+  
+  private String makeMethodReturnFieldName(final String name, final String desc) {
+    return name + sanitiseTypeNameForMemberName(desc);
+  }
+
+  void generateMethodReturnField(String name, String desc) {
+    // Generate field for method return value
+    if (!VOID_TYPE.equals(Type.getReturnType(desc).toString())) {
+      FieldVisitor fv = this.cv.visitField(ACC_PRIVATE | ACC_SYNTHETIC, 
+                                           this.makeMethodReturnFieldName(name, desc),                                          
+                                           Type.getReturnType(desc).toString(), 
+                                           null, null);
+      fv.visitEnd();
+    }
+
   }
   
   public ClassNode getNode() {

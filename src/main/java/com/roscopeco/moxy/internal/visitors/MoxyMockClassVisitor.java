@@ -71,14 +71,8 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
       // Always mock abstract methods (or it won't verify), decide for concrete based on mockMethods.
       if (isAbstract || isToMock(name, desc)) {
         // Create a return field for this mocked method
-        if (!VOID_TYPE.equals(Type.getReturnType(desc).toString())) {
-          FieldVisitor fv = this.cv.visitField(ACC_PRIVATE | ACC_SYNTHETIC, 
-                                               super.makeMethodReturnFieldName(name, desc),                                          
-                                               Type.getReturnType(desc).toString(), 
-                                               null, null);
-          fv.visitEnd();
-        }
-        
+        super.generateMethodReturnField(name, desc);
+ 
         // Do the mocking
         return new MoxyMockingMethodVisitor(cv.visitMethod(access & ~ACC_ABSTRACT, 
                                                            name, desc, signature, exceptions),

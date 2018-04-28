@@ -46,7 +46,7 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
     newInterfaces.addAll(Arrays.asList(originalInterfaces));
 
     super.visit(version, 
-                access & ~ACC_ABSTRACT, 
+                access & ~ACC_ABSTRACT | ACC_SYNTHETIC, 
                 super.getNewClassInternalName(),
                 signature, 
                 originalClassInternalName, 

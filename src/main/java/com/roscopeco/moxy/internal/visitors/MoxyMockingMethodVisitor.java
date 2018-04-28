@@ -100,6 +100,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
    * The caller should add the result to any iterator variable or whatever
    * they're using to keep track of locals.
    */
+  // TODO this could probably be DRYed...
   int generateLoadAndAutoboxing(int argNum, int currentLocalSlot) {
     char argType = this.argTypes[argNum].toString().charAt(0);
     int localSlots = 1;
@@ -180,7 +181,8 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     }
     return localSlots;
   }
-  
+ 
+  // TODO this could probably be DRYed
   void generateReturn() {
     char primitiveReturnType = returnType.charAt(0);
     switch (primitiveReturnType) {

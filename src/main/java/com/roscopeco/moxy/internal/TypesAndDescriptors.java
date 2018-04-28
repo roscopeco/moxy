@@ -76,4 +76,14 @@ public final class TypesAndDescriptors {
   public static final String VOID_CLASS_INTERNAL_NAME = Type.getInternalName(Void.class);
   
   public static final char OBJECT_PRIMITIVE_INTERNAL_NAME = 'L';
+
+  public static String sanitiseTypeNameForMemberName(final String descriptor) {
+    return descriptor.replaceAll("[./\\(\\);]", "");
+  }
+  
+  public static String makeMethodReturnFieldName(final String name, final String desc) {
+    return name + sanitiseTypeNameForMemberName(desc);
+  }
+
+
 }

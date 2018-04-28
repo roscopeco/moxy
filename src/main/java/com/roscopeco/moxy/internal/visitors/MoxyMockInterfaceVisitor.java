@@ -55,7 +55,8 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
         access & ~ACC_ABSTRACT, 
         name, desc, signature, exceptions),
     this.getNewClassInternalName(),
-    name + desc,
+    name,
+    desc,
     getReturnType(desc),
     Type.getArgumentTypes(desc),
     true);

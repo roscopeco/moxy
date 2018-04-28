@@ -6,18 +6,23 @@ import static com.roscopeco.moxy.internal.TypesAndDescriptors.*;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
+import com.roscopeco.moxy.internal.TypesAndDescriptors;
+
 class MoxyMockingMethodVisitor extends MethodVisitor {
   // Hide super field to prevent generation of original code.
   private final MethodVisitor mv;
   private final boolean wasAbstract;
-  private final char returnType;
+  private final String generatingClass;
+  private final String returnType;
   private final Type[] argTypes;
-  private final String methodNameAndSignature;
+  private final String methodName;
+  private final String methodDescriptor;
   
   public MoxyMockingMethodVisitor(final MethodVisitor delegate,
                                   final String generatingClass,
-                                  final String methodNameAndSignature,
-                                  final char returnType, 
+                                  final String methodName,
+                                  final String methodDescriptor,
+                                  final String returnType, 
                                   final Type[] argTypes, 
                                   final boolean wasAbstract) {
     // don't pass the delegate to the super constructor, or we'll generate
@@ -25,8 +30,10 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     // stash the delegate directly.
     super(ASM5);
     this.mv = delegate;
+    this.generatingClass = generatingClass;
     this.returnType = returnType;
-    this.methodNameAndSignature = methodNameAndSignature;
+    this.methodName = methodName;
+    this.methodDescriptor = methodDescriptor;
     this.argTypes = argTypes;
     this.wasAbstract = wasAbstract;    
   }
@@ -55,7 +62,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     this.mv.visitInsn(SWAP);
     
     // Loadconst method name and sig as second param
-    this.mv.visitLdcInsn(this.methodNameAndSignature);
+    this.mv.visitLdcInsn(this.methodName + this.methodDescriptor);
 
     // Create array as third param
     // TODO - could optimise here, no need to create new array if argc == 0,
@@ -175,34 +182,40 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
   }
   
   void generateReturn() {
-    switch (this.returnType) {
+    char primitiveReturnType = returnType.charAt(0);
+    switch (primitiveReturnType) {
     case BYTE_PRIMITIVE_INTERNAL_NAME:
     case CHAR_PRIMITIVE_INTERNAL_NAME:
     case SHORT_PRIMITIVE_INTERNAL_NAME:
     case INT_PRIMITIVE_INTERNAL_NAME:
     case BOOL_PRIMITIVE_INTERNAL_NAME:
       /* byte/char/short/int/bool */
-      this.mv.visitInsn(ICONST_0);
+      this.mv.visitVarInsn(ALOAD, 0);
+      this.mv.visitFieldInsn(GETFIELD, this.generatingClass, TypesAndDescriptors.makeMethodReturnFieldName(this.methodName, this.methodDescriptor), this.returnType);
       this.mv.visitInsn(IRETURN);
       break;
     case LONG_PRIMITIVE_INTERNAL_NAME:
       /* long */
-      this.mv.visitLdcInsn(0L);
+      this.mv.visitVarInsn(ALOAD, 0);
+      this.mv.visitFieldInsn(GETFIELD, this.generatingClass, TypesAndDescriptors.makeMethodReturnFieldName(this.methodName, this.methodDescriptor), this.returnType);
       this.mv.visitInsn(LRETURN);
       break;
     case FLOAT_PRIMITIVE_INTERNAL_NAME:
       /* float */
-      this.mv.visitLdcInsn(0.0f);
+      this.mv.visitVarInsn(ALOAD, 0);
+      this.mv.visitFieldInsn(GETFIELD, this.generatingClass, TypesAndDescriptors.makeMethodReturnFieldName(this.methodName, this.methodDescriptor), this.returnType);
       this.mv.visitInsn(FRETURN);
       break;
     case DOUBLE_PRIMITIVE_INTERNAL_NAME:
       /* double */
-      this.mv.visitLdcInsn(0.0d);
+      this.mv.visitVarInsn(ALOAD, 0);
+      this.mv.visitFieldInsn(GETFIELD, this.generatingClass, TypesAndDescriptors.makeMethodReturnFieldName(this.methodName, this.methodDescriptor), this.returnType);
       this.mv.visitInsn(DRETURN);
       break;
     case OBJECT_PRIMITIVE_INTERNAL_NAME:
       /* Object */
-      this.mv.visitInsn(ACONST_NULL);
+      this.mv.visitVarInsn(ALOAD, 0);
+      this.mv.visitFieldInsn(GETFIELD, this.generatingClass, TypesAndDescriptors.makeMethodReturnFieldName(this.methodName, this.methodDescriptor), this.returnType);
       this.mv.visitInsn(ARETURN);
       break;
     case VOID_PRIMITIVE_INTERNAL_NAME:

@@ -25,8 +25,8 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   }
   
   // Get return type given method descriptor.
-  protected char getReturnType(String desc) {
-    return desc.charAt(desc.indexOf(')') + 1);
+  protected String getReturnType(String desc) {
+    return Type.getReturnType(desc).toString();
   }
   
   protected String getNewClassInternalName() {
@@ -99,19 +99,11 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
     mv.visitEnd();    
   }
   
-  private String sanitiseTypeNameForMemberName(final String descriptor) {
-    return descriptor.replaceAll("[./\\(\\);]", "");
-  }
-  
-  private String makeMethodReturnFieldName(final String name, final String desc) {
-    return name + sanitiseTypeNameForMemberName(desc);
-  }
-
   void generateMethodReturnField(String name, String desc) {
     // Generate field for method return value
     if (!VOID_TYPE.equals(Type.getReturnType(desc).toString())) {
       FieldVisitor fv = this.cv.visitField(ACC_PRIVATE | ACC_SYNTHETIC, 
-                                           this.makeMethodReturnFieldName(name, desc),                                          
+                                           makeMethodReturnFieldName(name, desc),                                          
                                            Type.getReturnType(desc).toString(), 
                                            null, null);
       fv.visitEnd();

@@ -25,4 +25,12 @@ class ASMStubber<T> implements Stubber<T> {
   public Stubber<T> thenThrow(Throwable throwable) {
     return null;
   }
+
+  ASMMoxyEngine getEngine() {
+    return engine;
+  }
+
+  Invocation getTheInvocation() {
+    return theInvocation;
+  }
 }

@@ -1,7 +1,7 @@
 package com.roscopeco.moxy.internal.visitors;
 
-import static org.objectweb.asm.Opcodes.*;
 import static com.roscopeco.moxy.internal.TypesAndDescriptors.*;
+import static org.objectweb.asm.Opcodes.*;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
-import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 

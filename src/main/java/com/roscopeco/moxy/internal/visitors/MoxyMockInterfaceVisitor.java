@@ -1,12 +1,13 @@
 package com.roscopeco.moxy.internal.visitors;
 
-import static org.objectweb.asm.Opcodes.*;
 import static com.roscopeco.moxy.internal.TypesAndDescriptors.*;
+import static org.objectweb.asm.Opcodes.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
 
+import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
@@ -45,9 +46,19 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
     // Add the IsMock annotation
     this.visitAnnotation(Type.getDescriptor(IsMock.class), true).visitEnd();
   }
-
+  
   @Override
-  public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+  public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {    
+    // Generate field for method return value
+    if (!VOID_TYPE.equals(Type.getReturnType(desc).toString())) {
+      FieldVisitor fv = this.cv.visitField(ACC_PRIVATE | ACC_SYNTHETIC, 
+                                           super.makeMethodReturnFieldName(name, desc),                                          
+                                           Type.getReturnType(desc).toString(), 
+                                           null, null);
+      fv.visitEnd();
+    }
+    
+    // Do the mocking
     return new MoxyMockingMethodVisitor(this.cv.visitMethod(
         access & ~ACC_ABSTRACT, 
         name, desc, signature, exceptions),

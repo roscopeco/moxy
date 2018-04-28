@@ -46,10 +46,10 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     // Get recorder from Support interface method as receiver
     this.mv.visitInsn(DUP);
     this.mv.visitMethodInsn(INVOKEINTERFACE, 
-        MOXY_SUPPORT_INTERFACE_INTERNAL_NAME, 
-        SUPPORT_GETRECORDER_METHOD_NAME,
-        SUPPORT_GETRECORDER_DESCRIPTOR,
-        true);
+                            MOXY_SUPPORT_INTERFACE_INTERNAL_NAME, 
+                            SUPPORT_GETRECORDER_METHOD_NAME,
+                            SUPPORT_GETRECORDER_DESCRIPTOR,
+                            true);
     
     // Make stack right for recorder being receiver, and `this` being first param in later invoke.
     this.mv.visitInsn(SWAP);

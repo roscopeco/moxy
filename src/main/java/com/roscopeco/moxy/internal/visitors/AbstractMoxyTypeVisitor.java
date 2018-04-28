@@ -32,6 +32,14 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
     return newClassInternalName;
   }
   
+  private String sanitiseTypeNameForMemberName(final String descriptor) {
+    return descriptor.replaceAll("[./\\(\\);]", "");
+  }
+  
+  protected String makeMethodReturnFieldName(final String name, final String desc) {
+    return name + sanitiseTypeNameForMemberName(desc);
+  }
+
   @Override
   public void visitEnd() {
     this.generateSupportFields();

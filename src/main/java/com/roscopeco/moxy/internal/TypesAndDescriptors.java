@@ -11,6 +11,7 @@ public final class TypesAndDescriptors {
   /* General Java stuff */
   public static final String OBJECT_INTERNAL_NAME = Type.getInternalName(Object.class);  
   public static final String INIT_NAME = "<init>";
+  public static final String VOID_TYPE = "V";
   public static final String VOID_VOID_DESCRIPTOR = "()V";
   
   /* Moxy stuff */

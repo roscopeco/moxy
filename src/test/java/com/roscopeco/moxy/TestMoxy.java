@@ -131,7 +131,7 @@ public class TestMoxy {
   
   @Test
   public void testMoxyWhenWithMockThenReturnForObjectWorksProperly() {
-    SimpleClass mock = Moxy.mock(SimpleClass.class);
+    SimpleClass mock = Moxy.mock(SimpleClass.class, System.out);
     Moxy.when(mock.returnHello()).thenReturn("Goodbye");
     
     assertThat(mock.returnHello()).isEqualTo("Goodbye");

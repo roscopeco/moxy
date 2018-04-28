@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
+import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
@@ -62,12 +63,23 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
 
   @Override
   public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+    // Generate field for method return value
     boolean isAbstract = (access & ACC_ABSTRACT) != 0;
     
     // Never generate constructors (do that manually later).
     if (!INIT_NAME.equals(name)) {
       // Always mock abstract methods (or it won't verify), decide for concrete based on mockMethods.
-      if (isAbstract || isToMock(name, desc)) { 
+      if (isAbstract || isToMock(name, desc)) {
+        // Create a return field for this mocked method
+        if (!VOID_TYPE.equals(Type.getReturnType(desc).toString())) {
+          FieldVisitor fv = this.cv.visitField(ACC_PRIVATE | ACC_SYNTHETIC, 
+                                               super.makeMethodReturnFieldName(name, desc),                                          
+                                               Type.getReturnType(desc).toString(), 
+                                               null, null);
+          fv.visitEnd();
+        }
+        
+        // Do the mocking
         return new MoxyMockingMethodVisitor(cv.visitMethod(access & ~ACC_ABSTRACT, 
                                                            name, desc, signature, exceptions),
                                                            this.getNewClassInternalName(),

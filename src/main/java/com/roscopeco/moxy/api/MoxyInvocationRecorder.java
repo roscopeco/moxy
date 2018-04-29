@@ -7,7 +7,7 @@ public interface MoxyInvocationRecorder {
   /**
    * Record the given invocation.
    */
-  public void recordInvocation(Object receiver, String methodNameAndSig, Object[] args);
+  public void recordInvocation(Object receiver, String methodName, String methodDescriptor, Object[] args);
   
   /**
    * Get the most recent invocation.

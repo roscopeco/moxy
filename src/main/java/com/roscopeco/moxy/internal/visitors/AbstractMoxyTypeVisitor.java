@@ -102,7 +102,7 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   void generateMethodReturnField(String name, String desc) {
     // Generate field for method return value
     if (!VOID_TYPE.equals(Type.getReturnType(desc).toString())) {
-      FieldVisitor fv = this.cv.visitField(ACC_PRIVATE | ACC_SYNTHETIC, 
+      FieldVisitor fv = this.cv.visitField(ACC_PUBLIC | ACC_SYNTHETIC, 
                                            makeMethodReturnFieldName(name, desc),                                          
                                            Type.getReturnType(desc).toString(), 
                                            null, null);

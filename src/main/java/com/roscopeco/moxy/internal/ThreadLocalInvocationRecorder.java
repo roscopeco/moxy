@@ -18,12 +18,12 @@ class ThreadLocalInvocationRecorder implements MoxyInvocationRecorder {
     this.lastInvocationThreadLocal = new ThreadLocal<>();
   }
   
-  public void recordInvocation(Object receiver, String methodNameAndSig, Object[] args) {
+  public void recordInvocation(Object receiver, String methodName, String methodDesc, Object[] args) {
     final List<Invocation> invocations = ensureInvocationList(
         ensureInvocationMap(ensureLocalClassMap(), receiver.getClass()),
-        methodNameAndSig);
+        methodName, methodDesc);
     
-    Invocation invocation = new Invocation(receiver, methodNameAndSig, args);
+    Invocation invocation = new Invocation(receiver, methodName, methodDesc, args);
     
     // Add to list of invocations
     invocations.add(invocation);
@@ -62,11 +62,11 @@ class ThreadLocalInvocationRecorder implements MoxyInvocationRecorder {
   
   private List<Invocation> ensureInvocationList(
       LinkedHashMap<String, List<Invocation>> invocationMap,
-      String forMethodNameAndSignature) {
-    List<Invocation> list = invocationMap.get(forMethodNameAndSignature);
+      String forMethodName, String forMethodDescriptor) {
+    List<Invocation> list = invocationMap.get(forMethodName + forMethodDescriptor);
     
     if (list == null) {
-      invocationMap.put(forMethodNameAndSignature, list = new ArrayList<>());      
+      invocationMap.put(forMethodName + forMethodDescriptor, list = new ArrayList<>());      
     }
     
     return list;

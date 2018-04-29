@@ -25,7 +25,7 @@ public final class TypesAndDescriptors {
   /* Recorder */
   public static final String MOXY_RECORDER_INTERNAL_NAME = Type.getInternalName(MoxyInvocationRecorder.class);
   public static final String MOXY_RECORDER_RECORD_METHOD_NAME = "recordInvocation";
-  public static final String MOXY_RECORDER_RECORD_DESCRIPTOR = "(Ljava/lang/Object;Ljava/lang/String;[Ljava/lang/Object;)V";
+  public static final String MOXY_RECORDER_RECORD_DESCRIPTOR = "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;)V";
   
   /* ASMMoxyMockSupport-related */
   public static final String SUPPORT_GETENGINE_METHOD_NAME = "__moxy_asm_getEngine";

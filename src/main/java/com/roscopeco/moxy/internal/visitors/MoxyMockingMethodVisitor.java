@@ -61,10 +61,11 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     // Make stack right for recorder being receiver, and `this` being first param in later invoke.
     this.mv.visitInsn(SWAP);
     
-    // Loadconst method name and sig as second param
-    this.mv.visitLdcInsn(this.methodName + this.methodDescriptor);
+    // Loadconst method name and sig as second and third param
+    this.mv.visitLdcInsn(this.methodName);
+    this.mv.visitLdcInsn(this.methodDescriptor);
 
-    // Create array as third param
+    // Create array as fourth param
     // TODO - could optimise here, no need to create new array if argc == 0,
     //        could instead use static EMPTY_OBJECT_ARRAY.
     this.mv.visitIntInsn(BIPUSH, argc);

@@ -11,7 +11,8 @@ public final class Invocation {
   private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
   
   private final Object receiver;
-  private final String methodNameAndSig;
+  private final String methodName;
+  private final String methodDesc;
   private final Object[] args;
 
   /**
@@ -21,13 +22,18 @@ public final class Invocation {
    * @param methodNameAndSig
    * @param args
    */
-  public Invocation(final Object receiver, final String methodNameAndSig, final Object[] args) {
-    if (receiver == null || methodNameAndSig == null || methodNameAndSig.isEmpty()) {
-      throw new IllegalArgumentException("Cannot create invocation: receiver and/or methodNameAndSig are null (or empty)");
+  public Invocation(final Object receiver, final String methodName, final String methodDesc, final Object[] args) {
+    if (receiver == null || 
+        methodName == null || 
+        methodName.isEmpty() || 
+        methodDesc == null || 
+        methodDesc.isEmpty()) {
+      throw new IllegalArgumentException("Cannot create invocation: receiver and/or methodName/methodSig are null (or empty)");
     }
     
     this.receiver = receiver;
-    this.methodNameAndSig = methodNameAndSig;
+    this.methodName = methodName;
+    this.methodDesc = methodDesc;
     this.args = args;      
   }
 
@@ -39,10 +45,17 @@ public final class Invocation {
   }
 
   /**
-   * @return the invoked method name and signature.
+   * @return the invoked method name.
    */
-  public String getMethodNameAndSig() {
-    return methodNameAndSig;
+  public String getMethodName() {
+    return methodName;
+  }
+  
+  /**
+   * @return the invoked method's descriptor;
+   */
+  public String getMethodDesc() {
+    return methodDesc;
   }
 
   /**

@@ -73,7 +73,7 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
         super.generateMethodReturnField(name, desc);
  
         // Do the mocking
-        return new MoxyMockingMethodVisitor(cv.visitMethod(access & ~ACC_ABSTRACT, 
+        return new MoxyMockingMethodVisitor(cv.visitMethod(access & ~ACC_ABSTRACT | ACC_SYNTHETIC, 
                                                            name, desc, signature, exceptions),
                                                            this.getNewClassInternalName(),
                                                            name,

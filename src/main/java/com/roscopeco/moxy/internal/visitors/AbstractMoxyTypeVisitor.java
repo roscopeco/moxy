@@ -51,7 +51,7 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   }
   
   void generateActualConstructor(String superClassInternalName, String superDescriptor) {
-    MethodVisitor mv = this.cv.visitMethod(ACC_PUBLIC, INIT_NAME, MOCK_CONSTRUCTOR_DESCRIPTOR, null, EMPTY_STRING_ARRAY);
+    MethodVisitor mv = this.cv.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, INIT_NAME, MOCK_CONSTRUCTOR_DESCRIPTOR, null, EMPTY_STRING_ARRAY);
     mv.visitCode();
     mv.visitVarInsn(ALOAD, 0);
     mv.visitInsn(DUP);
@@ -63,7 +63,7 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   }
   
   void generateNullConstructor(String superClassInternalName, String superDescriptor) {
-    MethodVisitor mv = this.cv.visitMethod(ACC_PRIVATE, INIT_NAME, VOID_VOID_DESCRIPTOR, null, EMPTY_STRING_ARRAY);
+    MethodVisitor mv = this.cv.visitMethod(ACC_PRIVATE | ACC_SYNTHETIC, INIT_NAME, VOID_VOID_DESCRIPTOR, null, EMPTY_STRING_ARRAY);
     mv.visitCode();
     mv.visitVarInsn(ALOAD, 0);
     mv.visitInsn(DUP);
@@ -87,7 +87,7 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   }
   
   void generateMoxyAsmGetEngineMethod() {
-    MethodVisitor mv = this.cv.visitMethod(ACC_PUBLIC, 
+    MethodVisitor mv = this.cv.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, 
                                            SUPPORT_GETENGINE_METHOD_NAME,
                                            SUPPORT_GETENGINE_DESCRIPTOR,
                                            null, 

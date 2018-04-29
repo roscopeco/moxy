@@ -25,7 +25,7 @@ class ASMStubber<T> implements Stubber<T> {
     ASMMoxyMockSupport receiver = (ASMMoxyMockSupport)this.theInvocation.getReceiver();
     
     String methodReturnFieldName = TypesAndDescriptors.makeMethodReturnFieldName(
-        this.theInvocation.getMethodName(), theInvocation.getMethodDesc());
+        this.theInvocation.getMethodName(), this.theInvocation.getMethodDesc());
     
     try {
       Field f = receiver.getClass().getDeclaredField(methodReturnFieldName);

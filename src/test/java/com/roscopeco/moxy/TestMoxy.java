@@ -131,9 +131,19 @@ public class TestMoxy {
   
   @Test
   public void testMoxyWhenWithMockThenReturnForObjectWorksProperly() {
-    SimpleClass mock = Moxy.mock(SimpleClass.class, System.out);
+    SimpleClass mock = Moxy.mock(SimpleClass.class);
     Moxy.when(mock.returnHello()).thenReturn("Goodbye");
     
     assertThat(mock.returnHello()).isEqualTo("Goodbye");
+  }
+
+  @Test
+  public void testMoxyWhenWithMockThenReturnForPrimitiveWorksProperly() {
+    ClassWithPrimitiveReturns mock = Moxy.mock(ClassWithPrimitiveReturns.class, System.out);
+    Moxy.when(mock.returnInt()).thenReturn(0x2BADB007);
+    Moxy.when(mock.returnDouble()).thenReturn(4291.0d);
+    
+    assertThat(mock.returnInt()).isEqualTo(0x2BADB007);
+    assertThat(mock.returnDouble()).isEqualTo(4291.0d);
   }
 }

@@ -1,7 +1,6 @@
 package com.roscopeco.moxy.internal;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 import com.roscopeco.moxy.api.MoxyInvocation;
 import com.roscopeco.moxy.api.MoxyVerifier;

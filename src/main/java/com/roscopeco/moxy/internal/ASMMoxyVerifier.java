@@ -1,6 +1,7 @@
 package com.roscopeco.moxy.internal;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import com.roscopeco.moxy.api.MoxyInvocation;
 import com.roscopeco.moxy.api.MoxyVerifier;
@@ -28,7 +29,12 @@ class ASMMoxyVerifier<T> extends HasEngineAndInvocation implements MoxyVerifier<
     )) {
       return this;
     } else {
-      throw new AssertionFailedError("Expected mock " + methodName + "(...) to be called at least once but it wasn't");
+      throw new AssertionFailedError(
+          "Expected mock " + methodName + "(...) to be called with arguments (" 
+              + Arrays.stream(invocation.getArgs())
+                  .map((e) -> e.toString())
+                  .collect(Collectors.joining(",")) 
+              + ") at least once but it wasn't");
     }
   }
 

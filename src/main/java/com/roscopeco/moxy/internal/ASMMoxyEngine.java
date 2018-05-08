@@ -17,9 +17,11 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import com.roscopeco.moxy.Moxy;
+import com.roscopeco.moxy.api.Mock;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyInvocationRecorder;
-import com.roscopeco.moxy.api.Stubber;
+import com.roscopeco.moxy.api.MoxyStubber;
+import com.roscopeco.moxy.api.MoxyVerifier;
 import com.roscopeco.moxy.internal.visitors.AbstractMoxyTypeVisitor;
 import com.roscopeco.moxy.internal.visitors.MoxyMockClassVisitor;
 import com.roscopeco.moxy.internal.visitors.MoxyMockInterfaceVisitor;
@@ -157,15 +159,19 @@ public class ASMMoxyEngine implements MoxyEngine {
   }
   
   public boolean isMock(Class<?> clz) {
-    return clz.getAnnotation(IsMock.class) != null;
+    return clz.getAnnotation(Mock.class) != null;
   }
   
   public boolean isMock(Object obj) {
     return isMock(obj.getClass());
   }
   
-  public <T> Stubber<T> when(T invocation) {
-    return new ASMStubber<T>(this);
+  public <T> MoxyStubber<T> when(T invocation) {
+    return new ASMMoxyStubber<T>(this);
+  }
+  
+  public <T> MoxyVerifier<T> assertMock(T invocation) {
+    return new ASMMoxyVerifier<T>(this);
   }
   
   ClassNode createMockClassNode(Class<?> clz, Set<Method> methods, PrintStream trace) throws IOException {

@@ -3,7 +3,8 @@ package com.roscopeco.moxy;
 import java.io.PrintStream;
 
 import com.roscopeco.moxy.api.MoxyEngine;
-import com.roscopeco.moxy.api.Stubber;
+import com.roscopeco.moxy.api.MoxyStubber;
+import com.roscopeco.moxy.api.MoxyVerifier;
 import com.roscopeco.moxy.internal.ASMMoxyEngine;
 
 public final class Moxy {
@@ -58,11 +59,19 @@ public final class Moxy {
     return engine.isMock(obj);
   }
   
-  public static <T> Stubber<T> when(T invocation) {
+  public static <T> MoxyStubber<T> when(T invocation) {
     return when(ensureMoxyEngine(), invocation);
   }
   
-  public static <T> Stubber<T> when(MoxyEngine engine, T invocation) {
+  public static <T> MoxyStubber<T> when(MoxyEngine engine, T invocation) {
     return engine.when(invocation);
+  }
+  
+  public static <T> MoxyVerifier<T> assertMock(T invocation) {
+    return assertMock(ensureMoxyEngine(), invocation);
+  }
+  
+  public static <T> MoxyVerifier<T> assertMock(MoxyEngine engine, T invocation) {
+    return engine.assertMock(invocation);
   }
 }

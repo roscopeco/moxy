@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import com.roscopeco.moxy.api.Stubber;
-import com.roscopeco.moxy.internal.IsMock;
+import com.roscopeco.moxy.api.Mock;
+import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.model.ClassWithPrimitiveReturns;
 import com.roscopeco.moxy.model.MethodWithArguments;
 import com.roscopeco.moxy.model.MethodWithPrimitiveArguments;
@@ -53,7 +53,7 @@ public class TestMoxy {
   public void testMoxyMockHasIsMockAnnotation() {
     SimpleClass mock = Moxy.mock(SimpleClass.class);
     
-    assertThat(mock.getClass()).hasAnnotation(IsMock.class);    
+    assertThat(mock.getClass()).hasAnnotation(Mock.class);    
   }
 
   @Test
@@ -116,17 +116,17 @@ public class TestMoxy {
   public void testMoxyWhenWithNoMockInvocationThrowsIllegalStateException() {
     assertThatThrownBy(() -> Moxy.when("Hello"))
         .isInstanceOf(IllegalStateException.class)
-        .hasMessage("No mock to stub");
+        .hasMessage("No mock invocation found");
   }
   
   @Test
   public void testMoxyWhenWithMockReturnsStubber() {
     SimpleClass mock = Moxy.mock(SimpleClass.class);
-    Stubber<String> stubber = Moxy.when(mock.returnHello());
+    MoxyStubber<String> stubber = Moxy.when(mock.returnHello());
     
     assertThat(stubber)
         .isNotNull()
-        .isInstanceOf(Stubber.class);
+        .isInstanceOf(MoxyStubber.class);
   }
   
   @Test
@@ -139,11 +139,18 @@ public class TestMoxy {
 
   @Test
   public void testMoxyWhenWithMockThenReturnForPrimitiveWorksProperly() {
-    ClassWithPrimitiveReturns mock = Moxy.mock(ClassWithPrimitiveReturns.class, System.out);
-    Moxy.when(mock.returnInt()).thenReturn(0x2BADB007);
+    ClassWithPrimitiveReturns mock = Moxy.mock(ClassWithPrimitiveReturns.class);
+    Moxy.when(mock.returnInt()).thenReturn(0x2BADB002);
     Moxy.when(mock.returnDouble()).thenReturn(4291.0d);
     
-    assertThat(mock.returnInt()).isEqualTo(0x2BADB007);
+    assertThat(mock.returnInt()).isEqualTo(0x2BADB002);
     assertThat(mock.returnDouble()).isEqualTo(4291.0d);
+  }
+  
+  @Test
+  public void testMoxyAssertMockWithNoMockInvocationThrowsIllegalStateException() {
+    assertThatThrownBy(() -> Moxy.assertMock("Hello"))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("No mock invocation found");
   }
 }

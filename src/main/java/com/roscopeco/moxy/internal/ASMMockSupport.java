@@ -10,7 +10,7 @@ import com.roscopeco.moxy.api.MoxyInvocationRecorder;
  * @author Ross.Bamford
  *
  */
-public interface ASMMoxyMockSupport {
+public interface ASMMockSupport {
   /* For mocks to implement */
   public MoxyEngine __moxy_asm_getEngine();
   

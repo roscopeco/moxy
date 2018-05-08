@@ -7,7 +7,7 @@ package com.roscopeco.moxy.api;
  * @author Ross.Bamford
  *
  */
-public final class Invocation {
+public final class MoxyInvocation {
   private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
   
   private final Object receiver;
@@ -22,7 +22,7 @@ public final class Invocation {
    * @param methodNameAndSig
    * @param args
    */
-  public Invocation(final Object receiver, final String methodName, final String methodDesc, final Object[] args) {
+  public MoxyInvocation(final Object receiver, final String methodName, final String methodDesc, final Object[] args) {
     if (receiver == null || 
         methodName == null || 
         methodName.isEmpty() || 

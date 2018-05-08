@@ -12,5 +12,5 @@ public interface MoxyInvocationRecorder {
   /**
    * Get the most recent invocation.
    */
-  public Invocation getLastInvocation();
+  public MoxyInvocation getLastInvocation();
 }

@@ -19,7 +19,7 @@ public final class TypesAndDescriptors {
   public static final String MOXY_ASM_ENGINE_DESCRIPTOR = "L" + Type.getInternalName(ASMMoxyEngine.class) + ";";
   public static final String MOCK_CONSTRUCTOR_DESCRIPTOR = "(" + MOXY_ASM_ENGINE_DESCRIPTOR + ")V";
   
-  public static final String MOXY_SUPPORT_INTERFACE_INTERNAL_NAME = Type.getInternalName(ASMMoxyMockSupport.class);
+  public static final String MOXY_SUPPORT_INTERFACE_INTERNAL_NAME = Type.getInternalName(ASMMockSupport.class);
   public static final String MOXY_ENGINE_INTERNAL_NAME = Type.getInternalName(MoxyEngine.class);
 
   /* Recorder */
@@ -82,7 +82,7 @@ public final class TypesAndDescriptors {
   }
   
   public static String makeMethodReturnFieldName(final String name, final String desc) {
-    return name + sanitiseTypeNameForMemberName(desc);
+    return "__moxy_asm_" + name + sanitiseTypeNameForMemberName(desc);
   }
 
 

@@ -38,5 +38,7 @@ public interface MoxyEngine {
     
   public boolean isMock(Object obj);
 
-  public <T> Stubber<T> when(T invocation);
+  public <T> MoxyStubber<T> when(T invocation);
+  
+  public <T> MoxyVerifier<T> assertMock(T invocation);
 }

@@ -13,4 +13,9 @@ public interface MoxyInvocationRecorder {
    * Get the most recent invocation.
    */
   public MoxyInvocation getLastInvocation();
+  
+  /**
+   * Reset this recorder.
+   */
+  public void reset();
 }

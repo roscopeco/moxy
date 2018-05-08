@@ -38,6 +38,12 @@ class ThreadLocalInvocationRecorder implements MoxyInvocationRecorder {
     return this.lastInvocationThreadLocal.get();
   }
 
+  @Override
+  public void reset() {
+    this.lastInvocationThreadLocal.set(null);
+    this.invocationMapThreadLocal.set(null);    
+  }
+
   private LinkedHashMap<Class<?>, LinkedHashMap<String, List<MoxyInvocation>>> ensureLocalClassMap() {
     LinkedHashMap<Class<?>, LinkedHashMap<String, List<MoxyInvocation>>>
         classMap = this.invocationMapThreadLocal.get();

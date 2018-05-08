@@ -23,6 +23,10 @@ public final class Moxy {
     Moxy.moxyEngine = moxyEngine;
   }
   
+  public static MoxyEngine getMoxyEngine() {
+    return Moxy.ensureMoxyEngine();
+  }
+  
   public static <T> T mock(Class<T> clz) {
     return mock(clz, null);
   }

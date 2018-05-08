@@ -2,6 +2,7 @@ package com.roscopeco.moxy;
 
 import static org.assertj.core.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.roscopeco.moxy.api.Mock;
@@ -14,6 +15,11 @@ import com.roscopeco.moxy.model.SimpleClass;
 import com.roscopeco.moxy.model.SimpleInterface;
 
 public class TestMoxy {
+  @BeforeEach
+  public void setUp() {
+    Moxy.getMoxyEngine().getRecorder().reset();
+  }
+  
   @Test
   public void testMoxyMockWithNullThrowsIllegalArgumentException() {
     assertThatThrownBy(() -> Moxy.mock(null))

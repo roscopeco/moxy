@@ -7,6 +7,9 @@ import com.roscopeco.moxy.api.MoxyInvocationRecorder;
  * All mocks implement this interface. It (ab)uses default methods
  * to allow us to do less bytecode generation.
  * 
+ * Don't implement this yourself, it's only public because it needs
+ * to be visible to subclasses.
+ * 
  * @author Ross.Bamford
  *
  */

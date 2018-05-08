@@ -7,12 +7,15 @@ import org.junit.jupiter.api.Test;
 
 import com.roscopeco.moxy.api.Mock;
 import com.roscopeco.moxy.api.MoxyStubber;
+import com.roscopeco.moxy.api.MoxyVerifier;
 import com.roscopeco.moxy.model.ClassWithPrimitiveReturns;
 import com.roscopeco.moxy.model.MethodWithArguments;
 import com.roscopeco.moxy.model.MethodWithPrimitiveArguments;
 import com.roscopeco.moxy.model.SimpleAbstractClass;
 import com.roscopeco.moxy.model.SimpleClass;
 import com.roscopeco.moxy.model.SimpleInterface;
+
+import junit.framework.AssertionFailedError;
 
 public class TestMoxy {
   @BeforeEach
@@ -158,5 +161,33 @@ public class TestMoxy {
     assertThatThrownBy(() -> Moxy.assertMock("Hello"))
         .isInstanceOf(IllegalStateException.class)
         .hasMessage("No mock invocation found");
+  }
+  
+  @Test
+  public void testMoxyAssertMockWithMockReturnsVerifier() {
+    SimpleClass mock = Moxy.mock(SimpleClass.class);
+    MoxyVerifier<String> verifier = Moxy.assertMock(mock.returnHello());
+    
+    assertThat(verifier)
+        .isNotNull()
+        .isInstanceOf(MoxyVerifier.class);
+  }
+  
+  @Test
+  public void testMoxyAssertMockWithMockWasCalledFailsIfNotCalled() {
+    SimpleClass mock = Moxy.mock(SimpleClass.class);
+    
+    assertThatThrownBy(() -> Moxy.assertMock(mock.returnHello()).wasCalled())
+        .isInstanceOf(AssertionFailedError.class)
+        .hasMessage("Expected mock returnHello(...) to be called at least once but it wasn't");
+  }
+
+  @Test
+  public void testMoxyAssertMockWithMockWasCalledWorksIfWasCalled() {
+    SimpleClass mock = Moxy.mock(SimpleClass.class);
+    
+    mock.returnHello();
+    
+    Moxy.assertMock(mock.returnHello()).wasCalled();
   }
 }

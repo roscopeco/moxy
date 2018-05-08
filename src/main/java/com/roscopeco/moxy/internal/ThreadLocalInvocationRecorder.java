@@ -33,6 +33,25 @@ class ThreadLocalInvocationRecorder implements MoxyInvocationRecorder {
     this.lastInvocationThreadLocal.set(invocation);
   }
   
+  public void unrecordLastInvocation() {
+    final MoxyInvocation lastInvocation = this.getLastInvocation();
+    
+    if (lastInvocation != null) {
+      final List<MoxyInvocation> invocations = ensureInvocationList(
+          ensureInvocationMap(ensureLocalClassMap(), 
+                              lastInvocation.getReceiver().getClass()),
+                              lastInvocation.getMethodName(), 
+                              lastInvocation.getMethodDesc());
+      
+          invocations.remove(invocations.size() - 1);
+    }
+  }
+  
+  @Override
+  public List<MoxyInvocation> getInvocationList(Class<?> forClz, String methodName, String methodDesc) {
+    return ensureInvocationList(ensureInvocationMap(ensureLocalClassMap(), forClz), methodName, methodDesc);
+  }
+
   @Override
   public MoxyInvocation getLastInvocation() {
     return this.lastInvocationThreadLocal.get();

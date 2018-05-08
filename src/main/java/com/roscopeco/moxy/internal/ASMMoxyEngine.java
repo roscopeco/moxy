@@ -167,11 +167,17 @@ public class ASMMoxyEngine implements MoxyEngine {
   }
   
   public <T> MoxyStubber<T> when(T invocation) {
+    deleteLatestInvocationFromList();
     return new ASMMoxyStubber<T>(this);
   }
   
   public <T> MoxyVerifier<T> assertMock(T invocation) {
+    deleteLatestInvocationFromList();
     return new ASMMoxyVerifier<T>(this);
+  }
+  
+  void deleteLatestInvocationFromList() {
+    this.getRecorder().unrecordLastInvocation();
   }
   
   ClassNode createMockClassNode(Class<?> clz, Set<Method> methods, PrintStream trace) throws IOException {

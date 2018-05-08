@@ -1,5 +1,8 @@
 package com.roscopeco.moxy.internal;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import com.roscopeco.moxy.api.MoxyInvocation;
 import com.roscopeco.moxy.api.MoxyVerifier;
 
@@ -9,7 +12,7 @@ class ASMMoxyVerifier<T> extends HasEngineAndInvocation implements MoxyVerifier<
   public ASMMoxyVerifier(ASMMoxyEngine engine) {
     super(engine);
   }
-
+  
   @Override
   public MoxyVerifier<T> wasCalled() {
     final MoxyInvocation invocation = getTheInvocation();
@@ -21,11 +24,12 @@ class ASMMoxyVerifier<T> extends HasEngineAndInvocation implements MoxyVerifier<
             .getInvocationList(invocation.getReceiver().getClass(),
                                methodName, 
                                methodDesc)
-        .isEmpty())
-    {
-      throw new AssertionFailedError("Expected mock " + methodName + "(...) to be called at least once but it wasn't");
-    } else {
+        .stream()
+        .anyMatch((e) -> Arrays.equals(e.getArgs(), invocation.getArgs()) 
+    )) {
       return this;
+    } else {
+      throw new AssertionFailedError("Expected mock " + methodName + "(...) to be called at least once but it wasn't");
     }
   }
 

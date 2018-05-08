@@ -33,6 +33,13 @@ class ThreadLocalInvocationRecorder implements MoxyInvocationRecorder {
     this.lastInvocationThreadLocal.set(invocation);
   }
   
+  /*
+   * NOTE This does exactly what it says - deletes the invocation from the
+   * list, but not from the last invocation thread local. This means the engine
+   * can still use the last invocation for the args.
+   * 
+   * @see comments on {@link MoxyInvocationRecorder#unrecordLastInvocation}.
+   */
   public void unrecordLastInvocation() {
     final MoxyInvocation lastInvocation = this.getLastInvocation();
     

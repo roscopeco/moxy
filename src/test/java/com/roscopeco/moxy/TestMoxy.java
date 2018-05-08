@@ -190,4 +190,20 @@ public class TestMoxy {
     
     Moxy.assertMock(mock.returnHello()).wasCalled();
   }
+  
+  @Test
+  public void testMoxyAssertMockWithMockWasCalledWithExactArgumentsWorks() {
+    MethodWithPrimitiveArguments mock = Moxy.mock(MethodWithPrimitiveArguments.class, System.out);
+    
+    mock.hasArgs("One", (byte)2, 'a', (short)20, 0xdeadbeef, 100L, 2468.0f, 4291.0d, true);
+    
+    Moxy.assertMock(mock.hasArgs("One", (byte)2, 'a', (short)20, 0xdeadbeef, 100L, 2468.0f, 4291.0d, true))
+        .wasCalled();
+    
+    assertThatThrownBy(() -> 
+        Moxy.assertMock(mock.hasArgs("Two", (byte)1, 'b', (short)10, 0x2badf00d, 200L, 3579.0f, 5302.0d, false))
+            .wasCalled())
+        .isInstanceOf(AssertionFailedError.class)
+        .hasMessage("Expected mock hasArgs(...) to be called at least once but it wasn't");
+  }
 }

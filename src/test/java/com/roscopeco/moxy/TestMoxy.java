@@ -179,9 +179,10 @@ public class TestMoxy {
     
     assertThatThrownBy(() -> Moxy.assertMock(mock.returnHello()).wasCalled())
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock returnHello(...) to be called at least once but it wasn't");
+        .hasMessage("Expected mock returnHello(...) to be called with arguments () at least once but it wasn't");
   }
 
+  /* We're bootstrapped. Let's start eating our own dog food... */
   @Test
   public void testMoxyAssertMockWithMockWasCalledWorksIfWasCalled() {
     SimpleClass mock = Moxy.mock(SimpleClass.class);
@@ -204,6 +205,6 @@ public class TestMoxy {
         Moxy.assertMock(mock.hasArgs("Two", (byte)1, 'b', (short)10, 0x2badf00d, 200L, 3579.0f, 5302.0d, false))
             .wasCalled())
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock hasArgs(...) to be called at least once but it wasn't");
+        .hasMessage("Expected mock hasArgs(...) to be called with arguments (Two,1,b,10,732819469,200,3579.0,5302.0,false) at least once but it wasn't");
   }
 }

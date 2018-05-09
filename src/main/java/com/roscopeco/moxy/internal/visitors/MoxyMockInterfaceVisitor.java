@@ -36,7 +36,7 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
     
     // Start the class visit
     super.visit(version, 
-                access & ~ACC_ABSTRACT & ~ACC_INTERFACE, 
+                access & ~ACC_ABSTRACT & ~ACC_INTERFACE | ACC_SUPER, 
                 getNewClassInternalName(), 
                 signature, 
                 OBJECT_INTERNAL_NAME, 

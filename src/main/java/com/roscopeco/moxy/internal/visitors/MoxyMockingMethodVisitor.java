@@ -1,8 +1,9 @@
 package com.roscopeco.moxy.internal.visitors;
 
-import static org.objectweb.asm.Opcodes.*;
 import static com.roscopeco.moxy.internal.TypesAndDescriptors.*;
+import static org.objectweb.asm.Opcodes.*;
 
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
@@ -49,7 +50,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     
     // load self to pass to recordInvocation later
     this.mv.visitVarInsn(ALOAD, 0);
-    
+        
     // Get recorder from Support interface method as receiver
     this.mv.visitInsn(DUP);
     this.mv.visitMethodInsn(INVOKEINTERFACE, 

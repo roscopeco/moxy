@@ -207,4 +207,41 @@ public class TestMoxy {
         .isInstanceOf(AssertionFailedError.class)
         .hasMessage("Expected mock hasArgs(...) to be called with arguments (Two,1,b,10,732819469,200,3579.0,5302.0,false) at least once but it wasn't");
   }
+  
+  @Test
+  public void testMoxyAssertMockWithMockWasCalledExactNumberOfTimesWorks() {
+    SimpleClass mock = Moxy.mock(SimpleClass.class);
+    
+    mock.returnHello();    
+    Moxy.assertMock(mock.returnHello()).wasCalled(1);
+
+    mock.returnHello();    
+    Moxy.assertMock(mock.returnHello()).wasCalled(2);
+    
+    mock.returnHello();    
+    Moxy.assertMock(mock.returnHello()).wasCalled(3);
+
+    assertThatThrownBy(() -> 
+        Moxy.assertMock(mock.returnHello())
+            .wasCalled(4))
+        .isInstanceOf(AssertionFailedError.class)
+        .hasMessage("Expected mock returnHello(...) to be called with arguments () exactly 4 time(s) but it wasn't");
+
+  }
+  
+  @Test
+  public void testMoxyAssertMockWithMockVoidMethodWasCalledExactNumberOfTimesWorksWithArgs() {
+    MethodWithArguments mock = Moxy.mock(MethodWithArguments.class);
+    
+    mock.hasArgs("one", "two");
+    mock.hasArgs("one", "two");
+    
+    mock.hasArgs("one", "three");
+    
+    mock.hasArgs("three", "four");
+    
+    Moxy.assertMock(() -> mock.hasArgs("one", "two")).wasCalled(2);
+    Moxy.assertMock(() -> mock.hasArgs("one", "three")).wasCalled(1);
+    Moxy.assertMock(() -> mock.hasArgs("three", "four")).wasCalled(1);    
+  }
 }

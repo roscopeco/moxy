@@ -176,6 +176,13 @@ public class ASMMoxyEngine implements MoxyEngine {
     return new ASMMoxyVerifier<T>(this);
   }
   
+  @Override
+  public <T> MoxyVerifier<T> assertMock(Runnable invocation) {
+    invocation.run();
+    deleteLatestInvocationFromList();
+    return new ASMMoxyVerifier<T>(this);
+  }
+
   void deleteLatestInvocationFromList() {
     this.getRecorder().unrecordLastInvocation();
   }

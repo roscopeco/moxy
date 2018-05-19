@@ -40,6 +40,28 @@ class ASMMoxyVerifier<T> extends HasEngineAndInvocation implements MoxyVerifier<
 
   @Override
   public MoxyVerifier<T> wasCalled(int times) {
-    return this;
+    final MoxyInvocation invocation = getTheInvocation();
+    final String methodName = invocation.getMethodName();
+    final String methodDesc = invocation.getMethodDesc();
+    
+    if (this.getEngine()
+            .getRecorder()
+            .getInvocationList(invocation.getReceiver().getClass(),
+                               methodName, 
+                               methodDesc)
+        .stream()
+        .filter( (e) -> Arrays.equals(e.getArgs(), invocation.getArgs() ))
+        .collect(Collectors.toList())
+        .size() == times
+    ) {
+      return this;
+    } else {
+      throw new AssertionFailedError(
+          "Expected mock " + methodName + "(...) to be called with arguments (" 
+              + Arrays.stream(invocation.getArgs())
+                  .map((e) -> e.toString())
+                  .collect(Collectors.joining(",")) 
+              + ") exactly " + times + " time(s) but it wasn't");
+    }
   }
 }

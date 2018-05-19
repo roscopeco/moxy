@@ -75,7 +75,15 @@ public final class Moxy {
     return assertMock(ensureMoxyEngine(), invocation);
   }
   
+  public static <T> MoxyVerifier<T> assertMock(Runnable invocation) {
+    return assertMock(ensureMoxyEngine(), invocation);
+  }
+  
   public static <T> MoxyVerifier<T> assertMock(MoxyEngine engine, T invocation) {
+    return engine.assertMock(invocation);
+  }
+  
+  public static <T> MoxyVerifier<T> assertMock(MoxyEngine engine, Runnable invocation) {
     return engine.assertMock(invocation);
   }
 }

@@ -1,6 +1,7 @@
 package com.roscopeco.moxy;
 
 import java.io.PrintStream;
+import java.util.function.Supplier;
 
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyStubber;
@@ -63,11 +64,30 @@ public final class Moxy {
     return engine.isMock(obj);
   }
   
+  /**
+   * @deprecated
+   * @param invocation
+   * @return
+   */
   public static <T> MoxyStubber<T> when(T invocation) {
     return when(ensureMoxyEngine(), invocation);
   }
   
+  public static <T> MoxyStubber<T> when(Supplier<T> invocation) {
+    return when(ensureMoxyEngine(), invocation);
+  }
+
+  /**
+   * @deprecated
+   * @param engine
+   * @param invocation
+   * @return
+   */
   public static <T> MoxyStubber<T> when(MoxyEngine engine, T invocation) {
+    return engine.when(invocation);
+  }
+  
+  public static <T> MoxyStubber<T> when(MoxyEngine engine, Supplier<T> invocation) {
     return engine.when(invocation);
   }
   

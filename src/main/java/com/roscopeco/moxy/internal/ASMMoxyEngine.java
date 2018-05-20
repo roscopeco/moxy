@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -169,6 +170,17 @@ public class ASMMoxyEngine implements MoxyEngine {
   public <T> MoxyStubber<T> when(T invocation) {
     deleteLatestInvocationFromList();
     return new ASMMoxyStubber<T>(this);
+  }
+  
+  public <T> MoxyStubber<T> when(Supplier<T> invocation) {
+    try {
+      invocation.get();
+    } catch (Exception e) {
+      // TODO naively swallow for now, revisit later when we have a base exception for the framework.
+    }
+    deleteLatestInvocationFromList();
+    return new ASMMoxyStubber<T>(this);
+    
   }
   
   public MoxyVerifier assertMock(Object invocation) {

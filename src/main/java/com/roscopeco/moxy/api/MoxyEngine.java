@@ -3,6 +3,7 @@ package com.roscopeco.moxy.api;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public interface MoxyEngine {
 
@@ -38,7 +39,14 @@ public interface MoxyEngine {
     
   public boolean isMock(Object obj);
 
+  /**
+   * @deprecated
+   * @param invocation
+   * @return
+   */
   public <T> MoxyStubber<T> when(T invocation);
+
+  public <T> MoxyStubber<T> when(Supplier<T> invocation);
   
   /**
    * @deprecated

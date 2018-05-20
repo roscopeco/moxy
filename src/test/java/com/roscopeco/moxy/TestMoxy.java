@@ -287,9 +287,6 @@ public class TestMoxy {
         .isEqualTo("hello");
   }
   
-  // BUG: This can't work with current setup, exception will leak from invocation.
-  //
-  // FIX: Move to lambda based invocations across the board with a custom functional to swallow? 
   @Test
   public void testMoxyAssertMockWithMockThenThrowThenSeparateThenReturnFailsProperly() {
     SimpleClass mock = Moxy.mock(SimpleClass.class);

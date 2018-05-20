@@ -284,4 +284,22 @@ public class TestMoxy {
     assertThat(mock.returnHello())
         .isEqualTo("hello");
   }
+  
+  // BUG: This can't work with current setup, exception will leak from invocation.
+  //
+  // FIX: Move to lambda based invocations across the board with a custom functional to swallow? 
+  @Test
+  public void testMoxyAssertMockWithMockThenThrowThenSeparateThenReturnFailsProperly() {
+    SimpleClass mock = Moxy.mock(SimpleClass.class);
+    
+    RuntimeException theException = new RuntimeException("Oops!");
+    Moxy.when(mock.returnHello()).thenThrow(theException);
+    
+    assertThatThrownBy(() -> Moxy.when(mock.returnHello()).thenReturn("hello"))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Cannot set both throw and return for returnHello()Ljava/lang/String;");
+    
+    assertThatThrownBy(() -> mock.returnHello())
+        .isSameAs(theException);
+  }
 }

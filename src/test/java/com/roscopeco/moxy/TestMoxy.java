@@ -194,7 +194,7 @@ public class TestMoxy {
   
   @Test
   public void testMoxyAssertMockWithMockWasCalledWithExactArgumentsWorks() {
-    MethodWithPrimitiveArguments mock = Moxy.mock(MethodWithPrimitiveArguments.class, System.out);
+    MethodWithPrimitiveArguments mock = Moxy.mock(MethodWithPrimitiveArguments.class);
     
     mock.hasArgs("One", (byte)2, 'a', (short)20, 0xdeadbeef, 100L, 2468.0f, 4291.0d, true);
     
@@ -243,5 +243,45 @@ public class TestMoxy {
     Moxy.assertMock(() -> mock.hasArgs("one", "two")).wasCalled(2);
     Moxy.assertMock(() -> mock.hasArgs("one", "three")).wasCalled(1);
     Moxy.assertMock(() -> mock.hasArgs("three", "four")).wasCalled(1);    
+  }
+  
+  @Test
+  public void testMoxyAssertMockWithMockThenThrowWorks() {
+    SimpleClass mock = Moxy.mock(SimpleClass.class);
+    
+    RuntimeException theException = new RuntimeException("Oops!");
+    
+    Moxy.when(mock.returnHello()).thenThrow(theException);
+    
+    assertThatThrownBy(() -> mock.returnHello())
+        .isSameAs(theException);
+  }
+  
+  @Test
+  public void testMoxyAssertMockWithMockThenThrowThenReturnFailsProperly() {
+    SimpleClass mock = Moxy.mock(SimpleClass.class);
+    
+    RuntimeException theException = new RuntimeException("Oops!");
+    
+    assertThatThrownBy(() -> Moxy.when(mock.returnHello()).thenThrow(theException).thenReturn("hello"))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Cannot set both throw and return for returnHello()Ljava/lang/String;");
+    
+    assertThatThrownBy(() -> mock.returnHello())
+        .isSameAs(theException);
+  }
+  
+  @Test
+  public void testMoxyAssertMockWithMockThenReturnThenThrowFailsProperly() {
+    SimpleClass mock = Moxy.mock(SimpleClass.class);
+    
+    RuntimeException theException = new RuntimeException("Oops!");
+    
+    assertThatThrownBy(() -> Moxy.when(mock.returnHello()).thenReturn("hello").thenThrow(theException))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Cannot set both throw and return for returnHello()Ljava/lang/String;");
+    
+    assertThat(mock.returnHello())
+        .isEqualTo("hello");
   }
 }

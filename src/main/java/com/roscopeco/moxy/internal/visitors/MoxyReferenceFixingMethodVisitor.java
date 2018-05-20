@@ -13,7 +13,7 @@ public class MoxyReferenceFixingMethodVisitor extends MethodVisitor {
                                           String originalClassInternalName,
                                           String originalSuperClassInternalName,
                                           String newClassInternalName) {
-    super(ASM5, delegate);
+    super(ASM6, delegate);
     
     this.originalClassInternalName = originalClassInternalName;
     this.originalSuperClassInternalName = originalSuperClassInternalName;

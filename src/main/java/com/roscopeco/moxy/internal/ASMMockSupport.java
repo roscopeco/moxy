@@ -1,5 +1,7 @@
 package com.roscopeco.moxy.internal;
 
+import java.lang.reflect.Field;
+
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyInvocationRecorder;
 
@@ -24,5 +26,44 @@ public interface ASMMockSupport {
   
   default public void __moxy_asm_throwNullConstructorException() throws InstantiationException {
     throw new InstantiationException("Cannot construct mock with null constructor");
+  }
+  
+  default public void __moxy_asm_setThrowOrReturnField(String methodName,
+                                                       String methodDesc,
+                                                       Object object,
+                                                       boolean isReturn) {
+    
+    final String returnFieldName = TypesAndDescriptors.makeMethodReturnFieldName(
+        methodName, methodDesc);
+    
+    final String throwFieldName = TypesAndDescriptors.makeMethodThrowFieldName(
+        methodName, methodDesc);
+    
+    try {
+      final Field checkField, setField;
+      
+      if (isReturn) {
+        checkField = this.getClass().getDeclaredField(throwFieldName);
+        setField = this.getClass().getDeclaredField(returnFieldName);
+      } else {
+        checkField = this.getClass().getDeclaredField(returnFieldName);
+        setField = this.getClass().getDeclaredField(throwFieldName);
+      }
+
+      // This'll work right up until we start setting these fields elsewhere...
+      synchronized(this) {
+        if (checkField.get(this) != null) {
+          // other field is set - can't do both!
+          throw new IllegalStateException("Cannot set both throw and return for " + methodName + methodDesc);
+        }
+
+        setField.set(this, object);
+      }
+      
+    } catch (ReflectiveOperationException e) {
+      throw new IllegalStateException("Mock doesn't conform to expectations - are you using a different mock engine?\n"
+                                    + "(This stubber is for the default ASMMoxyEngine).",
+                                      e);
+    }    
   }
 }

@@ -215,7 +215,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   }
   
   byte[] generateBytecode(ClassNode node) {
-    ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+    ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     node.accept(writer);
     return writer.toByteArray();    
   }

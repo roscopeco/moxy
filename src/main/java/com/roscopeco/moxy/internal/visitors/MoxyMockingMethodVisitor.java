@@ -29,7 +29,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     // don't pass the delegate to the super constructor, or we'll generate
     // both old and new bytecode. Instead, just use local mv field and
     // stash the delegate directly.
-    super(ASM5);
+    super(ASM6);
     this.mv = delegate;
     this.generatingClass = generatingClass;
     this.returnType = returnType;
@@ -186,6 +186,20 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
  
   // TODO this could probably be DRYed
   void generateReturn() {
+    final Label returnLabel = new Label();
+    
+    // Always do exception first. Should never have both anyway, this is 
+    // enforced in ASMMoxyMockSupport when the fields are set.
+    this.mv.visitVarInsn(ALOAD, 0);
+    this.mv.visitFieldInsn(GETFIELD, this.generatingClass, TypesAndDescriptors.makeMethodThrowFieldName(this.methodName, this.methodDescriptor), TypesAndDescriptors.THROWABLE_DESCRIPTOR);
+    this.mv.visitJumpInsn(IFNULL, returnLabel);
+    
+    this.mv.visitVarInsn(ALOAD, 0);
+    this.mv.visitFieldInsn(GETFIELD, this.generatingClass, TypesAndDescriptors.makeMethodThrowFieldName(this.methodName, this.methodDescriptor), TypesAndDescriptors.THROWABLE_DESCRIPTOR);
+    this.mv.visitInsn(ATHROW);
+    
+    this.mv.visitLabel(returnLabel);
+    
     char primitiveReturnType = returnType.charAt(0);
     switch (primitiveReturnType) {
     case BYTE_PRIMITIVE_INTERNAL_NAME:
@@ -230,7 +244,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
       throw new IllegalArgumentException("Unrecognised JVM primitive type: '" + returnType + "'.\n"
                                        + "Your JVM must be super-new and improved.\n"
                                        + "To fix, add mysterious new type to switch in MoxyMockingMethodVisitor#visitCode()");
-    }
+    }    
   }
   
   @Override

@@ -9,7 +9,8 @@ public final class TypesAndDescriptors {
   public static final String[] EMPTY_STRING_ARRAY = new String[0];
   
   /* General Java stuff */
-  public static final String OBJECT_INTERNAL_NAME = Type.getInternalName(Object.class);  
+  public static final String OBJECT_INTERNAL_NAME = Type.getInternalName(Object.class);
+  public static final String THROWABLE_DESCRIPTOR = "L" + Type.getInternalName(Throwable.class) +";";
   public static final String INIT_NAME = "<init>";
   public static final String VOID_TYPE = "V";
   public static final String VOID_VOID_DESCRIPTOR = "()V";
@@ -82,7 +83,11 @@ public final class TypesAndDescriptors {
   }
   
   public static String makeMethodReturnFieldName(final String name, final String desc) {
-    return "__moxy_asm_" + name + sanitiseTypeNameForMemberName(desc);
+    return "__moxy_asm_return_" + name + sanitiseTypeNameForMemberName(desc);
+  }
+
+  public static String makeMethodThrowFieldName(final String name, final String desc) {
+    return "__moxy_asm_throw_" + name + sanitiseTypeNameForMemberName(desc);
   }
 
 

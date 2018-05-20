@@ -9,6 +9,8 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 
+import com.roscopeco.moxy.internal.TypesAndDescriptors;
+
 /**
  * Superclass for both class and interface visitors.
  * 
@@ -19,11 +21,11 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   private final String newClassInternalName;
   
   protected AbstractMoxyTypeVisitor(final String newClassInternalName) {
-    super(ASM5);
+    super(ASM6);
     this.cv = this.node;
     this.newClassInternalName = newClassInternalName;
   }
-  
+    
   // Get return type given method descriptor.
   protected String getReturnType(String desc) {
     return Type.getReturnType(desc).toString();
@@ -108,7 +110,15 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
                                            null, null);
       fv.visitEnd();
     }
-
+  }
+  
+  void generateMethodThrowField(String name, String desc) {
+    // Generate field for method exception value
+    FieldVisitor fv = this.cv.visitField(ACC_PUBLIC | ACC_SYNTHETIC, 
+                                         makeMethodThrowFieldName(name, desc),                                          
+                                         TypesAndDescriptors.THROWABLE_DESCRIPTOR, 
+                                         null, null);
+    fv.visitEnd();
   }
   
   public ClassNode getNode() {

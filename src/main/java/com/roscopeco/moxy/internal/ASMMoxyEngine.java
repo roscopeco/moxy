@@ -159,19 +159,17 @@ public class ASMMoxyEngine implements MoxyEngine {
     return methods;
   }
   
+  @Override
   public boolean isMock(Class<?> clz) {
     return clz.getAnnotation(Mock.class) != null;
   }
   
+  @Override
   public boolean isMock(Object obj) {
     return isMock(obj.getClass());
   }
-  
-  public <T> MoxyStubber<T> when(T invocation) {
-    deleteLatestInvocationFromList();
-    return new ASMMoxyStubber<T>(this);
-  }
-  
+
+  @Override
   public <T> MoxyStubber<T> when(Supplier<T> invocation) {
     try {
       invocation.get();
@@ -181,11 +179,6 @@ public class ASMMoxyEngine implements MoxyEngine {
     deleteLatestInvocationFromList();
     return new ASMMoxyStubber<T>(this);
     
-  }
-  
-  public MoxyVerifier assertMock(Object invocation) {
-    deleteLatestInvocationFromList();
-    return new ASMMoxyVerifier(this);
   }
   
   @Override

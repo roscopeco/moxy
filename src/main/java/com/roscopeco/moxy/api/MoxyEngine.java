@@ -39,21 +39,7 @@ public interface MoxyEngine {
     
   public boolean isMock(Object obj);
 
-  /**
-   * @deprecated
-   * @param invocation
-   * @return
-   */
-  public <T> MoxyStubber<T> when(T invocation);
-
   public <T> MoxyStubber<T> when(Supplier<T> invocation);
   
-  /**
-   * @deprecated
-   * @param invocation
-   * @return
-   */
-  public MoxyVerifier assertMock(Object invocation);
-
   public MoxyVerifier assertMock(Runnable invocation);
 }

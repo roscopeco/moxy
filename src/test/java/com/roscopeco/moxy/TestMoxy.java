@@ -123,7 +123,7 @@ public class TestMoxy {
     
   @Test
   public void testMoxyWhenWithNoMockInvocationThrowsIllegalStateException() {
-    assertThatThrownBy(() -> Moxy.when("Hello"))
+    assertThatThrownBy(() -> Moxy.when(() -> "Hello"))
         .isInstanceOf(IllegalStateException.class)
         .hasMessage("No mock invocation found");
   }
@@ -131,7 +131,7 @@ public class TestMoxy {
   @Test
   public void testMoxyWhenWithMockReturnsStubber() {
     SimpleClass mock = Moxy.mock(SimpleClass.class);
-    MoxyStubber<String> stubber = Moxy.when(mock.returnHello());
+    MoxyStubber<String> stubber = Moxy.when(() -> mock.returnHello());
     
     assertThat(stubber)
         .isNotNull()
@@ -141,7 +141,7 @@ public class TestMoxy {
   @Test
   public void testMoxyWhenWithMockThenReturnForObjectWorksProperly() {
     SimpleClass mock = Moxy.mock(SimpleClass.class);
-    Moxy.when(mock.returnHello()).thenReturn("Goodbye");
+    Moxy.when(() -> mock.returnHello()).thenReturn("Goodbye");
     
     assertThat(mock.returnHello()).isEqualTo("Goodbye");
   }
@@ -149,24 +149,26 @@ public class TestMoxy {
   @Test
   public void testMoxyWhenWithMockThenReturnForPrimitiveWorksProperly() {
     ClassWithPrimitiveReturns mock = Moxy.mock(ClassWithPrimitiveReturns.class);
-    Moxy.when(mock.returnInt()).thenReturn(0x2BADB002);
-    Moxy.when(mock.returnDouble()).thenReturn(4291.0d);
+    Moxy.when(() -> mock.returnInt()).thenReturn(0x2BADB002);
+    Moxy.when(() -> mock.returnDouble()).thenReturn(4291.0d);
     
     assertThat(mock.returnInt()).isEqualTo(0x2BADB002);
     assertThat(mock.returnDouble()).isEqualTo(4291.0d);
   }
   
+  /* No longer supported
   @Test
   public void testMoxyAssertMockWithNoMockInvocationThrowsIllegalStateException() {
     assertThatThrownBy(() -> Moxy.assertMock("Hello"))
         .isInstanceOf(IllegalStateException.class)
         .hasMessage("No mock invocation found");
   }
+  */
   
   @Test
   public void testMoxyAssertMockWithMockReturnsVerifier() {
     SimpleClass mock = Moxy.mock(SimpleClass.class);
-    MoxyVerifier verifier = Moxy.assertMock(mock.returnHello());
+    MoxyVerifier verifier = Moxy.assertMock(() -> mock.returnHello());
     
     assertThat(verifier)
         .isNotNull()
@@ -177,7 +179,7 @@ public class TestMoxy {
   public void testMoxyAssertMockWithMockWasCalledFailsIfNotCalled() {
     SimpleClass mock = Moxy.mock(SimpleClass.class);
     
-    assertThatThrownBy(() -> Moxy.assertMock(mock.returnHello()).wasCalled())
+    assertThatThrownBy(() -> Moxy.assertMock(() -> mock.returnHello()).wasCalled())
         .isInstanceOf(AssertionFailedError.class)
         .hasMessage("Expected mock returnHello(...) to be called with arguments () at least once but it wasn't");
   }
@@ -189,7 +191,7 @@ public class TestMoxy {
     
     mock.returnHello();
     
-    Moxy.assertMock(mock.returnHello()).wasCalled();
+    Moxy.assertMock(() -> mock.returnHello()).wasCalled();
   }
   
   @Test
@@ -198,11 +200,11 @@ public class TestMoxy {
     
     mock.hasArgs("One", (byte)2, 'a', (short)20, 0xdeadbeef, 100L, 2468.0f, 4291.0d, true);
     
-    Moxy.assertMock(mock.hasArgs("One", (byte)2, 'a', (short)20, 0xdeadbeef, 100L, 2468.0f, 4291.0d, true))
+    Moxy.assertMock(() -> mock.hasArgs("One", (byte)2, 'a', (short)20, 0xdeadbeef, 100L, 2468.0f, 4291.0d, true))
         .wasCalled();
     
     assertThatThrownBy(() -> 
-        Moxy.assertMock(mock.hasArgs("Two", (byte)1, 'b', (short)10, 0x2badf00d, 200L, 3579.0f, 5302.0d, false))
+        Moxy.assertMock(() -> mock.hasArgs("Two", (byte)1, 'b', (short)10, 0x2badf00d, 200L, 3579.0f, 5302.0d, false))
             .wasCalled())
         .isInstanceOf(AssertionFailedError.class)
         .hasMessage("Expected mock hasArgs(...) to be called with arguments (Two,1,b,10,732819469,200,3579.0,5302.0,false) at least once but it wasn't");
@@ -213,16 +215,16 @@ public class TestMoxy {
     SimpleClass mock = Moxy.mock(SimpleClass.class);
     
     mock.returnHello();    
-    Moxy.assertMock(mock.returnHello()).wasCalled(1);
+    Moxy.assertMock(() -> mock.returnHello()).wasCalled(1);
 
     mock.returnHello();    
-    Moxy.assertMock(mock.returnHello()).wasCalled(2);
+    Moxy.assertMock(() -> mock.returnHello()).wasCalled(2);
     
     mock.returnHello();    
-    Moxy.assertMock(mock.returnHello()).wasCalled(3);
+    Moxy.assertMock(() -> mock.returnHello()).wasCalled(3);
 
     assertThatThrownBy(() -> 
-        Moxy.assertMock(mock.returnHello())
+        Moxy.assertMock(() -> mock.returnHello())
             .wasCalled(4))
         .isInstanceOf(AssertionFailedError.class)
         .hasMessage("Expected mock returnHello(...) to be called with arguments () exactly 4 time(s) but it wasn't");
@@ -251,7 +253,7 @@ public class TestMoxy {
     
     RuntimeException theException = new RuntimeException("Oops!");
     
-    Moxy.when(mock.returnHello()).thenThrow(theException);
+    Moxy.when(() -> mock.returnHello()).thenThrow(theException);
     
     assertThatThrownBy(() -> mock.returnHello())
         .isSameAs(theException);
@@ -263,7 +265,7 @@ public class TestMoxy {
     
     RuntimeException theException = new RuntimeException("Oops!");
     
-    assertThatThrownBy(() -> Moxy.when(mock.returnHello()).thenThrow(theException).thenReturn("hello"))
+    assertThatThrownBy(() -> Moxy.when(() -> mock.returnHello()).thenThrow(theException).thenReturn("hello"))
         .isInstanceOf(IllegalStateException.class)
         .hasMessage("Cannot set both throw and return for returnHello()Ljava/lang/String;");
     
@@ -277,7 +279,7 @@ public class TestMoxy {
     
     RuntimeException theException = new RuntimeException("Oops!");
     
-    assertThatThrownBy(() -> Moxy.when(mock.returnHello()).thenReturn("hello").thenThrow(theException))
+    assertThatThrownBy(() -> Moxy.when(() -> mock.returnHello()).thenReturn("hello").thenThrow(theException))
         .isInstanceOf(IllegalStateException.class)
         .hasMessage("Cannot set both throw and return for returnHello()Ljava/lang/String;");
     
@@ -293,9 +295,9 @@ public class TestMoxy {
     SimpleClass mock = Moxy.mock(SimpleClass.class);
     
     RuntimeException theException = new RuntimeException("Oops!");
-    Moxy.when(mock.returnHello()).thenThrow(theException);
+    Moxy.when(() -> mock.returnHello()).thenThrow(theException);
     
-    assertThatThrownBy(() -> Moxy.when(mock.returnHello()).thenReturn("hello"))
+    assertThatThrownBy(() -> Moxy.when(() -> mock.returnHello()).thenReturn("hello"))
         .isInstanceOf(IllegalStateException.class)
         .hasMessage("Cannot set both throw and return for returnHello()Ljava/lang/String;");
     

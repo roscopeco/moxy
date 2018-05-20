@@ -83,10 +83,8 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
                                                            Type.getArgumentTypes(desc),
                                                            isAbstract);
       } else {
-        return new MoxyReferenceFixingMethodVisitor(cv.visitMethod(access, name, desc, signature, exceptions),
-                                                    originalClassInternalName, 
-                                                    originalSuperClassInternalName,
-                                                    super.getNewClassInternalName());
+        // Don't mock, just super.
+        return null; 
       }
     } else {
       return null;

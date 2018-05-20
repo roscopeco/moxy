@@ -40,7 +40,12 @@ public interface MoxyEngine {
 
   public <T> MoxyStubber<T> when(T invocation);
   
-  public <T> MoxyVerifier<T> assertMock(T invocation);
+  /**
+   * @deprecated
+   * @param invocation
+   * @return
+   */
+  public MoxyVerifier assertMock(Object invocation);
 
-  public <T> MoxyVerifier<T> assertMock(Runnable invocation);
+  public MoxyVerifier assertMock(Runnable invocation);
 }

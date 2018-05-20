@@ -71,19 +71,30 @@ public final class Moxy {
     return engine.when(invocation);
   }
   
-  public static <T> MoxyVerifier<T> assertMock(T invocation) {
+  /**
+   * @deprecated
+   * @param invocation
+   * @return
+   */
+  public static MoxyVerifier assertMock(Object invocation) {
     return assertMock(ensureMoxyEngine(), invocation);
   }
   
-  public static <T> MoxyVerifier<T> assertMock(Runnable invocation) {
+  public static MoxyVerifier assertMock(Runnable invocation) {
     return assertMock(ensureMoxyEngine(), invocation);
   }
   
-  public static <T> MoxyVerifier<T> assertMock(MoxyEngine engine, T invocation) {
+  /**
+   * @deprecated
+   * @param engine
+   * @param invocation
+   * @return
+   */
+  public static MoxyVerifier assertMock(MoxyEngine engine, Object invocation) {
     return engine.assertMock(invocation);
   }
   
-  public static <T> MoxyVerifier<T> assertMock(MoxyEngine engine, Runnable invocation) {
+  public static MoxyVerifier assertMock(MoxyEngine engine, Runnable invocation) {
     return engine.assertMock(invocation);
   }
 }

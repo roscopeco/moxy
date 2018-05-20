@@ -171,16 +171,16 @@ public class ASMMoxyEngine implements MoxyEngine {
     return new ASMMoxyStubber<T>(this);
   }
   
-  public <T> MoxyVerifier<T> assertMock(T invocation) {
+  public MoxyVerifier assertMock(Object invocation) {
     deleteLatestInvocationFromList();
-    return new ASMMoxyVerifier<T>(this);
+    return new ASMMoxyVerifier(this);
   }
   
   @Override
-  public <T> MoxyVerifier<T> assertMock(Runnable invocation) {
+  public MoxyVerifier assertMock(Runnable invocation) {
     invocation.run();
     deleteLatestInvocationFromList();
-    return new ASMMoxyVerifier<T>(this);
+    return new ASMMoxyVerifier(this);
   }
 
   void deleteLatestInvocationFromList() {

@@ -166,7 +166,7 @@ public class TestMoxy {
   @Test
   public void testMoxyAssertMockWithMockReturnsVerifier() {
     SimpleClass mock = Moxy.mock(SimpleClass.class);
-    MoxyVerifier<String> verifier = Moxy.assertMock(mock.returnHello());
+    MoxyVerifier verifier = Moxy.assertMock(mock.returnHello());
     
     assertThat(verifier)
         .isNotNull()

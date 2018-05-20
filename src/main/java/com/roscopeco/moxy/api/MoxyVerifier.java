@@ -2,7 +2,7 @@ package com.roscopeco.moxy.api;
 
 import junit.framework.AssertionFailedError;
 
-public interface MoxyVerifier<T> {
+public interface MoxyVerifier {
   /**
    * Verify that the mock method was called <em>at least</em> once,
    * with the arguments specified in the call.
@@ -13,7 +13,7 @@ public interface MoxyVerifier<T> {
    * @return <code>this</code>. 
    * @throws AssertionFailedError if the assertion fails.
    */
-  public MoxyVerifier<T> wasCalled();
+  public MoxyVerifier wasCalled();
 
   /**
    * Verify that the mock method was called <em>exactly</em> <code>times</code>,
@@ -25,5 +25,5 @@ public interface MoxyVerifier<T> {
    * @return <code>this</code>. 
    * @throws AssertionFailedError if the assertion fails.
    */
-  public MoxyVerifier<T> wasCalled(int times);
+  public MoxyVerifier wasCalled(int times);
 }

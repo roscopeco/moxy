@@ -8,13 +8,13 @@ import com.roscopeco.moxy.api.MoxyVerifier;
 
 import junit.framework.AssertionFailedError;
 
-class ASMMoxyVerifier<T> extends HasEngineAndInvocation implements MoxyVerifier<T> {
+class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
   public ASMMoxyVerifier(ASMMoxyEngine engine) {
     super(engine);
   }
   
   @Override
-  public MoxyVerifier<T> wasCalled() {
+  public MoxyVerifier wasCalled() {
     final MoxyInvocation invocation = getTheInvocation();
     final String methodName = invocation.getMethodName();
     final String methodDesc = invocation.getMethodDesc();
@@ -39,7 +39,7 @@ class ASMMoxyVerifier<T> extends HasEngineAndInvocation implements MoxyVerifier<
   }
 
   @Override
-  public MoxyVerifier<T> wasCalled(int times) {
+  public MoxyVerifier wasCalled(int times) {
     final MoxyInvocation invocation = getTheInvocation();
     final String methodName = invocation.getMethodName();
     final String methodDesc = invocation.getMethodDesc();

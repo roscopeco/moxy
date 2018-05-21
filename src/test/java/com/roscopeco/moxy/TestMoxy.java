@@ -348,7 +348,7 @@ public class TestMoxy {
 
   @Test
   public void testMoxyMockWithMockWhenThenThrowTakesAccountOfArgumentsWithVoidMethod() {
-    MethodWithArguments mock = Moxy.mock(MethodWithArguments.class);
+    MethodWithArguments mock = Moxy.mock(MethodWithArguments.class, System.out);
     
     RuntimeException worldException = new RuntimeException("world");
     RuntimeException samException = new RuntimeException("sam");

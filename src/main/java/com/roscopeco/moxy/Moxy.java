@@ -7,7 +7,7 @@ import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
 import com.roscopeco.moxy.api.MoxyVoidStubber;
-import com.roscopeco.moxy.internal.ASMMoxyEngine;
+import com.roscopeco.moxy.impl.asm.ASMMoxyEngine;
 
 public final class Moxy {
   private static MoxyEngine moxyEngine;

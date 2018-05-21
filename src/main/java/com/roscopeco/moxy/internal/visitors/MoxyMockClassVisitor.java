@@ -22,15 +22,12 @@ import com.roscopeco.moxy.api.Mock;
  */
 public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {  
   private final String originalClassInternalName;
-  private final String originalSuperClassInternalName;
   private final Set<Method> mockMethods;
 
   public MoxyMockClassVisitor(Class<?> originalClass, Set<Method> methods) {
     super(originalClass.getPackage().getName().replace('.', '/') + "/MoxyMock-"
         + UUID.randomUUID());
     this.originalClassInternalName = Type.getInternalName(originalClass);
-    this.originalSuperClassInternalName = Type.getInternalName(originalClass.getSuperclass());
-
     this.mockMethods = methods == null ? Collections.emptySet() : methods;
   }
 

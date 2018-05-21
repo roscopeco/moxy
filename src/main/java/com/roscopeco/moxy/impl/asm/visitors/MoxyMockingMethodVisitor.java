@@ -67,21 +67,23 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     this.mv.visitLdcInsn(this.methodDescriptor);
 
     // Create array as fourth param
-    // TODO - could optimise here, no need to create new array if argc == 0,
-    //        could instead use static EMPTY_OBJECT_ARRAY.
+    // TODO - could optimise here, no need to create new list if argc == 0,
+    //        could instead use static EMPTY_OBJECT_LIST.
+    this.mv.visitTypeInsn(NEW, ARRAYLIST_INTERNAL_NAME);
+    this.mv.visitInsn(DUP);
     this.mv.visitIntInsn(BIPUSH, argc);
-    this.mv.visitTypeInsn(ANEWARRAY, OBJECT_INTERNAL_NAME);
+    this.mv.visitMethodInsn(INVOKESPECIAL, ARRAYLIST_INTERNAL_NAME, INIT_NAME, VOID_INT_DESCRIPTOR, false);    
     
     // Go through arguments, load and autobox (if necessary).
     int currentLocalSlot = 1;
     for (int argNum = 0; argNum < argc; argNum++) {
       
       this.mv.visitInsn(DUP);
-      this.mv.visitIntInsn(BIPUSH, argNum);
       
       currentLocalSlot += generateLoadAndAutoboxing(argNum, currentLocalSlot);
       
-      this.mv.visitInsn(AASTORE);
+      this.mv.visitMethodInsn(INVOKEVIRTUAL, ARRAYLIST_INTERNAL_NAME, ADD_NAME, BOOLEAN_OBJECT_DESCRIPTOR, false);
+      this.mv.visitInsn(POP);
     }
     
     // Call recorder

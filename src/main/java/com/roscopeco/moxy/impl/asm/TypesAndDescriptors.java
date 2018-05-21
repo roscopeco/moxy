@@ -1,5 +1,7 @@
 package com.roscopeco.moxy.impl.asm;
 
+import java.util.ArrayList;
+
 import org.objectweb.asm.Type;
 
 import com.roscopeco.moxy.api.MoxyEngine;
@@ -10,10 +12,14 @@ public final class TypesAndDescriptors {
   
   /* General Java stuff */
   public static final String OBJECT_INTERNAL_NAME = Type.getInternalName(Object.class);
+  public static final String ARRAYLIST_INTERNAL_NAME = Type.getInternalName(ArrayList.class);
   public static final String THROWABLE_DESCRIPTOR = "L" + Type.getInternalName(Throwable.class) +";";
   public static final String INIT_NAME = "<init>";
+  public static final String ADD_NAME = "add";
   public static final String VOID_TYPE = "V";
   public static final String VOID_VOID_DESCRIPTOR = "()V";
+  public static final String VOID_INT_DESCRIPTOR = "(I)V";
+  public static final String BOOLEAN_OBJECT_DESCRIPTOR = "(L" + OBJECT_INTERNAL_NAME + ";)Z";
   
   /* Moxy stuff */
   public static final String MOXY_ENGINE_DESCRIPTOR = "L" + Type.getInternalName(MoxyEngine.class) + ";";
@@ -26,7 +32,7 @@ public final class TypesAndDescriptors {
   /* Recorder */
   public static final String MOXY_RECORDER_INTERNAL_NAME = Type.getInternalName(MoxyInvocationRecorder.class);
   public static final String MOXY_RECORDER_RECORD_METHOD_NAME = "recordInvocation";
-  public static final String MOXY_RECORDER_RECORD_DESCRIPTOR = "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;)V";
+  public static final String MOXY_RECORDER_RECORD_DESCRIPTOR = "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V";
   
   /* ASMMoxyMockSupport-related */
   public static final String SUPPORT_GETENGINE_METHOD_NAME = "__moxy_asm_getEngine";

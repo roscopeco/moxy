@@ -1,5 +1,8 @@
 package com.roscopeco.moxy.api;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Represents a single invocation of a given method, on a given receiver,
  * with given arguments.
@@ -8,12 +11,12 @@ package com.roscopeco.moxy.api;
  *
  */
 public final class MoxyInvocation {
-  private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
+  private static final List<Object> EMPTY_OBJECT_LIST = Collections.emptyList();
   
   private final Object receiver;
   private final String methodName;
   private final String methodDesc;
-  private final Object[] args;
+  private final List<Object> args;
 
   /**
    * Create a new Invocation with the specified receiver, method and arguments.
@@ -22,7 +25,7 @@ public final class MoxyInvocation {
    * @param methodNameAndSig
    * @param args
    */
-  public MoxyInvocation(final Object receiver, final String methodName, final String methodDesc, final Object[] args) {
+  public MoxyInvocation(final Object receiver, final String methodName, final String methodDesc, final List<Object> args) {
     if (receiver == null || 
         methodName == null || 
         methodName.isEmpty() || 
@@ -61,7 +64,7 @@ public final class MoxyInvocation {
   /**
    * @return the arguments the method was called with. Possibly empty, never null.
    */
-  public Object[] getArgs() {
-    return args == null ? EMPTY_OBJECT_ARRAY : args;
+  public List<Object> getArgs() {
+    return args == null ? EMPTY_OBJECT_LIST : args;
   }
 }

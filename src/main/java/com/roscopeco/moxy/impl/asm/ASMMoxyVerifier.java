@@ -1,6 +1,5 @@
 package com.roscopeco.moxy.impl.asm;
 
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import com.roscopeco.moxy.api.MoxyInvocation;
@@ -25,13 +24,13 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
                                methodName, 
                                methodDesc)
         .stream()
-        .anyMatch((e) -> Arrays.equals(e.getArgs(), invocation.getArgs()) 
+        .anyMatch((e) -> e.getArgs().equals(invocation.getArgs()) 
     )) {
       return this;
     } else {
       throw new AssertionFailedError(
           "Expected mock " + methodName + "(...) to be called with arguments (" 
-              + Arrays.stream(invocation.getArgs())
+              + invocation.getArgs().stream()
                   .map((e) -> e.toString())
                   .collect(Collectors.joining(",")) 
               + ") at least once but it wasn't");
@@ -50,7 +49,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
                                methodName, 
                                methodDesc)
         .stream()
-        .filter( (e) -> Arrays.equals(e.getArgs(), invocation.getArgs() ))
+        .filter( (e) -> e.getArgs().equals(invocation.getArgs()))
         .collect(Collectors.toList())
         .size() == times
     ) {
@@ -58,7 +57,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     } else {
       throw new AssertionFailedError(
           "Expected mock " + methodName + "(...) to be called with arguments (" 
-              + Arrays.stream(invocation.getArgs())
+              + invocation.getArgs().stream()
                   .map((e) -> e.toString())
                   .collect(Collectors.joining(",")) 
               + ") exactly " + times + " time(s) but it wasn't");

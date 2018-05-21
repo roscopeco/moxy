@@ -19,7 +19,7 @@ class ThreadLocalInvocationRecorder implements MoxyInvocationRecorder {
   }
   
   @Override
-  public void recordInvocation(Object receiver, String methodName, String methodDesc, Object[] args) {
+  public void recordInvocation(Object receiver, String methodName, String methodDesc, List<Object> args) {
     final List<MoxyInvocation> invocations = ensureInvocationList(
         ensureInvocationMap(ensureLocalClassMap(), receiver.getClass()),
         methodName, methodDesc);

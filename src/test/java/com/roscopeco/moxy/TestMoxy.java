@@ -9,6 +9,7 @@ import com.roscopeco.moxy.api.Mock;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
 import com.roscopeco.moxy.model.ClassWithPrimitiveReturns;
+import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
 import com.roscopeco.moxy.model.MethodWithPrimitiveArguments;
 import com.roscopeco.moxy.model.SimpleAbstractClass;
@@ -300,5 +301,68 @@ public class TestMoxy {
     
     assertThatThrownBy(() -> mock.returnHello())
         .isSameAs(theException);
+  }
+  
+  @Test
+  public void testMoxyWhenWithMockCanUseSameSyntaxButCannotSetReturnForVoidMethod() {
+    MethodWithArguments mock = Moxy.mock(MethodWithArguments.class);
+    
+    /* Does not compile
+    Moxy.when(() -> mock.hasArgs("one", "two")).thenReturn("anything");
+    */
+    
+    RuntimeException theException = new RuntimeException("Oops!");
+    
+    Moxy.when(() -> mock.hasArgs("one", "two")).thenThrow(theException);
+    
+    assertThatThrownBy(() -> mock.hasArgs("one", "two"))
+        .isSameAs(theException);
+  }
+  
+  @Test
+  public void testMoxyMockWithMockWhenThenReturnTakesAccountOfArguments() {
+    MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+    
+    Moxy.when(() -> mock.sayHelloTo("World")).thenReturn("Goodbye, cruel world");
+    Moxy.when(() -> mock.sayHelloTo("Sam")).thenReturn("Oh hi, Sam!");
+    
+    assertThat(mock.sayHelloTo("World")).isEqualTo("Goodbye, cruel world");
+    assertThat(mock.sayHelloTo("Sam")).isEqualTo("Oh hi, Sam!");
+    assertThat(mock.sayHelloTo("Me")).isNull();
+  }
+
+  @Test
+  public void testMoxyMockWithMockWhenThenThrowTakesAccountOfArguments() {
+    MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+    
+    RuntimeException worldException = new RuntimeException("world");
+    RuntimeException samException = new RuntimeException("sam");
+    
+    Moxy.when(() -> mock.sayHelloTo("World")).thenThrow(worldException);
+    Moxy.when(() -> mock.sayHelloTo("Sam")).thenThrow(samException);
+    
+    assertThatThrownBy(() -> mock.sayHelloTo("World")).isSameAs(worldException);
+    assertThatThrownBy(() -> mock.sayHelloTo("Sam")).isSameAs(samException);
+    assertThat(mock.sayHelloTo("Me")).isNull();
+  }
+
+  @Test
+  public void testMoxyMockWithMockWhenThenThrowTakesAccountOfArgumentsWithVoidMethod() {
+    MethodWithArguments mock = Moxy.mock(MethodWithArguments.class);
+    
+    RuntimeException worldException = new RuntimeException("world");
+    RuntimeException samException = new RuntimeException("sam");
+    
+    Moxy.when(() -> mock.hasArgs("hello", "world")).thenThrow(worldException);
+    Moxy.when(() -> mock.hasArgs("hello", "sam")).thenThrow(samException);
+    
+    assertThatThrownBy(() -> mock.hasArgs("hello", "world")).isSameAs(worldException);
+    assertThatThrownBy(() -> mock.hasArgs("hello", "sam")).isSameAs(samException);
+
+    try {
+      mock.hasArgs("hello", "matilda");
+    } catch (Throwable e) {
+      throw new AssertionFailedError("Expected no exception but got " + e.getMessage());
+    }
   }
 }

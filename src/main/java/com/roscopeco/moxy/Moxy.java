@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
+import com.roscopeco.moxy.api.MoxyVoidStubber;
 import com.roscopeco.moxy.internal.ASMMoxyEngine;
 
 public final class Moxy {
@@ -68,7 +69,22 @@ public final class Moxy {
     return when(ensureMoxyEngine(), invocation);
   }
 
+  /**
+   * Special case when to allow the same syntax to work for void
+   * methods as for non-void ones.
+   *  
+   * @param invocation
+   * @return The special-case MoxyVoidStubber. 
+   */
+  public static MoxyVoidStubber when(Runnable invocation) {
+    return when(ensureMoxyEngine(), invocation);
+  }
+
   public static <T> MoxyStubber<T> when(MoxyEngine engine, Supplier<T> invocation) {
+    return engine.when(invocation);
+  }
+  
+  public static MoxyVoidStubber when(MoxyEngine engine, Runnable invocation) {
     return engine.when(invocation);
   }
   

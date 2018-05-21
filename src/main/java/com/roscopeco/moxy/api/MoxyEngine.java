@@ -40,6 +40,14 @@ public interface MoxyEngine {
   public boolean isMock(Object obj);
 
   public <T> MoxyStubber<T> when(Supplier<T> invocation);
+
+  /**
+   * Special case to allow void methods to be stubbed (without thenReturn).
+   * 
+   * @param invocation
+   * @return A special-case MoxyVoidStubber.
+   */
+  public MoxyVoidStubber when(Runnable invocation);
   
   public MoxyVerifier assertMock(Runnable invocation);
 }

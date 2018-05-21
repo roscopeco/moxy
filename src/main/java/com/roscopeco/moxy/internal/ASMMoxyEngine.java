@@ -23,6 +23,7 @@ import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyInvocationRecorder;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
+import com.roscopeco.moxy.api.MoxyVoidStubber;
 import com.roscopeco.moxy.internal.visitors.AbstractMoxyTypeVisitor;
 import com.roscopeco.moxy.internal.visitors.MoxyMockClassVisitor;
 import com.roscopeco.moxy.internal.visitors.MoxyMockInterfaceVisitor;
@@ -168,19 +169,29 @@ public class ASMMoxyEngine implements MoxyEngine {
   public boolean isMock(Object obj) {
     return isMock(obj.getClass());
   }
-
-  @Override
-  public <T> MoxyStubber<T> when(Supplier<T> invocation) {
+  
+  void naivelyInvokeAndSwallowExceptions(Runnable doInvoke) {
     try {
-      invocation.get();
+      doInvoke.run();
     } catch (Exception e) {
       // TODO naively swallow for now, revisit later when we have a base exception for the framework.
     }
+  }
+
+  @Override
+  public <T> MoxyStubber<T> when(Supplier<T> invocation) {
+    naivelyInvokeAndSwallowExceptions(() -> invocation.get());
     deleteLatestInvocationFromList();
-    return new ASMMoxyStubber<T>(this);
-    
+    return new ASMMoxyStubber<T>(this);    
   }
   
+  @Override
+  public MoxyVoidStubber when(Runnable invocation) {
+    naivelyInvokeAndSwallowExceptions(() -> invocation.run());
+    deleteLatestInvocationFromList();
+    return new ASMMoxyVoidStubber(this);
+  }
+
   @Override
   public MoxyVerifier assertMock(Runnable invocation) {
     invocation.run();

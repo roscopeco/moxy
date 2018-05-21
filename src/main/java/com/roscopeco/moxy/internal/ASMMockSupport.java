@@ -66,4 +66,21 @@ public interface ASMMockSupport {
                                       e);
     }    
   }
+  
+  // NOTE only to be used for void methods!
+  default public void __moxy_asm_setThrowFieldForVoidMethods(String methodName,
+                                                        String methodDesc,
+                                                        Object object) {
+    final String throwFieldName = TypesAndDescriptors.makeMethodThrowFieldName(
+        methodName, methodDesc);
+    
+    try {
+      final Field throwField = this.getClass().getDeclaredField(throwFieldName);
+      throwField.set(this, object);
+    } catch (ReflectiveOperationException e) {
+      throw new IllegalStateException("Mock doesn't conform to expectations - are you using a different mock engine?\n"
+          + "(This stubber is for the default ASMMoxyEngine).",
+            e);
+    }    
+  }
 }

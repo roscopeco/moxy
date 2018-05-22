@@ -47,6 +47,18 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     }
   }
   
+  private String readableTimes(int times) {
+    if (times == 0) {
+      return "zero times";
+    } else if (times == 1) {
+      return "once";
+    } else if (times == 2) {
+      return "twice";
+    } else {
+      return "" + times + " times";
+    }
+  }
+  
   @Override
   public MoxyVerifier wasCalled() {
     final MoxyInvocation invocation = getTheInvocation();
@@ -66,7 +78,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
       throw new AssertionFailedError(
           "Expected mock " + methodName + ellipsisDesc(methodDesc) + " to be called " 
               + buildArgsString(invocation) 
-              + "at least once but it wasn't");
+              + "at least once but it wasn't called at all");
     }
   }
   
@@ -96,8 +108,8 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
       throw new AssertionFailedError(
           "Expected mock " + methodName + ellipsisDesc(methodDesc) + " to be called " 
               + buildArgsString(invocation) 
-              + "exactly " + times + " time(s), but it was called " 
-              + actual + " time(s)");
+              + "exactly " + readableTimes(times) + ", but it was called " 
+              + readableTimes(actual));      
     }
   }
 
@@ -130,8 +142,8 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
       throw new AssertionFailedError(
           "Expected mock " + methodName + ellipsisDesc(methodDesc) + " to be called " 
               + buildArgsString(invocation) 
-              + "at least " + times + " time(s), but it was called " 
-              + actual + " time(s)");
+              + "at least " + readableTimes(times) + ", but it was called " 
+              + readableTimes(actual));
     }
   }
 
@@ -149,8 +161,8 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
       throw new AssertionFailedError(
           "Expected mock " + methodName + ellipsisDesc(methodDesc) + " to be called " 
               + buildArgsString(invocation) 
-              + "at most " + times + " time(s), but it was called " 
-              + actual + " time(s)");
+              + "at most " + readableTimes(times) + ", but it was called " 
+              + readableTimes(actual));
     }
   }
 }

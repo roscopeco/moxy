@@ -182,7 +182,7 @@ public class TestMoxy {
     
     assertThatThrownBy(() -> Moxy.assertMock(() -> mock.returnHello()).wasCalled())
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock returnHello() to be called at least once but it wasn't");
+        .hasMessage("Expected mock returnHello() to be called at least once but it wasn't called at all");
   }
 
   /* We're bootstrapped. Let's start eating our own dog food... */
@@ -208,7 +208,7 @@ public class TestMoxy {
         Moxy.assertMock(() -> mock.hasArgs("Two", (byte)1, 'b', (short)10, 0x2badf00d, 200L, 3579.0f, 5302.0d, false))
             .wasCalled())
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock hasArgs(java.lang.String, byte, char, short, int, long, float, double, boolean) to be called with arguments (\"Two\", 1, 'b', 10, 732819469, 200, 3579.0, 5302.0, false) at least once but it wasn't");
+        .hasMessage("Expected mock hasArgs(java.lang.String, byte, char, short, int, long, float, double, boolean) to be called with arguments (\"Two\", 1, 'b', 10, 732819469, 200, 3579.0, 5302.0, false) at least once but it wasn't called at all");
   }
   
   @Test
@@ -228,7 +228,7 @@ public class TestMoxy {
         Moxy.assertMock(() -> mock.returnHello())
             .wasCalled(4))
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock returnHello() to be called exactly 4 time(s), but it was called 3 time(s)");
+        .hasMessage("Expected mock returnHello() to be called exactly 4 times, but it was called 3 times");
   }
   
   @Test
@@ -378,7 +378,7 @@ public class TestMoxy {
         Moxy.assertMock(() -> mock.hasArgs("this was", "called")).wasNotCalled()
     )
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock hasArgs(java.lang.String, java.lang.String) to be called with arguments (\"this was\", \"called\") exactly 0 time(s), but it was called 1 time(s)");
+        .hasMessage("Expected mock hasArgs(java.lang.String, java.lang.String) to be called with arguments (\"this was\", \"called\") exactly zero times, but it was called once");
     
     Moxy.assertMock(() -> mock.hasArgs("was never", "called")).wasNotCalled();
   }
@@ -398,13 +398,13 @@ public class TestMoxy {
         Moxy.assertMock(() -> mock.returnDouble()).wasCalledOnce()
     )
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock returnDouble() to be called exactly 1 time(s), but it was called 2 time(s)");
+        .hasMessage("Expected mock returnDouble() to be called exactly once, but it was called twice");
 
     assertThatThrownBy(() -> 
         Moxy.assertMock(() -> mock.returnLong()).wasCalledOnce()
     )
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock returnLong() to be called exactly 1 time(s), but it was called 0 time(s)");
+        .hasMessage("Expected mock returnLong() to be called exactly once, but it was called zero times");
     
   }
 
@@ -423,13 +423,13 @@ public class TestMoxy {
         Moxy.assertMock(() -> mock.returnShort()).wasCalledTwice()
     )
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock returnShort() to be called exactly 2 time(s), but it was called 1 time(s)");
+        .hasMessage("Expected mock returnShort() to be called exactly twice, but it was called once");
 
     assertThatThrownBy(() -> 
         Moxy.assertMock(() -> mock.returnLong()).wasCalledTwice()
     )
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock returnLong() to be called exactly 2 time(s), but it was called 0 time(s)");
+        .hasMessage("Expected mock returnLong() to be called exactly twice, but it was called zero times");
     
   }
 
@@ -453,13 +453,13 @@ public class TestMoxy {
         Moxy.assertMock(() -> mock.returnShort()).wasCalledAtLeast(2)
     )
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock returnShort() to be called at least 2 time(s), but it was called 1 time(s)");
+        .hasMessage("Expected mock returnShort() to be called at least twice, but it was called once");
 
     assertThatThrownBy(() -> 
         Moxy.assertMock(() -> mock.returnLong()).wasCalledAtLeast(2)
     )
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock returnLong() to be called at least 2 time(s), but it was called 0 time(s)");
+        .hasMessage("Expected mock returnLong() to be called at least twice, but it was called zero times");
     
   }
 
@@ -486,7 +486,7 @@ public class TestMoxy {
         Moxy.assertMock(() -> mock.returnBoolean()).wasCalledAtMost(2)
     )
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock returnBoolean() to be called at most 2 time(s), but it was called 3 time(s)");
+        .hasMessage("Expected mock returnBoolean() to be called at most twice, but it was called 3 times");
   }
 
   @Test
@@ -499,7 +499,7 @@ public class TestMoxy {
             .wasCalledAtMost(3)
     )
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock returnHello() to be called at least 1 time(s), but it was called 0 time(s)");
+        .hasMessage("Expected mock returnHello() to be called at least once, but it was called zero times");
 
     mock.returnHello();
 
@@ -527,6 +527,6 @@ public class TestMoxy {
             .wasCalledAtMost(3)
     )
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock returnHello() to be called at most 3 time(s), but it was called 4 time(s)");
+        .hasMessage("Expected mock returnHello() to be called at most 3 times, but it was called 4 times");
   }
 }

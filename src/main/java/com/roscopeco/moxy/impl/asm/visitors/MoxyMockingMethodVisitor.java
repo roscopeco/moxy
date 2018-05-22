@@ -3,8 +3,6 @@ package com.roscopeco.moxy.impl.asm.visitors;
 import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
 import static org.objectweb.asm.Opcodes.*;
 
-import java.util.function.Consumer;
-
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -209,56 +207,56 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
                              BYTEVALUE_METHOD_NAME,
                              BYTEVALUE_DESCRIPTOR,
                              IRETURN,
-                             (mv) -> mv.visitInsn(ICONST_0));
+                             ICONST_0);
       break;
     case CHAR_PRIMITIVE_INTERNAL_NAME:
       generateUnboxingReturn(CHAR_CLASS_INTERNAL_NAME, 
                              CHARVALUE_METHOD_NAME,
                              CHARVALUE_DESCRIPTOR,
                              IRETURN,
-                             (mv) -> mv.visitInsn(ICONST_0));
+                             ICONST_0);
       break;
     case SHORT_PRIMITIVE_INTERNAL_NAME:
       generateUnboxingReturn(SHORT_CLASS_INTERNAL_NAME, 
                              SHORTVALUE_METHOD_NAME,
                              SHORTVALUE_DESCRIPTOR,
                              IRETURN,
-                             (mv) -> mv.visitInsn(ICONST_0));
+                             ICONST_0);
       break;
     case INT_PRIMITIVE_INTERNAL_NAME:
       generateUnboxingReturn(INT_CLASS_INTERNAL_NAME, 
                              INTVALUE_METHOD_NAME,
                              INTVALUE_DESCRIPTOR,
                              IRETURN,
-                             (mv) -> mv.visitInsn(ICONST_0));
+                             ICONST_0);
       break;
     case BOOL_PRIMITIVE_INTERNAL_NAME:
       generateUnboxingReturn(BOOL_CLASS_INTERNAL_NAME, 
                              BOOLVALUE_METHOD_NAME,
                              BOOLVALUE_DESCRIPTOR,
                              IRETURN,
-                             (mv) -> mv.visitInsn(ICONST_0));
+                             ICONST_0);
       break;
     case LONG_PRIMITIVE_INTERNAL_NAME:
       generateUnboxingReturn(LONG_CLASS_INTERNAL_NAME, 
                              LONGVALUE_METHOD_NAME,
                              LONGVALUE_DESCRIPTOR,
                              LRETURN,
-                             (mv) -> mv.visitInsn(LCONST_0));
+                             LCONST_0);
       break;
     case FLOAT_PRIMITIVE_INTERNAL_NAME:
       generateUnboxingReturn(FLOAT_CLASS_INTERNAL_NAME, 
                              FLOATVALUE_METHOD_NAME,
                              FLOATVALUE_DESCRIPTOR,
                              FRETURN,
-                             (mv) -> mv.visitInsn(FCONST_0));
+                             FCONST_0);
       break;
     case DOUBLE_PRIMITIVE_INTERNAL_NAME:
       generateUnboxingReturn(DOUBLE_CLASS_INTERNAL_NAME, 
                              DOUBLEVALUE_METHOD_NAME,
                              DOUBLEVALUE_DESCRIPTOR,
                              DRETURN,
-                             (mv) -> mv.visitInsn(DCONST_0));
+                             DCONST_0);
       break;
     case OBJECT_PRIMITIVE_INTERNAL_NAME:
       this.mv.visitVarInsn(ALOAD, 0);
@@ -287,7 +285,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
                               String valueOfMethod,
                               String valueOfDescriptor,
                               int returnOpcode,
-                              Consumer<MethodVisitor> defaultValue) {
+                              int defaultValueOpcode) {
     final Label defaultValueLabel = new Label();
 
     this.mv.visitVarInsn(ALOAD, 0);
@@ -301,7 +299,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     this.mv.visitInsn(returnOpcode);
     
     this.mv.visitLabel(defaultValueLabel);
-    defaultValue.accept(this.mv);    
+    this.mv.visitInsn(defaultValueOpcode);
     this.mv.visitInsn(returnOpcode);
   }
   

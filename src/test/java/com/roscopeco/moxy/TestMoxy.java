@@ -488,4 +488,45 @@ public class TestMoxy {
         .isInstanceOf(AssertionFailedError.class)
         .hasMessage("Expected mock returnBoolean() to be called at most 2 time(s), but it was called 3 time(s)");
   }
+
+  @Test
+  public void testMoxyMockWithMockWasCalledChainingWorks() {
+    SimpleClass mock = Moxy.mock(SimpleClass.class);
+
+    assertThatThrownBy(() ->
+        Moxy.assertMock(() -> mock.returnHello())
+            .wasCalledAtLeast(1)
+            .wasCalledAtMost(3)
+    )
+        .isInstanceOf(AssertionFailedError.class)
+        .hasMessage("Expected mock returnHello() to be called at least 1 time(s), but it was called 0 time(s)");
+
+    mock.returnHello();
+
+    Moxy.assertMock(() -> mock.returnHello())
+        .wasCalledAtLeast(1)
+        .wasCalledAtMost(3);
+
+    mock.returnHello();
+
+    Moxy.assertMock(() -> mock.returnHello())
+        .wasCalledAtLeast(1)
+        .wasCalledAtMost(3);
+
+    mock.returnHello();
+
+    Moxy.assertMock(() -> mock.returnHello())
+        .wasCalledAtLeast(1)
+        .wasCalledAtMost(3);
+
+    mock.returnHello();
+
+    assertThatThrownBy(() -> 
+        Moxy.assertMock(() -> mock.returnHello())
+            .wasCalledAtLeast(1)
+            .wasCalledAtMost(3)
+    )
+        .isInstanceOf(AssertionFailedError.class)
+        .hasMessage("Expected mock returnHello() to be called at most 3 time(s), but it was called 4 time(s)");
+  }
 }

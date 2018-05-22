@@ -9,8 +9,6 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 
-import com.roscopeco.moxy.impl.asm.TypesAndDescriptors;
-
 /**
  * Superclass for both class and interface visitors.
  * 
@@ -60,6 +58,21 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
     mv.visitMethodInsn(INVOKESPECIAL, superClassInternalName, INIT_NAME, superDescriptor, false);
     mv.visitVarInsn(ALOAD, 1);
     mv.visitFieldInsn(PUTFIELD, newClassInternalName, SUPPORT_ENGINE_FIELD_NAME, MOXY_ASM_ENGINE_DESCRIPTOR);
+    
+    // return map
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitTypeInsn(NEW, HASHMAP_INTERNAL_NAME);
+    mv.visitInsn(DUP);
+    mv.visitMethodInsn(INVOKESPECIAL, HASHMAP_INTERNAL_NAME, "<init>", VOID_VOID_DESCRIPTOR, false);
+    mv.visitFieldInsn(PUTFIELD, newClassInternalName, SUPPORT_RETURNMAP_FIELD_NAME, HASHMAP_DESCRIPTOR);
+
+    // throw map
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitTypeInsn(NEW, HASHMAP_INTERNAL_NAME);
+    mv.visitInsn(DUP);
+    mv.visitMethodInsn(INVOKESPECIAL, HASHMAP_INTERNAL_NAME, "<init>", VOID_VOID_DESCRIPTOR, false);
+    mv.visitFieldInsn(PUTFIELD, newClassInternalName, SUPPORT_THROWMAP_FIELD_NAME, HASHMAP_DESCRIPTOR);
+
     mv.visitInsn(RETURN);
     mv.visitEnd();
   }
@@ -82,43 +95,45 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   void generateSupportFields() {
     FieldVisitor fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_ENGINE_FIELD_NAME, MOXY_ASM_ENGINE_DESCRIPTOR, null, null);
     fv.visitEnd();
+
+    fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_RETURNMAP_FIELD_NAME, HASHMAP_DESCRIPTOR, null, null);
+    fv.visitEnd();
+
+    fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_THROWMAP_FIELD_NAME, HASHMAP_DESCRIPTOR, null, null);
+    fv.visitEnd();
   }
   
   void generateSupportMethods() {
-    generateMoxyAsmGetEngineMethod();
+    this.generateSupportGetter(SUPPORT_GETENGINE_METHOD_NAME,
+                               SUPPORT_GETENGINE_DESCRIPTOR,
+                               SUPPORT_ENGINE_FIELD_NAME,
+                               MOXY_ASM_ENGINE_DESCRIPTOR);
+    
+    this.generateSupportGetter(SUPPORT_GETRETURNMAP_METHOD_NAME,
+                               SUPPORT_GETRETURNMAP_DESCRIPTOR,
+                               SUPPORT_RETURNMAP_FIELD_NAME,
+                               HASHMAP_DESCRIPTOR);
+    
+    this.generateSupportGetter(SUPPORT_GETTHROWMAP_METHOD_NAME,
+                               SUPPORT_GETTHROWMAP_DESCRIPTOR,
+                               SUPPORT_THROWMAP_FIELD_NAME,
+                               HASHMAP_DESCRIPTOR);
   }
   
-  void generateMoxyAsmGetEngineMethod() {
+  private void generateSupportGetter(String methodName,
+                             String methodDescriptor,
+                             String fieldName,
+                             String fieldDescriptor) {
     MethodVisitor mv = this.cv.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, 
-                                           SUPPORT_GETENGINE_METHOD_NAME,
-                                           SUPPORT_GETENGINE_DESCRIPTOR,
+                                           methodName,
+                                           methodDescriptor,
                                            null, 
                                            EMPTY_STRING_ARRAY);
     mv.visitCode();
     mv.visitVarInsn(ALOAD, 0);
-    mv.visitFieldInsn(GETFIELD, newClassInternalName, SUPPORT_ENGINE_FIELD_NAME, MOXY_ASM_ENGINE_DESCRIPTOR);
+    mv.visitFieldInsn(GETFIELD, newClassInternalName, fieldName, fieldDescriptor);
     mv.visitInsn(ARETURN);
     mv.visitEnd();    
-  }
-  
-  void generateMethodReturnField(String name, String desc) {
-    // Generate field for method return value
-    if (!VOID_TYPE.equals(Type.getReturnType(desc).toString())) {
-      FieldVisitor fv = this.cv.visitField(ACC_PUBLIC | ACC_SYNTHETIC, 
-                                           makeMethodReturnFieldName(name, desc),                                          
-                                           Type.getReturnType(desc).toString(), 
-                                           null, null);
-      fv.visitEnd();
-    }
-  }
-  
-  void generateMethodThrowField(String name, String desc) {
-    // Generate field for method exception value
-    FieldVisitor fv = this.cv.visitField(ACC_PUBLIC | ACC_SYNTHETIC, 
-                                         makeMethodThrowFieldName(name, desc),                                          
-                                         TypesAndDescriptors.THROWABLE_DESCRIPTOR, 
-                                         null, null);
-    fv.visitEnd();
   }
   
   public ClassNode getNode() {

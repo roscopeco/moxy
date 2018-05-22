@@ -3,11 +3,11 @@ package com.roscopeco.moxy.impl.asm.visitors;
 import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
 import static org.objectweb.asm.Opcodes.*;
 
+import java.util.function.Consumer;
+
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
-
-import com.roscopeco.moxy.impl.asm.TypesAndDescriptors;
 
 class MoxyMockingMethodVisitor extends MethodVisitor {
   // Hide super field to prevent generation of original code.
@@ -193,11 +193,11 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     // Always do exception first. Should never have both anyway, this is 
     // enforced in ASMMoxyMockSupport when the fields are set.
     this.mv.visitVarInsn(ALOAD, 0);
-    this.mv.visitFieldInsn(GETFIELD, this.generatingClass, TypesAndDescriptors.makeMethodThrowFieldName(this.methodName, this.methodDescriptor), TypesAndDescriptors.THROWABLE_DESCRIPTOR);
+    this.mv.visitMethodInsn(INVOKEVIRTUAL, this.generatingClass, SUPPORT_GETCURRENTTHROW_METHOD_NAME, VOID_THROWABLE_DESCRIPTOR, false);    
     this.mv.visitJumpInsn(IFNULL, returnLabel);
     
     this.mv.visitVarInsn(ALOAD, 0);
-    this.mv.visitFieldInsn(GETFIELD, this.generatingClass, TypesAndDescriptors.makeMethodThrowFieldName(this.methodName, this.methodDescriptor), TypesAndDescriptors.THROWABLE_DESCRIPTOR);
+    this.mv.visitMethodInsn(INVOKEVIRTUAL, this.generatingClass, SUPPORT_GETCURRENTTHROW_METHOD_NAME, VOID_THROWABLE_DESCRIPTOR, false);    
     this.mv.visitInsn(ATHROW);
     
     this.mv.visitLabel(returnLabel);
@@ -205,41 +205,68 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     char primitiveReturnType = returnType.charAt(0);
     switch (primitiveReturnType) {
     case BYTE_PRIMITIVE_INTERNAL_NAME:
+      generateUnboxingReturn(BYTE_CLASS_INTERNAL_NAME, 
+                             BYTEVALUE_METHOD_NAME,
+                             BYTEVALUE_DESCRIPTOR,
+                             IRETURN,
+                             (mv) -> mv.visitInsn(ICONST_0));
+      break;
     case CHAR_PRIMITIVE_INTERNAL_NAME:
+      generateUnboxingReturn(CHAR_CLASS_INTERNAL_NAME, 
+                             CHARVALUE_METHOD_NAME,
+                             CHARVALUE_DESCRIPTOR,
+                             IRETURN,
+                             (mv) -> mv.visitInsn(ICONST_0));
+      break;
     case SHORT_PRIMITIVE_INTERNAL_NAME:
+      generateUnboxingReturn(SHORT_CLASS_INTERNAL_NAME, 
+                             SHORTVALUE_METHOD_NAME,
+                             SHORTVALUE_DESCRIPTOR,
+                             IRETURN,
+                             (mv) -> mv.visitInsn(ICONST_0));
+      break;
     case INT_PRIMITIVE_INTERNAL_NAME:
+      generateUnboxingReturn(INT_CLASS_INTERNAL_NAME, 
+                             INTVALUE_METHOD_NAME,
+                             INTVALUE_DESCRIPTOR,
+                             IRETURN,
+                             (mv) -> mv.visitInsn(ICONST_0));
+      break;
     case BOOL_PRIMITIVE_INTERNAL_NAME:
-      /* byte/char/short/int/bool */
-      this.mv.visitVarInsn(ALOAD, 0);
-      this.mv.visitFieldInsn(GETFIELD, this.generatingClass, TypesAndDescriptors.makeMethodReturnFieldName(this.methodName, this.methodDescriptor), this.returnType);
-      this.mv.visitInsn(IRETURN);
+      generateUnboxingReturn(BOOL_CLASS_INTERNAL_NAME, 
+                             BOOLVALUE_METHOD_NAME,
+                             BOOLVALUE_DESCRIPTOR,
+                             IRETURN,
+                             (mv) -> mv.visitInsn(ICONST_0));
       break;
     case LONG_PRIMITIVE_INTERNAL_NAME:
-      /* long */
-      this.mv.visitVarInsn(ALOAD, 0);
-      this.mv.visitFieldInsn(GETFIELD, this.generatingClass, TypesAndDescriptors.makeMethodReturnFieldName(this.methodName, this.methodDescriptor), this.returnType);
-      this.mv.visitInsn(LRETURN);
+      generateUnboxingReturn(LONG_CLASS_INTERNAL_NAME, 
+                             LONGVALUE_METHOD_NAME,
+                             LONGVALUE_DESCRIPTOR,
+                             LRETURN,
+                             (mv) -> mv.visitInsn(LCONST_0));
       break;
     case FLOAT_PRIMITIVE_INTERNAL_NAME:
-      /* float */
-      this.mv.visitVarInsn(ALOAD, 0);
-      this.mv.visitFieldInsn(GETFIELD, this.generatingClass, TypesAndDescriptors.makeMethodReturnFieldName(this.methodName, this.methodDescriptor), this.returnType);
-      this.mv.visitInsn(FRETURN);
+      generateUnboxingReturn(FLOAT_CLASS_INTERNAL_NAME, 
+                             FLOATVALUE_METHOD_NAME,
+                             FLOATVALUE_DESCRIPTOR,
+                             FRETURN,
+                             (mv) -> mv.visitInsn(FCONST_0));
       break;
     case DOUBLE_PRIMITIVE_INTERNAL_NAME:
-      /* double */
-      this.mv.visitVarInsn(ALOAD, 0);
-      this.mv.visitFieldInsn(GETFIELD, this.generatingClass, TypesAndDescriptors.makeMethodReturnFieldName(this.methodName, this.methodDescriptor), this.returnType);
-      this.mv.visitInsn(DRETURN);
+      generateUnboxingReturn(DOUBLE_CLASS_INTERNAL_NAME, 
+                             DOUBLEVALUE_METHOD_NAME,
+                             DOUBLEVALUE_DESCRIPTOR,
+                             DRETURN,
+                             (mv) -> mv.visitInsn(DCONST_0));
       break;
     case OBJECT_PRIMITIVE_INTERNAL_NAME:
-      /* Object */
       this.mv.visitVarInsn(ALOAD, 0);
-      this.mv.visitFieldInsn(GETFIELD, this.generatingClass, TypesAndDescriptors.makeMethodReturnFieldName(this.methodName, this.methodDescriptor), this.returnType);
+      this.mv.visitMethodInsn(INVOKEVIRTUAL, this.generatingClass, SUPPORT_GETCURRENTRETURN_METHOD_NAME, VOID_OBJECT_DESCRIPTOR, false);
+      this.mv.visitTypeInsn(CHECKCAST, this.returnType);
       this.mv.visitInsn(ARETURN);
       break;
     case VOID_PRIMITIVE_INTERNAL_NAME:
-      /* void */
       this.mv.visitInsn(RETURN);
       break;
     default:
@@ -247,6 +274,35 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
                                        + "Your JVM must be super-new and improved.\n"
                                        + "To fix, add mysterious new type to switch in MoxyMockingMethodVisitor#visitCode()");
     }    
+  }
+
+  /*
+   * Generate an auto-unboxing return using the appropriate value from
+   * the ASMMoxySupport.__moxy_asm_getReturnForCurrentInvocation method.
+   * The defaultValue parameter is expected to generate the appropriate
+   * default value bytecode for primitive types if there is no value 
+   * returned from that method (i.e. if this method has not been stubbed).
+   */
+  void generateUnboxingReturn(String boxClass,
+                              String valueOfMethod,
+                              String valueOfDescriptor,
+                              int returnOpcode,
+                              Consumer<MethodVisitor> defaultValue) {
+    final Label defaultValueLabel = new Label();
+
+    this.mv.visitVarInsn(ALOAD, 0);
+    this.mv.visitMethodInsn(INVOKEVIRTUAL, this.generatingClass, SUPPORT_GETCURRENTRETURN_METHOD_NAME, VOID_OBJECT_DESCRIPTOR, false);    
+    this.mv.visitJumpInsn(IFNULL, defaultValueLabel);
+
+    this.mv.visitVarInsn(ALOAD, 0);
+    this.mv.visitMethodInsn(INVOKEVIRTUAL, this.generatingClass, SUPPORT_GETCURRENTRETURN_METHOD_NAME, VOID_OBJECT_DESCRIPTOR, false);
+    this.mv.visitTypeInsn(CHECKCAST, boxClass);    
+    this.mv.visitMethodInsn(INVOKEVIRTUAL, boxClass, valueOfMethod, valueOfDescriptor, false);
+    this.mv.visitInsn(returnOpcode);
+    
+    this.mv.visitLabel(defaultValueLabel);
+    defaultValue.accept(this.mv);    
+    this.mv.visitInsn(returnOpcode);
   }
   
   @Override

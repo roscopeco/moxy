@@ -13,9 +13,7 @@ class ASMMoxyVoidStubber extends HasEngineAndInvocation implements MoxyVoidStubb
     final MoxyInvocation invocation = this.theInvocation;
     ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
     
-    receiver.__moxy_asm_setThrowFieldForVoidMethods(invocation.getMethodName(),
-                                                    invocation.getMethodDesc(),
-                                                    throwable);
+    receiver.__moxy_asm_setThrowForVoidMethods(invocation, throwable);
         
     return this;
   }

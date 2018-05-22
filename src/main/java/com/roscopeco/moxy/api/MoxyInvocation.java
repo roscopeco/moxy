@@ -2,6 +2,7 @@ package com.roscopeco.moxy.api;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a single invocation of a given method, on a given receiver,
@@ -66,5 +67,25 @@ public final class MoxyInvocation {
    */
   public List<Object> getArgs() {
     return args == null ? EMPTY_OBJECT_LIST : args;
+  }
+  
+  @Override
+  public boolean equals(Object other) {
+    if (other == null) {
+      return false;
+    } else if (!(other instanceof MoxyInvocation)) {
+      return false;
+    } else {
+      MoxyInvocation otherInvocation = (MoxyInvocation)other;
+      return otherInvocation.receiver == this.receiver &&
+             otherInvocation.methodName.equals(this.methodName) &&
+             otherInvocation.methodDesc.equals(this.methodDesc) &&
+             otherInvocation.args.equals(this.args);
+    }    
+  }
+  
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.receiver, this.methodName, this.methodDesc, this.args);
   }
 }

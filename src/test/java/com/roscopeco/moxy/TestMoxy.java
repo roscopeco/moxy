@@ -348,7 +348,7 @@ public class TestMoxy {
 
   @Test
   public void testMoxyMockWithMockWhenThenThrowTakesAccountOfArgumentsWithVoidMethod() {
-    MethodWithArguments mock = Moxy.mock(MethodWithArguments.class, System.out);
+    MethodWithArguments mock = Moxy.mock(MethodWithArguments.class);
     
     RuntimeException worldException = new RuntimeException("world");
     RuntimeException samException = new RuntimeException("sam");
@@ -364,5 +364,5 @@ public class TestMoxy {
     } catch (Throwable e) {
       throw new AssertionFailedError("Expected no exception but got " + e.getMessage());
     }
-  }
+  }  
 }

@@ -1,8 +1,9 @@
 package com.roscopeco.moxy.impl.asm;
 
-import java.lang.reflect.Field;
+import java.util.HashMap;
 
 import com.roscopeco.moxy.api.MoxyEngine;
+import com.roscopeco.moxy.api.MoxyInvocation;
 import com.roscopeco.moxy.api.MoxyInvocationRecorder;
 
 /**
@@ -18,6 +19,8 @@ import com.roscopeco.moxy.api.MoxyInvocationRecorder;
 public interface ASMMockSupport {
   /* For mocks to implement */
   public MoxyEngine __moxy_asm_getEngine();
+  public HashMap<MoxyInvocation, Object> __moxy_asm_getReturnMap();
+  public HashMap<MoxyInvocation, Throwable> __moxy_asm_getThrowMap();
   
   /* Implemented by default */
   default public MoxyInvocationRecorder __moxy_asm_getRecorder() {
@@ -28,59 +31,72 @@ public interface ASMMockSupport {
     throw new InstantiationException("Cannot construct mock with null constructor");
   }
   
-  default public void __moxy_asm_setThrowOrReturnField(String methodName,
-                                                       String methodDesc,
-                                                       Object object,
-                                                       boolean isReturn) {
+  default public void __moxy_asm_setThrowOrReturn(MoxyInvocation invocation,
+                                                  Object object,
+                                                  boolean isReturn) {    
+
+    final HashMap<MoxyInvocation, Object> returnMap = __moxy_asm_getReturnMap();
+    final HashMap<MoxyInvocation, Throwable> throwMap = __moxy_asm_getThrowMap();
     
-    final String returnFieldName = TypesAndDescriptors.makeMethodReturnFieldName(
-        methodName, methodDesc);
-    
-    final String throwFieldName = TypesAndDescriptors.makeMethodThrowFieldName(
-        methodName, methodDesc);
-    
-    try {
-      final Field checkField, setField;
-      
+    // This'll work right up until we start setting these elsewhere...
+    synchronized(this) {
       if (isReturn) {
-        checkField = this.getClass().getDeclaredField(throwFieldName);
-        setField = this.getClass().getDeclaredField(returnFieldName);
-      } else {
-        checkField = this.getClass().getDeclaredField(returnFieldName);
-        setField = this.getClass().getDeclaredField(throwFieldName);
-      }
-
-      // This'll work right up until we start setting these fields elsewhere...
-      synchronized(this) {
-        if (checkField.get(this) != null) {
-          // other field is set - can't do both!
-          throw new IllegalStateException("Cannot set both throw and return for " + methodName + methodDesc);
+        if (throwMap.containsKey(invocation)) {
+          // throw is set - can't do both!
+          throw new IllegalStateException("Cannot set both throw and return for " 
+                                          + invocation.getMethodName()
+                                          + invocation.getMethodDesc());  
+        } else {
+          returnMap.put(invocation, object);
         }
-
-        setField.set(this, object);
+      } else {
+        if (returnMap.containsKey(invocation)) {
+          // return is set - can't do both!
+          throw new IllegalStateException("Cannot set both throw and return for " 
+                                          + invocation.getMethodName()
+                                          + invocation.getMethodDesc());  
+        } else {
+          if (!(object instanceof Throwable)) {
+            // should never happen - code calling this shouldn't allow it, but hey ho...
+            throw new IllegalArgumentException("Cannot throw instance of " + object.getClass());
+          } else {
+            throwMap.put(invocation, (Throwable)object);
+          }
+        }
       }
-      
-    } catch (ReflectiveOperationException e) {
-      throw new IllegalStateException("Mock doesn't conform to expectations - are you using a different mock engine?\n"
-                                    + "(This stubber is for the default ASMMoxyEngine).",
-                                      e);
-    }    
+    }
   }
   
   // NOTE only to be used for void methods!
-  default public void __moxy_asm_setThrowFieldForVoidMethods(String methodName,
-                                                        String methodDesc,
-                                                        Object object) {
-    final String throwFieldName = TypesAndDescriptors.makeMethodThrowFieldName(
-        methodName, methodDesc);
-    
-    try {
-      final Field throwField = this.getClass().getDeclaredField(throwFieldName);
-      throwField.set(this, object);
-    } catch (ReflectiveOperationException e) {
-      throw new IllegalStateException("Mock doesn't conform to expectations - are you using a different mock engine?\n"
-          + "(This stubber is for the default ASMMoxyEngine).",
-            e);
-    }    
+  default public void __moxy_asm_setThrowForVoidMethods(MoxyInvocation invocation,
+                                                             Object object) {
+    final HashMap<MoxyInvocation, Throwable> throwMap = __moxy_asm_getThrowMap();
+
+    if (!(object instanceof Throwable)) {
+      // should never happen - code calling this shouldn't allow it, but hey ho...
+      throw new IllegalArgumentException("Cannot throw instance of " + object.getClass());
+    } else {
+      throwMap.put(invocation, (Throwable)object);
+    }
+  }
+  
+  /* This MUST only ever be called from mocked methods AFTER the invocation has been
+   * recorded. It relies on the fact that getLastInvocation will always be the current 
+   * invocation just prior to throw or return.
+   */
+  default public Throwable __moxy_asm_getThrowForCurrentInvocation() {
+    final MoxyInvocation current = __moxy_asm_getEngine().getRecorder().getLastInvocation();
+    final HashMap<MoxyInvocation, Throwable> throwMap = __moxy_asm_getThrowMap();    
+    return throwMap.get(current);
+  }
+
+  /* This MUST only ever be called from mocked methods AFTER the invocation has been
+   * recorded. It relies on the fact that getLastInvocation will always be the current 
+   * invocation just prior to throw or return.
+   */
+  default public Object __moxy_asm_getReturnForCurrentInvocation() {
+    final MoxyInvocation current = __moxy_asm_getEngine().getRecorder().getLastInvocation();
+    final HashMap<MoxyInvocation, Object> returnMap = __moxy_asm_getReturnMap();    
+    return returnMap.get(current);
   }
 }

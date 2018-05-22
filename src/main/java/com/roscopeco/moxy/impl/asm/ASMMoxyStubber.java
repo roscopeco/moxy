@@ -13,10 +13,7 @@ class ASMMoxyStubber<T> extends HasEngineAndInvocation implements MoxyStubber<T>
     final MoxyInvocation invocation = this.theInvocation;
     ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
     
-    receiver.__moxy_asm_setThrowOrReturnField(invocation.getMethodName(),
-                                              invocation.getMethodDesc(),
-                                              object,
-                                              true);
+    receiver.__moxy_asm_setThrowOrReturn(invocation, object, true);
         
     return this;
   }
@@ -26,10 +23,7 @@ class ASMMoxyStubber<T> extends HasEngineAndInvocation implements MoxyStubber<T>
     final MoxyInvocation invocation = this.theInvocation;
     ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
     
-    receiver.__moxy_asm_setThrowOrReturnField(invocation.getMethodName(),
-                                              invocation.getMethodDesc(),
-                                              throwable,
-                                              false);
+    receiver.__moxy_asm_setThrowOrReturn(invocation, throwable, false);
         
     return this;
   }

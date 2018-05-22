@@ -5,7 +5,6 @@ import static org.objectweb.asm.Opcodes.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.UUID;
 
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -21,8 +20,8 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
   private final String interfaceInternalName;
 
   public MoxyMockInterfaceVisitor(Class<?> iface) {
-    super(iface.getPackage().getName().replace('.', '/') + "/MoxyMock-"
-        + UUID.randomUUID());
+    super(AbstractMoxyTypeVisitor.makeMockName(iface));
+    
     this.interfaceInternalName = Type.getInternalName(iface);
   }
 

@@ -3,6 +3,8 @@ package com.roscopeco.moxy.impl.asm.visitors;
 import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
 import static org.objectweb.asm.Opcodes.*;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -15,6 +17,15 @@ import org.objectweb.asm.tree.ClassNode;
  * Generates a ClassNode.
  */
 public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {   
+  protected static final AtomicInteger mockNumber = new AtomicInteger();
+  protected static String makeMockName(Class<?> originalClass) {
+    return originalClass.getPackage().getName().replace('.', '/') + "/Mock " 
+           + originalClass.getSimpleName() 
+           + " {"
+           + AbstractMoxyTypeVisitor.mockNumber.getAndIncrement()
+           + "}";
+  }
+
   private final ClassNode node = new ClassNode();
   private final String newClassInternalName;
   

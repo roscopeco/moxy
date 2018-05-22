@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -21,14 +20,12 @@ import com.roscopeco.moxy.api.Mock;
  * @author Ross.Bamford
  */
 public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {  
-  private static final AtomicInteger mockNumber = new AtomicInteger();
-  
   private final String originalClassInternalName;
   private final Set<Method> mockMethods;
 
   public MoxyMockClassVisitor(Class<?> originalClass, Set<Method> methods) {
-    super(originalClass.getPackage().getName().replace('.', '/') + "/Moxy Mock #"
-        + mockNumber.getAndIncrement());
+    super(AbstractMoxyTypeVisitor.makeMockName(originalClass));
+ 
     this.originalClassInternalName = Type.getInternalName(originalClass);
     this.mockMethods = methods == null ? Collections.emptySet() : methods;
   }

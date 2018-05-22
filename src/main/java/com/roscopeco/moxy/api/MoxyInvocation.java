@@ -70,22 +70,39 @@ public final class MoxyInvocation {
   }
   
   @Override
-  public boolean equals(Object other) {
-    if (other == null) {
-      return false;
-    } else if (!(other instanceof MoxyInvocation)) {
-      return false;
-    } else {
-      MoxyInvocation otherInvocation = (MoxyInvocation)other;
-      return otherInvocation.receiver == this.receiver &&
-             otherInvocation.methodName.equals(this.methodName) &&
-             otherInvocation.methodDesc.equals(this.methodDesc) &&
-             otherInvocation.args.equals(this.args);
-    }    
-  }
-  
-  @Override
   public int hashCode() {
     return Objects.hash(this.receiver, this.methodName, this.methodDesc, this.args);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    MoxyInvocation other = (MoxyInvocation) obj;
+    if (args == null) {
+      if (other.args != null)
+        return false;
+    } else if (!args.equals(other.args))
+      return false;
+    if (methodDesc == null) {
+      if (other.methodDesc != null)
+        return false;
+    } else if (!methodDesc.equals(other.methodDesc))
+      return false;
+    if (methodName == null) {
+      if (other.methodName != null)
+        return false;
+    } else if (!methodName.equals(other.methodName))
+      return false;
+    if (receiver == null) {
+      if (other.receiver != null)
+        return false;
+    } else if (!receiver.equals(other.receiver))
+      return false;
+    return true;
   }
 }

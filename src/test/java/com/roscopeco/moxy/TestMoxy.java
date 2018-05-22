@@ -182,7 +182,7 @@ public class TestMoxy {
     
     assertThatThrownBy(() -> Moxy.assertMock(() -> mock.returnHello()).wasCalled())
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock returnHello(...) to be called with arguments () at least once but it wasn't");
+        .hasMessage("Expected mock returnHello() to be called at least once but it wasn't");
   }
 
   /* We're bootstrapped. Let's start eating our own dog food... */
@@ -208,7 +208,7 @@ public class TestMoxy {
         Moxy.assertMock(() -> mock.hasArgs("Two", (byte)1, 'b', (short)10, 0x2badf00d, 200L, 3579.0f, 5302.0d, false))
             .wasCalled())
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock hasArgs(...) to be called with arguments (Two,1,b,10,732819469,200,3579.0,5302.0,false) at least once but it wasn't");
+        .hasMessage("Expected mock hasArgs(java.lang.String, byte, char, short, int, long, float, double, boolean) to be called with arguments (\"Two\", 1, 'b', 10, 732819469, 200, 3579.0, 5302.0, false) at least once but it wasn't");
   }
   
   @Test
@@ -228,8 +228,7 @@ public class TestMoxy {
         Moxy.assertMock(() -> mock.returnHello())
             .wasCalled(4))
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock returnHello(...) to be called with arguments () exactly 4 time(s) but it wasn't");
-
+        .hasMessage("Expected mock returnHello() to be called exactly 4 time(s), but it was called 3 time(s)");
   }
   
   @Test
@@ -364,5 +363,129 @@ public class TestMoxy {
     } catch (Throwable e) {
       throw new AssertionFailedError("Expected no exception but got " + e.getMessage());
     }
-  }  
+  }
+  
+  @Test
+  public void testMoxyMockWithMockWasNotCalledTakesAccountOfArguments() {
+    MethodWithArguments mock = Moxy.mock(MethodWithArguments.class);
+    
+    mock.hasArgs("this was", "called");
+    
+    Moxy.assertMock(() -> mock.hasArgs("this was", "called")).wasCalled();
+    Moxy.assertMock(() -> mock.hasArgs("this was", "called")).wasCalled(1);
+    
+    assertThatThrownBy(() -> 
+        Moxy.assertMock(() -> mock.hasArgs("this was", "called")).wasNotCalled()
+    )
+        .isInstanceOf(AssertionFailedError.class)
+        .hasMessage("Expected mock hasArgs(java.lang.String, java.lang.String) to be called with arguments (\"this was\", \"called\") exactly 0 time(s), but it was called 1 time(s)");
+    
+    Moxy.assertMock(() -> mock.hasArgs("was never", "called")).wasNotCalled();
+  }
+  
+  @Test
+  public void testMoxyMockWithMockWasCalledOnceWorks() {
+    ClassWithPrimitiveReturns mock = Moxy.mock(ClassWithPrimitiveReturns.class);
+    
+    mock.returnShort();
+    
+    mock.returnDouble();
+    mock.returnDouble();
+    
+    Moxy.assertMock(() -> mock.returnShort()).wasCalledOnce();
+
+    assertThatThrownBy(() -> 
+        Moxy.assertMock(() -> mock.returnDouble()).wasCalledOnce()
+    )
+        .isInstanceOf(AssertionFailedError.class)
+        .hasMessage("Expected mock returnDouble() to be called exactly 1 time(s), but it was called 2 time(s)");
+
+    assertThatThrownBy(() -> 
+        Moxy.assertMock(() -> mock.returnLong()).wasCalledOnce()
+    )
+        .isInstanceOf(AssertionFailedError.class)
+        .hasMessage("Expected mock returnLong() to be called exactly 1 time(s), but it was called 0 time(s)");
+    
+  }
+
+  @Test
+  public void testMoxyMockWithMockWasCalledTwiceWorks() {
+    ClassWithPrimitiveReturns mock = Moxy.mock(ClassWithPrimitiveReturns.class);
+    
+    mock.returnShort();
+    
+    mock.returnDouble();
+    mock.returnDouble();
+    
+    Moxy.assertMock(() -> mock.returnDouble()).wasCalledTwice();
+
+    assertThatThrownBy(() -> 
+        Moxy.assertMock(() -> mock.returnShort()).wasCalledTwice()
+    )
+        .isInstanceOf(AssertionFailedError.class)
+        .hasMessage("Expected mock returnShort() to be called exactly 2 time(s), but it was called 1 time(s)");
+
+    assertThatThrownBy(() -> 
+        Moxy.assertMock(() -> mock.returnLong()).wasCalledTwice()
+    )
+        .isInstanceOf(AssertionFailedError.class)
+        .hasMessage("Expected mock returnLong() to be called exactly 2 time(s), but it was called 0 time(s)");
+    
+  }
+
+  @Test
+  public void testMoxyMockWithMockWasCalledAtLeastWorks() {
+    ClassWithPrimitiveReturns mock = Moxy.mock(ClassWithPrimitiveReturns.class);
+    
+    mock.returnShort();
+    
+    mock.returnDouble();
+    mock.returnDouble();
+    
+    mock.returnBoolean();
+    mock.returnBoolean();
+    mock.returnBoolean();
+    
+    Moxy.assertMock(() -> mock.returnDouble()).wasCalledAtLeast(2);
+    Moxy.assertMock(() -> mock.returnBoolean()).wasCalledAtLeast(2);
+
+    assertThatThrownBy(() -> 
+        Moxy.assertMock(() -> mock.returnShort()).wasCalledAtLeast(2)
+    )
+        .isInstanceOf(AssertionFailedError.class)
+        .hasMessage("Expected mock returnShort() to be called at least 2 time(s), but it was called 1 time(s)");
+
+    assertThatThrownBy(() -> 
+        Moxy.assertMock(() -> mock.returnLong()).wasCalledAtLeast(2)
+    )
+        .isInstanceOf(AssertionFailedError.class)
+        .hasMessage("Expected mock returnLong() to be called at least 2 time(s), but it was called 0 time(s)");
+    
+  }
+
+  @Test
+  public void testMoxyMockWithMockWasCalledAtMostWorks() {
+    ClassWithPrimitiveReturns mock = Moxy.mock(ClassWithPrimitiveReturns.class);
+    
+    mock.returnShort();
+    
+    mock.returnDouble();
+    mock.returnDouble();
+    
+    mock.returnBoolean();
+    mock.returnBoolean();
+    mock.returnBoolean();
+    
+    // never called - passes
+    Moxy.assertMock(() -> mock.returnLong()).wasCalledAtMost(1);
+    
+    Moxy.assertMock(() -> mock.returnShort()).wasCalledAtMost(1);
+    Moxy.assertMock(() -> mock.returnDouble()).wasCalledAtMost(2);
+
+    assertThatThrownBy(() -> 
+        Moxy.assertMock(() -> mock.returnBoolean()).wasCalledAtMost(2)
+    )
+        .isInstanceOf(AssertionFailedError.class)
+        .hasMessage("Expected mock returnBoolean() to be called at most 2 time(s), but it was called 3 time(s)");
+  }
 }

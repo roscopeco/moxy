@@ -11,7 +11,7 @@ public interface MoxyVerifier {
    * expects an <em>exact number</em> of calls.
    * 
    * @return <code>this</code>. 
-   * @throws AssertionFailedError if the assertion fails.
+   * @throws {@link AssertionFailedError} if the assertion fails.
    */
   public MoxyVerifier wasCalled();
 
@@ -23,7 +23,45 @@ public interface MoxyVerifier {
    * expects an <em>at least one</em> call.
    * 
    * @return <code>this</code>. 
-   * @throws AssertionFailedError if the assertion fails.
+   * @throws {@link AssertionFailedError} if the assertion fails.
    */
   public MoxyVerifier wasCalled(int times);
+  
+  /**
+   * Verify that the mock method was not called.
+   * 
+   * @return <code>this</code>
+   * @throws {@link AssertionFailedError} if the assertion fails.
+   */
+  public MoxyVerifier wasNotCalled();
+  
+  /**
+   * Verify the mock method was called exactly once.
+   * 
+   * @return <code>this</code>
+   */
+  public MoxyVerifier wasCalledOnce();
+
+  /**
+   * Verify the mock method called exactly twice.
+   * 
+   * @return <code>this</code>
+   */
+  public MoxyVerifier wasCalledTwice();
+
+  /**
+   * Verify the mock method was called at least <code>times</code>.
+   *  
+   * @param times
+   * @return <code>this</code>
+   */
+  public MoxyVerifier wasCalledAtLeast(int times);
+  
+  /**
+   * Verify the mock method was called at most <code>times</code>.
+   * 
+   * @param times
+   * @return <code>this</code>
+   */
+  public MoxyVerifier wasCalledAtMost(int times);  
 }

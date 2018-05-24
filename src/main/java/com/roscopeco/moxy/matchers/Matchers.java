@@ -76,12 +76,12 @@ public class Matchers {
     return false;
   }
   
-  public static Object any() {
+  public static <T> T any() {
     return any(Moxy.getMoxyEngine());
   }
   
-  public static Object any(MoxyEngine engine) {
-    engine.getMatcherEngine().registerMatcher(new AnyMatcher<Object>());
+  public static <T> T any(MoxyEngine engine) {
+    engine.getMatcherEngine().registerMatcher(new AnyMatcher<T>());
     return null;
   }
 }

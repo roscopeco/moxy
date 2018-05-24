@@ -1,13 +1,11 @@
 package com.roscopeco.moxy.impl.asm;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.objectweb.asm.Type;
 
 import com.roscopeco.moxy.api.MoxyVerifier;
-import com.roscopeco.moxy.matchers.MoxyMatcher;
 
 import junit.framework.AssertionFailedError;
 

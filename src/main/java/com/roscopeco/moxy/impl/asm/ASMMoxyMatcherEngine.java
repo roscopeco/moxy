@@ -8,7 +8,17 @@ import com.roscopeco.moxy.api.MoxyMatcherEngine;
 import com.roscopeco.moxy.matchers.MoxyMatcher;
 
 class ASMMoxyMatcherEngine implements MoxyMatcherEngine {
+  final ASMMoxyEngine engine;
+  
+  ASMMoxyMatcherEngine(ASMMoxyEngine engine) {
+    this.engine = engine;
+  }
+  
   ThreadLocal<ArrayDeque<MoxyMatcher<?>>> matcherStack = new ThreadLocal<>();
+  
+  ASMMoxyEngine getASMMoxyEngine() {
+    return this.engine;
+  }
 
   ArrayDeque<MoxyMatcher<?>> ensureMatcherStack() {
     ArrayDeque<MoxyMatcher<?>> stack = matcherStack.get();

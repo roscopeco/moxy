@@ -20,6 +20,7 @@ import org.objectweb.asm.util.TraceClassVisitor;
 import com.roscopeco.moxy.Moxy;
 import com.roscopeco.moxy.api.Mock;
 import com.roscopeco.moxy.api.MoxyEngine;
+import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.api.MoxyMatcherEngine;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
@@ -55,7 +56,7 @@ public class ASMMoxyEngine implements MoxyEngine {
 
   public ASMMoxyEngine() {
     this.recorder = new ThreadLocalInvocationRecorder(this);
-    this.matcherEngine = new ASMMoxyMatcherEngine();
+    this.matcherEngine = new ASMMoxyMatcherEngine(this);
   }
   
   public ThreadLocalInvocationRecorder getRecorder() {
@@ -185,8 +186,11 @@ public class ASMMoxyEngine implements MoxyEngine {
   void naivelyInvokeAndSwallowExceptions(Runnable doInvoke) {
     try {
       doInvoke.run();
-    } catch (Exception e) {
-      // TODO naively swallow for now, revisit later when we have a base exception for the framework.
+    } catch (MoxyException e) {
+      // Framework error - rethrow this.
+      throw e;
+    } catch (Exception e) {      
+      // TODO naively swallow everything else.
     }
   }
   

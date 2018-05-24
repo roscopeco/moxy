@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import com.roscopeco.moxy.matchers.InconsistentMatchersException;
 import com.roscopeco.moxy.matchers.MoxyMatcher;
 
 public class ThreadLocalInvocationRecorder {
@@ -30,7 +31,7 @@ public class ThreadLocalInvocationRecorder {
       final Invocation lastInvocation = this.getLastInvocation();
       final List<Object> lastArgs = lastInvocation.getArgs();
       if (lastArgs.size() != matchers.size()) {
-        throw new IllegalStateException("When matchers are used, they must be used for all arguments");
+        throw new InconsistentMatchersException();
       } else {
         for (int i = 0; i < lastArgs.size(); i++) {
           lastArgs.set(i, matchers.get(i));          

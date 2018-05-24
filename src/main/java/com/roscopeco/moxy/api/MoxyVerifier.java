@@ -1,6 +1,6 @@
 package com.roscopeco.moxy.api;
 
-import junit.framework.AssertionFailedError;
+import org.opentest4j.AssertionFailedError;
 
 public interface MoxyVerifier {
   /**

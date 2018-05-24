@@ -16,7 +16,7 @@ import com.roscopeco.moxy.model.SimpleAbstractClass;
 import com.roscopeco.moxy.model.SimpleClass;
 import com.roscopeco.moxy.model.SimpleInterface;
 
-import junit.framework.AssertionFailedError;
+import org.opentest4j.AssertionFailedError;
 
 public class TestMoxy {
   @BeforeEach

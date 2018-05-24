@@ -7,7 +7,7 @@ import org.objectweb.asm.Type;
 
 import com.roscopeco.moxy.api.MoxyVerifier;
 
-import junit.framework.AssertionFailedError;
+import org.opentest4j.AssertionFailedError;
 
 class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
   public ASMMoxyVerifier(ASMMoxyEngine engine) {

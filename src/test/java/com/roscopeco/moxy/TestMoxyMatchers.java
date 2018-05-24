@@ -274,5 +274,20 @@ public class TestMoxyMatchers {
         .hasMessage("Inconsistent use of matchers: if using matchers, *all* arguments must be supplied with them.\n"
                   + "This limitation will (hopefully) be lifted in the future.");
 
-  }  
+  }
+  
+  @Test
+  public void testMoxyMockWithMockWhenCanStubMultipleCallsBeforeInvocation() {
+    MatcherTestClass mock = mock(MatcherTestClass.class);
+    
+    when(() -> mock.testByte(anyByte())).thenReturn(PASSED);
+    when(() -> mock.testBoolean(anyBool())).thenReturn(PASSED);
+    
+    assertThat(mock.testBoolean(true)).isEqualTo(PASSED);
+    assertThat(mock.testByte((byte)10)).isEqualTo(PASSED);
+    
+    assertMock(() -> mock.testByte((byte)10)).wasCalledOnce();
+    assertMock(() -> mock.testBoolean(true)).wasCalledOnce();
+  }
+  
 }

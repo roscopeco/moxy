@@ -60,34 +60,6 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     }
   }
   
-  // suppress because we check manually
-  @SuppressWarnings("unchecked")
-  boolean argsMatch(List<Object> actualArgs, List<Object> storedArgs) {
-    if (storedArgs.size() != actualArgs.size()) {
-      return false;
-    }
-    
-    boolean result = true;
-    
-    for (int i = 0; i < storedArgs.size(); i++) {
-      Object stored = storedArgs.get(i);
-      Object actual = actualArgs.get(i);
-      
-      if (stored instanceof MoxyMatcher) {
-        MoxyMatcher<Object> matcher = (MoxyMatcher<Object>)stored;
-        if (!matcher.matches(actual)) {
-          result = false;
-        }        
-      } else {
-        if (!stored.equals(actual)) {
-          result = false;
-        }
-      }
-    }
-    
-    return result;
-  }
-  
   @Override
   public MoxyVerifier wasCalled() {
     final Invocation invocation = getTheInvocation();
@@ -100,7 +72,9 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
                                methodName, 
                                methodDesc)
         .stream()
-        .anyMatch((e) -> argsMatch(e.getArgs(), invocation.getArgs())
+        .anyMatch((e) -> this.getEngine()
+                             .getASMMatcherEngine()
+                             .argsMatch(e.getArgs(), invocation.getArgs())
     )) {
       return this;
     } else {
@@ -118,7 +92,9 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
                            methodName, 
                            methodDesc)
     .stream()
-    .filter( (e) -> argsMatch(e.getArgs(), invocation.getArgs()) )
+    .filter( (e) -> this.getEngine()
+                        .getASMMatcherEngine()
+                        .argsMatch(e.getArgs(), invocation.getArgs()) )
     .collect(Collectors.toList())
     .size();    
   }

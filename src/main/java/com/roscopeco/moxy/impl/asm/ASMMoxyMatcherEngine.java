@@ -37,4 +37,32 @@ class ASMMoxyMatcherEngine implements MoxyMatcherEngine {
       return result;
     }    
   }
+  
+  // suppress because we check manually
+  @SuppressWarnings("unchecked")
+  boolean argsMatch(List<Object> actualArgs, List<Object> storedArgs) {
+    if (storedArgs.size() != actualArgs.size()) {
+      return false;
+    }
+    
+    boolean result = true;
+    
+    for (int i = 0; i < storedArgs.size(); i++) {
+      Object stored = storedArgs.get(i);
+      Object actual = actualArgs.get(i);
+      
+      if (stored instanceof MoxyMatcher) {
+        MoxyMatcher<Object> matcher = (MoxyMatcher<Object>)stored;
+        if (!matcher.matches(actual)) {
+          result = false;
+        }        
+      } else {
+        if (!stored.equals(actual)) {
+          result = false;
+        }
+      }
+    }
+    
+    return result;
+  }
 }

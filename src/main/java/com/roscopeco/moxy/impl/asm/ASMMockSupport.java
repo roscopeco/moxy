@@ -1,5 +1,7 @@
 package com.roscopeco.moxy.impl.asm;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 
 /**
@@ -15,8 +17,11 @@ import java.util.HashMap;
 public interface ASMMockSupport {
   /* For mocks to implement */
   public ASMMoxyEngine __moxy_asm_getEngine();
-  public HashMap<Invocation, Object> __moxy_asm_getReturnMap();
-  public HashMap<Invocation, Throwable> __moxy_asm_getThrowMap();
+  
+  // Using Deque here for efficient add-at-front, so when
+  // we stream we see the most recent stubbing...
+  public HashMap<StubMethod, Deque<StubReturn>> __moxy_asm_getReturnMap();
+  public HashMap<StubMethod, Deque<StubThrow>> __moxy_asm_getThrowMap();
   
   /* Implemented by default */
   default public ThreadLocalInvocationRecorder __moxy_asm_getRecorder() {
@@ -27,63 +32,111 @@ public interface ASMMockSupport {
     throw new InstantiationException("Cannot construct mock with null constructor");
   }
   
+  default public Deque<StubReturn>__moxy_asm_ensureStubReturnDeque(      
+      HashMap<StubMethod, Deque<StubReturn>> returnMap,
+      StubMethod method) {
+    Deque<StubReturn> deque = returnMap.get(method);
+    
+    if (deque == null) {
+      returnMap.put(method, deque = new ArrayDeque<>());      
+    }
+    
+    return deque;
+  }
+  
+  default public Deque<StubThrow>__moxy_asm_ensureStubThrowDeque(      
+      HashMap<StubMethod, Deque<StubThrow>> throwMap,
+      StubMethod method) {
+    Deque<StubThrow> deque = throwMap.get(method);
+    
+    if (deque == null) {
+      throwMap.put(method, deque = new ArrayDeque<>());      
+    }
+    
+    return deque;    
+  }
+  
   default public void __moxy_asm_setThrowOrReturn(Invocation invocation,
                                                   Object object,
                                                   boolean isReturn) {    
 
-    final HashMap<Invocation, Object> returnMap = __moxy_asm_getReturnMap();
-    final HashMap<Invocation, Throwable> throwMap = __moxy_asm_getThrowMap();
     
-    // This'll work right up until we start setting these elsewhere...
-    synchronized(this) {
-      if (isReturn) {
-        if (throwMap.containsKey(invocation)) {
-          // throw is set - can't do both!
-          throw new IllegalStateException("Cannot set both throw and return for " 
-                                          + invocation.getMethodName()
-                                          + invocation.getMethodDesc());  
-        } else {
-          returnMap.put(invocation, object);
-        }
+    if (isReturn) {
+      if (__moxy_asm_getThrowForInvocation(invocation) != null) {
+        throw new IllegalStateException("Cannot set both throw and return for " 
+                                      + invocation.getMethodName()
+                                      + invocation.getMethodDesc());
       } else {
-        if (returnMap.containsKey(invocation)) {
-          // return is set - can't do both!
-          throw new IllegalStateException("Cannot set both throw and return for " 
-                                          + invocation.getMethodName()
-                                          + invocation.getMethodDesc());  
+        final HashMap<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_getReturnMap();
+        final Deque<StubReturn> deque = __moxy_asm_ensureStubReturnDeque(
+            returnMap, 
+            new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
+        
+        deque.addFirst(new StubReturn(invocation.getArgs(), object));
+      }
+    } else {
+      if (__moxy_asm_getReturnForInvocation(invocation) != null) {
+        throw new IllegalStateException("Cannot set both throw and return for " 
+                                      + invocation.getMethodName()
+                                      + invocation.getMethodDesc());
+      } else {
+        final HashMap<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_getThrowMap();      
+        final Deque<StubThrow> deque = __moxy_asm_ensureStubThrowDeque(
+            throwMap, 
+            new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
+        
+        if (object instanceof Throwable) {      
+          deque.addFirst(new StubThrow(invocation.getArgs(), (Throwable)object));
         } else {
-          if (!(object instanceof Throwable)) {
-            // should never happen - code calling this shouldn't allow it, but hey ho...
-            throw new IllegalArgumentException("Cannot throw instance of " + object.getClass());
-          } else {
-            throwMap.put(invocation, (Throwable)object);
-          }
+          throw new IllegalArgumentException("Cannot throw non-Throwable class " + object.getClass().getName());
+        }
+      }
+    }    
+  }
+  
+  default public Throwable __moxy_asm_getThrowForInvocation(Invocation invocation) {
+    final HashMap<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_getThrowMap();
+    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
+    final Deque<StubThrow> deque = throwMap.get(
+        new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
+    
+    // Old-fashioned but a tad more efficient...
+    if (deque != null) {
+      for (StubThrow stubThrow : deque) {
+        if (matchEngine.argsMatch(invocation.getArgs(), stubThrow.args)) {
+          return stubThrow.toThrow;
         }
       }
     }
+    
+    return null;
   }
-  
-  // NOTE only to be used for void methods!
-  default public void __moxy_asm_setThrowForVoidMethods(Invocation invocation,
-                                                             Object object) {
-    final HashMap<Invocation, Throwable> throwMap = __moxy_asm_getThrowMap();
 
-    if (!(object instanceof Throwable)) {
-      // should never happen - code calling this shouldn't allow it, but hey ho...
-      throw new IllegalArgumentException("Cannot throw instance of " + object.getClass());
-    } else {
-      throwMap.put(invocation, (Throwable)object);
+  default public Object __moxy_asm_getReturnForInvocation(Invocation invocation) {
+    final HashMap<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_getReturnMap();
+    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
+    final Deque<StubReturn> deque = returnMap.get(
+        new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
+    
+    // Old-fashioned but a tad more efficient...
+    if (deque != null) {
+      for (StubReturn stubReturn : deque) {
+        if (matchEngine.argsMatch(invocation.getArgs(), stubReturn.args)) {
+          return stubReturn.toReturn;
+        }
+      }
     }
+    
+    return null;
   }
-  
+
   /* This MUST only ever be called from mocked methods AFTER the invocation has been
    * recorded. It relies on the fact that getLastInvocation will always be the current 
    * invocation just prior to throw or return.
    */
   default public Throwable __moxy_asm_getThrowForCurrentInvocation() {
-    final Invocation current = __moxy_asm_getEngine().getRecorder().getLastInvocation();
-    final HashMap<Invocation, Throwable> throwMap = __moxy_asm_getThrowMap();    
-    return throwMap.get(current);
+    return __moxy_asm_getThrowForInvocation(
+        __moxy_asm_getEngine().getRecorder().getLastInvocation());    
   }
 
   /* This MUST only ever be called from mocked methods AFTER the invocation has been
@@ -91,8 +144,7 @@ public interface ASMMockSupport {
    * invocation just prior to throw or return.
    */
   default public Object __moxy_asm_getReturnForCurrentInvocation() {
-    final Invocation current = __moxy_asm_getEngine().getRecorder().getLastInvocation();
-    final HashMap<Invocation, Object> returnMap = __moxy_asm_getReturnMap();    
-    return returnMap.get(current);
+    return __moxy_asm_getReturnForInvocation(
+        __moxy_asm_getEngine().getRecorder().getLastInvocation());
   }
 }

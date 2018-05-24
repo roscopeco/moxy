@@ -94,5 +94,5 @@ public final class Moxy {
   
   public static MoxyVerifier assertMock(MoxyEngine engine, Runnable invocation) {
     return engine.assertMock(invocation);
-  }
+  }  
 }

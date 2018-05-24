@@ -21,7 +21,7 @@ import junit.framework.AssertionFailedError;
 public class TestMoxy {
   @BeforeEach
   public void setUp() {
-    Moxy.getMoxyEngine().getRecorder().reset();
+    Moxy.getMoxyEngine().reset();
   }
   
   @Test
@@ -76,7 +76,7 @@ public class TestMoxy {
   
   @Test
   public void testMoxyMockWithSimpleInterfaceReturnsInstance() {
-    SimpleInterface mock = Moxy.mock(SimpleInterface.class);
+    SimpleInterface mock = Moxy.mock(SimpleInterface.class, System.out);
     
     assertThat(mock)
         .isNotNull()

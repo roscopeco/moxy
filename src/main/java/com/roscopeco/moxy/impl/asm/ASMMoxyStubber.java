@@ -1,6 +1,5 @@
 package com.roscopeco.moxy.impl.asm;
 
-import com.roscopeco.moxy.api.MoxyInvocation;
 import com.roscopeco.moxy.api.MoxyStubber;
 
 class ASMMoxyStubber<T> extends HasEngineAndInvocation implements MoxyStubber<T> {
@@ -10,7 +9,7 @@ class ASMMoxyStubber<T> extends HasEngineAndInvocation implements MoxyStubber<T>
   
   @Override
   public MoxyStubber<T> thenReturn(T object) {
-    final MoxyInvocation invocation = this.theInvocation;
+    final Invocation invocation = this.theInvocation;
     ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
     
     receiver.__moxy_asm_setThrowOrReturn(invocation, object, true);
@@ -20,7 +19,7 @@ class ASMMoxyStubber<T> extends HasEngineAndInvocation implements MoxyStubber<T>
 
   @Override
   public MoxyStubber<T> thenThrow(Throwable throwable) {
-    final MoxyInvocation invocation = this.theInvocation;
+    final Invocation invocation = this.theInvocation;
     ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
     
     receiver.__moxy_asm_setThrowOrReturn(invocation, throwable, false);

@@ -85,11 +85,11 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     }
     
     // Call recorder
-    this.mv.visitMethodInsn(INVOKEINTERFACE, 
+    this.mv.visitMethodInsn(INVOKEVIRTUAL, 
                             MOXY_RECORDER_INTERNAL_NAME, 
                             MOXY_RECORDER_RECORD_METHOD_NAME,
                             MOXY_RECORDER_RECORD_DESCRIPTOR,
-                            true);
+                            false);
     
   }
   

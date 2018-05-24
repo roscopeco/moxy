@@ -1,6 +1,5 @@
 package com.roscopeco.moxy.impl.asm;
 
-import com.roscopeco.moxy.api.MoxyInvocation;
 import com.roscopeco.moxy.api.MoxyVoidStubber;
 
 class ASMMoxyVoidStubber extends HasEngineAndInvocation implements MoxyVoidStubber {
@@ -10,7 +9,7 @@ class ASMMoxyVoidStubber extends HasEngineAndInvocation implements MoxyVoidStubb
   
   @Override
   public MoxyVoidStubber thenThrow(Throwable throwable) {
-    final MoxyInvocation invocation = this.theInvocation;
+    final Invocation invocation = this.theInvocation;
     ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
     
     receiver.__moxy_asm_setThrowForVoidMethods(invocation, throwable);

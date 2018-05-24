@@ -6,7 +6,6 @@ import java.util.HashMap;
 import org.objectweb.asm.Type;
 
 import com.roscopeco.moxy.api.MoxyEngine;
-import com.roscopeco.moxy.api.MoxyInvocationRecorder;
 
 // TODO tidy this up
 public final class TypesAndDescriptors {
@@ -36,13 +35,13 @@ public final class TypesAndDescriptors {
   public static final String MOXY_ENGINE_INTERNAL_NAME = Type.getInternalName(MoxyEngine.class);
 
   /* Recorder */
-  public static final String MOXY_RECORDER_INTERNAL_NAME = Type.getInternalName(MoxyInvocationRecorder.class);
+  public static final String MOXY_RECORDER_INTERNAL_NAME = Type.getInternalName(ThreadLocalInvocationRecorder.class);
   public static final String MOXY_RECORDER_RECORD_METHOD_NAME = "recordInvocation";
   public static final String MOXY_RECORDER_RECORD_DESCRIPTOR = "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V";
   
   /* ASMMoxyMockSupport-related */
   public static final String SUPPORT_GETENGINE_METHOD_NAME = "__moxy_asm_getEngine";
-  public static final String SUPPORT_GETENGINE_DESCRIPTOR = "()L" + MOXY_ENGINE_INTERNAL_NAME + ";";
+  public static final String SUPPORT_GETENGINE_DESCRIPTOR = "()" + MOXY_ASM_ENGINE_DESCRIPTOR;
   public static final String SUPPORT_GETRETURNMAP_METHOD_NAME = "__moxy_asm_getReturnMap";
   public static final String SUPPORT_GETRETURNMAP_DESCRIPTOR = "()" + HASHMAP_DESCRIPTOR;
   public static final String SUPPORT_GETTHROWMAP_METHOD_NAME = "__moxy_asm_getThrowMap";

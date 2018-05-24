@@ -7,7 +7,13 @@ import java.util.function.Supplier;
 
 public interface MoxyEngine {
 
-  public MoxyInvocationRecorder getRecorder();
+  public MoxyMatcherEngine getMatcherEngine();
+  
+  /**
+   * Reset this engine. Depending on implementation, may only
+   * reset for the current thread.
+   */
+  public void reset();
   
   /**
    * Generates a new mock based on `clz` and then defines it in the given classloader.

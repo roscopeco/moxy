@@ -4,33 +4,57 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.roscopeco.moxy.api.MoxyInvocation;
-import com.roscopeco.moxy.api.MoxyInvocationRecorder;
+import com.roscopeco.moxy.matchers.MoxyMatcher;
 
-class ThreadLocalInvocationRecorder implements MoxyInvocationRecorder {
-  private final ThreadLocal<LinkedHashMap<Class<?>, LinkedHashMap<String, List<MoxyInvocation>>>>
+public class ThreadLocalInvocationRecorder {
+  private final ASMMoxyEngine engine;
+  
+  private final ThreadLocal<LinkedHashMap<Class<?>, LinkedHashMap<String, List<Invocation>>>>
       invocationMapThreadLocal;
   
-  private final ThreadLocal<MoxyInvocation> lastInvocationThreadLocal;
+  private final ThreadLocal<Invocation> lastInvocationThreadLocal;
   
-  ThreadLocalInvocationRecorder() {
+  ThreadLocalInvocationRecorder(ASMMoxyEngine engine) {
+    this.engine = engine;
     this.invocationMapThreadLocal = new ThreadLocal<>();
     this.lastInvocationThreadLocal = new ThreadLocal<>();
   }
   
-  @Override
+  /*
+   * This gets any matchers from the MatcherEngine's stack, and replaces
+   * the arguments from the last invocation with them.
+   */
+  void replaceInvocationArgsWithMatchers() {
+    final List<MoxyMatcher<?>> matchers = this.engine.getASMMatcherEngine().popMatchers();
+    if (matchers != null) {
+      final Invocation lastInvocation = this.getLastInvocation();
+      final List<Object> lastArgs = lastInvocation.getArgs();
+      if (lastArgs.size() != matchers.size()) {
+        throw new IllegalStateException("When matchers are used, they must be used for all arguments");
+      } else {
+        for (int i = 0; i < lastArgs.size(); i++) {
+          lastArgs.set(i, matchers.get(i));          
+        }
+      }      
+    }
+  }
+  
+  // public as it's accessed from mocks (in different packages).
   public void recordInvocation(Object receiver, String methodName, String methodDesc, List<Object> args) {
-    final List<MoxyInvocation> invocations = ensureInvocationList(
+    final List<Invocation> invocations = ensureInvocationList(
         ensureInvocationMap(ensureLocalClassMap(), receiver.getClass()),
         methodName, methodDesc);
     
-    MoxyInvocation invocation = new MoxyInvocation(receiver, methodName, methodDesc, args);
+    Invocation invocation = new Invocation(receiver, methodName, methodDesc, args);
     
     // Add to list of invocations
     invocations.add(invocation);
     
     // Record last invocation on this thread
     this.lastInvocationThreadLocal.set(invocation);
+    
+    // Fixup matchers
+    replaceInvocationArgsWithMatchers();
   }
   
   /*
@@ -40,11 +64,11 @@ class ThreadLocalInvocationRecorder implements MoxyInvocationRecorder {
    * 
    * @see comments on {@link MoxyInvocationRecorder#unrecordLastInvocation}.
    */
-  public void unrecordLastInvocation() {
-    final MoxyInvocation lastInvocation = this.getLastInvocation();
+  void unrecordLastInvocation() {
+    final Invocation lastInvocation = this.getLastInvocation();
     
     if (lastInvocation != null) {
-      final List<MoxyInvocation> invocations = ensureInvocationList(
+      final List<Invocation> invocations = ensureInvocationList(
           ensureInvocationMap(ensureLocalClassMap(), 
                               lastInvocation.getReceiver().getClass()),
                               lastInvocation.getMethodName(), 
@@ -54,24 +78,27 @@ class ThreadLocalInvocationRecorder implements MoxyInvocationRecorder {
     }
   }
   
-  @Override
-  public List<MoxyInvocation> getInvocationList(Class<?> forClz, String methodName, String methodDesc) {
+  List<Invocation> getInvocationList(Class<?> forClz, String methodName, String methodDesc) {
     return ensureInvocationList(ensureInvocationMap(ensureLocalClassMap(), forClz), methodName, methodDesc);
   }
 
-  @Override
-  public MoxyInvocation getLastInvocation() {
+  Invocation getLastInvocation() {
     return this.lastInvocationThreadLocal.get();
   }
 
-  @Override
-  public void reset() {
+  Invocation getAndClearLastInvocation() {
+    Invocation invocation = getLastInvocation();
+    this.lastInvocationThreadLocal.set(null);
+    return invocation;
+  }
+
+  void reset() {
     this.lastInvocationThreadLocal.set(null);
     this.invocationMapThreadLocal.set(null);    
   }
 
-  private LinkedHashMap<Class<?>, LinkedHashMap<String, List<MoxyInvocation>>> ensureLocalClassMap() {
-    LinkedHashMap<Class<?>, LinkedHashMap<String, List<MoxyInvocation>>>
+  private LinkedHashMap<Class<?>, LinkedHashMap<String, List<Invocation>>> ensureLocalClassMap() {
+    LinkedHashMap<Class<?>, LinkedHashMap<String, List<Invocation>>>
         classMap = this.invocationMapThreadLocal.get();
     
     if (classMap == null) {
@@ -81,10 +108,10 @@ class ThreadLocalInvocationRecorder implements MoxyInvocationRecorder {
     return classMap;    
   }
   
-  private LinkedHashMap<String, List<MoxyInvocation>> ensureInvocationMap(
-      LinkedHashMap<Class<?>, LinkedHashMap<String, List<MoxyInvocation>>> classMap,
+  private LinkedHashMap<String, List<Invocation>> ensureInvocationMap(
+      LinkedHashMap<Class<?>, LinkedHashMap<String, List<Invocation>>> classMap,
       Class<?> forClz) {
-    LinkedHashMap<String, List<MoxyInvocation>> invocationMap = classMap.get(forClz);
+    LinkedHashMap<String, List<Invocation>> invocationMap = classMap.get(forClz);
     
     if (invocationMap == null) {
       classMap.put(forClz, invocationMap = new LinkedHashMap<>());
@@ -93,10 +120,10 @@ class ThreadLocalInvocationRecorder implements MoxyInvocationRecorder {
     return invocationMap;
   }
   
-  private List<MoxyInvocation> ensureInvocationList(
-      LinkedHashMap<String, List<MoxyInvocation>> invocationMap,
+  private List<Invocation> ensureInvocationList(
+      LinkedHashMap<String, List<Invocation>> invocationMap,
       String forMethodName, String forMethodDescriptor) {
-    List<MoxyInvocation> list = invocationMap.get(forMethodName + forMethodDescriptor);
+    List<Invocation> list = invocationMap.get(forMethodName + forMethodDescriptor);
     
     if (list == null) {
       invocationMap.put(forMethodName + forMethodDescriptor, list = new ArrayList<>());      

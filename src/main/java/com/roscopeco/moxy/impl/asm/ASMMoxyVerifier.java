@@ -1,12 +1,13 @@
 package com.roscopeco.moxy.impl.asm;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.objectweb.asm.Type;
 
-import com.roscopeco.moxy.api.MoxyInvocation;
 import com.roscopeco.moxy.api.MoxyVerifier;
+import com.roscopeco.moxy.matchers.MoxyMatcher;
 
 import junit.framework.AssertionFailedError;
 
@@ -25,7 +26,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     }
   }
   
-  private String buildArgsString(MoxyInvocation invocation) {
+  private String buildArgsString(Invocation invocation) {
     String args = invocation.getArgs().stream()
         .map((e) -> inspectArg(e))
         .collect(Collectors.joining(", "));
@@ -59,9 +60,37 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     }
   }
   
+  // suppress because we check manually
+  @SuppressWarnings("unchecked")
+  boolean argsMatch(List<Object> actualArgs, List<Object> storedArgs) {
+    if (storedArgs.size() != actualArgs.size()) {
+      return false;
+    }
+    
+    boolean result = true;
+    
+    for (int i = 0; i < storedArgs.size(); i++) {
+      Object stored = storedArgs.get(i);
+      Object actual = actualArgs.get(i);
+      
+      if (stored instanceof MoxyMatcher) {
+        MoxyMatcher<Object> matcher = (MoxyMatcher<Object>)stored;
+        if (!matcher.matches(actual)) {
+          result = false;
+        }        
+      } else {
+        if (!stored.equals(actual)) {
+          result = false;
+        }
+      }
+    }
+    
+    return result;
+  }
+  
   @Override
   public MoxyVerifier wasCalled() {
-    final MoxyInvocation invocation = getTheInvocation();
+    final Invocation invocation = getTheInvocation();
     final String methodName = invocation.getMethodName();
     final String methodDesc = invocation.getMethodDesc();
     
@@ -71,7 +100,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
                                methodName, 
                                methodDesc)
         .stream()
-        .anyMatch((e) -> e.getArgs().equals(invocation.getArgs()) 
+        .anyMatch((e) -> argsMatch(e.getArgs(), invocation.getArgs())
     )) {
       return this;
     } else {
@@ -82,21 +111,21 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     }
   }
   
-  int getCallCount(MoxyInvocation invocation, String methodName, String methodDesc) {
+  int getCallCount(Invocation invocation, String methodName, String methodDesc) {
     return this.getEngine()
         .getRecorder()
         .getInvocationList(invocation.getReceiver().getClass(),
                            methodName, 
                            methodDesc)
     .stream()
-    .filter( (e) -> e.getArgs().equals(invocation.getArgs()))
+    .filter( (e) -> argsMatch(e.getArgs(), invocation.getArgs()) )
     .collect(Collectors.toList())
     .size();    
   }
 
   @Override
   public MoxyVerifier wasCalled(int times) {
-    final MoxyInvocation invocation = getTheInvocation();
+    final Invocation invocation = getTheInvocation();
     final String methodName = invocation.getMethodName();
     final String methodDesc = invocation.getMethodDesc();
     final int actual = getCallCount(invocation, methodName, methodDesc);
@@ -130,7 +159,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
 
   @Override
   public MoxyVerifier wasCalledAtLeast(int times) {
-    final MoxyInvocation invocation = getTheInvocation();
+    final Invocation invocation = getTheInvocation();
     final String methodName = invocation.getMethodName();
     final String methodDesc = invocation.getMethodDesc();
     final int actual = getCallCount(invocation, methodName, methodDesc);
@@ -149,7 +178,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
 
   @Override
   public MoxyVerifier wasCalledAtMost(int times) {
-    final MoxyInvocation invocation = getTheInvocation();
+    final Invocation invocation = getTheInvocation();
     final String methodName = invocation.getMethodName();
     final String methodDesc = invocation.getMethodDesc();
     final int actual = getCallCount(invocation, methodName, methodDesc);

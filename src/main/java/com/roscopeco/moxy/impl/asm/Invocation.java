@@ -1,4 +1,4 @@
-package com.roscopeco.moxy.api;
+package com.roscopeco.moxy.impl.asm;
 
 import java.util.Collections;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Objects;
  * @author Ross.Bamford
  *
  */
-public final class MoxyInvocation {
+public final class Invocation {
   private static final List<Object> EMPTY_OBJECT_LIST = Collections.emptyList();
   
   private final Object receiver;
@@ -26,7 +26,7 @@ public final class MoxyInvocation {
    * @param methodNameAndSig
    * @param args
    */
-  public MoxyInvocation(final Object receiver, final String methodName, final String methodDesc, final List<Object> args) {
+  public Invocation(final Object receiver, final String methodName, final String methodDesc, final List<Object> args) {
     if (receiver == null || 
         methodName == null || 
         methodName.isEmpty() || 
@@ -82,7 +82,7 @@ public final class MoxyInvocation {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    MoxyInvocation other = (MoxyInvocation) obj;
+    Invocation other = (Invocation) obj;
     if (args == null) {
       if (other.args != null)
         return false;

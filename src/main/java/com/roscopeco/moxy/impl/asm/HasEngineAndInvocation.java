@@ -1,14 +1,12 @@
 package com.roscopeco.moxy.impl.asm;
 
-import com.roscopeco.moxy.api.MoxyInvocation;
-
 class HasEngineAndInvocation {
   protected final ASMMoxyEngine engine;
-  protected final MoxyInvocation theInvocation;
+  protected final Invocation theInvocation;
 
   public HasEngineAndInvocation(ASMMoxyEngine engine) {
     this.engine = engine;
-    this.theInvocation = engine.getRecorder().getLastInvocation();
+    this.theInvocation = engine.getRecorder().getAndClearLastInvocation();
 
     if (this.theInvocation == null || 
         this.theInvocation.getReceiver() == null || 
@@ -21,7 +19,7 @@ class HasEngineAndInvocation {
     return engine;
   }
 
-  protected MoxyInvocation getTheInvocation() {
+  protected Invocation getTheInvocation() {
     return theInvocation;
   }
 }

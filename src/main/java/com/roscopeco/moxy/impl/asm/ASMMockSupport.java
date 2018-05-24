@@ -2,10 +2,6 @@ package com.roscopeco.moxy.impl.asm;
 
 import java.util.HashMap;
 
-import com.roscopeco.moxy.api.MoxyEngine;
-import com.roscopeco.moxy.api.MoxyInvocation;
-import com.roscopeco.moxy.api.MoxyInvocationRecorder;
-
 /**
  * All mocks implement this interface. It (ab)uses default methods
  * to allow us to do less bytecode generation.
@@ -18,12 +14,12 @@ import com.roscopeco.moxy.api.MoxyInvocationRecorder;
  */
 public interface ASMMockSupport {
   /* For mocks to implement */
-  public MoxyEngine __moxy_asm_getEngine();
-  public HashMap<MoxyInvocation, Object> __moxy_asm_getReturnMap();
-  public HashMap<MoxyInvocation, Throwable> __moxy_asm_getThrowMap();
+  public ASMMoxyEngine __moxy_asm_getEngine();
+  public HashMap<Invocation, Object> __moxy_asm_getReturnMap();
+  public HashMap<Invocation, Throwable> __moxy_asm_getThrowMap();
   
   /* Implemented by default */
-  default public MoxyInvocationRecorder __moxy_asm_getRecorder() {
+  default public ThreadLocalInvocationRecorder __moxy_asm_getRecorder() {
     return __moxy_asm_getEngine().getRecorder();    
   }
   
@@ -31,12 +27,12 @@ public interface ASMMockSupport {
     throw new InstantiationException("Cannot construct mock with null constructor");
   }
   
-  default public void __moxy_asm_setThrowOrReturn(MoxyInvocation invocation,
+  default public void __moxy_asm_setThrowOrReturn(Invocation invocation,
                                                   Object object,
                                                   boolean isReturn) {    
 
-    final HashMap<MoxyInvocation, Object> returnMap = __moxy_asm_getReturnMap();
-    final HashMap<MoxyInvocation, Throwable> throwMap = __moxy_asm_getThrowMap();
+    final HashMap<Invocation, Object> returnMap = __moxy_asm_getReturnMap();
+    final HashMap<Invocation, Throwable> throwMap = __moxy_asm_getThrowMap();
     
     // This'll work right up until we start setting these elsewhere...
     synchronized(this) {
@@ -68,9 +64,9 @@ public interface ASMMockSupport {
   }
   
   // NOTE only to be used for void methods!
-  default public void __moxy_asm_setThrowForVoidMethods(MoxyInvocation invocation,
+  default public void __moxy_asm_setThrowForVoidMethods(Invocation invocation,
                                                              Object object) {
-    final HashMap<MoxyInvocation, Throwable> throwMap = __moxy_asm_getThrowMap();
+    final HashMap<Invocation, Throwable> throwMap = __moxy_asm_getThrowMap();
 
     if (!(object instanceof Throwable)) {
       // should never happen - code calling this shouldn't allow it, but hey ho...
@@ -85,8 +81,8 @@ public interface ASMMockSupport {
    * invocation just prior to throw or return.
    */
   default public Throwable __moxy_asm_getThrowForCurrentInvocation() {
-    final MoxyInvocation current = __moxy_asm_getEngine().getRecorder().getLastInvocation();
-    final HashMap<MoxyInvocation, Throwable> throwMap = __moxy_asm_getThrowMap();    
+    final Invocation current = __moxy_asm_getEngine().getRecorder().getLastInvocation();
+    final HashMap<Invocation, Throwable> throwMap = __moxy_asm_getThrowMap();    
     return throwMap.get(current);
   }
 
@@ -95,8 +91,8 @@ public interface ASMMockSupport {
    * invocation just prior to throw or return.
    */
   default public Object __moxy_asm_getReturnForCurrentInvocation() {
-    final MoxyInvocation current = __moxy_asm_getEngine().getRecorder().getLastInvocation();
-    final HashMap<MoxyInvocation, Object> returnMap = __moxy_asm_getReturnMap();    
+    final Invocation current = __moxy_asm_getEngine().getRecorder().getLastInvocation();
+    final HashMap<Invocation, Object> returnMap = __moxy_asm_getReturnMap();    
     return returnMap.get(current);
   }
 }

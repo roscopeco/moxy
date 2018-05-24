@@ -20,7 +20,7 @@ import org.objectweb.asm.util.TraceClassVisitor;
 import com.roscopeco.moxy.Moxy;
 import com.roscopeco.moxy.api.Mock;
 import com.roscopeco.moxy.api.MoxyEngine;
-import com.roscopeco.moxy.api.MoxyInvocationRecorder;
+import com.roscopeco.moxy.api.MoxyMatcherEngine;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
 import com.roscopeco.moxy.api.MoxyVoidStubber;
@@ -39,7 +39,8 @@ import com.roscopeco.moxy.impl.asm.visitors.MoxyMockInterfaceVisitor;
 public class ASMMoxyEngine implements MoxyEngine {
   private static final Set<Method> EMPTY_METHODS = Collections.emptySet();
   
-  private final MoxyInvocationRecorder recorder; 
+  private final ThreadLocalInvocationRecorder recorder;
+  private final ASMMoxyMatcherEngine matcherEngine;
   
   private static final Method defineClass;       
   static {
@@ -53,17 +54,28 @@ public class ASMMoxyEngine implements MoxyEngine {
   }
 
   public ASMMoxyEngine() {
-    this.recorder = new ThreadLocalInvocationRecorder();
+    this.recorder = new ThreadLocalInvocationRecorder(this);
+    this.matcherEngine = new ASMMoxyMatcherEngine();
   }
   
-  public ASMMoxyEngine(MoxyInvocationRecorder recorder) {
-    this.recorder = recorder;    
+  public ThreadLocalInvocationRecorder getRecorder() {
+    return this.recorder;
   }
   
-  public MoxyInvocationRecorder getRecorder() {
-    return recorder;
+  @Override
+  public MoxyMatcherEngine getMatcherEngine() {
+    return this.matcherEngine;
   }
   
+  ASMMoxyMatcherEngine getASMMatcherEngine() {
+    return this.matcherEngine;
+  }
+  
+  @Override
+  public void reset() {
+    getRecorder().reset();
+  }
+
   /* (non-Javadoc)
    * @see com.roscopeco.moxy.internal.MoxyEngine#mock(java.lang.Class)
    */
@@ -177,10 +189,11 @@ public class ASMMoxyEngine implements MoxyEngine {
       // TODO naively swallow for now, revisit later when we have a base exception for the framework.
     }
   }
-
+  
   @Override
   public <T> MoxyStubber<T> when(Supplier<T> invocation) {
     naivelyInvokeAndSwallowExceptions(() -> invocation.get());
+    this.getRecorder().replaceInvocationArgsWithMatchers();
     deleteLatestInvocationFromList();
     return new ASMMoxyStubber<T>(this);    
   }
@@ -188,13 +201,15 @@ public class ASMMoxyEngine implements MoxyEngine {
   @Override
   public MoxyVoidStubber when(Runnable invocation) {
     naivelyInvokeAndSwallowExceptions(() -> invocation.run());
+    this.getRecorder().replaceInvocationArgsWithMatchers();
     deleteLatestInvocationFromList();
     return new ASMMoxyVoidStubber(this);
   }
 
   @Override
   public MoxyVerifier assertMock(Runnable invocation) {
-    invocation.run();
+    naivelyInvokeAndSwallowExceptions(() -> invocation.run());
+    this.getRecorder().replaceInvocationArgsWithMatchers();
     deleteLatestInvocationFromList();
     return new ASMMoxyVerifier(this);
   }

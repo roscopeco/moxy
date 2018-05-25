@@ -11,12 +11,14 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<asm.version>6.1.1</asm.version>
-		<junit.jupiter.version>5.1.0</junit.jupiter.version>
+		<opentest4j.version>1.0.0</opentest4j.version>
+		<junit.jupiter.version>5.1.1</junit.jupiter.version>
 		<junit.platform.version>1.1.1</junit.platform.version>
 		<assertj.core.version>3.8.0</assertj.core.version>
 
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<dependencies>
@@ -31,9 +33,9 @@
 			<version>${asm.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.opentest4j</groupId>
-		    <artifactId>opentest4j</artifactId>
-		    <version>1.0.0-RC1</version>
+			<groupId>org.opentest4j</groupId>
+			<artifactId>opentest4j</artifactId>
+			<version>${opentest4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -71,15 +73,37 @@
 					<dependency>
 						<groupId>org.junit.platform</groupId>
 						<artifactId>junit-platform-surefire-provider</artifactId>
-						<version>1.1.0</version>
+						<version>${junit.platform.version}</version>
 					</dependency>
 					<dependency>
 						<groupId>org.junit.jupiter</groupId>
 						<artifactId>junit-jupiter-engine</artifactId>
-						<version>5.1.0</version>
+						<version>${junit.jupiter.version}</version>
 					</dependency>
 				</dependencies>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<show>private</show>
+					<nohelp>true</nohelp>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<show>public</show>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>

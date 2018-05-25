@@ -42,7 +42,7 @@ class ASMMoxyMatcherEngine implements MoxyMatcherEngine {
     } else {
       ArrayList<MoxyMatcher<?>> result = new ArrayList<>();
       while (!stack.isEmpty()) {
-        result.add(stack.pop());
+        result.add(stack.removeLast());
       }
       return result;
     }    

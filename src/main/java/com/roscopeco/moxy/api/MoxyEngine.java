@@ -5,6 +5,20 @@ import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.function.Supplier;
 
+/**
+ * <p>A MoxyEngine is the class that is responsible for generating mocks
+ * according to whatever strategy it is designed to use.</p>
+ * 
+ * <p>It usually also coordinates activities of mocks, as well as 
+ * integrating the matchers (in concert with {@link MoxyMatcherEngine}).</p>
+ * 
+ * <p>The default implementation uses the ASM library to generate mocks
+ * at runtime. If you wish to replace that implementation, see 
+ * {@link com.roscopeco.moxy.Moxy#setMoxyEngine(MoxyEngine)}.</p>
+ * 
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ * @since 1.0
+ */
 public interface MoxyEngine {
 
   public MoxyMatcherEngine getMatcherEngine();

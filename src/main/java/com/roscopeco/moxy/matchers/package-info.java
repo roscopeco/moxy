@@ -1,5 +1,5 @@
 /**
- * Argument-matchers for Moxy. 
+ * Argument-matcher API for Moxy. 
  * 
  * @see com.roscopeco.moxy.matchers.Matchers
  */

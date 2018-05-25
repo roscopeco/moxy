@@ -8,7 +8,7 @@ import java.util.Objects;
  * Represents a single invocation of a given method, on a given receiver,
  * with given arguments.
  * 
- * @author Ross.Bamford
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  *
  */
 final class Invocation {

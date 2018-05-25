@@ -9,7 +9,8 @@ import java.lang.annotation.Target;
 /**
  * All mocks should have this annotation.
  * 
- * @author Ross.Bamford
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ * @since 1.0
  */
 @Retention(RUNTIME)
 @Target(TYPE)

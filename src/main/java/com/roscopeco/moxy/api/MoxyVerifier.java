@@ -2,6 +2,18 @@ package com.roscopeco.moxy.api;
 
 import org.opentest4j.AssertionFailedError;
 
+/**
+ * <p>Implementations of this interface allow mocks to be verified after
+ * use. They are returned by the  {@link MoxyEngine#assertMock(Runnable)} 
+ * method.</p>
+ * 
+ * <p>Individual engines will usually provide their own implementation
+ * of this interface, as verifying will require internal knowledge 
+ * of the engine's mocking strategy.</p>
+ * 
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ * @since 1.0
+ */
 public interface MoxyVerifier {
   /**
    * Verify that the mock method was called <em>at least</em> once,

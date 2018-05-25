@@ -11,7 +11,7 @@ import java.util.HashMap;
  * Don't implement this yourself, it's only public because it needs
  * to be visible to subclasses.
  * 
- * @author Ross.Bamford
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  *
  */
 public interface ASMMockSupport {

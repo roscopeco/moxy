@@ -35,7 +35,7 @@ import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
  * 
  * Based on bytecode generation with ASM.
  * 
- * @author Ross.Bamford
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  *
  */
 public class ASMMoxyEngine implements MoxyEngine {

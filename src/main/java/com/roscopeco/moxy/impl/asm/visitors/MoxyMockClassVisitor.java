@@ -17,7 +17,7 @@ import com.roscopeco.moxy.api.Mock;
 /**
  * Creates mocks from classes.
  * 
- * @author Ross.Bamford
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {  
   private final String originalClassInternalName;

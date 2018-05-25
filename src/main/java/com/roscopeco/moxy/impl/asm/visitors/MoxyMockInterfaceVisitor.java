@@ -14,7 +14,7 @@ import com.roscopeco.moxy.api.Mock;
 /**
  * Creates mocks from interfaces.
  * 
- * @author Ross.Bamford
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {  
   private final String interfaceInternalName;

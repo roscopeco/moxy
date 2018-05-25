@@ -8,7 +8,43 @@ import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
 import com.roscopeco.moxy.api.MoxyVoidStubber;
 import com.roscopeco.moxy.impl.asm.ASMMoxyEngine;
+import com.roscopeco.moxy.matchers.Matchers;
 
+/**
+ * <p>Moxy is a type-safe mocking/spying framework for Java with a fluent API.</p>
+ * 
+ * <p>It takes inspiration from a number of other popular mocking frameworks,
+ * notably Mockito. It aims to be lean, fast, and as far as possible to lack
+ * the "surprises" one finds in other mocking frameworks (e.g. it should not
+ * give weird failures in unrelated tests, but instead should fail fast when
+ * used improperly).</p>
+ * 
+ * <p>This class, along with the {@link Matchers} class, are the main top-level
+ * classes most users will need to interact with when using Moxy. They are
+ * designed so you can simply <code>import static</code> and start mocking. 
+ * For example:</p>
+ * 
+ * <pre><code>
+ * import static com.roscopeco.moxy.Moxy.*;
+ * import static com.roscopeco.moxy.matchers.Matchers.*;
+ * 
+ * // ... later ...
+ * 
+ * SomeClass mock = mock(SomeClass.class);
+ * 
+ * when(() -&gt; mock.someMethod(any(), eq("something"))).thenReturn("whatever");
+ * 
+ * // ... mock usage ...
+ * 
+ * assertMock(() -&gt; mock.someMethod("expected", "something").wasCalledTwice();
+ * assertMock(() -&gt; mock.someMethod("badfood", "something").wasNotCalled();
+ * </code></pre>
+ * 
+ * See <code>README.md</code> for more detailed usage of the library.
+ * 
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ * @since 1.0
+ */
 public final class Moxy {
   private static MoxyEngine moxyEngine;
   

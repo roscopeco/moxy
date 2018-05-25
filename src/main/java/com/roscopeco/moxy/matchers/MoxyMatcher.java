@@ -7,5 +7,7 @@ public interface MoxyMatcher<T> {
   
   // TODO don't like this, it exposes impl details.
   //      Maybe matchers should be made internal, and the engine handles it all.
-  public void addToStack(Deque<MoxyMatcher<?>> stack);
+  default public void addToStack(Deque<MoxyMatcher<?>> stack) {
+    stack.push(this);    
+  }
 }

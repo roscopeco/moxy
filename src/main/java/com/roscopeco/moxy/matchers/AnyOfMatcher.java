@@ -1,6 +1,5 @@
 package com.roscopeco.moxy.matchers;
 
-import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,11 +24,6 @@ public class AnyOfMatcher<T> implements MoxyMatcher<T> {
     return objects.contains(arg);
   }
 
-  @Override
-  public void addToStack(Deque<MoxyMatcher<?>> stack) {
-    stack.push(this);    
-  }
-  
   @Override
   public String toString() {
     if (this.objects.size() < 3) {

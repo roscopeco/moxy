@@ -32,7 +32,7 @@ class ASMMoxyMatcherEngine implements MoxyMatcherEngine {
   
   @Override
   public void registerMatcher(MoxyMatcher<?> matcher) {
-    ensureMatcherStack().push(matcher);
+    matcher.addToStack(ensureMatcherStack());
   }
   
   List<MoxyMatcher<?>> popMatchers() {

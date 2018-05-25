@@ -1,5 +1,8 @@
 package com.roscopeco.moxy.matchers;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.roscopeco.moxy.Moxy;
 import com.roscopeco.moxy.api.MoxyEngine;
 
@@ -82,6 +85,292 @@ public class Matchers {
   
   public static <T> T any(MoxyEngine engine) {
     engine.getMatcherEngine().registerMatcher(new AnyMatcher<T>());
+    return null;
+  }
+
+  /* ************ EQUALS ************** */
+
+  public static byte eqByte(byte value) {
+    return eqByte(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static byte eqByte(MoxyEngine engine, byte value) {
+    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<Byte>(value));
+    return 0;
+  }
+
+  public static char eqChar(char value) {
+    return eqChar(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static char eqChar(MoxyEngine engine, char value) {
+    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<Character>(value));
+    return 0;
+  }
+  
+  public static short eqShort(short value) {
+    return eqShort(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static short eqShort(MoxyEngine engine, short value) {
+    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<Short>(value));
+    return 0;
+  }
+    
+  public static int eqInt(int value) {
+    return eqInt(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static int eqInt(MoxyEngine engine, int value) {
+    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<Integer>(value));
+    return 0;
+  }
+  
+  public static long eqLong(long value) {
+    return eqLong(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static long eqLong(MoxyEngine engine, long value) {
+    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<Long>(value));
+    return 0;
+  }
+  
+  public static float eqFloat(float value) {
+    return eqFloat(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static float eqFloat(MoxyEngine engine, float value) {
+    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<Float>(value));
+    return 0;
+  }
+  
+  public static double eqDouble(double value) {
+    return eqDouble(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static double eqDouble(MoxyEngine engine, double value) {
+    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<Double>(value));
+    return 0;
+  }
+  
+  public static boolean eqBool(boolean value) {
+    return eqBool(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static boolean eqBool(MoxyEngine engine, boolean value) {
+    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<Boolean>(value));
+    return false;
+  }
+  
+  public static <T> T eq(T value) {
+    return eq(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static <T> T eq(MoxyEngine engine, T value) {
+    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<T>(value));
+    return null;
+  }
+  
+  /* ************ ANYOF ************** */
+
+  public static byte anyOfByte(Byte... possibilities) {
+    return anyOfByte(Arrays.asList(possibilities));
+  }
+  
+  public static byte anyOfByte(List<Byte> possibilities) {
+    return anyOfByte(Moxy.getMoxyEngine(), possibilities);
+  }
+  
+  public static byte anyOfByte(MoxyEngine engine, List<Byte> possibilities) {
+    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<Byte>(possibilities));
+    return 0;
+  }
+  
+  public static char anyOfChar(Character... possibilities) {
+    return anyOfChar(Arrays.asList(possibilities));
+  }
+
+  public static char anyOfChar(List<Character> possibilities) {
+    return anyOfChar(Moxy.getMoxyEngine(), possibilities);
+  }
+  
+  public static char anyOfChar(MoxyEngine engine, List<Character> possibilities) {
+    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<Character>(possibilities));
+    return 0;
+  }
+  
+  public static short anyOfShort(Short... possibilities) {
+    return anyOfShort(Arrays.asList(possibilities));
+  }
+  
+  public static short anyOfShort(List<Short> possibilities) {
+    return anyOfShort(Moxy.getMoxyEngine(), possibilities);
+  }
+  
+  public static short anyOfShort(MoxyEngine engine, List<Short> possibilities) {
+    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<Short>(possibilities));
+    return 0;
+  }
+    
+  public static int anyOfInt(Integer... possibilities) {
+    return anyOfInt(Arrays.asList(possibilities));
+  }
+  
+  public static int anyOfInt(List<Integer> possibilities) {
+    return anyOfInt(Moxy.getMoxyEngine(), possibilities);
+  }
+  
+  public static int anyOfInt(MoxyEngine engine, List<Integer> possibilities) {
+    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<Integer>(possibilities));
+    return 0;
+  }
+  
+  public static long anyOfLong(Long... possibilities) {
+    return anyOfLong(Arrays.asList(possibilities));
+  }
+  
+  public static long anyOfLong(List<Long> possibilities) {
+    return anyOfLong(Moxy.getMoxyEngine(), possibilities);
+  }
+  
+  public static long anyOfLong(MoxyEngine engine, List<Long> possibilities) {
+    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<Long>(possibilities));
+    return 0l;
+  }
+  
+  public static float anyOfFloat(Float... possibilities) {
+    return anyOfFloat(Arrays.asList(possibilities));
+  }
+  
+  public static float anyOfFloat(List<Float> possibilities) {
+    return anyOfFloat(Moxy.getMoxyEngine(), possibilities);
+  }
+  
+  public static float anyOfFloat(MoxyEngine engine, List<Float> possibilities) {
+    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<Float>(possibilities));
+    return 0.0f;
+  }
+  
+  public static double anyOfDouble(Double... possibilities) {
+    return anyOfDouble(Arrays.asList(possibilities));
+  }
+  
+  public static double anyOfDouble(List<Double> possibilities) {
+    return anyOfDouble(Moxy.getMoxyEngine(), possibilities);
+  }
+  
+  public static double anyOfDouble(MoxyEngine engine, List<Double> possibilities) {
+    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<Double>(possibilities));
+    return 0.0d;
+  }
+  
+  public static boolean anyOfBool(Boolean... possibilities) {
+    return anyOfBool(Arrays.asList(possibilities));
+  }
+  
+  public static boolean anyOfBool(List<Boolean> possibilities) {
+    return anyOfBool(Moxy.getMoxyEngine(), possibilities);
+  }
+  
+  public static boolean anyOfBool(MoxyEngine engine, List<Boolean> possibilities) {
+    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<Boolean>(possibilities));
+    return false;
+  }
+  
+  @SafeVarargs
+  public static <T> T anyOf(T... possibilities) {
+    return anyOf(Arrays.asList(possibilities));
+  }
+  
+  public static <T> T anyOf(List<? extends T> possibilities) {
+    return anyOf(Moxy.getMoxyEngine(), possibilities);
+  }
+  
+  public static <T> T anyOf(MoxyEngine engine, List<? extends T> possibilities) {
+    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<T>(possibilities));
+    return null;
+  }
+
+  /* ************ NOT ************** */
+
+  public static byte notByte(byte fromMatcher) {
+    return notByte(Moxy.getMoxyEngine(), fromMatcher);
+  }
+  
+  public static byte notByte(MoxyEngine engine, byte fromMatcher) {
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<Byte>(fromMatcher));
+    return 0;
+  }
+
+  public static char notChar(char fromMatcher) {
+    return notChar(Moxy.getMoxyEngine(), fromMatcher);
+  }
+  
+  public static char notChar(MoxyEngine engine, char fromMatcher) {
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<Character>(fromMatcher));
+    return 0;
+  }
+  
+  public static short notShort(short fromMatcher) {
+    return notShort(Moxy.getMoxyEngine(), fromMatcher);
+  }
+  
+  public static short notShort(MoxyEngine engine, short fromMatcher) {
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<Short>(fromMatcher));
+    return 0;
+  }
+    
+  public static int notInt(int fromMatcher) {
+    return notInt(Moxy.getMoxyEngine(), fromMatcher);
+  }
+  
+  public static int notInt(MoxyEngine engine, int fromMatcher) {
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<Integer>(fromMatcher));
+    return 0;
+  }
+  
+  public static long notLong(long fromMatcher) {
+    return notLong(Moxy.getMoxyEngine(), fromMatcher);
+  }
+  
+  public static long notLong(MoxyEngine engine, long fromMatcher) {
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<Long>(fromMatcher));
+    return 0;
+  }
+  
+  public static float notFloat(float fromMatcher) {
+    return notFloat(Moxy.getMoxyEngine(), fromMatcher);
+  }
+  
+  public static float notFloat(MoxyEngine engine, float fromMatcher) {
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<Float>(fromMatcher));
+    return 0;
+  }
+  
+  public static double notDouble(double fromMatcher) {
+    return notDouble(Moxy.getMoxyEngine(), fromMatcher);
+  }
+  
+  public static double notDouble(MoxyEngine engine, double fromMatcher) {
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<Double>(fromMatcher));
+    return 0;
+  }
+  
+  public static boolean notBool(boolean fromMatcher) {
+    return notBool(Moxy.getMoxyEngine(), fromMatcher);
+  }
+  
+  public static boolean notBool(MoxyEngine engine, boolean fromMatcher) {
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<Boolean>(fromMatcher));
+    return false;
+  }
+  
+  public static <T> T not(T fromMatcher) {
+    return not(Moxy.getMoxyEngine(), fromMatcher);
+  }
+  
+  public static <T> T not(MoxyEngine engine, T fromMatcher) {
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<T>(fromMatcher));
     return null;
   }
 }

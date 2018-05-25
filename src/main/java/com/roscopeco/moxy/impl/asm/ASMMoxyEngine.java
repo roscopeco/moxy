@@ -28,6 +28,7 @@ import com.roscopeco.moxy.api.MoxyVoidStubber;
 import com.roscopeco.moxy.impl.asm.visitors.AbstractMoxyTypeVisitor;
 import com.roscopeco.moxy.impl.asm.visitors.MoxyMockClassVisitor;
 import com.roscopeco.moxy.impl.asm.visitors.MoxyMockInterfaceVisitor;
+import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
 
 /**
  * Default MoxyEngine implementation.
@@ -189,6 +190,12 @@ public class ASMMoxyEngine implements MoxyEngine {
     } catch (MoxyException e) {
       // Framework error - rethrow this.
       throw e;
+    } catch (NullPointerException e) {
+      // Often an autoboxing error, give (hopefully) useful error message.
+      throw new PossibleMatcherUsageError(
+          "NPE in invocation: If you're using primitive matchers, ensure you're using the " 
+        + "correct type (e.g. anyInt() rather than any()), especially when nesting.\n"
+        + "Otherwise, the causing exception may have more information.", e);
     } catch (Exception e) {      
       // TODO naively swallow everything else.
     }

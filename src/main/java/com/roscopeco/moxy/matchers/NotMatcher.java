@@ -5,9 +5,6 @@ import java.util.Deque;
 public class NotMatcher<T> implements MoxyMatcher<T> {
   private MoxyMatcher<? super T> matcher;
   
-  public NotMatcher(final T object) {
-  }
-  
   public MoxyMatcher<? super T> getMatcher() {
     return matcher;
   }

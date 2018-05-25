@@ -171,6 +171,255 @@ public class Matchers {
     return null;
   }
   
+  /* ************ NOTEQUALS ************** */
+
+  public static byte neqByte(byte value) {
+    return neqByte(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static byte neqByte(MoxyEngine engine, byte value) {
+    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<Byte>(value));
+    return 0;
+  }
+
+  public static char neqChar(char value) {
+    return neqChar(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static char neqChar(MoxyEngine engine, char value) {
+    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<Character>(value));
+    return 0;
+  }
+  
+  public static short neqShort(short value) {
+    return neqShort(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static short neqShort(MoxyEngine engine, short value) {
+    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<Short>(value));
+    return 0;
+  }
+    
+  public static int neqInt(int value) {
+    return neqInt(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static int neqInt(MoxyEngine engine, int value) {
+    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<Integer>(value));
+    return 0;
+  }
+  
+  public static long neqLong(long value) {
+    return neqLong(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static long neqLong(MoxyEngine engine, long value) {
+    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<Long>(value));
+    return 0;
+  }
+  
+  public static float neqFloat(float value) {
+    return neqFloat(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static float neqFloat(MoxyEngine engine, float value) {
+    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<Float>(value));
+    return 0;
+  }
+  
+  public static double neqDouble(double value) {
+    return neqDouble(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static double neqDouble(MoxyEngine engine, double value) {
+    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<Double>(value));
+    return 0;
+  }
+  
+  public static boolean neqBool(boolean value) {
+    return neqBool(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static boolean neqBool(MoxyEngine engine, boolean value) {
+    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<Boolean>(value));
+    return false;
+  }
+  
+  public static <T> T neq(T value) {
+    return neq(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static <T> T neq(MoxyEngine engine, T value) {
+    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<T>(value));
+    return null;
+  }
+  
+  /* ************ LESSTHAN ************** */
+
+  public static byte ltByte(byte value) {
+    return ltByte(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static byte ltByte(MoxyEngine engine, byte value) {
+    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<Byte>(value));
+    return 0;
+  }
+
+  public static char ltChar(char value) {
+    return ltChar(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static char ltChar(MoxyEngine engine, char value) {
+    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<Character>(value));
+    return 0;
+  }
+  
+  public static short ltShort(short value) {
+    return ltShort(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static short ltShort(MoxyEngine engine, short value) {
+    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<Short>(value));
+    return 0;
+  }
+    
+  public static int ltInt(int value) {
+    return ltInt(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static int ltInt(MoxyEngine engine, int value) {
+    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<Integer>(value));
+    return 0;
+  }
+  
+  public static long ltLong(long value) {
+    return ltLong(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static long ltLong(MoxyEngine engine, long value) {
+    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<Long>(value));
+    return 0;
+  }
+  
+  public static float ltFloat(float value) {
+    return ltFloat(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static float ltFloat(MoxyEngine engine, float value) {
+    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<Float>(value));
+    return 0;
+  }
+  
+  public static double ltDouble(double value) {
+    return ltDouble(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static double ltDouble(MoxyEngine engine, double value) {
+    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<Double>(value));
+    return 0;
+  }
+  
+  public static boolean ltBool(boolean value) {
+    return ltBool(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static boolean ltBool(MoxyEngine engine, boolean value) {
+    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<Boolean>(value));
+    return false;
+  }
+  
+  public static <T extends Comparable<T>> T lt(T value) {
+    return lt(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static <T extends Comparable<T>> T lt(MoxyEngine engine, T value) {
+    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<T>(value));
+    return null;
+  }
+  
+  /* ************ GREATERTHAN ************** */
+
+  public static byte gtByte(byte value) {
+    return gtByte(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static byte gtByte(MoxyEngine engine, byte value) {
+    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<Byte>(value));
+    return 0;
+  }
+
+  public static char gtChar(char value) {
+    return gtChar(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static char gtChar(MoxyEngine engine, char value) {
+    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<Character>(value));
+    return 0;
+  }
+  
+  public static short gtShort(short value) {
+    return gtShort(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static short gtShort(MoxyEngine engine, short value) {
+    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<Short>(value));
+    return 0;
+  }
+    
+  public static int gtInt(int value) {
+    return gtInt(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static int gtInt(MoxyEngine engine, int value) {
+    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<Integer>(value));
+    return 0;
+  }
+  
+  public static long gtLong(long value) {
+    return gtLong(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static long gtLong(MoxyEngine engine, long value) {
+    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<Long>(value));
+    return 0;
+  }
+  
+  public static float gtFloat(float value) {
+    return gtFloat(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static float gtFloat(MoxyEngine engine, float value) {
+    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<Float>(value));
+    return 0;
+  }
+  
+  public static double gtDouble(double value) {
+    return gtDouble(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static double gtDouble(MoxyEngine engine, double value) {
+    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<Double>(value));
+    return 0;
+  }
+  
+  public static boolean gtBool(boolean value) {
+    return gtBool(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static boolean gtBool(MoxyEngine engine, boolean value) {
+    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<Boolean>(value));
+    return false;
+  }
+  
+  public static <T extends Comparable<T>> T gt(T value) {
+    return gt(Moxy.getMoxyEngine(), value);
+  }
+  
+  public static <T extends Comparable<T>> T gt(MoxyEngine engine, T value) {
+    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<T>(value));
+    return null;
+  }
+  
   /* ************ ANYOF ************** */
 
   public static byte anyOfByte(Byte... possibilities) {
@@ -291,6 +540,91 @@ public class Matchers {
     return null;
   }
 
+  /* ************ AND ************** */
+
+  public static byte andByte(Byte... fromMatchers) {
+    return andByte(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  public static byte andByte(MoxyEngine engine, Byte... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new AndMatcher<Byte>(fromMatchers));
+    return 0;
+  }
+
+  public static char andChar(Character... fromMatchers) {
+    return andChar(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  public static char andChar(MoxyEngine engine, Character... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new AndMatcher<Character>(fromMatchers));
+    return 0;
+  }
+  
+  public static short andShort(Short... fromMatchers) {
+    return andShort(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  public static short andShort(MoxyEngine engine, Short... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new AndMatcher<Short>(fromMatchers));
+    return 0;
+  }
+    
+  public static int andInt(Integer... fromMatchers) {
+    return andInt(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  public static int andInt(MoxyEngine engine, Integer... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new AndMatcher<Integer>(fromMatchers));
+    return 0;
+  }
+  
+  public static long andLong(Long... fromMatchers) {
+    return andLong(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  public static long andLong(MoxyEngine engine, Long... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new AndMatcher<Long>(fromMatchers));
+    return 0;
+  }
+  
+  public static float andFloat(Float... fromMatchers) {
+    return andFloat(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  public static float andFloat(MoxyEngine engine, Float... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new AndMatcher<Float>(fromMatchers));
+    return 0;
+  }
+  
+  public static double andDouble(Double... fromMatchers) {
+    return andDouble(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  public static double andDouble(MoxyEngine engine, Double... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new AndMatcher<Double>(fromMatchers));
+    return 0;
+  }
+  
+  public static boolean andBool(Boolean... fromMatchers) {
+    return andBool(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  public static boolean andBool(MoxyEngine engine, Boolean... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new AndMatcher<Boolean>(fromMatchers));
+    return false;
+  }
+  
+  @SafeVarargs
+  public static <T> T and(T... fromMatchers) {
+    return and(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  @SafeVarargs
+  public static <T> T and(MoxyEngine engine, T... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new AndMatcher<T>(fromMatchers));
+    return null;
+  }
+
   /* ************ NOT ************** */
 
   public static byte notByte(byte fromMatcher) {
@@ -298,7 +632,7 @@ public class Matchers {
   }
   
   public static byte notByte(MoxyEngine engine, byte fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<Byte>(fromMatcher));
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<Byte>());
     return 0;
   }
 
@@ -307,7 +641,7 @@ public class Matchers {
   }
   
   public static char notChar(MoxyEngine engine, char fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<Character>(fromMatcher));
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<Character>());
     return 0;
   }
   
@@ -316,7 +650,7 @@ public class Matchers {
   }
   
   public static short notShort(MoxyEngine engine, short fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<Short>(fromMatcher));
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<Short>());
     return 0;
   }
     
@@ -325,7 +659,7 @@ public class Matchers {
   }
   
   public static int notInt(MoxyEngine engine, int fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<Integer>(fromMatcher));
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<Integer>());
     return 0;
   }
   
@@ -334,7 +668,7 @@ public class Matchers {
   }
   
   public static long notLong(MoxyEngine engine, long fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<Long>(fromMatcher));
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<Long>());
     return 0;
   }
   
@@ -343,7 +677,7 @@ public class Matchers {
   }
   
   public static float notFloat(MoxyEngine engine, float fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<Float>(fromMatcher));
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<Float>());
     return 0;
   }
   
@@ -352,7 +686,7 @@ public class Matchers {
   }
   
   public static double notDouble(MoxyEngine engine, double fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<Double>(fromMatcher));
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<Double>());
     return 0;
   }
   
@@ -361,7 +695,7 @@ public class Matchers {
   }
   
   public static boolean notBool(MoxyEngine engine, boolean fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<Boolean>(fromMatcher));
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<Boolean>());
     return false;
   }
   
@@ -370,7 +704,7 @@ public class Matchers {
   }
   
   public static <T> T not(MoxyEngine engine, T fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<T>(fromMatcher));
+    engine.getMatcherEngine().registerMatcher(new NotMatcher<T>());
     return null;
   }
 }

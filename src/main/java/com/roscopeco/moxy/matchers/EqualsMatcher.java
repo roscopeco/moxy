@@ -1,27 +1,25 @@
 package com.roscopeco.moxy.matchers;
 
-public class EqualsMatcher<T> implements MoxyMatcher<T> {
-  private final T object;
-  
+public class EqualsMatcher<T> extends SimpleObjectMatcher<T> {
   EqualsMatcher(final T object) {
-    this.object = object;
-  }
-  
-  public T getObject() {
-    return object;
+    super(object, true);
   }
   
   @Override
   public boolean matches(T arg) {
-    return object.equals(arg);
+    if (arg == null) {
+      if (object == null) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return arg.equals(object);
+    }
   }
   
   @Override
   public String toString() {
-    if (this.object == null) {
-      return "null";
-    } else {
-      return object.toString();
-    }
+    return "<eq" + super.toString();
   }
 }

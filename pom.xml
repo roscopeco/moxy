@@ -107,6 +107,7 @@
 				<version>3.0.0</version>
 				<configuration>
 					<show>public</show>
+					<excludePackageNames>com.roscopeco.moxy.impl.*</excludePackageNames>
 				</configuration>
 			</plugin>
 		</plugins>

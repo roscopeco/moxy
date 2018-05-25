@@ -11,7 +11,7 @@ import java.util.Objects;
  * @author Ross.Bamford
  *
  */
-public final class Invocation {
+final class Invocation {
   private static final List<Object> EMPTY_OBJECT_LIST = Collections.emptyList();
   
   private final Object receiver;
@@ -23,7 +23,8 @@ public final class Invocation {
    * Create a new Invocation with the specified receiver, method and arguments.
    * 
    * @param receiver
-   * @param methodNameAndSig
+   * @param methodName
+   * @param methodDesc
    * @param args
    */
   public Invocation(final Object receiver, final String methodName, final String methodDesc, final List<Object> args) {

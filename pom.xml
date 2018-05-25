@@ -4,9 +4,33 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.roscopeco</groupId>
 	<artifactId>moxy</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.81-SNAPSHOT</version>
 	<name>Moxy</name>
-	<description>Fluent API mocking framework</description>
+	<description>Fluent API mocking/spying framework for Java.</description>
+	<inceptionYear>2018</inceptionYear>
+	<url>https://github.com/roscopeco/moxy</url>
+	
+	<licenses>
+		<license>
+			<name>The MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	
+	<developers>
+		<developer>
+			<id>roscopeco</id>
+			<name>Ross Bamford</name>
+			<email>roscopeco@gmail.com</email>
+			<url>http://roscopeco.com</url>
+			<roles>
+				<role>Technical Architect</role>
+				<role>Software Developer</role>
+			</roles>
+			<timezone>Europe/London</timezone>
+		</developer>
+	</developers>
 
 	<properties>
 		<java.version>1.8</java.version>

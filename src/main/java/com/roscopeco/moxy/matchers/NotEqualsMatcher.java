@@ -1,6 +1,6 @@
 package com.roscopeco.moxy.matchers;
 
-public class NotEqualsMatcher<T> extends SimpleObjectMatcher<T> {  
+class NotEqualsMatcher<T> extends SimpleObjectMatcher<T> {  
   public NotEqualsMatcher(final T object) {
     super(object, true);
   }

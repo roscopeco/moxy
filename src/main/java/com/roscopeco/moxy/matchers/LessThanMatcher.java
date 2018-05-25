@@ -1,6 +1,6 @@
 package com.roscopeco.moxy.matchers;
 
-public class LessThanMatcher<T extends Comparable<T>> extends SimpleObjectMatcher<T> {
+class LessThanMatcher<T extends Comparable<T>> extends SimpleObjectMatcher<T> {
   LessThanMatcher(final T object) {
     super(object, false);
   }

@@ -1,6 +1,6 @@
 package com.roscopeco.moxy.matchers;
 
-public class EqualsMatcher<T> extends SimpleObjectMatcher<T> {
+class EqualsMatcher<T> extends SimpleObjectMatcher<T> {
   EqualsMatcher(final T object) {
     super(object, true);
   }

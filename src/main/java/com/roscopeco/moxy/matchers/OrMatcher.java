@@ -6,7 +6,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class OrMatcher<T> implements MoxyMatcher<T> {
+class OrMatcher<T> implements MoxyMatcher<T> {
   // This is only used to determine how many matchers we should be popping
   final Object[] passedArgs;
 

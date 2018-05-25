@@ -1,6 +1,6 @@
 package com.roscopeco.moxy.matchers;
 
-public abstract class SimpleObjectMatcher<T> implements MoxyMatcher<T> {
+abstract class SimpleObjectMatcher<T> implements MoxyMatcher<T> {
   protected final T object;
 
   public SimpleObjectMatcher(final T object, boolean allowNull) {

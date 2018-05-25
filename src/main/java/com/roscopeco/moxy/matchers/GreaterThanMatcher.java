@@ -1,6 +1,6 @@
 package com.roscopeco.moxy.matchers;
 
-public class GreaterThanMatcher<T extends Comparable<T>> extends SimpleObjectMatcher<T> {
+class GreaterThanMatcher<T extends Comparable<T>> extends SimpleObjectMatcher<T> {
   GreaterThanMatcher(final T object) {
     super(object, false);
   }

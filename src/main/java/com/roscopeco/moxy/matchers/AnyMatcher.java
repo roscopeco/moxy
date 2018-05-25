@@ -1,6 +1,6 @@
 package com.roscopeco.moxy.matchers;
 
-public class AnyMatcher<T> implements MoxyMatcher<T> {
+class AnyMatcher<T> implements MoxyMatcher<T> {
   AnyMatcher() { }
   
   @Override

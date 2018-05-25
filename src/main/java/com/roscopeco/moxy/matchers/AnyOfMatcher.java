@@ -3,7 +3,7 @@ package com.roscopeco.moxy.matchers;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AnyOfMatcher<T> implements MoxyMatcher<T> {
+class AnyOfMatcher<T> implements MoxyMatcher<T> {
   private final List<? extends T> objects;
   
   AnyOfMatcher(final List<? extends T> objects) {

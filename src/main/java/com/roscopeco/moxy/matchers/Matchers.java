@@ -641,6 +641,91 @@ public class Matchers {
     return null;
   }
 
+  /* ************ OR ************** */
+
+  public static byte orByte(Byte... fromMatchers) {
+    return orByte(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  public static byte orByte(MoxyEngine engine, Byte... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new OrMatcher<Byte>(fromMatchers));
+    return 0;
+  }
+
+  public static char orChar(Character... fromMatchers) {
+    return orChar(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  public static char orChar(MoxyEngine engine, Character... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new OrMatcher<Character>(fromMatchers));
+    return 0;
+  }
+  
+  public static short orShort(Short... fromMatchers) {
+    return orShort(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  public static short orShort(MoxyEngine engine, Short... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new OrMatcher<Short>(fromMatchers));
+    return 0;
+  }
+    
+  public static int orInt(Integer... fromMatchers) {
+    return orInt(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  public static int orInt(MoxyEngine engine, Integer... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new OrMatcher<Integer>(fromMatchers));
+    return 0;
+  }
+  
+  public static long orLong(Long... fromMatchers) {
+    return orLong(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  public static long orLong(MoxyEngine engine, Long... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new OrMatcher<Long>(fromMatchers));
+    return 0;
+  }
+  
+  public static float orFloat(Float... fromMatchers) {
+    return orFloat(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  public static float orFloat(MoxyEngine engine, Float... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new OrMatcher<Float>(fromMatchers));
+    return 0;
+  }
+  
+  public static double orDouble(Double... fromMatchers) {
+    return orDouble(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  public static double orDouble(MoxyEngine engine, Double... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new OrMatcher<Double>(fromMatchers));
+    return 0;
+  }
+  
+  public static boolean orBool(Boolean... fromMatchers) {
+    return orBool(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  public static boolean orBool(MoxyEngine engine, Boolean... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new OrMatcher<Boolean>(fromMatchers));
+    return false;
+  }
+  
+  @SafeVarargs
+  public static <T> T or(T... fromMatchers) {
+    return or(Moxy.getMoxyEngine(), fromMatchers);
+  }
+  
+  @SafeVarargs
+  public static <T> T or(MoxyEngine engine, T... fromMatchers) {
+    engine.getMatcherEngine().registerMatcher(new OrMatcher<T>(fromMatchers));
+    return null;
+  }
+
   /* ************ NOT ************** */
 
   public static byte notByte(byte fromMatcher) {

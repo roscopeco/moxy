@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import com.roscopeco.moxy.api.MoxyException;
+
 /**
  * Represents a single invocation of a given method, on a given receiver,
  * with given arguments.
@@ -33,7 +35,8 @@ final class Invocation {
         methodName.isEmpty() || 
         methodDesc == null || 
         methodDesc.isEmpty()) {
-      throw new IllegalArgumentException("Cannot create invocation: receiver and/or methodName/methodSig are null (or empty)");
+      throw new MoxyException("Illegal argument: Invocation.<init>(...). See cause.",
+          new IllegalArgumentException("Cannot create invocation: receiver and/or methodName/methodSig are null (or empty)"));
     }
     
     this.receiver = receiver;

@@ -44,6 +44,7 @@ import com.roscopeco.moxy.matchers.Matchers;
  * 
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  * @since 1.0
+ * @see com.roscopeco.moxy.matchers.Matchers
  */
 public final class Moxy {
   private static MoxyEngine moxyEngine;

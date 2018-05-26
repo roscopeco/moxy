@@ -2,10 +2,26 @@ package com.roscopeco.moxy.matchers;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import com.roscopeco.moxy.Moxy;
 import com.roscopeco.moxy.api.MoxyEngine;
 
+/**
+ * <p>Provides static access to the standard Moxy argument matchers.</p>
+ * 
+ * <p>This class, along with the {@link com.roscopeco.moxy.Moxy} class, are the main top-level
+ * classes most users will need to interact with when using Moxy. They are
+ * designed so you can simply <code>import static</code> and start mocking.</p>
+ * 
+ * <p>For a mini example, see {@link com.roscopeco.moxy.Moxy}. For full details,
+ * see <code>README.md</code>.
+ *  
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ * @since 1.0
+ * @see com.roscopeco.moxy.Moxy
+ *
+ */
 public class Matchers {
   public static byte anyByte() {
     return anyByte(Moxy.getMoxyEngine());
@@ -705,6 +721,89 @@ public class Matchers {
   
   public static <T> T not(MoxyEngine engine, T fromMatcher) {
     engine.getMatcherEngine().registerMatcher(new NotMatcher<T>());
+    return null;
+  }
+  
+  /* ************ LAMBDA ************** */
+
+  public static byte lambdaByte(Function<Byte, Boolean> function) {
+    return lambdaByte(Moxy.getMoxyEngine(), function);
+  }
+  
+  public static byte lambdaByte(MoxyEngine engine, Function<Byte, Boolean> function) {
+    engine.getMatcherEngine().registerMatcher(new LambdaMatcher<Byte>(function));
+    return 0;
+  }
+
+  public static char lambdaChar(Function<Character, Boolean> function) {
+    return lambdaChar(Moxy.getMoxyEngine(), function);
+  }
+  
+  public static char lambdaChar(MoxyEngine engine, Function<Character, Boolean> function) {
+    engine.getMatcherEngine().registerMatcher(new LambdaMatcher<Character>(function));
+    return 0;
+  }
+  
+  public static short lambdaShort(Function<Short, Boolean> function) {
+    return lambdaShort(Moxy.getMoxyEngine(), function);
+  }
+  
+  public static short lambdaShort(MoxyEngine engine, Function<Short, Boolean> function) {
+    engine.getMatcherEngine().registerMatcher(new LambdaMatcher<Short>(function));
+    return 0;
+  }
+    
+  public static int lambdaInt(Function<Integer, Boolean> function) {
+    return lambdaInt(Moxy.getMoxyEngine(), function);
+  }
+  
+  public static int lambdaInt(MoxyEngine engine, Function<Integer, Boolean> function) {
+    engine.getMatcherEngine().registerMatcher(new LambdaMatcher<Integer>(function));
+    return 0;
+  }
+  
+  public static long lambdaLong(Function<Long, Boolean> function) {
+    return lambdaLong(Moxy.getMoxyEngine(), function);
+  }
+  
+  public static long lambdaLong(MoxyEngine engine, Function<Long, Boolean> function) {
+    engine.getMatcherEngine().registerMatcher(new LambdaMatcher<Long>(function));
+    return 0;
+  }
+  
+  public static float lambdaFloat(Function<Float, Boolean> function) {
+    return lambdaFloat(Moxy.getMoxyEngine(), function);
+  }
+  
+  public static float lambdaFloat(MoxyEngine engine, Function<Float, Boolean> function) {
+    engine.getMatcherEngine().registerMatcher(new LambdaMatcher<Float>(function));
+    return 0;
+  }
+  
+  public static double lambdaDouble(Function<Double, Boolean> function) {
+    return lambdaDouble(Moxy.getMoxyEngine(), function);
+  }
+  
+  public static double lambdaDouble(MoxyEngine engine, Function<Double, Boolean> function) {
+    engine.getMatcherEngine().registerMatcher(new LambdaMatcher<Double>(function));
+    return 0;
+  }
+  
+  public static boolean lambdaBool(Function<Boolean, Boolean> function) {
+    return lambdaBool(Moxy.getMoxyEngine(), function);
+  }
+  
+  public static boolean lambdaBool(MoxyEngine engine, Function<Boolean, Boolean> function) {
+    engine.getMatcherEngine().registerMatcher(new LambdaMatcher<Boolean>(function));
+    return false;
+  }
+  
+  public static <T> T lambda(Function<T, Boolean> function) {
+    return lambda(Moxy.getMoxyEngine(), function);
+  }
+  
+  public static <T> T lambda(MoxyEngine engine, Function<T, Boolean> function) {
+    engine.getMatcherEngine().registerMatcher(new LambdaMatcher<T>(function));
     return null;
   }
 }

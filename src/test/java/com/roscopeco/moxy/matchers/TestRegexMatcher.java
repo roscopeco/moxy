@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
+import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
 
@@ -26,7 +27,12 @@ public class TestRegexMatcher {
     assertMock(() -> mock.hasArgs(regexMatch("e$"), regexMatch("o$"))).wasCalledOnce();
     assertMock(() -> mock.hasArgs(regexMatch("ne$"), regexMatch("ur$"))).wasNotCalled();
 
-    assertMock(() -> mock.hasArgs(regexMatch(null), regexMatch(null))).wasNotCalled();
+    assertThatThrownBy(() -> 
+        assertMock(() -> mock.hasArgs(regexMatch(null), regexMatch(null))).wasNotCalled()
+    )
+        .isInstanceOf(MoxyException.class)
+        .hasMessage("Null argument; see cause")
+        .hasCauseInstanceOf(IllegalArgumentException.class);        
   }
 
   @Test

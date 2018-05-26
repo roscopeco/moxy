@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.matchers.InconsistentMatchersException;
 import com.roscopeco.moxy.matchers.MoxyMatcher;
 
@@ -27,13 +26,14 @@ public class ThreadLocalInvocationRecorder {
    * the arguments from the last invocation with them.
    */
   void replaceInvocationArgsWithMatchers() {
-    final List<MoxyMatcher<?>> matchers = this.engine.getASMMatcherEngine().popMatchers();
+    ASMMoxyMatcherEngine mengine = this.engine.getASMMatcherEngine();
+    final List<MoxyMatcher<?>> matchers = mengine.popMatchers();
     if (matchers != null) {
       final Invocation lastInvocation = this.getLastInvocation();
       
       final List<Object> lastArgs = lastInvocation.getArgs();
       if (lastArgs.size() != matchers.size()) {
-        throw new InconsistentMatchersException();
+        throw new InconsistentMatchersException(lastArgs.size(), mengine.ensureMatcherStack());
       } else {
         for (int i = 0; i < lastArgs.size(); i++) {
           lastArgs.set(i, matchers.get(i));          

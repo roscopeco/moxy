@@ -183,8 +183,12 @@ public class ASMMoxyEngine implements MoxyEngine {
   public boolean isMock(Object obj) {
     return isMock(obj.getClass());
   }
-  
+
+  /*
+   * Validates matcher stack consistency.
+   */
   void naivelyInvokeAndSwallowExceptions(Runnable doInvoke) {
+    this.getASMMatcherEngine().validateStackConsistency();
     try {
       doInvoke.run();
     } catch (MoxyException e) {
@@ -225,8 +229,12 @@ public class ASMMoxyEngine implements MoxyEngine {
     return new ASMMoxyVerifier(this);
   }
 
+  /*
+   * Validates matcher stack consistency.
+   */
   void deleteLatestInvocationFromList() {
     this.getRecorder().unrecordLastInvocation();
+    this.getASMMatcherEngine().validateStackConsistency();
   }
   
   ClassNode createMockClassNode(Class<?> clz, Set<Method> methods, PrintStream trace) throws IOException {

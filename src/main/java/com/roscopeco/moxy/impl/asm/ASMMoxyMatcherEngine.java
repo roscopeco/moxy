@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.roscopeco.moxy.api.MoxyMatcherEngine;
+import com.roscopeco.moxy.matchers.InconsistentMatchersException;
 import com.roscopeco.moxy.matchers.MoxyMatcher;
 
 class ASMMoxyMatcherEngine implements MoxyMatcherEngine {
@@ -74,5 +75,17 @@ class ASMMoxyMatcherEngine implements MoxyMatcherEngine {
     }
     
     return result;
+  }
+  
+  /*
+   * Verifies the stack is empty. Called at entry and exit to the
+   * framework (i.e. start and end of when() and assert() calls).
+   * 
+   * If non-empty, throws InconsistentMatchersException.
+   */
+  void validateStackConsistency() {
+    if (!ensureMatcherStack().isEmpty()) {
+      throw new InconsistentMatchersException(0, this.matcherStack.get());      
+    }    
   }
 }

@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.api.MoxyMatcherEngine;
 import com.roscopeco.moxy.matchers.InconsistentMatchersException;
 import com.roscopeco.moxy.matchers.MoxyMatcher;
@@ -31,8 +32,16 @@ class ASMMoxyMatcherEngine implements MoxyMatcherEngine {
     return stack;
   }
   
+  void verifyMatcherNotNull(MoxyMatcher<?> matcher) {
+    if (matcher == null) {
+      throw new MoxyException("Null argument; see cause",
+          new IllegalArgumentException("Cannot match to null"));
+    }
+  }
+  
   @Override
   public void registerMatcher(MoxyMatcher<?> matcher) {
+    verifyMatcherNotNull(matcher);
     matcher.addToStack(ensureMatcherStack());
   }
   
@@ -68,8 +77,12 @@ class ASMMoxyMatcherEngine implements MoxyMatcherEngine {
           result = false;
         }        
       } else {
-        if (!stored.equals(actual)) {
-          result = false;
+        if (stored == null) {
+          return actual == null;
+        } else {
+          if (!stored.equals(actual)) {
+            result = false;
+          }
         }
       }
     }

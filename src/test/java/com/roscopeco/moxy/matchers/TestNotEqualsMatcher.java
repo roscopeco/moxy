@@ -217,12 +217,33 @@ public class TestNotEqualsMatcher {
   }
 
   @Test
+  public void testMoxyMockVerifyWithNotEqualsObjectMatcherWorksWithNull() {
+    MethodWithArguments mock = mock(MethodWithArguments.class);
+
+    mock.hasArgs("one", "two");
+    mock.hasArgs("three", "four");
+    mock.hasArgs("five", "six");
+
+    assertMock(() -> mock.hasArgs(neq(null), neq(null))).wasCalled(3);
+  }
+
+  @Test
   public void testMoxyMockWhenWithNotEqualsObjectMatcherWorks() {
     MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
 
     when(() -> mock.sayHelloTo(neq("Steve"))).thenReturn(PASSED);
 
     assertThat(mock.sayHelloTo("Steve")).isEqualTo(null);
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo(PASSED);
+  }
+
+  @Test
+  public void testMoxyMockWhenWithNotEqualsObjectMatcherWorksWithNull() {
+    MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
+
+    when(() -> mock.sayHelloTo(neq(null))).thenReturn(PASSED);
+
+    assertThat(mock.sayHelloTo("Steve")).isEqualTo(PASSED);
     assertThat(mock.sayHelloTo("Bill")).isEqualTo(PASSED);
   }
 }

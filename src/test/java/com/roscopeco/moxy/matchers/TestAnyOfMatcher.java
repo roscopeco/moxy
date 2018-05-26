@@ -3,8 +3,8 @@ package com.roscopeco.moxy.matchers;
 import static com.roscopeco.moxy.Moxy.*;
 import static com.roscopeco.moxy.matchers.Matchers.*;
 import static com.roscopeco.moxy.matchers.Matchers.anyOf;
+import static com.roscopeco.moxy.matchers.TestMoxyMatchers.*;
 import static org.assertj.core.api.Assertions.*;
-import static com.roscopeco.moxy.matchers.TestMoxyMatchers.PASSED;
 
 import org.junit.jupiter.api.Test;
 

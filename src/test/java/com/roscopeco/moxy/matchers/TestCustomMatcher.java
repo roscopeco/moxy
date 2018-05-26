@@ -7,13 +7,14 @@ import static com.roscopeco.moxy.matchers.TestMoxyMatchers.PASSED;
 
 import org.junit.jupiter.api.Test;
 
+import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.model.MatcherTestClass;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
 
 public class TestCustomMatcher {
   @Test
-  public void testMoxyMockVerifyWithLambdaByteMatcherWorks() {
+  public void testMoxyMockVerifyWithCustomByteMatcherWorks() {
     MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testByte((byte) 0);
@@ -24,7 +25,7 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockWhenWithLambdaByteMatcherWorks() {
+  public void testMoxyMockWhenWithCustomByteMatcherWorks() {
     MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testByte(customByte((b) -> b.equals(Byte.MAX_VALUE)))).thenReturn(PASSED);
@@ -37,7 +38,7 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockVerifyWithLambdaCharMatcherWorks() {
+  public void testMoxyMockVerifyWithCustomCharMatcherWorks() {
     MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testChar('a');
@@ -48,7 +49,7 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockWhenWithLambdaCharMatcherWorks() {
+  public void testMoxyMockWhenWithCustomCharMatcherWorks() {
     MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testChar(customChar((c) -> c.equals('c')))).thenReturn(PASSED);
@@ -62,7 +63,7 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockVerifyWithLambdaShortMatcherWorks() {
+  public void testMoxyMockVerifyWithCustomShortMatcherWorks() {
     MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testShort((short) 0);
@@ -73,7 +74,7 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockWhenWithLambdaShortMatcherWorks() {
+  public void testMoxyMockWhenWithCustomShortMatcherWorks() {
     MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testShort(customShort((s) -> s.equals(Short.MAX_VALUE)))).thenReturn(PASSED);
@@ -86,7 +87,7 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockVerifyWithLambdaIntMatcherWorks() {
+  public void testMoxyMockVerifyWithCustomIntMatcherWorks() {
     MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testInt(0);
@@ -97,7 +98,7 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockWhenWithLambdaIntMatcherWorks() {
+  public void testMoxyMockWhenWithCustomIntMatcherWorks() {
     MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testInt(customInt((i) -> i.equals(Integer.MAX_VALUE)))).thenReturn(PASSED);
@@ -111,7 +112,7 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockVerifyWithLambdaLongMatcherWorks() {
+  public void testMoxyMockVerifyWithCustomLongMatcherWorks() {
     MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testLong(0);
@@ -122,7 +123,7 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockWhenWithLambdaLongMatcherWorks() {
+  public void testMoxyMockWhenWithCustomLongMatcherWorks() {
     MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testLong(customLong((l) -> l.equals(Long.MAX_VALUE)))).thenReturn(PASSED);
@@ -136,7 +137,7 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockVerifyWithLambdaFloatMatcherWorks() {
+  public void testMoxyMockVerifyWithCustomFloatMatcherWorks() {
     MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testFloat(0.0f);
@@ -147,7 +148,7 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockWhenWithLambdaFloatMatcherWorks() {
+  public void testMoxyMockWhenWithCustomFloatMatcherWorks() {
     MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testFloat(customFloat((f) -> f.equals(Float.MAX_VALUE)))).thenReturn(PASSED);
@@ -160,7 +161,7 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockVerifyWithLambdaDoubleMatcherWorks() {
+  public void testMoxyMockVerifyWithCustomDoubleMatcherWorks() {
     MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testDouble(0.0d);
@@ -171,7 +172,7 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockWhenWithLambdaDoubleMatcherWorks() {
+  public void testMoxyMockWhenWithCustomDoubleMatcherWorks() {
     MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testDouble(customDouble((d) -> d.equals(Double.MAX_VALUE)))).thenReturn(PASSED);
@@ -184,7 +185,7 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockVerifyWithLambdaBoolMatcherWorks() {
+  public void testMoxyMockVerifyWithCustomBoolMatcherWorks() {
     MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testBoolean(Boolean.TRUE);
@@ -195,7 +196,7 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockWhenWithLambdaBoolMatcherWorks() {
+  public void testMoxyMockWhenWithCustomBoolMatcherWorks() {
     MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testBoolean(customBool((z) -> z.equals(Boolean.TRUE)))).thenReturn(PASSED);
@@ -205,7 +206,7 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockVerifyWithLambdaObjectMatcherWorks() {
+  public void testMoxyMockVerifyWithCustomObjectMatcherWorks() {
     MethodWithArguments mock = mock(MethodWithArguments.class);
 
     mock.hasArgs("one", "two");
@@ -226,12 +227,24 @@ public class TestCustomMatcher {
   }
 
   @Test
-  public void testMoxyMockWhenWithLambdaObjectMatcherWorks() {
+  public void testMoxyMockWhenWithCustomObjectMatcherWorks() {
     MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
 
     when(() -> mock.sayHelloTo(custom((s) -> s.equals("Steve")))).thenReturn(PASSED);
 
     assertThat(mock.sayHelloTo("Steve")).isEqualTo(PASSED);
     assertThat(mock.sayHelloTo("Bill")).isEqualTo(null);
+  }
+
+  @Test
+  public void testMoxyMockWhenWithCustomObjectMatcherFailsFastWithNull() {
+    MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
+
+    assertThatThrownBy(() -> 
+        when(() -> mock.sayHelloTo(custom(null))).thenReturn(PASSED)
+    )
+        .isInstanceOf(MoxyException.class)
+        .hasMessage("Null argument; see cause")
+        .hasCauseInstanceOf(IllegalArgumentException.class);            
   }
 }

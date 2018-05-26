@@ -2,8 +2,8 @@ package com.roscopeco.moxy.matchers;
 
 import static com.roscopeco.moxy.Moxy.*;
 import static com.roscopeco.moxy.matchers.Matchers.*;
+import static com.roscopeco.moxy.matchers.TestMoxyMatchers.*;
 import static org.assertj.core.api.Assertions.*;
-import static com.roscopeco.moxy.matchers.TestMoxyMatchers.PASSED;
 
 import org.junit.jupiter.api.Test;
 
@@ -211,8 +211,10 @@ public class TestEqualsMatcher {
     mock.hasArgs("one", "two");
     mock.hasArgs("three", "four");
     mock.hasArgs("five", "six");
+    mock.hasArgs(null, "six");
 
     assertMock(() -> mock.hasArgs(eq("three"), eq("four"))).wasCalledOnce();
+    assertMock(() -> mock.hasArgs(eq(null), eq("six"))).wasCalledOnce();
     assertMock(() -> mock.hasArgs(eq("one"), eq("four"))).wasNotCalled();
   }
 
@@ -221,8 +223,10 @@ public class TestEqualsMatcher {
     MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
 
     when(() -> mock.sayHelloTo(eq("Steve"))).thenReturn(PASSED);
+    when(() -> mock.sayHelloTo(eq(null))).thenReturn(PASSED);
 
     assertThat(mock.sayHelloTo("Steve")).isEqualTo(PASSED);
     assertThat(mock.sayHelloTo("Bill")).isEqualTo(null);
+    assertThat(mock.sayHelloTo(null)).isEqualTo(PASSED);
   }
 }

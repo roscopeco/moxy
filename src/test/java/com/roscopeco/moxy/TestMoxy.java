@@ -529,4 +529,15 @@ public class TestMoxy {
         .isInstanceOf(AssertionFailedError.class)
         .hasMessage("Expected mock returnHello() to be called at most 3 times, but it was called 4 times");
   }
+  
+  @Test
+  public void testCanStubAndAssertNullArgument() {
+    MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+    
+    Moxy.when(() -> mock.sayHelloTo(null)).thenReturn("Hello, nobody");
+    
+    mock.sayHelloTo(null);
+    
+    Moxy.assertMock(() -> mock.sayHelloTo(null)).wasCalledOnce();
+  }
 }

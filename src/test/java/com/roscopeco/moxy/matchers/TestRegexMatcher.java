@@ -45,5 +45,12 @@ public class TestRegexMatcher {
     assertThat(mock.sayHelloTo("Stove")).isEqualTo(PASSED);
     assertThat(mock.sayHelloTo("Bill")).isEqualTo(null);
     assertThat(mock.sayHelloTo(null)).isEqualTo(null);
+
+    assertThatThrownBy(() -> 
+        when(() -> mock.sayHelloTo(regexMatch(null))).thenReturn(PASSED)
+    )
+        .isInstanceOf(MoxyException.class)
+        .hasMessage("Null argument; see cause")
+        .hasCauseInstanceOf(IllegalArgumentException.class);            
   }
 }

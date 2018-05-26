@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
+import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
 
@@ -22,6 +23,14 @@ public class TestEndsWithMatcher {
     assertMock(() -> mock.hasArgs(endsWith("ne"), endsWith("wo"))).wasCalledOnce();
     assertMock(() -> mock.hasArgs(endsWith("e"), endsWith("wo"))).wasCalledOnce();
     assertMock(() -> mock.hasArgs(endsWith("ne"), endsWith("ur"))).wasNotCalled();
+    assertThatThrownBy(() -> 
+
+    assertMock(
+        () -> mock.hasArgs(regexMatch(null), regexMatch(null))).wasNotCalled()
+    )
+        .isInstanceOf(MoxyException.class)
+        .hasMessage("Null argument; see cause")
+        .hasCauseInstanceOf(IllegalArgumentException.class);        
   }
 
   @Test
@@ -32,5 +41,12 @@ public class TestEndsWithMatcher {
 
     assertThat(mock.sayHelloTo("Steve")).isEqualTo(PASSED);
     assertThat(mock.sayHelloTo("Bill")).isEqualTo(null);
+
+    assertThatThrownBy(() -> 
+        when(() -> mock.sayHelloTo(endsWith(null))).thenReturn(PASSED)
+    )
+        .isInstanceOf(MoxyException.class)
+        .hasMessage("Null argument; see cause")
+        .hasCauseInstanceOf(IllegalArgumentException.class);            
   }
 }

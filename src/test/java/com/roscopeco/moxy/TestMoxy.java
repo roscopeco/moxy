@@ -535,7 +535,7 @@ public class TestMoxy {
     
     Moxy.when(() -> mock.sayHelloTo(null)).thenReturn("Hello, nobody");
     
-    mock.sayHelloTo(null);
+    assertThat(mock.sayHelloTo(null)).isEqualTo("Hello, nobody");
     
     Moxy.assertMock(() -> mock.sayHelloTo(null)).wasCalledOnce();
   }
@@ -574,9 +574,5 @@ public class TestMoxy {
       .isInstanceOf(AssertionFailedError.class)
       .hasMessage("Expected mock sayHelloTo(java.lang.String) with arguments (\"dothrow\") "
                 + "never to throw exception java.lang.RuntimeException: MARKER, but it was thrown once");
-
-    //Moxy.assertMock(() -> mock.sayHelloTo("dothrow")).neverThrew(marker));
-    
-    //Moxy.assertMock(() -> mock.sayHelloTo("dothrow")).neverThrew(marker));
   }
 }

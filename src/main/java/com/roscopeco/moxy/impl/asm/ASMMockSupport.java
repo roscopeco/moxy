@@ -147,4 +147,14 @@ public interface ASMMockSupport {
     return __moxy_asm_getReturnForInvocation(
         __moxy_asm_getEngine().getRecorder().getLastInvocation());
   }
+  
+  /* This MUST only ever be called from mocked methods AFTER the invocation has been
+   * recorded. It relies on the fact that getLastInvocation will always be the current 
+   * invocation just prior to throw or return.
+   */
+  default public void __moxy_asm_updateCurrentInvocationReturnThrow(Object returned, Throwable threw) {
+    final Invocation invocation = __moxy_asm_getEngine().getRecorder().getLastInvocation();
+    invocation.setReturned(returned);
+    invocation.setThrew(threw);
+  }  
 }

@@ -83,13 +83,31 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
       this.mv.visitMethodInsn(INVOKEVIRTUAL, ARRAYLIST_INTERNAL_NAME, ADD_NAME, BOOLEAN_OBJECT_DESCRIPTOR, false);
       this.mv.visitInsn(POP);
     }
-    
-    // Call recorder
+
+    // Call recorder - Need to record it before we can get the return/throw
+    // for it, since the support methods rely on getLastInvocation().
+    //
+    // TODO refactor this at some point to maybe create the invocation in generated
+    // code, and use getReturn/ThrowForInvocation rather than last invocation.
+    // That would save this two-step dance...
     this.mv.visitMethodInsn(INVOKEVIRTUAL, 
                             MOXY_RECORDER_INTERNAL_NAME, 
                             MOXY_RECORDER_RECORD_METHOD_NAME,
                             MOXY_RECORDER_RECORD_DESCRIPTOR,
                             false);
+    
+    // Get the value this method will return (unless it also has a throw) or null if none.
+    this.mv.visitVarInsn(ALOAD, 0);
+    this.mv.visitInsn(DUP);
+    this.mv.visitInsn(DUP);
+    this.mv.visitMethodInsn(INVOKEVIRTUAL, this.generatingClass, SUPPORT_GETCURRENTRETURN_METHOD_NAME, VOID_OBJECT_DESCRIPTOR, false);
+    
+    // Get the exception this method will throw (or null if none)
+    this.mv.visitInsn(SWAP);    
+    this.mv.visitMethodInsn(INVOKEVIRTUAL, this.generatingClass, SUPPORT_GETCURRENTTHROW_METHOD_NAME, VOID_THROWABLE_DESCRIPTOR, false);    
+
+    // Update the current invocation's returned and thrown fields.
+    this.mv.visitMethodInsn(INVOKEVIRTUAL,  this.generatingClass, SUPPORT_UPDATECURRENTRETURNED_METHOD_NAME, VOID_OBJECT_THROWABLE_DESCRIPTOR, false);
     
   }
   

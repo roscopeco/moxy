@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
 
 import com.roscopeco.moxy.api.Mock;
 import com.roscopeco.moxy.api.MoxyStubber;
@@ -15,8 +16,6 @@ import com.roscopeco.moxy.model.MethodWithPrimitiveArguments;
 import com.roscopeco.moxy.model.SimpleAbstractClass;
 import com.roscopeco.moxy.model.SimpleClass;
 import com.roscopeco.moxy.model.SimpleInterface;
-
-import org.opentest4j.AssertionFailedError;
 
 public class TestMoxy {
   @BeforeEach
@@ -539,5 +538,45 @@ public class TestMoxy {
     mock.sayHelloTo(null);
     
     Moxy.assertMock(() -> mock.sayHelloTo(null)).wasCalledOnce();
+  }
+  
+  @Test
+  public void testMoxyWithMockAssertNeverThrewWorks() {
+    MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+    
+    RuntimeException marker = new RuntimeException("MARKER");
+    
+    Moxy.when(() -> mock.sayHelloTo("nothrow")).thenReturn("Didn't throw");
+    Moxy.when(() -> mock.sayHelloTo("dothrow")).thenThrow(marker);
+    
+    mock.sayHelloTo("nothrow");
+
+    assertThatThrownBy(() -> mock.sayHelloTo("dothrow")).isSameAs(marker);
+        
+    Moxy.assertMock(() -> mock.sayHelloTo("nothrow")).neverThrewAnyException();
+    Moxy.assertMock(() -> mock.sayHelloTo("nothrow")).neverThrew(RuntimeException.class);    
+    Moxy.assertMock(() -> mock.sayHelloTo("nothrow")).neverThrew(marker);
+    
+    assertThatThrownBy(
+          () -> Moxy.assertMock(() -> mock.sayHelloTo("dothrow")).neverThrewAnyException())
+      .isInstanceOf(AssertionFailedError.class)
+      .hasMessage("Expected mock sayHelloTo(java.lang.String) with arguments (\"dothrow\") "
+                + "never to throw any exception, but exceptions were thrown once");
+    
+    assertThatThrownBy(
+          () -> Moxy.assertMock(() -> mock.sayHelloTo("dothrow")).neverThrew(RuntimeException.class))
+      .isInstanceOf(AssertionFailedError.class)
+      .hasMessage("Expected mock sayHelloTo(java.lang.String) with arguments (\"dothrow\") "
+                + "never to throw exception class java.lang.RuntimeException, but it was thrown once");
+
+    assertThatThrownBy(
+          () -> Moxy.assertMock(() -> mock.sayHelloTo("dothrow")).neverThrew(marker))
+      .isInstanceOf(AssertionFailedError.class)
+      .hasMessage("Expected mock sayHelloTo(java.lang.String) with arguments (\"dothrow\") "
+                + "never to throw exception java.lang.RuntimeException: MARKER, but it was thrown once");
+
+    //Moxy.assertMock(() -> mock.sayHelloTo("dothrow")).neverThrew(marker));
+    
+    //Moxy.assertMock(() -> mock.sayHelloTo("dothrow")).neverThrew(marker));
   }
 }

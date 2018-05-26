@@ -43,12 +43,19 @@ public class ThreadLocalInvocationRecorder {
   }
   
   // public as it's accessed from mocks (in different packages).
-  public void recordInvocation(Object receiver, String methodName, String methodDesc, List<Object> args) {
+  public void recordInvocation(Object receiver, 
+                               String methodName,
+                               String methodDesc, 
+                               List<Object> args) {
+    
     final List<Invocation> invocations = ensureInvocationList(
         ensureInvocationMap(ensureLocalClassMap(), receiver.getClass()),
         methodName, methodDesc);
     
-    Invocation invocation = new Invocation(receiver, methodName, methodDesc, args);
+    Invocation invocation = new Invocation(receiver, 
+                                           methodName,
+                                           methodDesc,
+                                           args);
     
     // Add to list of invocations
     invocations.add(invocation);

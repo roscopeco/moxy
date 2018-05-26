@@ -13,6 +13,7 @@ public final class TypesAndDescriptors {
   
   /* General Java stuff */
   public static final String OBJECT_INTERNAL_NAME = Type.getInternalName(Object.class);
+  public static final String OBJECT_DESCRIPTOR = "L" + OBJECT_INTERNAL_NAME + ";";
   public static final String ARRAYLIST_INTERNAL_NAME = Type.getInternalName(ArrayList.class);
   public static final String HASHMAP_INTERNAL_NAME = Type.getInternalName(HashMap.class);
   public static final String THROWABLE_DESCRIPTOR = "L" + Type.getInternalName(Throwable.class) +";";
@@ -25,6 +26,7 @@ public final class TypesAndDescriptors {
   public static final String VOID_OBJECT_DESCRIPTOR = "()L" + OBJECT_INTERNAL_NAME + ";";
   public static final String VOID_THROWABLE_DESCRIPTOR = "()" + THROWABLE_DESCRIPTOR;
   public static final String BOOLEAN_OBJECT_DESCRIPTOR = "(L" + OBJECT_INTERNAL_NAME + ";)Z";
+  public static final String VOID_OBJECT_THROWABLE_DESCRIPTOR = "(" + OBJECT_DESCRIPTOR + THROWABLE_DESCRIPTOR + ")V"; 
   
   /* Moxy stuff */
   public static final String MOXY_ENGINE_DESCRIPTOR = "L" + Type.getInternalName(MoxyEngine.class) + ";";
@@ -52,7 +54,7 @@ public final class TypesAndDescriptors {
   public static final String SUPPORT_NULL_CONSTRUCTOR_THROWER_METHOD_DESCRIPTOR = "()V";
   public static final String SUPPORT_GETRECORDER_METHOD_NAME = "__moxy_asm_getRecorder";
   public static final String SUPPORT_GETRECORDER_DESCRIPTOR = "()L" + MOXY_RECORDER_INTERNAL_NAME + ";";
-  
+  public static final String SUPPORT_UPDATECURRENTRETURNED_METHOD_NAME = "__moxy_asm_updateCurrentInvocationReturnThrow";
   public static final String SUPPORT_ENGINE_FIELD_NAME = "__moxy_asm_engine";
   public static final String SUPPORT_RETURNMAP_FIELD_NAME = "__moxy_asm_returnMap";
   public static final String SUPPORT_THROWMAP_FIELD_NAME = "__moxy_asm_throwMap";

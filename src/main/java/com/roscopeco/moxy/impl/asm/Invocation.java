@@ -20,6 +20,8 @@ final class Invocation {
   private final String methodName;
   private final String methodDesc;
   private final List<Object> args;
+  private Object returned;
+  private Throwable threw;
 
   /**
    * Create a new Invocation with the specified receiver, method and arguments.
@@ -29,7 +31,10 @@ final class Invocation {
    * @param methodDesc
    * @param args
    */
-  public Invocation(final Object receiver, final String methodName, final String methodDesc, final List<Object> args) {
+  public Invocation(final Object receiver, 
+                    final String methodName, 
+                    final String methodDesc, 
+                    final List<Object> args) {
     if (receiver == null || 
         methodName == null || 
         methodName.isEmpty() || 
@@ -42,7 +47,7 @@ final class Invocation {
     this.receiver = receiver;
     this.methodName = methodName;
     this.methodDesc = methodDesc;
-    this.args = args;      
+    this.args = args;
   }
 
   /**
@@ -73,6 +78,29 @@ final class Invocation {
     return args == null ? EMPTY_OBJECT_LIST : args;
   }
   
+  /**
+   * @return The object this method invocation returned (may be null).
+   */
+  Object getReturned() {
+    return returned;
+  }
+
+  void setReturned(Object returned) {
+    this.returned = returned;
+  }
+
+  /**
+   * 
+   * @return The exception this method invocation threw (may be null).
+   */
+  Throwable getThrew() {
+    return threw;
+  }
+
+  void setThrew(Throwable threw) {
+    this.threw = threw;
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(this.receiver, this.methodName, this.methodDesc, this.args);

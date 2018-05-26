@@ -86,5 +86,36 @@ public interface MoxyVerifier {
    * @param times
    * @return <code>this</code>
    */
-  public MoxyVerifier wasCalledAtMost(int times);  
+  public MoxyVerifier wasCalledAtMost(int times);
+  
+  /**
+   * Verify the mocked method never threw an exception of type <code>throwable</code>.
+   * 
+   * Throws {@link AssertionFailedError} if the assertion fails.
+   * 
+   * @param throwable The exception type to check.
+   * 
+   * @return <code>this</code>
+   */
+  public MoxyVerifier neverThrew(Class<? extends Throwable> throwable);
+
+  /**
+   * Verify the mocked method never threw the given <code>throwable</code> instance.
+   * 
+   * Throws {@link AssertionFailedError} if the assertion fails.
+   * 
+   * @param throwable The exception instance to check.
+   * 
+   * @return <code>this</code>
+   */
+  public MoxyVerifier neverThrew(Throwable throwable);
+  
+  /**
+   * Verify the mocked method never threw any exceptions.
+   * 
+   * Throws {@link AssertionFailedError} if the assertion fails.
+   * 
+   * @return <code>this</code>
+   */
+  public MoxyVerifier neverThrewAnyException();
 }

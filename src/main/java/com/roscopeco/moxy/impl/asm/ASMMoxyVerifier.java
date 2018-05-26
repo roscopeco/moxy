@@ -1,13 +1,13 @@
 package com.roscopeco.moxy.impl.asm;
 
 import java.util.Arrays;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.objectweb.asm.Type;
+import org.opentest4j.AssertionFailedError;
 
 import com.roscopeco.moxy.api.MoxyVerifier;
-
-import org.opentest4j.AssertionFailedError;
 
 class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
   public ASMMoxyVerifier(ASMMoxyEngine engine) {
@@ -167,5 +167,90 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
               + "at most " + readableTimes(times) + ", but it was called " 
               + readableTimes(actual));
     }
+  }  
+  
+  int countExceptionsThrown(final Invocation invocation,
+                            final String methodName, 
+                            final String methodDesc,
+                            final Predicate<? super Invocation> filterPredicate) {
+    return this.getEngine()
+        .getRecorder()
+        .getInvocationList(invocation.getReceiver().getClass(),
+                           methodName, 
+                           methodDesc)
+      .stream()
+      .filter( (e) -> this.getEngine()
+          .getASMMatcherEngine()
+          .argsMatch(e.getArgs(), invocation.getArgs()) )
+      .filter(filterPredicate)
+      .collect(Collectors.toList())
+      .size();
   }
+  
+  public MoxyVerifier neverThrew(Class<? extends Throwable> throwableClass) {
+    Invocation invocation = getTheInvocation();
+    final String methodName = invocation.getMethodName();
+    final String methodDesc = invocation.getMethodDesc();
+    
+    int actual = (countExceptionsThrown(invocation, 
+                                        invocation.getMethodName(), 
+                                        invocation.getMethodDesc(),
+        (e) -> e.getThrew() != null && e.getThrew().getClass().equals(throwableClass))
+    );
+    
+    if (actual > 0) {
+      throw new AssertionFailedError(
+          "Expected mock " + methodName + ellipsisDesc(methodDesc) + " "
+              + buildArgsString(invocation) 
+              + "never to throw exception class " + throwableClass.getName()
+              + ", but it was thrown " + readableTimes(actual));
+          
+    } else {
+      return this;
+    }
+  }
+  
+  public MoxyVerifier neverThrew(Throwable throwable) {
+    final Invocation invocation = getTheInvocation();
+    final String methodName = invocation.getMethodName();
+    final String methodDesc = invocation.getMethodDesc();
+    
+    int actual = (countExceptionsThrown(invocation, 
+                                        invocation.getMethodName(), 
+                                        invocation.getMethodDesc(),
+        (e) -> e.getThrew() != null && e.getThrew().equals(throwable))
+    );
+    
+    if (actual > 0) {
+      throw new AssertionFailedError(
+          "Expected mock " + methodName + ellipsisDesc(methodDesc) + " "
+              + buildArgsString(invocation) 
+              + "never to throw exception " + throwable
+              + ", but it was thrown " + readableTimes(actual));
+          
+    } else {
+      return this;
+    }
+  }
+  
+  public MoxyVerifier neverThrewAnyException() {
+    Invocation invocation = getTheInvocation();
+    final String methodName = invocation.getMethodName();
+    final String methodDesc = invocation.getMethodDesc();
+    
+    int actual = (countExceptionsThrown(invocation, 
+                                        invocation.getMethodName(), 
+                                        invocation.getMethodDesc(),
+        (e) -> e.getThrew() != null)
+    );
+    
+    if (actual > 0) {
+      throw new AssertionFailedError(
+          "Expected mock " + methodName + ellipsisDesc(methodDesc) + " " 
+              + buildArgsString(invocation) 
+              + "never to throw any exception, but exceptions were thrown " + readableTimes(actual));
+    } else {
+      return this;
+    }
+  } 
 }

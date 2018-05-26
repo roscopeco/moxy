@@ -1,7 +1,7 @@
 package com.roscopeco.moxy.matchers;
 
 abstract class SimpleObjectMatcher<T> implements MoxyMatcher<T> {
-  protected final T object;
+  private final T object;
 
   public SimpleObjectMatcher(final T object, boolean allowNull) {
     if (!allowNull && object == null) {
@@ -11,7 +11,7 @@ abstract class SimpleObjectMatcher<T> implements MoxyMatcher<T> {
     this.object = object;
   }
 
-  public T getObject() {
+  protected T getObject() {
     return object;
   }
 

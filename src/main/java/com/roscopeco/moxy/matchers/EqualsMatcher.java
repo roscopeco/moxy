@@ -7,6 +7,7 @@ class EqualsMatcher<T> extends SimpleObjectMatcher<T> {
   
   @Override
   public boolean matches(T arg) {
+    T object = getObject();
     if (arg == null) {
       if (object == null) {
         return true;

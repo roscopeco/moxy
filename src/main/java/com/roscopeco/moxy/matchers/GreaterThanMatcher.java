@@ -8,7 +8,7 @@ class GreaterThanMatcher<T extends Comparable<T>> extends SimpleObjectMatcher<T>
   @Override
   public boolean matches(T arg) {
     // NOTE check reversed for easier null handling
-    return object.compareTo(arg) < 0;
+    return getObject().compareTo(arg) < 0;
   }
   
   @Override

@@ -50,8 +50,8 @@ To summarise, the aims of Moxy are:
 
 ##### Compile/runtime:
 
-* Java (1.6+ probably, tested on 1.8).
-* ASM 6.1.1
+* Java (1.8, not yet working on 1.9 and above).
+* ASM 6.1.1 (base jar and -util)
 * opentest4j 1.0.0
 
 ##### For building/testing
@@ -59,6 +59,8 @@ To summarise, the aims of Moxy are:
 * Maven 3 (tested with 3.5.3)
 * Junit 5
 * AssertJ 3.8
+* JaCoCo 0.8.1
+* FindBugs 3.0.1
 
 #### Getting the code
 
@@ -127,11 +129,6 @@ make a given method return something else, you would _stub_ it, like so:
 when(() -> mock.connectDatabase("mydatabase")).thenReturn("OK");
 ```
 
-**Side note**
-> You'll notice we make extensive use of Java 8 lambda syntax in Moxy. If 
-you're on pre-1.8 then, frankly, you're going to have a bit of a tougher
-time of it. Yet another good reason to upgrade? 
-
 Now, whenever you call `connect` with `"mydatabase"` as the argument,
 it'll return "OK". That argument part is kind of important - if you call
 it with anything other than `"mydatabase"`, it'll still return `null`.
@@ -198,7 +195,7 @@ For a full list of the available asserts, take a look at the
 When the time comes that matching methods based on simple immediate arguments
 just isn't enough, you'll want to take a look at _argument matchers_. 
 
-Simply put, matchers are used in `when()` and `assertMock` calls to
+Simply put, matchers are used in `when()` and `assertMock()` calls to
 allow you to specify variable arguments based on some condition. 
 
 For example, say you want your `connectDatabase` method to _always_ return

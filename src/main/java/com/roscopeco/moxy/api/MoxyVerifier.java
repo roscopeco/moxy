@@ -37,6 +37,8 @@ public interface MoxyVerifier {
    * 
    * Throws {@link AssertionFailedError} if the assertion fails.
    * 
+   * @param times The number of expected invocations.
+   * 
    * @return <code>this</code>. 
    */
   public MoxyVerifier wasCalled(int times);
@@ -73,7 +75,8 @@ public interface MoxyVerifier {
    * 
    * Throws {@link AssertionFailedError} if the assertion fails.
    *  
-   * @param times
+   * @param times The number of expected invocations.
+   * 
    * @return <code>this</code>
    */
   public MoxyVerifier wasCalledAtLeast(int times);
@@ -83,7 +86,8 @@ public interface MoxyVerifier {
    * 
    * Throws {@link AssertionFailedError} if the assertion fails.
    * 
-   * @param times
+   * @param times The number of expected invocations.
+   * 
    * @return <code>this</code>
    */
   public MoxyVerifier wasCalledAtMost(int times);

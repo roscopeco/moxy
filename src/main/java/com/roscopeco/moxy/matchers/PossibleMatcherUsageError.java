@@ -5,7 +5,7 @@ import com.roscopeco.moxy.api.MoxyException;
 /**
  * <p>Thrown to indicate that Moxy has detected potentially-incorrect
  * usage of matchers. This will provide a helpful message to the
- * user, rather than a random, hard-to-debug crash at some 
+ * user, rather than a seemingly-random, hard-to-debug crash at some 
  * indeterminate future time.</p>
  * 
  * <p>Note that this doesn't <em>always</em> indicate incorrect 

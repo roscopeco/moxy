@@ -110,7 +110,8 @@ public final class Moxy {
    * Special case when to allow the same syntax to work for void
    * methods as for non-void ones.
    *  
-   * @param invocation
+   * @param invocation A runnable that invokes the mock method.
+   * 
    * @return The special-case MoxyVoidStubber. 
    */
   public static MoxyVoidStubber when(Runnable invocation) {

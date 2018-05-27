@@ -97,7 +97,13 @@ class ASMMoxyMatcherEngine implements MoxyMatcherEngine {
    * If non-empty, throws InconsistentMatchersException.
    */
   void validateStackConsistency() {
-    if (!(this.matcherStack.get() == null || this.matcherStack.get().isEmpty())) {
+    ArrayDeque<MoxyMatcher<?>> stack = this.matcherStack.get();
+    if (!(stack == null || stack.isEmpty())) {
+      // clear stack as per contract of InconsistentMatchersException
+      if (stack != null) {
+        stack.clear();
+      }
+      
       throw new InconsistentMatchersException(0, this.matcherStack.get());      
     }    
   }

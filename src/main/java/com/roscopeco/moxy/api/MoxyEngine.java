@@ -38,6 +38,8 @@ public interface MoxyEngine {
    * @param trace If non-null, the resulting class will be dumped (with a `TraceClassVisitor` to the given stream. 
    * 
    * @return The new `Class` object.
+   * 
+   * @param <I> The type of the class being mocked.
    */
   public <I> Class<? extends I> getMockClass(ClassLoader loader, Class<I> clz, Set<Method> methods, PrintStream trace);
 
@@ -64,7 +66,8 @@ public interface MoxyEngine {
   /**
    * Special case to allow void methods to be stubbed (without thenReturn).
    * 
-   * @param invocation
+   * @param invocation A runnable that invokes the mock method.
+   * 
    * @return A special-case MoxyVoidStubber.
    */
   public MoxyVoidStubber when(Runnable invocation);

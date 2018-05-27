@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import com.roscopeco.moxy.model.MatcherTestClass;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 
-// TODO this really needs splitting up...
 public abstract class TestMoxyMatchers {
   public static final String PASSED = "passed";
 

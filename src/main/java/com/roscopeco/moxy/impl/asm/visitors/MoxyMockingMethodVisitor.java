@@ -12,7 +12,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
   private final MethodVisitor mv;
   private final boolean wasAbstract;
   private final String generatingClass;
-  private final String returnType;
+  private final Type returnType;
   private final Type[] argTypes;
   private final String methodName;
   private final String methodDescriptor;
@@ -21,7 +21,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
                                   final String generatingClass,
                                   final String methodName,
                                   final String methodDescriptor,
-                                  final String returnType, 
+                                  final Type returnType, 
                                   final Type[] argTypes, 
                                   final boolean wasAbstract) {
     // don't pass the delegate to the super constructor, or we'll generate
@@ -218,7 +218,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     
     this.mv.visitLabel(returnLabel);
     
-    char primitiveReturnType = returnType.charAt(0);
+    char primitiveReturnType = returnType.toString().charAt(0);
     switch (primitiveReturnType) {
     case BYTE_PRIMITIVE_INTERNAL_NAME:
       generateUnboxingReturn(BYTE_CLASS_INTERNAL_NAME, 
@@ -279,7 +279,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     case OBJECT_PRIMITIVE_INTERNAL_NAME:
       this.mv.visitVarInsn(ALOAD, 0);
       this.mv.visitMethodInsn(INVOKEVIRTUAL, this.generatingClass, SUPPORT_GETCURRENTRETURN_METHOD_NAME, VOID_OBJECT_DESCRIPTOR, false);
-      this.mv.visitTypeInsn(CHECKCAST, this.returnType);
+      this.mv.visitTypeInsn(CHECKCAST, this.returnType.getInternalName());
       this.mv.visitInsn(ARETURN);
       break;
     case VOID_PRIMITIVE_INTERNAL_NAME:

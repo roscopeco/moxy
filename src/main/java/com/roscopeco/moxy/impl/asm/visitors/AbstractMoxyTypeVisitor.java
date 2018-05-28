@@ -8,7 +8,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 
 /**
@@ -35,11 +34,6 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
     this.newClassInternalName = newClassInternalName;
   }
     
-  // Get return type given method descriptor.
-  protected String getReturnType(String desc) {
-    return Type.getReturnType(desc).toString();
-  }
-  
   protected String getNewClassInternalName() {
     return newClassInternalName;
   }

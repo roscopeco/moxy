@@ -1,6 +1,19 @@
 language: java
+sudo: false
+install: true
+addons:
+        sonarcloud:
+                organization: "roscopeco-github"
+                token:
+                        secure: "AtvYumhXWt+fP3kVZvENFK0IHzTfWrfia0Wso4jvWJpJDjL9/YrJ9hUicPoVCS2Iy7ijJ6J2vUGHTT5gQORfFlVrDn+jutcQQjoepWuHlX5I9b8McfZf8B3qz81RC/GGqxAqzCS8tr5Rx7f5JKBm0KLDI35ff368zX2PFS31Zz09pb5tfyqZp4TQlQh8kjwAEBuKOzPGNqfRJ+jqM3z7kYSuwqkV/OcUl3pPu5bjs68KKLAPBY2a7dLVadMuIpV6Kj9ix0GsfvWIHners2B4CcIH+9D/RsNcQRb0Jxq9Ek05cpuh1HLVxUpDcDmbiIbiDJAekRuJMikJ8nC5cqmYTzrgaPj++MxGmIMcXgU3N/KzhQVY/L+Y3B0IajpW5V+B8PWc+HvfbE1QDPYVs1hmIgrI5Lgdv5j+zhJg35dS4kTqZ9imSCwP+fXoxrirtAsJq47qR4wmKqKcOtfzO7cx5ZKgLXL6Pdx42Pee3X9FS/wDitY92knK7Rg/22C7glHVCWDCUBXTWiWulJm8CelcRjdyvRQtvzJEPYrxR3RtGLNtJuDYtZXoQcmyzZiu2lgAlQN27iePWKeSbeyLvg9QhWEcS9vAmt2/M913nRy7th0SE66XwnZXnmiNsiSgpxeuQb7Kmx+VBH6qpe4QqTf3yvhO0uNp9gFpa6cl57t71x4="
 jdk:
-  - oraclejdk8
-  - oraclejdk9
-  - openjdk8
+        - oraclejdk8
+        - oraclejdk9
+        - openjdk8
+script:
+        - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
+cache:
+        directories:
+                - '$HOME/.m2/repository'                 
+                - '$HOME/.sonar/cache'
 

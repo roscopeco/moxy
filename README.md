@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/roscopeco/moxy.svg?branch=master)](https://travis-ci.org/roscopeco/moxy)
+
 # Moxy
 
 ## Lean-and-mean mocking framework for Java with a fluent API.

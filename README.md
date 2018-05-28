@@ -50,7 +50,7 @@ To summarise, the aims of Moxy are:
 
 ##### Compile/runtime:
 
-* Java (1.8, not yet working on 1.9 and above).
+* Java (1.8+).
 * ASM 6.1.1 (base jar and -util)
 * opentest4j 1.0.0
 

@@ -26,7 +26,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
   
   private String buildArgsString(Invocation invocation) {
     String args = invocation.getArgs().stream()
-        .map((e) -> inspectArg(e))
+        .map(this::inspectArg)
         .collect(Collectors.joining(", "));
     
     if (args.isEmpty()) {
@@ -41,7 +41,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
       return "()";
     } else {
       return "(" + Arrays.stream(Type.getArgumentTypes(descriptor))
-          .map((e) -> e.getClassName())
+          .map(Type::getClassName)
           .collect(Collectors.joining(", ")) + ")";
     }
   }

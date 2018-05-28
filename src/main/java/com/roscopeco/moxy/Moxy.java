@@ -49,6 +49,11 @@ import com.roscopeco.moxy.matchers.Matchers;
 public final class Moxy {
   private static MoxyEngine moxyEngine;
   
+  private Moxy() {
+    throw new UnsupportedOperationException(
+        "com.roscopeco.moxy.Moxy is not designed for instantiation");
+  }
+  
   private static MoxyEngine ensureMoxyEngine() {
     if (moxyEngine == null) {
       moxyEngine = new ASMMoxyEngine();

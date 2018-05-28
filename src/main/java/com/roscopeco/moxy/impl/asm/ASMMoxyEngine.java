@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -39,7 +40,10 @@ import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
  *
  */
 public class ASMMoxyEngine implements MoxyEngine {
+  private static final Logger LOG = Logger.getLogger(MoxyEngine.class.getName());
+  
   private static final Set<Method> EMPTY_METHODS = Collections.emptySet();
+  private static final String UNRECOVERABLE_ERROR = "Unrecoverable Error";
   
   private final ThreadLocalInvocationRecorder recorder;
   private final ASMMoxyMatcherEngine matcherEngine;
@@ -96,8 +100,7 @@ public class ASMMoxyEngine implements MoxyEngine {
       Constructor<? extends T> ctor = mockClass.getConstructor(ASMMoxyEngine.class);
       return ctor.newInstance(this);
     } catch (Exception e) {
-      throw new RuntimeException("Unrecoverable error: exception in mock constructor", e);
-      
+      throw new MoxyException("Unrecoverable error: exception in mock constructor", e);      
     }
   }
   
@@ -113,7 +116,7 @@ public class ASMMoxyEngine implements MoxyEngine {
     try {
       return (Class<I>)defineClass(loader, createMockClassNode(clz, methods, trace));
     } catch (IOException e) {
-      throw new RuntimeException("Unrecoverable Error", e);
+      throw new MoxyException(UNRECOVERABLE_ERROR, e);
     }
   }
 
@@ -161,7 +164,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   }
   
   HashSet<Method> gatherPublicMethods(Class<?> originalClass) {
-    HashSet<Method> methods = new HashSet<Method>();
+    HashSet<Method> methods = new HashSet<>();
 
     Class<?> currentClass = originalClass;
     while (originalClass != null && !originalClass.equals(Object.class)) {
@@ -207,15 +210,15 @@ public class ASMMoxyEngine implements MoxyEngine {
   
   @Override
   public <T> MoxyStubber<T> when(Supplier<T> invocation) {
-    naivelyInvokeAndSwallowExceptions(() -> invocation.get());
+    naivelyInvokeAndSwallowExceptions(invocation::get);
     this.getRecorder().replaceInvocationArgsWithMatchers();
     deleteLatestInvocationFromList();
-    return new ASMMoxyStubber<T>(this);    
+    return new ASMMoxyStubber<>(this);
   }
   
   @Override
   public MoxyVoidStubber when(Runnable invocation) {
-    naivelyInvokeAndSwallowExceptions(() -> invocation.run());
+    naivelyInvokeAndSwallowExceptions(invocation::run);
     this.getRecorder().replaceInvocationArgsWithMatchers();
     deleteLatestInvocationFromList();
     return new ASMMoxyVoidStubber(this);
@@ -223,7 +226,7 @@ public class ASMMoxyEngine implements MoxyEngine {
 
   @Override
   public MoxyVerifier assertMock(Runnable invocation) {
-    naivelyInvokeAndSwallowExceptions(() -> invocation.run());
+    naivelyInvokeAndSwallowExceptions(invocation::run);
     this.getRecorder().replaceInvocationArgsWithMatchers();
     deleteLatestInvocationFromList();
     return new ASMMoxyVerifier(this);
@@ -275,11 +278,11 @@ public class ASMMoxyEngine implements MoxyEngine {
     try {
       return (Class<?>)defineClass.invoke(loader, node.name.replace('/',  '.'), code, 0, code.length);      
     } catch (InvocationTargetException e) {
-      System.err.println("InvocationTargetException: in defineClass: " + e.getMessage());      
-      throw new RuntimeException("Unrecoverable Error", e);
+      LOG.severe("InvocationTargetException: in defineClass: " + e.getMessage());      
+      throw new MoxyException(UNRECOVERABLE_ERROR, e);
     } catch (IllegalAccessException e) {
-      System.err.println("IllegalAccessException: in defineClass: " + e.getMessage());      
-      throw new RuntimeException("Unrecoverable Error", e);
+      LOG.severe("IllegalAccessException: in defineClass: " + e.getMessage());      
+      throw new MoxyException(UNRECOVERABLE_ERROR, e);
     }
   }
 }

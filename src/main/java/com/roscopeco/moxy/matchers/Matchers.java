@@ -3825,4 +3825,10 @@ public class Matchers {
     engine.getMatcherEngine().registerMatcher(new RegexMatcher(regex));
     return null;
   }
+  
+  private Matchers() {
+    throw new UnsupportedOperationException(
+        "com.roscopeco.moxy.matchers.Matchers is not designed for instantiation");
+  }
+
 }

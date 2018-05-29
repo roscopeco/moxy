@@ -101,8 +101,10 @@ public class ASMMoxyEngine implements MoxyEngine {
     try {
       Class<? extends T> mockClass = getMockClass(clz, trace);
       return instantiateMock(mockClass);
+    } catch (MoxyException e) {
+      throw e;
     } catch (Exception e) {
-      throw new MoxyException("Unrecoverable error: exception in mock constructor", e);      
+      throw new MoxyException("Unrecoverable error: exception during mock generation", e);      
     }
   }
   
@@ -238,15 +240,19 @@ public class ASMMoxyEngine implements MoxyEngine {
    * Instantiate a mock of the given class 
    */
   @SuppressWarnings({ "unchecked", "restriction", "rawtypes" })
-  public <T> T instantiateMock(Class<? extends T> mockClass) throws Exception {
-    Field engineField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_ENGINE_FIELD_NAME);
-    Field returnMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_RETURNMAP_FIELD_NAME);
-    Field throwMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_THROWMAP_FIELD_NAME);
-    Object mock = UNSAFE.allocateInstance(mockClass);
-    UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(engineField), this);
-    UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(returnMapField), new HashMap());
-    UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(throwMapField), new HashMap());
-    return (T)mock;
+  <T> T instantiateMock(Class<? extends T> mockClass) throws MoxyException {
+    try {
+      Field engineField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_ENGINE_FIELD_NAME);
+      Field returnMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_RETURNMAP_FIELD_NAME);
+      Field throwMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_THROWMAP_FIELD_NAME);
+      Object mock = UNSAFE.allocateInstance(mockClass);
+      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(engineField), this);
+      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(returnMapField), new HashMap());
+      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(throwMapField), new HashMap());
+      return (T)mock;
+    } catch (Exception e) {
+      throw new MoxyException("Unrecoverable error: Instantiation exception; see cause", e);
+    }
   }
   
   /*

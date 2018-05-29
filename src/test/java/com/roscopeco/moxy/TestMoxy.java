@@ -9,6 +9,7 @@ import org.opentest4j.AssertionFailedError;
 import com.roscopeco.moxy.api.Mock;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
+import com.roscopeco.moxy.model.ClassWithNoNullConstructor;
 import com.roscopeco.moxy.model.ClassWithPrimitiveReturns;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
@@ -75,7 +76,7 @@ public class TestMoxy {
   
   @Test
   public void testMoxyMockWithSimpleInterfaceReturnsInstance() {
-    SimpleInterface mock = Moxy.mock(SimpleInterface.class, System.out);
+    SimpleInterface mock = Moxy.mock(SimpleInterface.class);
     
     assertThat(mock)
         .isNotNull()
@@ -574,5 +575,14 @@ public class TestMoxy {
       .isInstanceOf(AssertionFailedError.class)
       .hasMessage("Expected mock sayHelloTo(java.lang.String) with arguments (\"dothrow\") "
                 + "never to throw exception java.lang.RuntimeException: MARKER, but it was thrown once");
+  }
+  
+  @Test
+  public void testThatCanMockClassWithNoNullConstructor() {
+    ClassWithNoNullConstructor mock = Moxy.mock(ClassWithNoNullConstructor.class);
+    
+    Moxy.when(() -> mock.returnSomething()).thenReturn("passed");
+    
+    assertThat(mock.returnSomething()).isEqualTo("passed");
   }
 }

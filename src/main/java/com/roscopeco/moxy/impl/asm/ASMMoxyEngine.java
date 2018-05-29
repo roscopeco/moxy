@@ -3,14 +3,13 @@ package com.roscopeco.moxy.impl.asm;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -39,23 +38,28 @@ import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
  *
  */
 public class ASMMoxyEngine implements MoxyEngine {
-  private static final Logger LOG = Logger.getLogger(MoxyEngine.class.getName());
-  
   private static final Set<Method> EMPTY_METHODS = Collections.emptySet();
   private static final String UNRECOVERABLE_ERROR = "Unrecoverable Error";
   
   private final ThreadLocalInvocationRecorder recorder;
   private final ASMMoxyMatcherEngine matcherEngine;
   
-  private static final Method defineClass;       
-  static {
+  @SuppressWarnings("restriction")
+  private static final sun.misc.Unsafe UNSAFE = getUnsafe();
+  
+  @SuppressWarnings("restriction")
+  private static sun.misc.Unsafe getUnsafe() {    
     try {
-      defineClass = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class);
-    } catch (NoSuchMethodException e) {
-      throw new IllegalStateException("Unrecoverable Error: NoSuchMethodException 'defineClass' on ClassLoader.\n"
+      Field unsafeField = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
+      unsafeField.setAccessible(true);
+      return (sun.misc.Unsafe)unsafeField.get(null);
+    } catch (NoSuchFieldException e) {
+      throw new IllegalStateException("Unrecoverable Error: NoSuchFieldException 'theUnsafe' on sun.misc.Unsafe.\n"
+          + "This is most likely an environment issue.", e);
+    } catch (IllegalAccessException e) {
+      throw new IllegalStateException("Unrecoverable Error: IllegalAccessException when accessing 'theUnsafe' on sun.misc.Unsafe.\n"
           + "This is most likely an environment issue.", e);
     }
-    defineClass.setAccessible(true);
   }
 
   public ASMMoxyEngine() {
@@ -96,8 +100,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   public <T> T mock(Class<T> clz, PrintStream trace) {
     try {
       Class<? extends T> mockClass = getMockClass(clz, trace);
-      Constructor<? extends T> ctor = mockClass.getConstructor(ASMMoxyEngine.class);
-      return ctor.newInstance(this);
+      return instantiateMock(mockClass);
     } catch (Exception e) {
       throw new MoxyException("Unrecoverable error: exception in mock constructor", e);      
     }
@@ -231,6 +234,21 @@ public class ASMMoxyEngine implements MoxyEngine {
     return new ASMMoxyVerifier(this);
   }
 
+  /* 
+   * Instantiate a mock of the given class 
+   */
+  @SuppressWarnings({ "unchecked", "restriction", "rawtypes" })
+  public <T> T instantiateMock(Class<? extends T> mockClass) throws Exception {
+    Field engineField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_ENGINE_FIELD_NAME);
+    Field returnMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_RETURNMAP_FIELD_NAME);
+    Field throwMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_THROWMAP_FIELD_NAME);
+    Object mock = UNSAFE.allocateInstance(mockClass);
+    UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(engineField), this);
+    UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(returnMapField), new HashMap());
+    UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(throwMapField), new HashMap());
+    return (T)mock;
+  }
+  
   /*
    * Validates matcher stack consistency.
    */
@@ -239,6 +257,9 @@ public class ASMMoxyEngine implements MoxyEngine {
     this.getASMMatcherEngine().validateStackConsistency();
   }
   
+  /*
+   * Actual generator; create the ASM ClassNode for a mock.
+   */
   ClassNode createMockClassNode(Class<?> clz, Set<Method> methods, PrintStream trace) throws IOException {
     String clzInternalName = Type.getInternalName(clz);
     ClassReader reader = new ClassReader(clzInternalName);
@@ -266,22 +287,21 @@ public class ASMMoxyEngine implements MoxyEngine {
     return visitor.getNode();    
   }
   
+  /*
+   * Define a class given a loader and an ASM ClassNode. 
+   */
+  @SuppressWarnings("restriction")
+  Class<?> defineClass(ClassLoader loader, ClassNode node) {
+    byte[] code = generateBytecode(node);
+    return UNSAFE.defineClass(node.name.replace('/',  '.'), code, 0, code.length, loader, null);      
+  }
+  
+  /*
+   * Transform a ClassNode into bytecode.
+   */
   byte[] generateBytecode(ClassNode node) {
     ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     node.accept(writer);
     return writer.toByteArray();    
-  }
-  
-  Class<?> defineClass(ClassLoader loader, ClassNode node) {
-    byte[] code = generateBytecode(node);
-    try {
-      return (Class<?>)defineClass.invoke(loader, node.name.replace('/',  '.'), code, 0, code.length);      
-    } catch (InvocationTargetException e) {
-      LOG.severe("InvocationTargetException: in defineClass: " + e.getMessage());      
-      throw new MoxyException(UNRECOVERABLE_ERROR, e);
-    } catch (IllegalAccessException e) {
-      LOG.severe("IllegalAccessException: in defineClass: " + e.getMessage());      
-      throw new MoxyException(UNRECOVERABLE_ERROR, e);
-    }
-  }
+  }  
 }

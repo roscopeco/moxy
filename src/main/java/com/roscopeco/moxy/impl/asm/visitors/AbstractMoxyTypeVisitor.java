@@ -45,58 +45,6 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
     super.visitEnd();
   }
   
-  /**
-   * Called from subclass to generate approriate constructor.
-   * 
-   * Call during visitEnd, before calling super.
-   */
-  protected void generateConstructors(String superClassInternalName, String superDescriptor) {
-    generateActualConstructor(superClassInternalName, superDescriptor);
-    generateNullConstructor(superClassInternalName, superDescriptor);    
-  }
-  
-  void generateActualConstructor(String superClassInternalName, String superDescriptor) {
-    MethodVisitor mv = this.cv.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, INIT_NAME, MOCK_CONSTRUCTOR_DESCRIPTOR, null, EMPTY_STRING_ARRAY);
-    mv.visitCode();
-    mv.visitVarInsn(ALOAD, 0);
-    mv.visitInsn(DUP);
-    mv.visitMethodInsn(INVOKESPECIAL, superClassInternalName, INIT_NAME, superDescriptor, false);
-    mv.visitVarInsn(ALOAD, 1);
-    mv.visitFieldInsn(PUTFIELD, newClassInternalName, SUPPORT_ENGINE_FIELD_NAME, MOXY_ASM_ENGINE_DESCRIPTOR);
-    
-    // return map
-    mv.visitVarInsn(ALOAD, 0);
-    mv.visitTypeInsn(NEW, HASHMAP_INTERNAL_NAME);
-    mv.visitInsn(DUP);
-    mv.visitMethodInsn(INVOKESPECIAL, HASHMAP_INTERNAL_NAME, "<init>", VOID_VOID_DESCRIPTOR, false);
-    mv.visitFieldInsn(PUTFIELD, newClassInternalName, SUPPORT_RETURNMAP_FIELD_NAME, HASHMAP_DESCRIPTOR);
-
-    // throw map
-    mv.visitVarInsn(ALOAD, 0);
-    mv.visitTypeInsn(NEW, HASHMAP_INTERNAL_NAME);
-    mv.visitInsn(DUP);
-    mv.visitMethodInsn(INVOKESPECIAL, HASHMAP_INTERNAL_NAME, "<init>", VOID_VOID_DESCRIPTOR, false);
-    mv.visitFieldInsn(PUTFIELD, newClassInternalName, SUPPORT_THROWMAP_FIELD_NAME, HASHMAP_DESCRIPTOR);
-
-    mv.visitInsn(RETURN);
-    mv.visitEnd();
-  }
-  
-  void generateNullConstructor(String superClassInternalName, String superDescriptor) {
-    MethodVisitor mv = this.cv.visitMethod(ACC_PRIVATE | ACC_SYNTHETIC, INIT_NAME, VOID_VOID_DESCRIPTOR, null, EMPTY_STRING_ARRAY);
-    mv.visitCode();
-    mv.visitVarInsn(ALOAD, 0);
-    mv.visitInsn(DUP);
-    mv.visitMethodInsn(INVOKESPECIAL, superClassInternalName, INIT_NAME, superDescriptor, false);
-    mv.visitMethodInsn(INVOKEVIRTUAL,
-                       newClassInternalName, 
-                       SUPPORT_NULL_CONSTRUCTOR_THROWER_METHOD_NAME,
-                       SUPPORT_NULL_CONSTRUCTOR_THROWER_METHOD_DESCRIPTOR, 
-                       false);
-    mv.visitInsn(RETURN);
-    mv.visitEnd();
-  }
-  
   void generateSupportFields() {
     FieldVisitor fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_ENGINE_FIELD_NAME, MOXY_ASM_ENGINE_DESCRIPTOR, null, null);
     fv.visitEnd();

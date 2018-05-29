@@ -82,12 +82,4 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
       return null;
     }
   }
-
-  @Override
-  public void visitEnd() {
-    super.generateConstructors(originalClassInternalName, VOID_VOID_DESCRIPTOR);
-    super.visitEnd();
-  }
-  
-  
 }

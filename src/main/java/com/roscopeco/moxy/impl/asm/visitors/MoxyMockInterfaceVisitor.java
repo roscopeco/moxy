@@ -58,10 +58,4 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
     Type.getArgumentTypes(desc),
     true);
   }
-  
-  @Override
-  public void visitEnd() {
-    super.generateConstructors(OBJECT_INTERNAL_NAME, VOID_VOID_DESCRIPTOR);
-    super.visitEnd();    
-  }
 }

@@ -14,6 +14,11 @@ public class ClassWithNoNullConstructor {
     this.anyInt = anyInt;
   }
   
+  public ClassWithNoNullConstructor(float f, double d, long l) {
+    this.anything = "nothing";
+    this.anyInt = 42;
+  }
+  
   public String returnSomething() {
     return anything;
   }

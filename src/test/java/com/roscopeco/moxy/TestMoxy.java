@@ -10,6 +10,7 @@ import org.opentest4j.AssertionFailedError;
 
 import com.roscopeco.moxy.api.InvalidMockInvocationException;
 import com.roscopeco.moxy.api.Mock;
+import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
 import com.roscopeco.moxy.model.ClassWithNoNullConstructor;
@@ -594,9 +595,13 @@ public class TestMoxy {
   public void testMoxyMockWithSpecificMethodsWorks() throws Exception {
     MethodWithArgAndReturn control = new MethodWithArgAndReturn();
     
-    MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class,
-                                            MethodWithArgAndReturn.class.getMethod(
-                                                "hasTwoArgs", String.class, int.class));
+    Class<? extends MethodWithArgAndReturn> mockClass = 
+        Moxy.getMoxyEngine().getMockClass(MethodWithArgAndReturn.class,
+            Collections.singleton(MethodWithArgAndReturn.class.getMethod(
+                "hasTwoArgs", String.class, int.class)));
+    
+    MethodWithArgAndReturn mock = mockClass
+        .getConstructor(MoxyEngine.class).newInstance(Moxy.getMoxyEngine());
     
     assertThat(control.hasTwoArgs("test", 1)).isEqualTo("test1");
     assertThat(mock.hasTwoArgs("test", 1)).isNull();
@@ -609,9 +614,13 @@ public class TestMoxy {
   public void testMoxyMockWithSpecificMethodsStubNonMockFailsFast() throws Exception {
     MethodWithArgAndReturn control = new MethodWithArgAndReturn();
     
-    MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class,
-                                            MethodWithArgAndReturn.class.getMethod(
-                                                "hasTwoArgs", String.class, int.class));
+    Class<? extends MethodWithArgAndReturn> mockClass = 
+        Moxy.getMoxyEngine().getMockClass(MethodWithArgAndReturn.class,
+            Collections.singleton(MethodWithArgAndReturn.class.getMethod(
+                "hasTwoArgs", String.class, int.class)));
+    
+    MethodWithArgAndReturn mock = mockClass
+        .getConstructor(MoxyEngine.class).newInstance(Moxy.getMoxyEngine());
     
     assertThat(control.hasTwoArgs("test", 1)).isEqualTo("test1");
     assertThat(mock.hasTwoArgs("test", 1)).isNull();
@@ -627,8 +636,12 @@ public class TestMoxy {
   
   @Test
   public void testMoxyMockWithSpecificMethodsForcesAbstractsInInterfaces() throws Exception {
-    SimpleInterface mock = Moxy.mock(SimpleInterface.class,
-                                     SimpleInterface.class.getMethod("returnHello"));
+    Class<? extends SimpleInterface> mockClass = 
+        Moxy.getMoxyEngine().getMockClass(SimpleInterface.class,
+              Collections.singleton(SimpleInterface.class.getMethod("returnHello")));
+    
+    SimpleInterface mock = mockClass
+        .getConstructor(MoxyEngine.class).newInstance(Moxy.getMoxyEngine());
     
     assertThat(mock.returnHello()).isNull();
     assertThat(mock.returnGoodbye()).isNull();
@@ -642,8 +655,12 @@ public class TestMoxy {
 
   @Test
   public void testMoxyMockWithSpecificMethodsForcesAbstractsInClasses() throws Exception {
-    SimpleAbstractClass mock = Moxy.mock(SimpleAbstractClass.class,
-                                         SimpleAbstractClass.class.getMethod("concreteMethod"));
+    Class<? extends SimpleAbstractClass> mockClass = 
+        Moxy.getMoxyEngine().getMockClass(SimpleAbstractClass.class,
+              Collections.singleton(SimpleAbstractClass.class.getMethod("concreteMethod")));
+    
+    SimpleAbstractClass mock = mockClass
+        .getConstructor(MoxyEngine.class).newInstance(Moxy.getMoxyEngine());
     
     assertThat(mock.returnHello()).isNull();
     assertThat(mock.concreteMethod()).isNull();
@@ -663,7 +680,8 @@ public class TestMoxy {
             Collections.singleton(ClassWithNoNullConstructor.class.getMethod("getAnyInt")));
     
     ClassWithNoNullConstructor mock = 
-        mockClass.getConstructor(String.class).newInstance(PASSED);
+        mockClass.getConstructor(MoxyEngine.class, String.class)
+            .newInstance(Moxy.getMoxyEngine(), PASSED);
     
     assertThat(mock.returnSomething()).isEqualTo(PASSED);
     
@@ -672,7 +690,8 @@ public class TestMoxy {
             ClassWithNoNullConstructor.class,
             Collections.singleton(ClassWithNoNullConstructor.class.getMethod("returnSomething")));
     
-    mock = mockClass.getConstructor(int.class).newInstance(37);
+    mock = mockClass.getConstructor(MoxyEngine.class, int.class)
+        .newInstance(Moxy.getMoxyEngine(), 37);
     
     assertThat(mock.getAnyInt()).isEqualTo(37);
   }

@@ -56,6 +56,18 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
       .anyMatch((m) -> m.getName().equals(name) && Type.getMethodDescriptor(m).equals(desc));
   }
 
+  /*
+   * Used when generating constructors, inserts MoxyEngine as the first argument
+   * in a method descriptor.
+   */
+  private String prependMethodArgsDescriptorWithEngine(String descriptor) {
+    if (descriptor == null) {
+      return MOCK_CONSTRUCTOR_DESCRIPTOR;
+    } else {
+      return "(" + MOXY_ENGINE_DESCRIPTOR + descriptor.substring(1);
+    }
+  }
+
   @Override
   public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
     // Generate field for method return value
@@ -63,11 +75,12 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
     
     if (INIT_NAME.equals(name)) {
       // Generate pass-through constructors
+      String newDesc = prependMethodArgsDescriptorWithEngine(desc); /* this is the new descriptor */
       return new MoxyPassThroughConstructorVisitor(cv.visitMethod(access & ~ACC_ABSTRACT | ACC_SYNTHETIC, 
-                                                           name, desc, signature, exceptions),
+                                                           name, newDesc, signature, exceptions),
                                                            this.originalClassInternalName,
                                                            this.getNewClassInternalName(),
-                                                           desc,
+                                                           desc,    /* this is the super descriptor */
                                                            Type.getArgumentTypes(desc));
     } else {
       // Always mock abstract methods (or it won't verify), decide for concrete based on mockMethods.

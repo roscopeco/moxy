@@ -58,4 +58,25 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
     Type.getArgumentTypes(desc),
     true);
   }
+  
+  @Override
+  public void visitEnd() {
+    // Manually generate a constructor in case user wants to manually instantiate,
+    // like they do for partial mocks...
+    MoxyPassThroughConstructorVisitor mv = 
+        new MoxyPassThroughConstructorVisitor(cv.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC,
+                            INIT_NAME,
+                            MOCK_CONSTRUCTOR_DESCRIPTOR,
+                            null,
+                            null),
+            OBJECT_INTERNAL_NAME,
+            this.getNewClassInternalName(),
+            VOID_VOID_DESCRIPTOR,
+            EMPTY_TYPE_ARRAY);
+    
+    mv.visitCode();
+    mv.visitEnd();
+    
+    super.visitEnd();
+  }
 }

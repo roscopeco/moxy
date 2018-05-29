@@ -16,6 +16,7 @@ import com.roscopeco.moxy.api.MoxyEngine;
 // TODO tidy this up
 public final class TypesAndDescriptors {
   public static final String[] EMPTY_STRING_ARRAY = new String[0];
+  public static final Type[] EMPTY_TYPE_ARRAY = new Type[0];
   
   /* General Java stuff */
   public static final String OBJECT_INTERNAL_NAME = Type.getInternalName(Object.class);
@@ -36,8 +37,9 @@ public final class TypesAndDescriptors {
   
   /* Moxy stuff */
   public static final String MOXY_ENGINE_DESCRIPTOR = "L" + Type.getInternalName(MoxyEngine.class) + ";";
-  public static final String MOXY_ASM_ENGINE_DESCRIPTOR = "L" + Type.getInternalName(ASMMoxyEngine.class) + ";";
-  public static final String MOCK_CONSTRUCTOR_DESCRIPTOR = "(" + MOXY_ASM_ENGINE_DESCRIPTOR + ")V";
+  public static final String MOXY_ASM_ENGINE_INTERNAL_NAME = Type.getInternalName(ASMMoxyEngine.class);
+  public static final String MOXY_ASM_ENGINE_DESCRIPTOR = "L" + MOXY_ASM_ENGINE_INTERNAL_NAME + ";";
+  public static final String MOCK_CONSTRUCTOR_DESCRIPTOR = "(" + MOXY_ENGINE_DESCRIPTOR + ")V";
   
   public static final String MOXY_SUPPORT_INTERFACE_INTERNAL_NAME = Type.getInternalName(ASMMockSupport.class);
   public static final String MOXY_ENGINE_INTERNAL_NAME = Type.getInternalName(MoxyEngine.class);

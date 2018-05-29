@@ -1,6 +1,7 @@
 package com.roscopeco.moxy.impl.asm.visitors;
 
 import static org.objectweb.asm.Opcodes.*;
+import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
 
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -27,12 +28,17 @@ public class MoxyPassThroughConstructorVisitor extends MethodVisitor {
     this.methodDescriptor = methodDescriptor;
     this.argTypes = argTypes;
   }
-
+  
   @Override
   public void visitCode() {
+    // one for super call, one for field store, one each for throws/return map
     this.delegate.visitVarInsn(ALOAD, 0);
+    this.delegate.visitInsn(DUP);    
+    this.delegate.visitInsn(DUP);    
+    this.delegate.visitInsn(DUP);    
     
-    int currentSlot = 1;
+    // super call
+    int currentSlot = 2;
     for (int argNum = 0; argNum < this.argTypes.length; argNum++) {
       char argType = this.argTypes[argNum].toString().charAt(0);
       switch (argType) {
@@ -67,7 +73,24 @@ public class MoxyPassThroughConstructorVisitor extends MethodVisitor {
       }
     }
 
-    this.delegate.visitMethodInsn(INVOKESPECIAL, originalClass, "<init>", this.methodDescriptor, false);
+    this.delegate.visitMethodInsn(INVOKESPECIAL, originalClass, INIT_NAME, this.methodDescriptor, false);
+    
+    // store engine in field    
+    this.delegate.visitVarInsn(ALOAD, 1);
+    this.delegate.visitTypeInsn(CHECKCAST, MOXY_ASM_ENGINE_INTERNAL_NAME);    
+    this.delegate.visitFieldInsn(PUTFIELD, this.generatingClass, SUPPORT_ENGINE_FIELD_NAME, MOXY_ASM_ENGINE_DESCRIPTOR);
+    
+    // create and store return and throws maps
+    this.delegate.visitTypeInsn(NEW, HASHMAP_INTERNAL_NAME);
+    this.delegate.visitInsn(DUP);
+    this.delegate.visitMethodInsn(INVOKESPECIAL, HASHMAP_INTERNAL_NAME, INIT_NAME, VOID_VOID_DESCRIPTOR, false);
+    this.delegate.visitFieldInsn(PUTFIELD, this.generatingClass, SUPPORT_RETURNMAP_FIELD_NAME, HASHMAP_DESCRIPTOR);
+    
+    this.delegate.visitTypeInsn(NEW, HASHMAP_INTERNAL_NAME);
+    this.delegate.visitInsn(DUP);
+    this.delegate.visitMethodInsn(INVOKESPECIAL, HASHMAP_INTERNAL_NAME, INIT_NAME, VOID_VOID_DESCRIPTOR, false);
+    this.delegate.visitFieldInsn(PUTFIELD, this.generatingClass, SUPPORT_THROWMAP_FIELD_NAME, HASHMAP_DESCRIPTOR);
+    
     this.delegate.visitInsn(RETURN);
   }
 }

@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,6 +38,7 @@ import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
  *
  */
 public class ASMMoxyEngine implements MoxyEngine {
+  private static final Set<Method> ALL_METHODS = Collections.emptySet();
   private static final String UNRECOVERABLE_ERROR = "Unrecoverable Error";
   
   private final ThreadLocalInvocationRecorder recorder;
@@ -88,33 +90,16 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <T> T mock(Class<T> clz) {
-    return this.mock(clz,  MoxyEngine.ALL_METHODS);
+    return this.mock(clz, null);
   }
   
-  /*
-   * (non-Javadoc)
-   * @see com.roscopeco.moxy.api.MoxyEngine#mock(java.lang.Class, java.util.Set)
-   */
-  @Override
-  public <T> T mock(Class<T> clz, Set<Method> methods) {
-    return this.mock(clz, methods, null);    
-  }
-
   /* (non-Javadoc)
    * @see com.roscopeco.moxy.internal.MoxyEngine#mock(java.lang.Class, java.io.PrintStream)
    */
   @Override
   public <T> T mock(Class<T> clz, PrintStream trace) {
-    return this.mock(clz, MoxyEngine.ALL_METHODS, trace);
-  }
-  
-  /* (non-Javadoc)
-   * @see com.roscopeco.moxy.internal.MoxyEngine#mock(java.lang.Class, java.io.PrintStream)
-   */
-  @Override
-  public <T> T mock(Class<T> clz, Set<Method> methods, PrintStream trace) {
     try {
-      Class<? extends T> mockClass = getMockClass(clz, methods, trace);
+      Class<? extends T> mockClass = getMockClass(clz, ALL_METHODS, trace);
       return instantiateMock(mockClass);
     } catch (MoxyException e) {
       throw e;
@@ -163,7 +148,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <I> Class<? extends I> getMockClass(ClassLoader loader, Class<I> clz) {
-    return getMockClass(loader, clz, MoxyEngine.ALL_METHODS, null);
+    return getMockClass(loader, clz, ALL_METHODS, null);
   }
 
   /*
@@ -180,7 +165,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <I> Class<? extends I> getMockClass(Class<I> clz, PrintStream trace) {
-    return getMockClass(clz.getClassLoader(), clz, MoxyEngine.ALL_METHODS, trace);
+    return getMockClass(clz.getClassLoader(), clz, ALL_METHODS, trace);
   }
   
   /* (non-Javadoc)

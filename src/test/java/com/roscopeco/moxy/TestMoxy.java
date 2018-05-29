@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
 
+import com.roscopeco.moxy.api.InvalidMockInvocationException;
 import com.roscopeco.moxy.api.Mock;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
@@ -125,7 +126,7 @@ public class TestMoxy {
   @Test
   public void testMoxyWhenWithNoMockInvocationThrowsIllegalStateException() {
     assertThatThrownBy(() -> Moxy.when(() -> "Hello"))
-        .isInstanceOf(IllegalStateException.class)
+        .isInstanceOf(InvalidMockInvocationException.class)
         .hasMessage("No mock invocation found");
   }
   
@@ -584,5 +585,70 @@ public class TestMoxy {
     Moxy.when(() -> mock.returnSomething()).thenReturn("passed");
     
     assertThat(mock.returnSomething()).isEqualTo("passed");
+  }
+  
+  @Test
+  public void testMoxyMockWithSpecificMethodsWorks() throws Exception {
+    MethodWithArgAndReturn control = new MethodWithArgAndReturn();
+    
+    MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class,
+                                            MethodWithArgAndReturn.class.getMethod(
+                                                "hasTwoArgs", String.class, int.class));
+    
+    assertThat(control.hasTwoArgs("test", 1)).isEqualTo("test1");
+    assertThat(mock.hasTwoArgs("test", 1)).isNull();
+    
+    assertThat(control.sayHelloTo("Steve"))
+        .isEqualTo(mock.sayHelloTo("Steve"));
+  }
+  
+  @Test
+  public void testMoxyMockWithSpecificMethodsStubNonMockFailsFast() throws Exception {
+    MethodWithArgAndReturn control = new MethodWithArgAndReturn();
+    
+    MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class,
+                                            MethodWithArgAndReturn.class.getMethod(
+                                                "hasTwoArgs", String.class, int.class));
+    
+    assertThat(control.hasTwoArgs("test", 1)).isEqualTo("test1");
+    assertThat(mock.hasTwoArgs("test", 1)).isNull();
+
+    assertThatThrownBy(() ->
+        Moxy.when(() -> mock.sayHelloTo("Steve")).thenReturn("failed")
+    )
+        .isInstanceOf(InvalidMockInvocationException.class)
+        .hasMessage("No mock invocation found");
+    
+    assertThat(mock.sayHelloTo("Steve")).isEqualTo("Hello, Steve");    
+  }
+  
+  @Test
+  public void testMoxyMockWithSpecificMethodsForcesAbstractsInInterfaces() throws Exception {
+    SimpleInterface mock = Moxy.mock(SimpleInterface.class,
+                                     SimpleInterface.class.getMethod("returnHello"));
+    
+    assertThat(mock.returnHello()).isNull();
+    assertThat(mock.returnGoodbye()).isNull();
+    
+    Moxy.when(() -> mock.returnHello()).thenReturn("Hello!");
+    Moxy.when(() -> mock.returnGoodbye()).thenReturn("Goodbye!");
+    
+    assertThat(mock.returnHello()).isEqualTo("Hello!");
+    assertThat(mock.returnGoodbye()).isEqualTo("Goodbye!");
+  }
+
+  @Test
+  public void testMoxyMockWithSpecificMethodsForcesAbstractsInClasses() throws Exception {
+    SimpleAbstractClass mock = Moxy.mock(SimpleAbstractClass.class,
+                                         SimpleAbstractClass.class.getMethod("concreteMethod"));
+    
+    assertThat(mock.returnHello()).isNull();
+    assertThat(mock.concreteMethod()).isNull();
+    
+    Moxy.when(() -> mock.returnHello()).thenReturn("Hello!");
+    Moxy.when(() -> mock.concreteMethod()).thenReturn("Concrete!");
+    
+    assertThat(mock.returnHello()).isEqualTo("Hello!");
+    assertThat(mock.concreteMethod()).isEqualTo("Concrete!");
   }
 }

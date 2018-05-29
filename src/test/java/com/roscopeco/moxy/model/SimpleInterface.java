@@ -1,5 +1,6 @@
 package com.roscopeco.moxy.model;
 
 public interface SimpleInterface {
-  public String returnHello();
+  public String returnHello();  
+  public String returnGoodbye();
 }

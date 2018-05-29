@@ -95,10 +95,14 @@ public class ThreadLocalInvocationRecorder {
   Invocation getLastInvocation() {
     return this.lastInvocationThreadLocal.get();
   }
+  
+  void clearLastInvocation() {
+    this.lastInvocationThreadLocal.set(null);    
+  }
 
   Invocation getAndClearLastInvocation() {
     Invocation invocation = getLastInvocation();
-    this.lastInvocationThreadLocal.set(null);
+    clearLastInvocation();    
     return invocation;
   }
 

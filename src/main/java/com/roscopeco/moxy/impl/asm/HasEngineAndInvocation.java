@@ -1,5 +1,7 @@
 package com.roscopeco.moxy.impl.asm;
 
+import com.roscopeco.moxy.api.InvalidMockInvocationException;
+
 class HasEngineAndInvocation {
   protected final ASMMoxyEngine engine;
   protected final Invocation theInvocation;
@@ -11,7 +13,7 @@ class HasEngineAndInvocation {
     if (this.theInvocation == null || 
         this.theInvocation.getReceiver() == null || 
         !engine.isMock(this.theInvocation.getReceiver().getClass())) {
-      throw new IllegalStateException("No mock invocation found");
+      throw new InvalidMockInvocationException("No mock invocation found");
     }
   }
 

@@ -5,7 +5,6 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,7 +37,6 @@ import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
  *
  */
 public class ASMMoxyEngine implements MoxyEngine {
-  private static final Set<Method> EMPTY_METHODS = Collections.emptySet();
   private static final String UNRECOVERABLE_ERROR = "Unrecoverable Error";
   
   private final ThreadLocalInvocationRecorder recorder;
@@ -90,16 +88,33 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <T> T mock(Class<T> clz) {
-    return this.mock(clz,  null);
+    return this.mock(clz,  MoxyEngine.ALL_METHODS);
+  }
+  
+  /*
+   * (non-Javadoc)
+   * @see com.roscopeco.moxy.api.MoxyEngine#mock(java.lang.Class, java.util.Set)
+   */
+  @Override
+  public <T> T mock(Class<T> clz, Set<Method> methods) {
+    return this.mock(clz, methods, null);    
+  }
+
+  /* (non-Javadoc)
+   * @see com.roscopeco.moxy.internal.MoxyEngine#mock(java.lang.Class, java.io.PrintStream)
+   */
+  @Override
+  public <T> T mock(Class<T> clz, PrintStream trace) {
+    return this.mock(clz, MoxyEngine.ALL_METHODS, trace);
   }
   
   /* (non-Javadoc)
    * @see com.roscopeco.moxy.internal.MoxyEngine#mock(java.lang.Class, java.io.PrintStream)
    */
   @Override
-  public <T> T mock(Class<T> clz, PrintStream trace) {
+  public <T> T mock(Class<T> clz, Set<Method> methods, PrintStream trace) {
     try {
-      Class<? extends T> mockClass = getMockClass(clz, trace);
+      Class<? extends T> mockClass = getMockClass(clz, methods, trace);
       return instantiateMock(mockClass);
     } catch (MoxyException e) {
       throw e;
@@ -139,8 +154,8 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <I> Class<? extends I> getMockClass(Class<I> clz, 
-                                             Set<Method> extraMethods) {
-    return getMockClass(clz.getClassLoader(), clz, extraMethods, null);    
+                                             Set<Method> methods) {
+    return getMockClass(clz.getClassLoader(), clz, methods, null);    
   }
   
   /* (non-Javadoc)
@@ -148,7 +163,16 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <I> Class<? extends I> getMockClass(ClassLoader loader, Class<I> clz) {
-    return getMockClass(loader, clz, EMPTY_METHODS, null);
+    return getMockClass(loader, clz, MoxyEngine.ALL_METHODS, null);
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.roscopeco.moxy.api.MoxyEngine#getMockClass(java.lang.Class, java.util.Set, java.io.PrintStream)
+   */
+  @Override
+  public <I> Class<? extends I> getMockClass(Class<I> clz, Set<Method> methods, PrintStream trace) {
+    return getMockClass(clz.getClassLoader(), clz, methods, trace);
   }
 
   /* (non-Javadoc)
@@ -156,7 +180,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <I> Class<? extends I> getMockClass(Class<I> clz, PrintStream trace) {
-    return getMockClass(clz.getClassLoader(), clz, EMPTY_METHODS, trace);
+    return getMockClass(clz.getClassLoader(), clz, MoxyEngine.ALL_METHODS, trace);
   }
   
   /* (non-Javadoc)
@@ -190,12 +214,17 @@ public class ASMMoxyEngine implements MoxyEngine {
   public boolean isMock(Object obj) {
     return isMock(obj.getClass());
   }
+  
+  void ensureEngineConsistencyBeforeMonitoredInvocation() {
+    this.getRecorder().clearLastInvocation();
+    this.getASMMatcherEngine().validateStackConsistency();
+  }
 
   /*
    * Validates matcher stack consistency.
    */
   void naivelyInvokeAndSwallowExceptions(Runnable doInvoke) {
-    this.getASMMatcherEngine().validateStackConsistency();
+    ensureEngineConsistencyBeforeMonitoredInvocation();
     try {
       doInvoke.run();
     } catch (MoxyException e) {
@@ -240,7 +269,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    * Instantiate a mock of the given class 
    */
   @SuppressWarnings({ "unchecked", "restriction", "rawtypes" })
-  <T> T instantiateMock(Class<? extends T> mockClass) throws MoxyException {
+  <T> T instantiateMock(Class<? extends T> mockClass) {
     try {
       Field engineField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_ENGINE_FIELD_NAME);
       Field returnMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_RETURNMAP_FIELD_NAME);

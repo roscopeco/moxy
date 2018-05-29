@@ -452,7 +452,7 @@ a bit, put them into lists, sort them, lose them, find them again, and that kind
 thing, ready for the stubbers and verifiers to come along and either tell the mock
 what it should do when its called, or ask it what its been up to.
 
-More dark magic and poor coding then take over to turn all these internal things
+More dark magic and questionable code then take over to turn all these internal things
 into friendly external things that are suitable for human consumption.
 
 If you're interested, you take a look around the `com.roscopeco.moxy.impl.asm` package

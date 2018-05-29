@@ -7,6 +7,12 @@ import org.objectweb.asm.Type;
 
 import com.roscopeco.moxy.api.MoxyEngine;
 
+/**
+ * Holds internal types and descriptors for the 
+ * {@link com.roscopeco.moxy.impl.asm.ASMMoxyEngine} and supporting code.
+ * 
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ */
 // TODO tidy this up
 public final class TypesAndDescriptors {
   public static final String[] EMPTY_STRING_ARRAY = new String[0];

@@ -18,7 +18,6 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.TraceClassVisitor;
 
-import com.roscopeco.moxy.Moxy;
 import com.roscopeco.moxy.api.Mock;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyException;
@@ -136,7 +135,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   @Override
   public <I> Class<? extends I> getMockClass(Class<I> clz, 
                                              Set<Method> extraMethods) {
-    return getMockClass(Moxy.class.getClassLoader(), clz, extraMethods, null);    
+    return getMockClass(clz.getClassLoader(), clz, extraMethods, null);    
   }
   
   /* (non-Javadoc)
@@ -152,7 +151,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <I> Class<? extends I> getMockClass(Class<I> clz, PrintStream trace) {
-    return getMockClass(Moxy.class.getClassLoader(), clz, EMPTY_METHODS, trace);
+    return getMockClass(clz.getClassLoader(), clz, EMPTY_METHODS, trace);
   }
   
   /* (non-Javadoc)
@@ -160,7 +159,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <I> Class<? extends I> getMockClass(Class<I> clz) {
-    return getMockClass(Moxy.class.getClassLoader(), clz);
+    return getMockClass(clz.getClassLoader(), clz);
   }
   
   HashSet<Method> gatherPublicMethods(Class<?> originalClass) {

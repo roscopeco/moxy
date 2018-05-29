@@ -13,5 +13,17 @@ import com.roscopeco.moxy.matchers.MoxyMatcher;
  * @since 1.0
  */
 public interface MoxyMatcherEngine {
+  /**
+   * <p>Register the given matcher with this <code>MoxyMatcherEngine</code>.</p>
+   * 
+   * <p>This method triggers a two-step process, whereby the matcher engine
+   * takes care of any housekeeping required by the current {@link MoxyEngine}
+   * and then calls back to the {@link MoxyMatcher#addToStack(java.util.Deque)}
+   * method, passing in the appropriate stack.</p>
+   * 
+   * <p>See the documentation on {@link MoxyMatcher} for more information.</p>
+   * 
+   * @param matcher The {@link MoxyMatcher} to register.
+   */
   public void registerMatcher(MoxyMatcher<?> matcher);
 }

@@ -7,7 +7,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * All mocks should have this annotation.
+ * All mocks created by a {@link MoxyEngine} implementation 
+ * <strong>must</strong> have this annotation.
  * 
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  * @since 1.0

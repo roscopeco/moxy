@@ -25,7 +25,7 @@ public class InconsistentMatchersException extends MoxyException {
   private static final long serialVersionUID = 1L;
   
   private final int expectedSize;
-  private final Deque<MoxyMatcher<?>> stack;
+  private final ArrayDeque<MoxyMatcher<?>> stack;
 
   public InconsistentMatchersException(final int expectedSize, 
                                        final Deque<MoxyMatcher<?>> stack) {

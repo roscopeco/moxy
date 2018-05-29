@@ -61,8 +61,15 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
     // Generate field for method return value
     boolean isAbstract = (access & ACC_ABSTRACT) != 0;
     
-    // Never generate constructors (do that manually later).
-    if (!INIT_NAME.equals(name)) {
+    if (INIT_NAME.equals(name)) {
+      // Generate pass-through constructors
+      return new MoxyPassThroughConstructorVisitor(cv.visitMethod(access & ~ACC_ABSTRACT | ACC_SYNTHETIC, 
+                                                           name, desc, signature, exceptions),
+                                                           this.originalClassInternalName,
+                                                           this.getNewClassInternalName(),
+                                                           desc,
+                                                           Type.getArgumentTypes(desc));
+    } else {
       // Always mock abstract methods (or it won't verify), decide for concrete based on mockMethods.
       if (isAbstract || isToMock(name, desc)) {
         // Do the mocking
@@ -78,8 +85,6 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
         // Don't mock, just super.
         return null; 
       }
-    } else {
-      return null;
     }
   }
 }

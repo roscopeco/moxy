@@ -2,6 +2,8 @@ package com.roscopeco.moxy;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.Collections;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
@@ -20,6 +22,7 @@ import com.roscopeco.moxy.model.SimpleClass;
 import com.roscopeco.moxy.model.SimpleInterface;
 
 public class TestMoxy {
+  private static final String PASSED = "passed";
   @BeforeEach
   public void setUp() {
     Moxy.getMoxyEngine().reset();
@@ -582,9 +585,9 @@ public class TestMoxy {
   public void testThatCanMockClassWithNoNullConstructor() {
     ClassWithNoNullConstructor mock = Moxy.mock(ClassWithNoNullConstructor.class);
     
-    Moxy.when(() -> mock.returnSomething()).thenReturn("passed");
+    Moxy.when(() -> mock.returnSomething()).thenReturn(PASSED);
     
-    assertThat(mock.returnSomething()).isEqualTo("passed");
+    assertThat(mock.returnSomething()).isEqualTo(PASSED);
   }
   
   @Test
@@ -650,5 +653,27 @@ public class TestMoxy {
     
     assertThat(mock.returnHello()).isEqualTo("Hello!");
     assertThat(mock.concreteMethod()).isEqualTo("Concrete!");
+  }
+  
+  @Test
+  public void testMoxyMockGeneratesPassthroughConstructors() throws Exception {
+    Class<? extends ClassWithNoNullConstructor> mockClass = 
+        Moxy.getMoxyEngine().getMockClass(
+            ClassWithNoNullConstructor.class,
+            Collections.singleton(ClassWithNoNullConstructor.class.getMethod("getAnyInt")));
+    
+    ClassWithNoNullConstructor mock = 
+        mockClass.getConstructor(String.class).newInstance(PASSED);
+    
+    assertThat(mock.returnSomething()).isEqualTo(PASSED);
+    
+    mockClass = 
+        Moxy.getMoxyEngine().getMockClass(
+            ClassWithNoNullConstructor.class,
+            Collections.singleton(ClassWithNoNullConstructor.class.getMethod("returnSomething")));
+    
+    mock = mockClass.getConstructor(int.class).newInstance(37);
+    
+    assertThat(mock.getAnyInt()).isEqualTo(37);
   }
 }

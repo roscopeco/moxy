@@ -1,9 +1,24 @@
 package com.roscopeco.moxy.model;
 
 public class ClassWithNoNullConstructor {
-  public ClassWithNoNullConstructor(String anything) { }
+  final String anything;
+  final int anyInt;
+  
+  public ClassWithNoNullConstructor(String anything) { 
+    this.anything = anything;
+    this.anyInt = 42;
+  }
+  
+  public ClassWithNoNullConstructor(int anyInt) {
+    this.anything = "nothing";
+    this.anyInt = anyInt;
+  }
   
   public String returnSomething() {
-    return "something";
+    return anything;
+  }
+  
+  public int getAnyInt() {
+    return anyInt;
   }
 }

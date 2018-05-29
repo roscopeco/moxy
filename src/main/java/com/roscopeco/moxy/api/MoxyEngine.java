@@ -2,7 +2,6 @@ package com.roscopeco.moxy.api;
 
 import java.io.PrintStream;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.Set;
 import java.util.function.Supplier;
 

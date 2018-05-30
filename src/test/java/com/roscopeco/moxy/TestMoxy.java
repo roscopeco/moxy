@@ -11,13 +11,14 @@ import org.opentest4j.AssertionFailedError;
 
 import com.roscopeco.moxy.api.InvalidMockInvocationException;
 import com.roscopeco.moxy.api.Mock;
+import com.roscopeco.moxy.api.MockGenerationException;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
-import com.roscopeco.moxy.impl.asm.TypesAndDescriptors;
 import com.roscopeco.moxy.model.ClassWithNoNullConstructor;
 import com.roscopeco.moxy.model.ClassWithPrimitiveReturns;
 import com.roscopeco.moxy.model.FieldsClass;
+import com.roscopeco.moxy.model.FinalClass;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
 import com.roscopeco.moxy.model.MethodWithPrimitiveArguments;
@@ -706,15 +707,13 @@ public class TestMoxy {
     // Ensure we've only got the support fields, and haven't copied any...
     assertThat(mock.getClass().getDeclaredFields())
         .hasSize(3)
-        .hasSameElementsAs(
+        .doesNotContainAnyElementsOf(
             Lists.newArrayList(
-                mock.getClass().getDeclaredField(
-                    TypesAndDescriptors.SUPPORT_ENGINE_FIELD_NAME),
-                mock.getClass().getDeclaredField(
-                    TypesAndDescriptors.SUPPORT_RETURNMAP_FIELD_NAME),
-                mock.getClass().getDeclaredField(
-                    TypesAndDescriptors.SUPPORT_THROWMAP_FIELD_NAME)
-                ));
+                FieldsClass.class.getDeclaredField("intField"),
+                FieldsClass.class.getDeclaredField("byteField"),
+                FieldsClass.class.getDeclaredField("boolField"),
+                FieldsClass.class.getDeclaredField("longField")
+            ));
   }
   
   @Test
@@ -724,5 +723,14 @@ public class TestMoxy {
     assertThat(objectMock)
         .isNotNull()
         .isInstanceOf(Object.class);
+  }
+  
+  @Test
+  public void testMoxyMockWithFinalClassFailsFast() {
+    assertThatThrownBy(() ->
+        Moxy.mock(FinalClass.class)
+    )
+        .isInstanceOf(MockGenerationException.class)
+        .hasMessage("Mocking of final classes is not yet supported");
   }
 }

@@ -19,6 +19,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import com.roscopeco.moxy.api.Mock;
+import com.roscopeco.moxy.api.MockGenerationException;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.api.MoxyMatcherEngine;
@@ -41,6 +42,7 @@ import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
 public class ASMMoxyEngine implements MoxyEngine {
   private static final Set<Method> ALL_METHODS = Collections.emptySet();
   private static final String UNRECOVERABLE_ERROR = "Unrecoverable Error";
+  private static final String CANNOT_MOCK_NULL_CLASS = "Cannot mock null class";
   
   private final ThreadLocalInvocationRecorder recorder;
   private final ASMMoxyMatcherEngine matcherEngine;
@@ -104,13 +106,17 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <T> T mock(Class<T> clz, PrintStream trace) {
+    if (clz == null) {
+      throw new IllegalArgumentException(CANNOT_MOCK_NULL_CLASS);
+    }
+
     try {
       Class<? extends T> mockClass = getMockClass(clz, ALL_METHODS, trace);
       return instantiateMock(mockClass);
     } catch (MoxyException e) {
       throw e;
     } catch (Exception e) {
-      throw new MoxyException("Unrecoverable error: exception during mock generation", e);      
+      throw new MockGenerationException("Unrecoverable error: exception during mock generation", e);      
     }
   }
   
@@ -296,6 +302,14 @@ public class ASMMoxyEngine implements MoxyEngine {
    * Actual generator; create the ASM ClassNode for a mock.
    */
   ClassNode createMockClassNode(Class<?> clz, Set<Method> methods, PrintStream trace) throws IOException {
+    if (clz == null) {
+      throw new IllegalArgumentException(CANNOT_MOCK_NULL_CLASS);
+    }
+    
+    if ((clz.getModifiers() & Opcodes.ACC_FINAL) > 0) {
+      throw new MockGenerationException("Mocking of final classes is not yet supported");
+    }
+    
     String clzInternalName = Type.getInternalName(clz);
     ClassReader reader = new ClassReader(clzInternalName);
     
@@ -327,6 +341,12 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @SuppressWarnings("restriction")
   Class<?> defineClass(ClassLoader loader, ClassNode node) {
+    if (loader == null) {
+      throw new IllegalArgumentException("Implicit definition in the system classloader is unsupported.\n"
+                                       + "Defining mocks here will almost certainly fail with NoClassDefFoundError for framework classes.\n"
+                                       + "If you're sure this is what you want to do, pass system loader explicitly (rather than null)");      
+    }
+    
     byte[] code = generateBytecode(node);
     return UNSAFE.defineClass(node.name.replace('/',  '.'), code, 0, code.length, loader, null);      
   }

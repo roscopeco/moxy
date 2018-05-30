@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.TraceClassVisitor;
@@ -65,6 +66,11 @@ public class ASMMoxyEngine implements MoxyEngine {
   public ASMMoxyEngine() {
     this.recorder = new ThreadLocalInvocationRecorder(this);
     this.matcherEngine = new ASMMoxyMatcherEngine(this);
+  }
+  
+  ASMMoxyEngine(ThreadLocalInvocationRecorder recorder, ASMMoxyMatcherEngine matcherEngine) {
+    this.recorder = recorder;
+    this.matcherEngine = matcherEngine;
   }
   
   public ThreadLocalInvocationRecorder getRecorder() {
@@ -140,7 +146,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   @Override
   public <I> Class<? extends I> getMockClass(Class<I> clz, 
                                              Set<Method> methods) {
-    return getMockClass(clz.getClassLoader(), clz, methods, null);    
+    return getMockClass(MoxyEngine.class.getClassLoader(), clz, methods, null);    
   }
   
   /* (non-Javadoc)
@@ -157,7 +163,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <I> Class<? extends I> getMockClass(Class<I> clz, Set<Method> methods, PrintStream trace) {
-    return getMockClass(clz.getClassLoader(), clz, methods, trace);
+    return getMockClass(MoxyEngine.class.getClassLoader(), clz, methods, trace);
   }
 
   /* (non-Javadoc)
@@ -165,7 +171,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <I> Class<? extends I> getMockClass(Class<I> clz, PrintStream trace) {
-    return getMockClass(clz.getClassLoader(), clz, ALL_METHODS, trace);
+    return getMockClass(MoxyEngine.class.getClassLoader(), clz, ALL_METHODS, trace);
   }
   
   /* (non-Javadoc)
@@ -173,16 +179,25 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <I> Class<? extends I> getMockClass(Class<I> clz) {
-    return getMockClass(clz.getClassLoader(), clz);
+    return getMockClass(MoxyEngine.class.getClassLoader(), clz);
   }
   
-  HashSet<Method> gatherPublicMethods(Class<?> originalClass) {
+  boolean isMockCandidate(Method m) {
+    return (!m.getName().equals(TypesAndDescriptors.INIT_NAME)) 
+        && (((m.getModifiers() & Opcodes.ACC_PUBLIC) > 0)
+            || ((m.getModifiers() & Opcodes.ACC_PROTECTED) > 0)
+            || ((m.getModifiers() & Opcodes.ACC_PRIVATE) == 0));
+  }
+  
+  HashSet<Method> gatherAllMockableMethods(Class<?> originalClass) {
     HashSet<Method> methods = new HashSet<>();
 
     Class<?> currentClass = originalClass;
     while (originalClass != null && !originalClass.equals(Object.class)) {
-      for (Method m : currentClass.getMethods()) {
-        methods.add(m);
+      for (Method m : currentClass.getDeclaredMethods()) {
+        if (isMockCandidate(m)) {
+          methods.add(m);
+        }
       }
       originalClass = originalClass.getSuperclass();
     }
@@ -288,7 +303,7 @@ public class ASMMoxyEngine implements MoxyEngine {
     
     Set<Method> mockableMethods;
     if (methods == null || methods.isEmpty()) {
-      mockableMethods = gatherPublicMethods(clz);
+      mockableMethods = gatherAllMockableMethods(clz);
     } else {
       mockableMethods = methods;
     }

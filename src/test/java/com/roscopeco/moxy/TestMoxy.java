@@ -26,6 +26,14 @@ import com.roscopeco.moxy.model.SimpleAbstractClass;
 import com.roscopeco.moxy.model.SimpleClass;
 import com.roscopeco.moxy.model.SimpleInterface;
 
+/*
+ * This is basically integration tests. It's actually the tests used
+ * for high-level TDD.
+ * 
+ * We run it with the rest of the tests though as it's quick enough.
+ * 
+ * If it gets much bigger it may need to be split up though.
+ */
 public class TestMoxy {
   private static final String PASSED = "passed";
   @BeforeEach

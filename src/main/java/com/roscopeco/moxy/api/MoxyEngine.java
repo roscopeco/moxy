@@ -131,7 +131,7 @@ public interface MoxyEngine {
    * engine's default <code>ClassLoader</code>.</p>
    * 
    * <p>For the default engine, the default <code>ClassLoader</code> is the same
-   * <code>ClassLoader</code> that loaded the class being mocked.</p>
+   * <code>ClassLoader</code> that loaded the Moxy framework.</p>
    * 
    * <p>This method allows only a specific subset of methods to be mocked.
    * Please note, however, that any abstract methods will always be mocked
@@ -200,7 +200,7 @@ public interface MoxyEngine {
    * engine's default <code>ClassLoader</code>.</p>
    * 
    * <p>For the default engine, the default <code>ClassLoader</code> is the same
-   * <code>ClassLoader</code> that loaded the class being mocked.</p>
+   * <code>ClassLoader</code> that loaded the Moxy framework.</p>
    *
    * <p>Generated Mock classes will define public pass-through constructors to
    * all public constructors on the superclass (if concrete), or a single
@@ -237,7 +237,7 @@ public interface MoxyEngine {
    * engine's default <code>ClassLoader</code>.</p>
    * 
    * <p>For the default engine, the default <code>ClassLoader</code> is the same
-   * <code>ClassLoader</code> that loaded the class being mocked.</p>
+   * <code>ClassLoader</code> that loaded the Moxy framework.</p>
    *
    * <p>Generated Mock classes will define public pass-through constructors to
    * all public constructors on the superclass (if concrete), or a single
@@ -275,7 +275,7 @@ public interface MoxyEngine {
    * engine's default <code>ClassLoader</code>.</p>
    * 
    * <p>For the default engine, the default <code>ClassLoader</code> is the same
-   * <code>ClassLoader</code> that loaded the class being mocked.</p>
+   * <code>ClassLoader</code> that loaded the Moxy framework.</p>
    * 
    * <p>Generated Mock classes will define public pass-through constructors to
    * all public constructors on the superclass (if concrete), or a single

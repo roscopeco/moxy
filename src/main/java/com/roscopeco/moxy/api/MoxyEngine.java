@@ -27,6 +27,8 @@ public interface MoxyEngine {
    * Constant set to be passed to mock generation methods when all methods are
    * to be mocked.
    */
+  // Ignore this in sonar, it's final and null, hence immutable.
+  @SuppressWarnings("squid:S2386")
   public static final Set<Method> ALL_METHODS = null;
 
   /**

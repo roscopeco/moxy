@@ -726,7 +726,7 @@ public class TestMoxy {
   
   @Test
   public void testMoxyMockCanMockJavaLangClasses() {
-    Object objectMock = Moxy.mock(Object.class, System.out);
+    Object objectMock = Moxy.mock(Object.class);
     
     assertThat(objectMock)
         .isNotNull()

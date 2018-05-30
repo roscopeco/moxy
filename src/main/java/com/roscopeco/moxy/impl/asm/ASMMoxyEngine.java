@@ -188,29 +188,6 @@ public class ASMMoxyEngine implements MoxyEngine {
     return getMockClass(MoxyEngine.class.getClassLoader(), clz);
   }
   
-  boolean isMockCandidate(Method m) {
-    return (!m.getName().equals(TypesAndDescriptors.INIT_NAME)) 
-        && (((m.getModifiers() & Opcodes.ACC_PUBLIC) > 0)
-            || ((m.getModifiers() & Opcodes.ACC_PROTECTED) > 0)
-            || ((m.getModifiers() & Opcodes.ACC_PRIVATE) == 0));
-  }
-  
-  HashSet<Method> gatherAllMockableMethods(Class<?> originalClass) {
-    HashSet<Method> methods = new HashSet<>();
-
-    Class<?> currentClass = originalClass;
-    while (originalClass != null && !originalClass.equals(Object.class)) {
-      for (Method m : currentClass.getDeclaredMethods()) {
-        if (isMockCandidate(m)) {
-          methods.add(m);
-        }
-      }
-      originalClass = originalClass.getSuperclass();
-    }
-    
-    return methods;
-  }
-  
   @Override
   public boolean isMock(Class<?> clz) {
     return clz.getAnnotation(Mock.class) != null;
@@ -219,6 +196,25 @@ public class ASMMoxyEngine implements MoxyEngine {
   @Override
   public boolean isMock(Object obj) {
     return isMock(obj.getClass());
+  }
+  
+  boolean isMockCandidate(final Method m) {
+    return ((m.getModifiers() & Opcodes.ACC_FINAL) == 0) 
+        && (((m.getModifiers() & Opcodes.ACC_PUBLIC) > 0)
+            || ((m.getModifiers() & Opcodes.ACC_PROTECTED) > 0)
+            || ((m.getModifiers() & Opcodes.ACC_PRIVATE) == 0));
+  }
+  
+  HashSet<Method> gatherAllMockableMethods(final Class<?> originalClass) {
+    HashSet<Method> methods = new HashSet<>();
+
+    for (Method m : originalClass.getDeclaredMethods()) {
+      if (isMockCandidate(m)) {
+        methods.add(m);
+      }
+    }
+    
+    return methods;
   }
   
   void ensureEngineConsistencyBeforeMonitoredInvocation() {

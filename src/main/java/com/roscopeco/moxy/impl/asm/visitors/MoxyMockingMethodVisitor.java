@@ -191,6 +191,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
                               DOUBLE_VALUEOF_DESCRIPTOR,
                               false);
       break;
+    case ARRAY_PRIMITIVE_INTERNAL_NAME:
     case OBJECT_PRIMITIVE_INTERNAL_NAME:
       this.delegate.visitVarInsn(ALOAD, currentLocalSlot);
       break;

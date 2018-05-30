@@ -122,6 +122,8 @@ public final class TypesAndDescriptors {
   public static final String VOID_CLASS_INTERNAL_NAME = Type.getInternalName(Void.class);
   
   public static final char OBJECT_PRIMITIVE_INTERNAL_NAME = 'L';
+
+  public static final char ARRAY_PRIMITIVE_INTERNAL_NAME = '[';
   
   private TypesAndDescriptors() {
     throw new UnsupportedOperationException(

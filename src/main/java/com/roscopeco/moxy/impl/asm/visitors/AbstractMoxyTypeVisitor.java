@@ -17,8 +17,24 @@ import org.objectweb.asm.tree.ClassNode;
  */
 public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {   
   protected static final AtomicInteger mockNumber = new AtomicInteger();
+  
+  /*
+   * Ensures we don't try to use any of the prohibited packages
+   * (e.g. java.lang).
+   */
+  private static String makeMockPackageInternalName(Package originalPackage) {
+    final String originalName = originalPackage.getName();
+    
+    if ("java.lang".equals(originalName)) {
+      // default package
+      return "";      
+    } else {
+      return originalName.replace('.', '/');
+    }    
+  }
+  
   protected static String makeMockName(Class<?> originalClass) {
-    return originalClass.getPackage().getName().replace('.', '/') + "/Mock " 
+    return makeMockPackageInternalName(originalClass.getPackage()) + "/Mock " 
            + originalClass.getSimpleName() 
            + " {"
            + AbstractMoxyTypeVisitor.mockNumber.getAndIncrement()

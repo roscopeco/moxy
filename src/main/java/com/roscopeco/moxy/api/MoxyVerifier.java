@@ -4,7 +4,8 @@ import org.opentest4j.AssertionFailedError;
 
 /**
  * <p>Implementations of this interface allow mocks to be verified after
- * use. They are returned by the  {@link MoxyEngine#assertMock(Runnable)} 
+ * use. They are returned by the
+ * {@link MoxyEngine#assertMock(com.roscopeco.moxy.api.InvocationRunnable)} 
  * method.</p>
  * 
  * <p>Individual engines will usually provide their own implementation

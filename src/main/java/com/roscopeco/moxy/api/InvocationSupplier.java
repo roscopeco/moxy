@@ -15,6 +15,7 @@ public interface InvocationSupplier<T> {
    * Run the invocation. The framework will swallow most types of exception.
    * 
    * @throws Exception Should never be thrown, just here to make the API more friendly.
+   * @return null (ignored).
    */
   public T get() throws Exception;
 }

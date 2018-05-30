@@ -4,7 +4,6 @@ import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import com.roscopeco.moxy.matchers.Matchers;
 
@@ -458,7 +457,7 @@ public interface MoxyEngine {
    * @return A {@link MoxyStubber} that will stub the given method.
    * 
    * @param <T> The type being stubbed (the return type of the mocked method).
-   * @see #when(Runnable)
+   * @see #when(InvocationRunnable)
    * @see MoxyStubber
    * @since 1.0
    */
@@ -492,7 +491,7 @@ public interface MoxyEngine {
    * 
    * @return A {@link MoxyVoidStubber} that will stub the given method.
    * 
-   * @see #when(Supplier)
+   * @see #when(InvocationSupplier)
    * @see MoxyStubber
    * @since 1.0
    */

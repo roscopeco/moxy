@@ -1,7 +1,6 @@
 package com.roscopeco.moxy;
 
 import java.io.PrintStream;
-import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import com.roscopeco.moxy.api.InvocationRunnable;
@@ -176,7 +175,6 @@ public final class Moxy {
    * 
    * @param engine The {@link MoxyEngine} implementation to use.
    * @param clz The <code>Class</code> to mock.
-   * @param methods The <code>java.lang.reflect.Method</code>s to mock.
    * @param trace If non-null, the resulting class will be dumped (with a <code>TraceClassVisitor</code>) to the given stream.
    *  
    * @return A new mock instance.
@@ -291,8 +289,8 @@ public final class Moxy {
    * @return A {@link MoxyStubber} that will stub the given method.
    * 
    * @param <T> The type being stubbed (return type of the mock method).
-   * @see #when(Runnable)
-   * @see #when(MoxyEngine, Supplier)
+   * @see #when(InvocationRunnable)
+   * @see #when(MoxyEngine, InvocationSupplier)
    * @see MoxyStubber
    * @since 1.0
    */
@@ -328,8 +326,8 @@ public final class Moxy {
    * 
    * @return A {@link MoxyStubber} that will stub the given method.
    * 
-   * @see #when(Supplier)
-   * @see #when(MoxyEngine, Runnable)
+   * @see #when(InvocationSupplier)
+   * @see #when(MoxyEngine, InvocationRunnable)
    * @see MoxyStubber
    * @since 1.0
    */
@@ -363,8 +361,8 @@ public final class Moxy {
    * @return A {@link MoxyStubber} that will stub the given method.
    * 
    * @param <T> The type being stubbed (return type of the mocked method).
-   * @see #when(MoxyEngine, Runnable)
-   * @see #when(Supplier)
+   * @see #when(MoxyEngine, InvocationRunnable)
+   * @see #when(InvocationSupplier)
    * @see MoxyStubber
    * @since 1.0
    */
@@ -401,8 +399,8 @@ public final class Moxy {
    * 
    * @return A {@link MoxyStubber} that will stub the given method.
    * 
-   * @see #when(Supplier)
-   * @see #when(MoxyEngine, Runnable)
+   * @see #when(InvocationSupplier)
+   * @see #when(MoxyEngine, InvocationRunnable)
    * @see MoxyStubber
    * @since 1.0
    */
@@ -434,7 +432,7 @@ public final class Moxy {
    * 
    * @return A {@link MoxyVerifier} that will verify the given method.
    *
-   * @see #assertMock(MoxyEngine, Runnable)
+   * @see #assertMock(MoxyEngine, InvocationRunnable)
    * @see MoxyVerifier
    * @since 1.0
    */
@@ -467,7 +465,7 @@ public final class Moxy {
    * 
    * @return A {@link MoxyVerifier} that will verify the given method.
    *
-   * @see #assertMock(Runnable)
+   * @see #assertMock(InvocationRunnable)
    * @see MoxyVerifier
    * @since 1.0
    */

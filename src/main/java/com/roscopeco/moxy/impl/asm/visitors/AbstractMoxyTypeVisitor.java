@@ -39,6 +39,12 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   }
   
   @Override
+  public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
+    // Don't visit, we don't need to copy fields...
+    return null;
+  }
+
+  @Override
   public void visitEnd() {
     this.generateSupportFields();
     this.generateSupportMethods();

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.Collections;
 
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
@@ -13,8 +14,10 @@ import com.roscopeco.moxy.api.Mock;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
+import com.roscopeco.moxy.impl.asm.TypesAndDescriptors;
 import com.roscopeco.moxy.model.ClassWithNoNullConstructor;
 import com.roscopeco.moxy.model.ClassWithPrimitiveReturns;
+import com.roscopeco.moxy.model.FieldsClass;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
 import com.roscopeco.moxy.model.MethodWithPrimitiveArguments;
@@ -694,5 +697,23 @@ public class TestMoxy {
         .newInstance(Moxy.getMoxyEngine(), 37);
     
     assertThat(mock.getAnyInt()).isEqualTo(37);
+  }
+  
+  @Test
+  public void testMoxyMockDoesntCopyFields() throws Exception {
+    FieldsClass mock = Moxy.mock(FieldsClass.class);
+    
+    // Ensure we've only got the support fields, and haven't copied any...
+    assertThat(mock.getClass().getDeclaredFields())
+        .hasSize(3)
+        .hasSameElementsAs(
+            Lists.newArrayList(
+                mock.getClass().getDeclaredField(
+                    TypesAndDescriptors.SUPPORT_ENGINE_FIELD_NAME),
+                mock.getClass().getDeclaredField(
+                    TypesAndDescriptors.SUPPORT_RETURNMAP_FIELD_NAME),
+                mock.getClass().getDeclaredField(
+                    TypesAndDescriptors.SUPPORT_THROWMAP_FIELD_NAME)
+                ));
   }
 }

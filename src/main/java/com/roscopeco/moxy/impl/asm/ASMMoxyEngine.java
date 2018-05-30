@@ -238,7 +238,7 @@ public class ASMMoxyEngine implements MoxyEngine {
         + "correct type (e.g. anyInt() rather than any()), especially when nesting.\n"
         + "Otherwise, the causing exception may have more information.", e);
     } catch (Exception e) {      
-      // TODO naively swallow everything else.
+      // naively swallow everything else.
     }
   }
   
@@ -259,7 +259,7 @@ public class ASMMoxyEngine implements MoxyEngine {
         + "correct type (e.g. anyInt() rather than any()), especially when nesting.\n"
         + "Otherwise, the causing exception may have more information.", e);
     } catch (Exception e) {      
-      // TODO naively swallow everything else.
+      // naively swallow everything else.
     }
   }
   

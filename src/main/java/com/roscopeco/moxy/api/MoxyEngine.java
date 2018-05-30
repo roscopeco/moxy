@@ -2,6 +2,7 @@ package com.roscopeco.moxy.api;
 
 import java.io.PrintStream;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -22,6 +23,18 @@ import com.roscopeco.moxy.matchers.Matchers;
  * @since 1.0
  */
 public interface MoxyEngine {
+  /**
+   * Constant set to be passed to mock generation methods when all methods are
+   * to be mocked.
+   */
+  public static final Set<Method> ALL_METHODS = null;
+
+  /**
+   * Constant set to be passed to mock generation methods when no methods are
+   * to be mocked.
+   */
+  public static final Set<Method> NO_METHODS = Collections.emptySet();
+
   /**
    * <p>Obtain the {@link MoxyMatcherEngine} that this <code>MoxyEngine</code>
    * uses to service argument matchers.</p>
@@ -57,6 +70,14 @@ public interface MoxyEngine {
    * in order to generate loadable classes. This also applies to interfaces,
    * in which all methods (except those with a <code>default</code>
    * implementation) are considered abstract.</p>
+   * 
+   * <p>The <code>MoxyEngine</code> class provides two useful constants you
+   * may want to use for the <code>methods</code> parameter:</p>
+   * 
+   * <pre><code>
+   *   MoxyEngine.ALL_METHODS       // mock all methods
+   *   MoxyEngine.NO_METHODS        // mock no methods
+   * </code></pre>
    * 
    * <p>Generated Mock classes will define public pass-through constructors to
    * all public constructors on the superclass (if concrete), or a single
@@ -99,6 +120,14 @@ public interface MoxyEngine {
    * in which all methods (except those with a <code>default</code>
    * implementation) are considered abstract.</p>
    *
+   * <p>The <code>MoxyEngine</code> class provides two useful constants you
+   * may want to use for the <code>methods</code> parameter:</p>
+   * 
+   * <pre><code>
+   *   MoxyEngine.ALL_METHODS       // mock all methods
+   *   MoxyEngine.NO_METHODS        // mock no methods
+   * </code></pre>
+   * 
    * <p>Generated Mock classes will define public pass-through constructors to
    * all public constructors on the superclass (if concrete), or a single
    * public constructor (if mocking an interface). These constructors
@@ -139,6 +168,14 @@ public interface MoxyEngine {
    * in which all methods (except those with a <code>default</code>
    * implementation) are considered abstract.</p>
    *
+   * <p>The <code>MoxyEngine</code> class provides two useful constants you
+   * may want to use for the <code>methods</code> parameter:</p>
+   * 
+   * <pre><code>
+   *   MoxyEngine.ALL_METHODS       // mock all methods
+   *   MoxyEngine.NO_METHODS        // mock no methods
+   * </code></pre>
+   * 
    * <p>Generated Mock classes will define public pass-through constructors to
    * all public constructors on the superclass (if concrete), or a single
    * public constructor (if mocking an interface). These constructors
@@ -239,6 +276,20 @@ public interface MoxyEngine {
    * <p>For the default engine, the default <code>ClassLoader</code> is the same
    * <code>ClassLoader</code> that loaded the Moxy framework.</p>
    *
+   * <p>This method allows only a specific subset of methods to be mocked.
+   * Please note, however, that any abstract methods will always be mocked
+   * in order to generate loadable classes. This also applies to interfaces,
+   * in which all methods (except those with a <code>default</code>
+   * implementation) are considered abstract.</p>
+   *
+   * <p>The <code>MoxyEngine</code> class provides two useful constants you
+   * may want to use for the <code>methods</code> parameter:</p>
+   * 
+   * <pre><code>
+   *   MoxyEngine.ALL_METHODS       // mock all methods
+   *   MoxyEngine.NO_METHODS        // mock no methods
+   * </code></pre>
+   * 
    * <p>Generated Mock classes will define public pass-through constructors to
    * all public constructors on the superclass (if concrete), or a single
    * public constructor (if mocking an interface). These constructors

@@ -5,7 +5,6 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,7 +39,6 @@ import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
  *
  */
 public class ASMMoxyEngine implements MoxyEngine {
-  private static final Set<Method> ALL_METHODS = Collections.emptySet();
   private static final String UNRECOVERABLE_ERROR = "Unrecoverable Error";
   private static final String CANNOT_MOCK_NULL_CLASS = "Cannot mock null class";
   
@@ -111,7 +109,7 @@ public class ASMMoxyEngine implements MoxyEngine {
     }
 
     try {
-      Class<? extends T> mockClass = getMockClass(clz, ALL_METHODS, trace);
+      Class<? extends T> mockClass = getMockClass(clz, MoxyEngine.ALL_METHODS, trace);
       return instantiateMock(mockClass);
     } catch (MoxyException e) {
       throw e;
@@ -160,7 +158,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <I> Class<? extends I> getMockClass(ClassLoader loader, Class<I> clz) {
-    return getMockClass(loader, clz, ALL_METHODS, null);
+    return getMockClass(loader, clz, MoxyEngine.ALL_METHODS, null);
   }
 
   /*
@@ -177,7 +175,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <I> Class<? extends I> getMockClass(Class<I> clz, PrintStream trace) {
-    return getMockClass(MoxyEngine.class.getClassLoader(), clz, ALL_METHODS, trace);
+    return getMockClass(MoxyEngine.class.getClassLoader(), clz, MoxyEngine.ALL_METHODS, trace);
   }
   
   /* (non-Javadoc)
@@ -243,6 +241,14 @@ public class ASMMoxyEngine implements MoxyEngine {
     }
   }
   
+  /*
+   * Deletes latest invocation, and validates matcher stack consistency.
+   */
+  void deleteLatestInvocationFromList() {
+    this.getRecorder().unrecordLastInvocation();
+    this.getASMMatcherEngine().validateStackConsistency();
+  }
+  
   @Override
   public <T> MoxyStubber<T> when(Supplier<T> invocation) {
     naivelyInvokeAndSwallowExceptions(invocation::get);
@@ -287,14 +293,6 @@ public class ASMMoxyEngine implements MoxyEngine {
   }
   
   /*
-   * Validates matcher stack consistency.
-   */
-  void deleteLatestInvocationFromList() {
-    this.getRecorder().unrecordLastInvocation();
-    this.getASMMatcherEngine().validateStackConsistency();
-  }
-  
-  /*
    * Actual generator; create the ASM ClassNode for a mock.
    */
   ClassNode createMockClassNode(Class<?> clz, Set<Method> methods, PrintStream trace) throws IOException {
@@ -312,7 +310,7 @@ public class ASMMoxyEngine implements MoxyEngine {
     // Find the annotated methods (and their interfaces)
     
     Set<Method> mockableMethods;
-    if (methods == null || methods.isEmpty()) {
+    if (methods == MoxyEngine.ALL_METHODS) {
       mockableMethods = gatherAllMockableMethods(clz);
     } else {
       mockableMethods = methods;

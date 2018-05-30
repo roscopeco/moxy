@@ -191,6 +191,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
                               DOUBLE_VALUEOF_DESCRIPTOR,
                               false);
       break;
+    case ARRAY_PRIMITIVE_INTERNAL_NAME:
     case OBJECT_PRIMITIVE_INTERNAL_NAME:
       this.delegate.visitVarInsn(ALOAD, currentLocalSlot);
       break;
@@ -276,6 +277,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
                              DRETURN,
                              DCONST_0);
       break;
+    case ARRAY_PRIMITIVE_INTERNAL_NAME:
     case OBJECT_PRIMITIVE_INTERNAL_NAME:
       this.delegate.visitVarInsn(ALOAD, 0);
       this.delegate.visitMethodInsn(INVOKEVIRTUAL, this.generatingClass, SUPPORT_GETCURRENTRETURN_METHOD_NAME, VOID_OBJECT_DESCRIPTOR, false);
@@ -288,7 +290,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     default:
       throw new IllegalArgumentException("Unrecognised JVM primitive type: '" + returnType + "'.\n"
                                        + "Your JVM must be super-new and improved.\n"
-                                       + "To fix, add mysterious new type to switch in MoxyMockingMethodVisitor#visitCode()");
+                                       + "To fix, add mysterious new type to switch in MoxyMockingMethodVisitor#generateReturn()");
     }    
   }
 

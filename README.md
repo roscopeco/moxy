@@ -5,6 +5,20 @@
 
 ## Lean-and-mean mocking framework for Java with a fluent API.
 
+### Contents
+
+* [What is this?](#what-is-this)
+* [Purpose](#_another_-mock-framework)
+* [Usage](#enough-about-that-how-do-i-use-it)
+  * [Requirements](#requirements)
+  * [Getting the code](#getting-the-code)
+  * [Using the code](#using-the-code)
+    * [Creating mocks](#creating-mocks)
+    * [Stubbing](#stubbing)
+    * [Verifying](#verifying)
+    * [Argument matchers](#argument-matchers)
+    * [Partial Mocking and Spying](#partial-mocking-and-spying)
+    
 ### What is this?
 
 Moxy is a fairly lightweight mock/spy framework for use in Java automated
@@ -62,8 +76,6 @@ To summarise, the aims of Moxy are:
 * Maven 3 (tested with 3.5.3)
 * Junit 5
 * AssertJ 3.8
-* JaCoCo 0.8.1
-* FindBugs 3.0.1
 
 #### Getting the code
 
@@ -361,6 +373,68 @@ do suggest it for inclusion into the core Moxy distribution. GitHub pull request
 preferred format for such suggestions, but if you don't have time for that feel free to submit
 a bug/feature request instead.
 
+##### Partial Mocking and Spying
+
+In addition to the standard behaviour of mocking all public methods, Moxy also supports
+_partial mocking_, where only _some_ of the methods in a given class are mocked, leaving
+the rest with their original implementation.
+
+Partial mocking is inherently trickier than straight-up complete mocking, mostly because
+**Moxy doesn't call call constructors**. This means that, if the methods you don't mock
+require any state that is set in a constructor, they're likely to fail miserably.
+
+For this reason, the usual static _Moxy.mock(...)_ API doesn't support partial mocking -
+you'll have to get a little deeper into the API and call a constructor yourself.
+This is a deliberate design decision, to ensure that mocks remain type-safe and 
+don't suddenly break if you decide later that you need to initialise something in
+your constructor.
+
+**Side note**
+> Why doesn't Moxy call constructors? Because it can't intelligently choose which constructor
+it should be calling, or what arguments it might pass in. These decisions are best left 
+to you. Read on to find out how to do it once you've made your decision!
+
+In order to make this work, you'll have to generate the mock `Class` rather than 
+directly creating an instance out of thin-air as you've done before. Don't worry,
+it's not that much more work:
+
+Given that you have a constructor that looks like:
+
+```java
+public MyClass(String arg1, int arg2) { ... }
+```
+
+You simply need to generate the class, and then instantiate it with reflection.
+The only thing to note is that the mock class will have an extra constructor 
+argument, prepended to the normal constructor arguments, into which you'll 
+pass the `MoxyEngine` that created the class. So the generated constructor
+will look like:
+
+```java
+public MyClass(MoxyEngine engine, String arg1, int arg2) { ... }
+```
+
+If you're mocking a single method `myMethod`, the whole generation-and-instantiation
+piece looks like:
+
+```java
+Class<? extends MyClass> mockClass = 
+    Moxy.getMoxyEngine().getMockClass(MyClass.class,
+        Collections.singleton(
+            SimpleAbstractClass.class.getMethod("myMethod")));
+
+MyClass mock = mockClass
+    .getConstructor(MoxyEngine.class, String.class, int.class)
+    .newInstance(Moxy.getMoxyEngine(), "Some string", 42);
+```
+
+Those six extra lines might seem like a bit of a pain, but think of the 
+extra work as a reminder that partial mocking is a little bit dangerous.
+
+**Side note**
+> For true spying, those in the know will be yelling that they can't call
+the real method, which is true. But don't worry, it's on the TODO list.
+
 ### How does it work?
 
 In a nutshell, Moxy works by dynamically generating subclasses of your classes and 
@@ -376,7 +450,7 @@ a bit, put them into lists, sort them, lose them, find them again, and that kind
 thing, ready for the stubbers and verifiers to come along and either tell the mock
 what it should do when its called, or ask it what its been up to.
 
-More dark magic and poor coding then take over to turn all these internal things
+More dark magic and questionable code then take over to turn all these internal things
 into friendly external things that are suitable for human consumption.
 
 If you're interested, you take a look around the `com.roscopeco.moxy.impl.asm` package

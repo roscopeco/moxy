@@ -28,10 +28,6 @@ public interface ASMMockSupport {
     return __moxy_asm_getEngine().getRecorder();    
   }
   
-  default public void __moxy_asm_throwNullConstructorException() throws InstantiationException {
-    throw new InstantiationException("Cannot construct mock with null constructor");
-  }
-  
   default public Deque<StubReturn>__moxy_asm_ensureStubReturnDeque(      
       HashMap<StubMethod, Deque<StubReturn>> returnMap,
       StubMethod method) {
@@ -71,7 +67,6 @@ public interface ASMMockSupport {
         final Deque<StubReturn> deque = __moxy_asm_ensureStubReturnDeque(
             returnMap, 
             new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
-        
         deque.addFirst(new StubReturn(invocation.getArgs(), object));
       }
     } else {

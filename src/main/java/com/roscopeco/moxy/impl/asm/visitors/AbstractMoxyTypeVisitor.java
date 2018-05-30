@@ -3,7 +3,10 @@ package com.roscopeco.moxy.impl.asm.visitors;
 import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
 import static org.objectweb.asm.Opcodes.*;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
@@ -17,8 +20,29 @@ import org.objectweb.asm.tree.ClassNode;
  */
 public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {   
   protected static final AtomicInteger mockNumber = new AtomicInteger();
+  private static final List<Pattern> PROHIBITED_PACKAGES = Arrays.asList(
+      Pattern.compile("java\\..*"),
+      Pattern.compile("sun\\..*"),
+      Pattern.compile("com\\.sun\\..*")
+    );
+  
+  /*
+   * Ensures we don't try to use any of the prohibited packages
+   * (e.g. java.lang).
+   */
+  private static String makeMockPackageInternalName(Package originalPackage) {
+    final String originalName = originalPackage.getName();
+    
+    if (PROHIBITED_PACKAGES.stream().anyMatch(regex -> regex.matcher(originalName).find())) {
+      // default package
+      return "";      
+    } else {
+      return originalName.replace('.', '/') + "/";
+    }    
+  }
+  
   protected static String makeMockName(Class<?> originalClass) {
-    return originalClass.getPackage().getName().replace('.', '/') + "/Mock " 
+    return makeMockPackageInternalName(originalClass.getPackage()) + "Mock " 
            + originalClass.getSimpleName() 
            + " {"
            + AbstractMoxyTypeVisitor.mockNumber.getAndIncrement()
@@ -38,6 +62,12 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
     return newClassInternalName;
   }
   
+  @Override
+  public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
+    // Don't visit, we don't need to copy fields...
+    return null;
+  }
+
   @Override
   public void visitEnd() {
     this.generateSupportFields();

@@ -15,7 +15,9 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
   }
   
   private String inspectArg(Object arg) {
-    if (arg instanceof String) {
+    if (arg == null) {
+      return null;
+    } else if (arg instanceof String) {
       return "\"" + arg + "\"";
     } else if (arg instanceof Character) {
       return "'" + arg + "'";

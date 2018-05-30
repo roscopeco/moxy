@@ -716,4 +716,13 @@ public class TestMoxy {
                     TypesAndDescriptors.SUPPORT_THROWMAP_FIELD_NAME)
                 ));
   }
+  
+  @Test
+  public void testMoxyMockCanMockJavaLangClasses() {
+    Object objectMock = Moxy.mock(Object.class, System.out);
+    
+    assertThat(objectMock)
+        .isNotNull()
+        .isInstanceOf(Object.class);
+  }
 }

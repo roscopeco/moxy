@@ -76,8 +76,6 @@ To summarise, the aims of Moxy are:
 * Maven 3 (tested with 3.5.3)
 * Junit 5
 * AssertJ 3.8
-* JaCoCo 0.8.1
-* FindBugs 3.0.1
 
 #### Getting the code
 

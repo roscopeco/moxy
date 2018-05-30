@@ -3,7 +3,10 @@ package com.roscopeco.moxy.impl.asm.visitors;
 import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
 import static org.objectweb.asm.Opcodes.*;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
@@ -17,6 +20,11 @@ import org.objectweb.asm.tree.ClassNode;
  */
 public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {   
   protected static final AtomicInteger mockNumber = new AtomicInteger();
+  private static final List<Pattern> PROHIBITED_PACKAGES = Arrays.asList(
+      Pattern.compile("java\\..*"),
+      Pattern.compile("sun\\..*"),
+      Pattern.compile("com\\.sun\\..*")
+    );
   
   /*
    * Ensures we don't try to use any of the prohibited packages
@@ -25,7 +33,7 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   private static String makeMockPackageInternalName(Package originalPackage) {
     final String originalName = originalPackage.getName();
     
-    if ("java.lang".equals(originalName)) {
+    if (PROHIBITED_PACKAGES.stream().anyMatch(regex -> regex.matcher(originalName).find())) {
       // default package
       return "";      
     } else {

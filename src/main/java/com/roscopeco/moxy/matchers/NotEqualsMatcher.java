@@ -18,4 +18,9 @@ class NotEqualsMatcher<T> extends SimpleObjectMatcher<T> {
       return !arg.equals(object);
     }
   }
+
+  @Override
+  public String toString() {
+    return "<neq" + super.toString();
+  }
 }

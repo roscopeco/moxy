@@ -42,27 +42,28 @@ public class MoxyPassThroughConstructorVisitor extends MethodVisitor {
     for (int argNum = 0; argNum < this.argTypes.length; argNum++) {
       char argType = this.argTypes[argNum].toString().charAt(0);
       switch (argType) {
-      case 'B':
-      case 'C':
-      case 'S':
-      case 'I':
-      case 'Z':
+      case BYTE_PRIMITIVE_INTERNAL_NAME:
+      case CHAR_PRIMITIVE_INTERNAL_NAME:
+      case SHORT_PRIMITIVE_INTERNAL_NAME:
+      case INT_PRIMITIVE_INTERNAL_NAME:
+      case BOOL_PRIMITIVE_INTERNAL_NAME:
         this.delegate.visitVarInsn(ILOAD, currentSlot);
         currentSlot += 1;
         break;
-      case 'J':
+      case LONG_PRIMITIVE_INTERNAL_NAME:
         this.delegate.visitVarInsn(LLOAD, currentSlot);
         currentSlot += 2;
         break;
-      case 'F':
+      case FLOAT_PRIMITIVE_INTERNAL_NAME:
         this.delegate.visitVarInsn(FLOAD, currentSlot);
         currentSlot += 1;
         break;
-      case 'D':
+      case DOUBLE_PRIMITIVE_INTERNAL_NAME:
         this.delegate.visitVarInsn(DLOAD, currentSlot);
         currentSlot += 2;
         break;
-      case 'L':
+      case ARRAY_PRIMITIVE_INTERNAL_NAME:
+      case OBJECT_PRIMITIVE_INTERNAL_NAME:
         this.delegate.visitVarInsn(ALOAD, currentSlot);
         currentSlot += 1;
         break;

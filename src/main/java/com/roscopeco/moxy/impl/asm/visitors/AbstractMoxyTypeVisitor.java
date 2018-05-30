@@ -29,12 +29,12 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
       // default package
       return "";      
     } else {
-      return originalName.replace('.', '/');
+      return originalName.replace('.', '/') + "/";
     }    
   }
   
   protected static String makeMockName(Class<?> originalClass) {
-    return makeMockPackageInternalName(originalClass.getPackage()) + "/Mock " 
+    return makeMockPackageInternalName(originalClass.getPackage()) + "Mock " 
            + originalClass.getSimpleName() 
            + " {"
            + AbstractMoxyTypeVisitor.mockNumber.getAndIncrement()

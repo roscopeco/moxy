@@ -348,7 +348,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
         ASMMoxyEngine.class.getDeclaredMethod("naivelyInvokeAndSwallowExceptions", InvocationSupplier.class),
         ASMMoxyEngine.class.getDeclaredMethod("deleteLatestInvocationFromList"));
 
-    SimpleClass simpleMock = mock(SimpleClass.class);
+    SimpleClass simpleMock = mockEngine.mock(SimpleClass.class);
     
     Invocation testInvocation = new Invocation(simpleMock, "test", "test", Collections.emptyList());
     
@@ -382,7 +382,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
         ASMMoxyEngine.class.getDeclaredMethod("naivelyInvokeAndSwallowExceptions", InvocationRunnable.class),
         ASMMoxyEngine.class.getDeclaredMethod("deleteLatestInvocationFromList"));
 
-    MethodWithArguments voidReturnMock = mock(MethodWithArguments.class);
+    MethodWithArguments voidReturnMock = mockEngine.mock(MethodWithArguments.class);
     
     Invocation testInvocation = new Invocation(voidReturnMock, "test", "test", Collections.emptyList());
     
@@ -416,7 +416,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
         ASMMoxyEngine.class.getDeclaredMethod("naivelyInvokeAndSwallowExceptions", InvocationRunnable.class),
         ASMMoxyEngine.class.getDeclaredMethod("deleteLatestInvocationFromList"));
 
-    MethodWithArguments voidReturnMock = mock(MethodWithArguments.class);
+    MethodWithArguments voidReturnMock = mockEngine.mock(MethodWithArguments.class);
     
     Invocation testInvocation = new Invocation(voidReturnMock, "test", "test", Collections.emptyList());
     

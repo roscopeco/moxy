@@ -4,6 +4,8 @@ import java.io.PrintStream;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
+import com.roscopeco.moxy.api.InvocationRunnable;
+import com.roscopeco.moxy.api.InvocationSupplier;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
@@ -294,7 +296,7 @@ public final class Moxy {
    * @see MoxyStubber
    * @since 1.0
    */
-  public static <T> MoxyStubber<T> when(Supplier<T> invocation) {
+  public static <T> MoxyStubber<T> when(InvocationSupplier<T> invocation) { 
     return when(ensureMoxyEngine(), invocation);
   }
 
@@ -331,7 +333,7 @@ public final class Moxy {
    * @see MoxyStubber
    * @since 1.0
    */
-  public static MoxyVoidStubber when(Runnable invocation) {
+  public static MoxyVoidStubber when(InvocationRunnable invocation) {
     return when(ensureMoxyEngine(), invocation);
   }
 
@@ -366,7 +368,7 @@ public final class Moxy {
    * @see MoxyStubber
    * @since 1.0
    */
-  public static <T> MoxyStubber<T> when(MoxyEngine engine, Supplier<T> invocation) {
+  public static <T> MoxyStubber<T> when(MoxyEngine engine, InvocationSupplier<T> invocation) { 
     return engine.when(invocation);
   }
   
@@ -404,7 +406,7 @@ public final class Moxy {
    * @see MoxyStubber
    * @since 1.0
    */
-  public static MoxyVoidStubber when(MoxyEngine engine, Runnable invocation) {
+  public static MoxyVoidStubber when(MoxyEngine engine, InvocationRunnable invocation) {
     return engine.when(invocation);
   }
   
@@ -436,7 +438,7 @@ public final class Moxy {
    * @see MoxyVerifier
    * @since 1.0
    */
-  public static MoxyVerifier assertMock(Runnable invocation) {
+  public static MoxyVerifier assertMock(InvocationRunnable invocation) {
     return assertMock(ensureMoxyEngine(), invocation);
   }
   
@@ -469,7 +471,7 @@ public final class Moxy {
    * @see MoxyVerifier
    * @since 1.0
    */
-  public static MoxyVerifier assertMock(MoxyEngine engine, Runnable invocation) {
+  public static MoxyVerifier assertMock(MoxyEngine engine, InvocationRunnable invocation) {
     return engine.assertMock(invocation);
   }  
 }

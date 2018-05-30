@@ -8,7 +8,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -17,6 +16,8 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.TraceClassVisitor;
 
+import com.roscopeco.moxy.api.InvocationRunnable;
+import com.roscopeco.moxy.api.InvocationSupplier;
 import com.roscopeco.moxy.api.Mock;
 import com.roscopeco.moxy.api.MockGenerationException;
 import com.roscopeco.moxy.api.MoxyEngine;
@@ -223,10 +224,31 @@ public class ASMMoxyEngine implements MoxyEngine {
   /*
    * Validates matcher stack consistency.
    */
-  void naivelyInvokeAndSwallowExceptions(Runnable doInvoke) {
+  void naivelyInvokeAndSwallowExceptions(InvocationRunnable doInvoke) {
     ensureEngineConsistencyBeforeMonitoredInvocation();
     try {
       doInvoke.run();
+    } catch (MoxyException e) {
+      // Framework error - rethrow this.
+      throw e;
+    } catch (NullPointerException e) {
+      // Often an autoboxing error, give (hopefully) useful error message.
+      throw new PossibleMatcherUsageError(
+          "NPE in invocation: If you're using primitive matchers, ensure you're using the " 
+        + "correct type (e.g. anyInt() rather than any()), especially when nesting.\n"
+        + "Otherwise, the causing exception may have more information.", e);
+    } catch (Exception e) {      
+      // TODO naively swallow everything else.
+    }
+  }
+  
+  /*
+   * Validates matcher stack consistency.
+   */
+  <T> void naivelyInvokeAndSwallowExceptions(InvocationSupplier<T> doInvoke) {
+    ensureEngineConsistencyBeforeMonitoredInvocation();
+    try {
+      doInvoke.get();
     } catch (MoxyException e) {
       // Framework error - rethrow this.
       throw e;
@@ -250,24 +272,24 @@ public class ASMMoxyEngine implements MoxyEngine {
   }
   
   @Override
-  public <T> MoxyStubber<T> when(Supplier<T> invocation) {
-    naivelyInvokeAndSwallowExceptions(invocation::get);
+  public <T> MoxyStubber<T> when(InvocationSupplier<T> invocation) {
+    naivelyInvokeAndSwallowExceptions(invocation);
     this.getRecorder().replaceInvocationArgsWithMatchers();
     deleteLatestInvocationFromList();
     return new ASMMoxyStubber<>(this);
   }
   
   @Override
-  public MoxyVoidStubber when(Runnable invocation) {
-    naivelyInvokeAndSwallowExceptions(invocation::run);
+  public MoxyVoidStubber when(InvocationRunnable invocation) {
+    naivelyInvokeAndSwallowExceptions(invocation);
     this.getRecorder().replaceInvocationArgsWithMatchers();
     deleteLatestInvocationFromList();
     return new ASMMoxyVoidStubber(this);
   }
 
   @Override
-  public MoxyVerifier assertMock(Runnable invocation) {
-    naivelyInvokeAndSwallowExceptions(invocation::run);
+  public MoxyVerifier assertMock(InvocationRunnable invocation) {
+    naivelyInvokeAndSwallowExceptions(invocation);
     this.getRecorder().replaceInvocationArgsWithMatchers();
     deleteLatestInvocationFromList();
     return new ASMMoxyVerifier(this);

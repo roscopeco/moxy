@@ -462,7 +462,7 @@ public interface MoxyEngine {
    * @see MoxyStubber
    * @since 1.0
    */
-  public <T> MoxyStubber<T> when(Supplier<T> invocation);
+  public <T> MoxyStubber<T> when(InvocationSupplier<T> invocation);
 
   /**
    * <p>Starts stubbing of the mock invocation in the supplied lambda 
@@ -496,7 +496,7 @@ public interface MoxyEngine {
    * @see MoxyStubber
    * @since 1.0
    */
-  public MoxyVoidStubber when(Runnable invocation);
+  public MoxyVoidStubber when(InvocationRunnable invocation);
   
   /**
    * <p>Starts verification of the mock invocation in the supplied lambda 
@@ -525,5 +525,5 @@ public interface MoxyEngine {
    * @see MoxyVerifier
    * @since 1.0
    */
-  public MoxyVerifier assertMock(Runnable invocation);
+  public MoxyVerifier assertMock(InvocationRunnable invocation);
 }

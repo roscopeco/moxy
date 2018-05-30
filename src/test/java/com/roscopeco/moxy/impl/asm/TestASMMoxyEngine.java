@@ -5,6 +5,7 @@ import static com.roscopeco.moxy.matchers.Matchers.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -20,6 +21,8 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import com.roscopeco.moxy.Moxy;
+import com.roscopeco.moxy.api.InvocationRunnable;
+import com.roscopeco.moxy.api.InvocationSupplier;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
@@ -163,6 +166,28 @@ class TestASMMoxyEngine extends AbstractImplTest {
     String output = new String(baos.toByteArray(), java.nio.charset.StandardCharsets.UTF_8);
     
     assertThat(output).contains("class Mock Object");
+  }
+  
+  @Test
+  public void testGetMockClassLoaderClassSetPrintStreamHandlesIOException() throws Exception {
+    ASMMoxyEngine engine = makePartialMock(false,
+        ASMMoxyEngine.class.getDeclaredMethod("createMockClassNode", Class.class, Set.class, PrintStream.class));
+    
+    IOException ioException = new IOException("Marker");
+    
+    when(() -> engine.createMockClassNode(any(), any(), any())).thenThrow(ioException);
+    
+    assertThatThrownBy(() ->
+        engine.getMockClass(MoxyEngine.class.getClassLoader(),
+                            SimpleClass.class, 
+                            MoxyEngine.ALL_METHODS, 
+                            null)
+    )
+        .isInstanceOf(MoxyException.class)
+        .hasMessage("Unrecoverable Error")
+          .extracting(e -> e.getCause())
+          .hasSize(1)
+          .hasSameElementsAs(Lists.newArrayList(ioException));
   }
   
   @Test
@@ -317,9 +342,10 @@ class TestASMMoxyEngine extends AbstractImplTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testWhenSupplier() throws Exception {
     ASMMoxyEngine mockEngine = makePartialMock(true, 
-        ASMMoxyEngine.class.getDeclaredMethod("naivelyInvokeAndSwallowExceptions", Runnable.class),
+        ASMMoxyEngine.class.getDeclaredMethod("naivelyInvokeAndSwallowExceptions", InvocationSupplier.class),
         ASMMoxyEngine.class.getDeclaredMethod("deleteLatestInvocationFromList"));
 
     SimpleClass simpleMock = mock(SimpleClass.class);
@@ -344,7 +370,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(stubber.theInvocation.getArgs()).isEqualTo(Collections.emptyList());
     
     // Ensure engine state consistency was maintained behind the scenes
-    assertMock(() -> mockEngine.naivelyInvokeAndSwallowExceptions(any())).wasCalledOnce();
+    assertMock(() -> mockEngine.naivelyInvokeAndSwallowExceptions((InvocationSupplier<String>)any())).wasCalledOnce();
     assertMock(() -> recorder.replaceInvocationArgsWithMatchers()).wasCalledOnce();
     assertMock(() -> recorder.getAndClearLastInvocation()).wasCalledOnce();
     assertMock(() -> mockEngine.deleteLatestInvocationFromList()).wasCalledOnce();
@@ -353,7 +379,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
   @Test
   public void testWhenRunnable() throws Exception {
     ASMMoxyEngine mockEngine = makePartialMock(true, 
-        ASMMoxyEngine.class.getDeclaredMethod("naivelyInvokeAndSwallowExceptions", Runnable.class),
+        ASMMoxyEngine.class.getDeclaredMethod("naivelyInvokeAndSwallowExceptions", InvocationRunnable.class),
         ASMMoxyEngine.class.getDeclaredMethod("deleteLatestInvocationFromList"));
 
     MethodWithArguments voidReturnMock = mock(MethodWithArguments.class);
@@ -378,7 +404,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(stubber.theInvocation.getArgs()).isEqualTo(Collections.emptyList());
     
     // Ensure engine state consistency was maintained behind the scenes
-    assertMock(() -> mockEngine.naivelyInvokeAndSwallowExceptions(any())).wasCalledOnce();
+    assertMock(() -> mockEngine.naivelyInvokeAndSwallowExceptions((InvocationRunnable)any())).wasCalledOnce();
     assertMock(() -> recorder.replaceInvocationArgsWithMatchers()).wasCalledOnce();
     assertMock(() -> recorder.getAndClearLastInvocation()).wasCalledOnce();
     assertMock(() -> mockEngine.deleteLatestInvocationFromList()).wasCalledOnce();
@@ -387,7 +413,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
   @Test
   public void testAssertMockRunnable() throws Exception {
     ASMMoxyEngine mockEngine = makePartialMock(true, 
-        ASMMoxyEngine.class.getDeclaredMethod("naivelyInvokeAndSwallowExceptions", Runnable.class),
+        ASMMoxyEngine.class.getDeclaredMethod("naivelyInvokeAndSwallowExceptions", InvocationRunnable.class),
         ASMMoxyEngine.class.getDeclaredMethod("deleteLatestInvocationFromList"));
 
     MethodWithArguments voidReturnMock = mock(MethodWithArguments.class);
@@ -412,7 +438,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(verifier.theInvocation.getArgs()).isEqualTo(Collections.emptyList());
     
     // Ensure engine state consistency was maintained behind the scenes
-    assertMock(() -> mockEngine.naivelyInvokeAndSwallowExceptions(any())).wasCalledOnce();
+    assertMock(() -> mockEngine.naivelyInvokeAndSwallowExceptions((InvocationRunnable)any())).wasCalledOnce();
     assertMock(() -> recorder.replaceInvocationArgsWithMatchers()).wasCalledOnce();
     assertMock(() -> recorder.getAndClearLastInvocation()).wasCalledOnce();
     assertMock(() -> mockEngine.deleteLatestInvocationFromList()).wasCalledOnce();

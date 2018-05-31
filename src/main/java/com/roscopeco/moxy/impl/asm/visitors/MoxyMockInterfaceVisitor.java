@@ -51,7 +51,7 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
     return new MoxyMockingMethodVisitor(this.cv.visitMethod(
         access & ~ACC_ABSTRACT | ACC_SYNTHETIC, 
         name, desc, signature, exceptions),
-    this.getNewClassInternalName(),
+    this.interfaceInternalName,
     name,
     desc,
     Type.getReturnType(desc),

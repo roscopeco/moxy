@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.objectweb.asm.Type;
 
+import com.roscopeco.moxy.api.InvalidStubbingException;
 import com.roscopeco.moxy.api.MoxyEngine;
 
 /**
@@ -25,13 +26,16 @@ public final class TypesAndDescriptors {
   public static final String HASHMAP_INTERNAL_NAME = Type.getInternalName(HashMap.class);
   public static final String THROWABLE_DESCRIPTOR = "L" + Type.getInternalName(Throwable.class) +";";
   public static final String HASHMAP_DESCRIPTOR = "L" + HASHMAP_INTERNAL_NAME + ";";
+  public static final String STRING_INTERNAL_NAME = Type.getInternalName(String.class);
+  public static final String STRING_DESCRIPTOR = "L" + STRING_INTERNAL_NAME + ";";
   public static final String INIT_NAME = "<init>";
   public static final String ADD_NAME = "add";
   public static final String VOID_TYPE = "V";
   public static final String VOID_VOID_DESCRIPTOR = "()V";
   public static final String VOID_INT_DESCRIPTOR = "(I)V";
-  public static final String VOID_OBJECT_DESCRIPTOR = "()L" + OBJECT_INTERNAL_NAME + ";";
-  public static final String VOID_THROWABLE_DESCRIPTOR = "()" + THROWABLE_DESCRIPTOR;
+  public static final String OBJECT_VOID_DESCRIPTOR = "()L" + OBJECT_INTERNAL_NAME + ";";
+  public static final String THROWABLE_VOID_DESCRIPTOR = "()" + THROWABLE_DESCRIPTOR;
+  public static final String VOID_STRING_DESCRIPTOR = "(" + STRING_DESCRIPTOR + ")V";
   public static final String BOOLEAN_OBJECT_DESCRIPTOR = "(L" + OBJECT_INTERNAL_NAME + ";)Z";
   public static final String VOID_OBJECT_THROWABLE_DESCRIPTOR = "(" + OBJECT_DESCRIPTOR + THROWABLE_DESCRIPTOR + ")V"; 
   
@@ -43,6 +47,8 @@ public final class TypesAndDescriptors {
   
   public static final String MOXY_SUPPORT_INTERFACE_INTERNAL_NAME = Type.getInternalName(ASMMockSupport.class);
   public static final String MOXY_ENGINE_INTERNAL_NAME = Type.getInternalName(MoxyEngine.class);
+  
+  public static final String INVALID_STUBBING_INTERNAL_NAME = Type.getInternalName(InvalidStubbingException.class);
 
   /* Recorder */
   public static final String MOXY_RECORDER_INTERNAL_NAME = Type.getInternalName(ThreadLocalInvocationRecorder.class);
@@ -56,6 +62,8 @@ public final class TypesAndDescriptors {
   public static final String SUPPORT_GETRETURNMAP_DESCRIPTOR = "()" + HASHMAP_DESCRIPTOR;
   public static final String SUPPORT_GETTHROWMAP_METHOD_NAME = "__moxy_asm_getThrowMap";
   public static final String SUPPORT_GETTHROWMAP_DESCRIPTOR = "()" + HASHMAP_DESCRIPTOR;
+  public static final String SUPPORT_GETSUPERMAP_METHOD_NAME = "__moxy_asm_getCallSuperMap";
+  public static final String SUPPORT_GETSUPERMAP_DESCRIPTOR = "()" + HASHMAP_DESCRIPTOR;  
   public static final String SUPPORT_GETCURRENTTHROW_METHOD_NAME = "__moxy_asm_getThrowForCurrentInvocation";
   public static final String SUPPORT_GETCURRENTRETURN_METHOD_NAME = "__moxy_asm_getReturnForCurrentInvocation";
   public static final String SUPPORT_NULL_CONSTRUCTOR_THROWER_METHOD_NAME = "__moxy_asm_throwNullConstructorException";
@@ -66,6 +74,9 @@ public final class TypesAndDescriptors {
   public static final String SUPPORT_ENGINE_FIELD_NAME = "__moxy_asm_engine";
   public static final String SUPPORT_RETURNMAP_FIELD_NAME = "__moxy_asm_returnMap";
   public static final String SUPPORT_THROWMAP_FIELD_NAME = "__moxy_asm_throwMap";
+  public static final String SUPPORT_SUPERMAP_FIELD_NAME = "__moxy_asm_superMap";
+  public static final String SUPPORT_SHOULD_CALL_SUPER_METHOD_NAME = "__moxy_asm_shouldCallSuperForCurrentInvocation";
+  public static final String SUPPORT_SHOULD_CALL_SUPER_DESCRIPTOR = "()Z";
   
   /* primitives and their corresponding box types */
   public static final String VALUEOF_METHOD_NAME = "valueOf";

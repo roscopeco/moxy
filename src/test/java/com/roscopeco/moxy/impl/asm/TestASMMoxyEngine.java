@@ -484,13 +484,14 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(node.superName).isEqualTo("com/roscopeco/moxy/model/ClassWithPrimitiveReturns");
     
     assertThat(node.methods)
-      .hasSize(5)
+      .hasSize(6)
       .hasOnlyElementsOfType(MethodNode.class)
       .extracting("name", "desc")
           .containsOnly(tuple("<init>",                  "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
                         tuple("__moxy_asm_getEngine",    "()Lcom/roscopeco/moxy/impl/asm/ASMMoxyEngine;"),
                         tuple("__moxy_asm_getReturnMap", "()Ljava/util/HashMap;"),
                         tuple("__moxy_asm_getThrowMap",  "()Ljava/util/HashMap;"),
+                        tuple("__moxy_asm_getCallSuperMap",  "()Ljava/util/HashMap;"),
                         tuple("returnByte",              "()B"));    
   }
   
@@ -506,13 +507,14 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(node.superName).isEqualTo("com/roscopeco/moxy/model/ClassWithPrimitiveReturns");
     
     assertThat(node.methods)
-      .hasSize(13)
+      .hasSize(14)
       .hasOnlyElementsOfType(MethodNode.class)
       .extracting("name", "desc")
           .containsOnly(tuple("<init>",                  "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
                         tuple("__moxy_asm_getEngine",    "()Lcom/roscopeco/moxy/impl/asm/ASMMoxyEngine;"),
                         tuple("__moxy_asm_getReturnMap", "()Ljava/util/HashMap;"),
                         tuple("__moxy_asm_getThrowMap",  "()Ljava/util/HashMap;"),
+                        tuple("__moxy_asm_getCallSuperMap",  "()Ljava/util/HashMap;"),
                         tuple("returnByte",              "()B"),
                         tuple("returnChar",              "()C"),
                         tuple("returnShort",             "()S"),
@@ -536,12 +538,13 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(node.superName).isEqualTo("com/roscopeco/moxy/model/ClassWithPrimitiveReturns");
     
     assertThat(node.methods)
-      .hasSize(4)
+      .hasSize(5)
       .hasOnlyElementsOfType(MethodNode.class)
       .extracting("name", "desc")
           .containsOnly(tuple("<init>",                  "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
                         tuple("__moxy_asm_getEngine",    "()Lcom/roscopeco/moxy/impl/asm/ASMMoxyEngine;"),
                         tuple("__moxy_asm_getReturnMap", "()Ljava/util/HashMap;"),
-                        tuple("__moxy_asm_getThrowMap",  "()Ljava/util/HashMap;"));
+                        tuple("__moxy_asm_getThrowMap",  "()Ljava/util/HashMap;"),
+                        tuple("__moxy_asm_getCallSuperMap",  "()Ljava/util/HashMap;"));
   }
 }

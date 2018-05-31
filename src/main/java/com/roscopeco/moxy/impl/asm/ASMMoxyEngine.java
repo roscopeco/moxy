@@ -304,10 +304,12 @@ public class ASMMoxyEngine implements MoxyEngine {
       Field engineField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_ENGINE_FIELD_NAME);
       Field returnMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_RETURNMAP_FIELD_NAME);
       Field throwMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_THROWMAP_FIELD_NAME);
+      Field superMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_SUPERMAP_FIELD_NAME);
       Object mock = UNSAFE.allocateInstance(mockClass);
       UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(engineField), this);
       UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(returnMapField), new HashMap());
       UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(throwMapField), new HashMap());
+      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(superMapField), new HashMap());
       return (T)mock;
     } catch (Exception e) {
       throw new MoxyException("Unrecoverable error: Instantiation exception; see cause", e);
@@ -355,7 +357,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   /*
    * Define a class given a loader and an ASM ClassNode. 
    */
-  @SuppressWarnings("restriction")
+  @SuppressWarnings({ "restriction", "deprecation" })
   Class<?> defineClass(ClassLoader loader, ClassNode node) {
     if (loader == null) {
       throw new IllegalArgumentException("Implicit definition in the system classloader is unsupported.\n"

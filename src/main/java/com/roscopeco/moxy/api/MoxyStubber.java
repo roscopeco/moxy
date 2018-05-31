@@ -41,4 +41,6 @@ public interface MoxyStubber<T> {
    * @return <code>this</code>
    */
   public MoxyStubber<T> thenThrow(Throwable throwable);
+  
+  public MoxyStubber<T> thenCallRealMethod();
 }

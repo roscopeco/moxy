@@ -31,11 +31,11 @@ public class MoxyPassThroughConstructorVisitor extends MethodVisitor {
   
   @Override
   public void visitCode() {
-    // one for super call, one for field store, one each for throws/return map
+    // one for super call, one for field store, one each for throws/return/super map
     this.delegate.visitVarInsn(ALOAD, 0);
-    this.delegate.visitInsn(DUP);    
-    this.delegate.visitInsn(DUP);    
-    this.delegate.visitInsn(DUP);    
+    this.delegate.visitInsn(DUP);
+    this.delegate.visitInsn(DUP);
+    this.delegate.visitInsn(DUP2);
     
     // super call
     int currentSlot = 2;
@@ -91,6 +91,11 @@ public class MoxyPassThroughConstructorVisitor extends MethodVisitor {
     this.delegate.visitInsn(DUP);
     this.delegate.visitMethodInsn(INVOKESPECIAL, HASHMAP_INTERNAL_NAME, INIT_NAME, VOID_VOID_DESCRIPTOR, false);
     this.delegate.visitFieldInsn(PUTFIELD, this.generatingClass, SUPPORT_THROWMAP_FIELD_NAME, HASHMAP_DESCRIPTOR);
+    
+    this.delegate.visitTypeInsn(NEW, HASHMAP_INTERNAL_NAME);
+    this.delegate.visitInsn(DUP);
+    this.delegate.visitMethodInsn(INVOKESPECIAL, HASHMAP_INTERNAL_NAME, INIT_NAME, VOID_VOID_DESCRIPTOR, false);
+    this.delegate.visitFieldInsn(PUTFIELD, this.generatingClass, SUPPORT_SUPERMAP_FIELD_NAME, HASHMAP_DESCRIPTOR);
     
     this.delegate.visitInsn(RETURN);
   }

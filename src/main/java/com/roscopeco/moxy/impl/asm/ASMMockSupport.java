@@ -23,6 +23,9 @@ public interface ASMMockSupport {
   public HashMap<StubMethod, Deque<StubReturn>> __moxy_asm_getReturnMap();
   public HashMap<StubMethod, Deque<StubThrow>> __moxy_asm_getThrowMap();
   
+  // Present and true: call super; otherwise, use stubbing.
+  public HashMap<StubMethod, Deque<StubSuper>> __moxy_asm_getCallSuperMap(); 
+  
   /* Implemented by default */
   default public ThreadLocalInvocationRecorder __moxy_asm_getRecorder() {
     return __moxy_asm_getEngine().getRecorder();    
@@ -40,16 +43,28 @@ public interface ASMMockSupport {
     return deque;
   }
   
-  default public Deque<StubThrow>__moxy_asm_ensureStubThrowDeque(      
+  default public Deque<StubThrow>__moxy_asm_ensureStubThrowDeque(
       HashMap<StubMethod, Deque<StubThrow>> throwMap,
       StubMethod method) {
     Deque<StubThrow> deque = throwMap.get(method);
-    
+
     if (deque == null) {
-      throwMap.put(method, deque = new ArrayDeque<>());      
+      throwMap.put(method, deque = new ArrayDeque<>());
     }
     
     return deque;    
+  }
+  
+  default public Deque<StubSuper>__moxy_asm_ensureStubSuperDeque(
+      HashMap<StubMethod, Deque<StubSuper>> superMap,
+      StubMethod method) {
+    Deque<StubSuper> deque = superMap.get(method);
+
+    if (deque == null) {
+      superMap.put(method, deque = new ArrayDeque<>());
+    }
+    
+    return deque;
   }
   
   default public void __moxy_asm_setThrowOrReturn(Invocation invocation,
@@ -58,10 +73,13 @@ public interface ASMMockSupport {
 
     
     if (isReturn) {
-      if (__moxy_asm_getThrowForInvocation(invocation) != null) {
-        throw new IllegalStateException("Cannot set both throw and return for " 
-                                      + invocation.getMethodName()
-                                      + invocation.getMethodDesc());
+      if (__moxy_asm_getThrowForInvocation(invocation) != null
+          || __moxy_asm_shouldCallSuperForInvocation(invocation)) {
+        throw new IllegalStateException("Cannot set return for '" 
+                                        + TypeStringUtils.javaMethodSignature(invocation)
+                                        + "' "
+                                        + TypeStringUtils.buildArgsString(invocation)
+                                        + "as it has already been stubbed to throw or call real method");
       } else {
         final HashMap<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_getReturnMap();
         final Deque<StubReturn> deque = __moxy_asm_ensureStubReturnDeque(
@@ -70,10 +88,13 @@ public interface ASMMockSupport {
         deque.addFirst(new StubReturn(invocation.getArgs(), object));
       }
     } else {
-      if (__moxy_asm_getReturnForInvocation(invocation) != null) {
-        throw new IllegalStateException("Cannot set both throw and return for " 
-                                      + invocation.getMethodName()
-                                      + invocation.getMethodDesc());
+      if (__moxy_asm_getReturnForInvocation(invocation) != null
+          || __moxy_asm_shouldCallSuperForInvocation(invocation)) {
+        throw new IllegalStateException("Cannot set throw for '" 
+                                        + TypeStringUtils.javaMethodSignature(invocation)
+                                        + "' "
+                                        + TypeStringUtils.buildArgsString(invocation)
+                                        + "as it has already been stubbed to return or call real method");
       } else {
         final HashMap<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_getThrowMap();      
         final Deque<StubThrow> deque = __moxy_asm_ensureStubThrowDeque(
@@ -87,6 +108,24 @@ public interface ASMMockSupport {
         }
       }
     }    
+  }
+  
+  public default void __moxy_asm_setShouldCallSuper(Invocation invocation,
+                                                    boolean callSuper) {
+    if (__moxy_asm_getThrowForInvocation(invocation) != null
+        || __moxy_asm_getReturnForInvocation(invocation) != null) {
+      throw new IllegalStateException("Cannot call real method for '" 
+                                    + TypeStringUtils.javaMethodSignature(invocation)
+                                    + "' "
+                                    + TypeStringUtils.buildArgsString(invocation)
+                                    + "as it has already been stubbed");
+    } else {
+      final HashMap<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_getCallSuperMap();
+      final Deque<StubSuper> deque = __moxy_asm_ensureStubSuperDeque(
+          superMap, 
+          new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
+      deque.addFirst(new StubSuper(invocation.getArgs(), true));
+    }
   }
   
   default public Throwable __moxy_asm_getThrowForInvocation(Invocation invocation) {
@@ -125,6 +164,24 @@ public interface ASMMockSupport {
     return null;
   }
 
+  default public boolean __moxy_asm_shouldCallSuperForInvocation(Invocation invocation) {
+    final HashMap<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_getCallSuperMap();
+    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
+    final Deque<StubSuper> deque = superMap.get(
+        new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
+    
+    // Old-fashioned but a tad more efficient...
+    if (deque != null) {
+      for (StubSuper stubSuper : deque) {
+        if (matchEngine.argsMatch(invocation.getArgs(), stubSuper.args)) {
+          return stubSuper.callSuper;
+        }
+      }
+    }
+    
+    return false;
+  }
+  
   /* This MUST only ever be called from mocked methods AFTER the invocation has been
    * recorded. It relies on the fact that getLastInvocation will always be the current 
    * invocation just prior to throw or return.
@@ -140,6 +197,15 @@ public interface ASMMockSupport {
    */
   default public Object __moxy_asm_getReturnForCurrentInvocation() {
     return __moxy_asm_getReturnForInvocation(
+        __moxy_asm_getEngine().getRecorder().getLastInvocation());
+  }
+  
+  /* This MUST only ever be called from mocked methods AFTER the invocation has been
+   * recorded. It relies on the fact that getLastInvocation will always be the current 
+   * invocation just prior to throw or return.
+   */
+  public default boolean __moxy_asm_shouldCallSuperForCurrentInvocation() {
+    return __moxy_asm_shouldCallSuperForInvocation(
         __moxy_asm_getEngine().getRecorder().getLastInvocation());
   }
   

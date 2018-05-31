@@ -284,7 +284,7 @@ public class TestMoxy {
     
     assertThatThrownBy(() -> Moxy.when(() -> mock.returnHello()).thenThrow(theException).thenReturn("hello"))
         .isInstanceOf(IllegalStateException.class)
-        .hasMessage("Cannot set both throw and return for returnHello()Ljava/lang/String;");
+        .hasMessage("Cannot set return for 'java.lang.String returnHello()' as it has already been stubbed to throw or call real method");
     
     assertThatThrownBy(() -> mock.returnHello())
         .isSameAs(theException);
@@ -298,7 +298,7 @@ public class TestMoxy {
     
     assertThatThrownBy(() -> Moxy.when(() -> mock.returnHello()).thenReturn("hello").thenThrow(theException))
         .isInstanceOf(IllegalStateException.class)
-        .hasMessage("Cannot set both throw and return for returnHello()Ljava/lang/String;");
+        .hasMessage("Cannot set throw for 'java.lang.String returnHello()' as it has already been stubbed to return or call real method");
     
     assertThat(mock.returnHello())
         .isEqualTo("hello");
@@ -313,8 +313,8 @@ public class TestMoxy {
     
     assertThatThrownBy(() -> Moxy.when(() -> mock.returnHello()).thenReturn("hello"))
         .isInstanceOf(IllegalStateException.class)
-        .hasMessage("Cannot set both throw and return for returnHello()Ljava/lang/String;");
-    
+            .hasMessage("Cannot set return for 'java.lang.String returnHello()' as it has already been stubbed to throw or call real method");
+
     assertThatThrownBy(() -> mock.returnHello())
         .isSameAs(theException);
   }
@@ -714,7 +714,7 @@ public class TestMoxy {
     
     // Ensure we've only got the support fields, and haven't copied any...
     assertThat(mock.getClass().getDeclaredFields())
-        .hasSize(3)
+        .hasSize(4)
         .doesNotContainAnyElementsOf(
             Lists.newArrayList(
                 FieldsClass.class.getDeclaredField("intField"),
@@ -740,5 +740,15 @@ public class TestMoxy {
     )
         .isInstanceOf(MockGenerationException.class)
         .hasMessage("Mocking of final classes is not yet supported");
+  }
+  
+  @Test
+  public void testMoxyMockThenCallRealMethod() {
+    MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class, System.out);
+    
+    Moxy.when(() -> mock.sayHelloTo("Bill")).thenCallRealMethod();
+    
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hello, Bill");
+    assertThat(mock.sayHelloTo("Steve")).isEqualTo(null);
   }
 }

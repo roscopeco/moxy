@@ -16,4 +16,9 @@ class ASMMoxyVoidStubber extends HasEngineAndInvocation implements MoxyVoidStubb
         
     return this;
   }
+  
+  @Override
+  public MoxyVoidStubber thenCallRealMethod() {
+    return this;
+  }
 }

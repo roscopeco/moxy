@@ -26,4 +26,14 @@ class ASMMoxyStubber<T> extends HasEngineAndInvocation implements MoxyStubber<T>
         
     return this;
   }
+
+  @Override
+  public MoxyStubber<T> thenCallRealMethod() {
+    final Invocation invocation = this.theInvocation;
+    ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
+    
+    receiver.__moxy_asm_setShouldCallSuper(invocation, true);    
+
+    return this;
+  }
 }

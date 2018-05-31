@@ -1,10 +1,8 @@
 package com.roscopeco.moxy.impl.asm;
 
-import java.util.Arrays;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.objectweb.asm.Type;
 import org.opentest4j.AssertionFailedError;
 
 import com.roscopeco.moxy.api.MoxyVerifier;
@@ -12,40 +10,6 @@ import com.roscopeco.moxy.api.MoxyVerifier;
 class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
   public ASMMoxyVerifier(ASMMoxyEngine engine) {
     super(engine);
-  }
-  
-  private String inspectArg(Object arg) {
-    if (arg == null) {
-      return null;
-    } else if (arg instanceof String) {
-      return "\"" + arg + "\"";
-    } else if (arg instanceof Character) {
-      return "'" + arg + "'";
-    } else {
-      return arg.toString();
-    }
-  }
-  
-  private String buildArgsString(Invocation invocation) {
-    String args = invocation.getArgs().stream()
-        .map(this::inspectArg)
-        .collect(Collectors.joining(", "));
-    
-    if (args.isEmpty()) {
-      return args;
-    } else {
-      return "with arguments (" + args + ") ";      
-    }
-  }
-  
-  private String ellipsisDesc(String descriptor) {    
-    if (descriptor.contains("()")) {
-      return "()";
-    } else {
-      return "(" + Arrays.stream(Type.getArgumentTypes(descriptor))
-          .map(Type::getClassName)
-          .collect(Collectors.joining(", ")) + ")";
-    }
   }
   
   private String readableTimes(int times) {
@@ -79,8 +43,8 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
       return this;
     } else {
       throw new AssertionFailedError(
-          "Expected mock " + methodName + ellipsisDesc(methodDesc) + " to be called " 
-              + buildArgsString(invocation) 
+          "Expected mock " + methodName + TypeStringUtils.ellipsisDesc(methodDesc) + " to be called " 
+              + TypeStringUtils.buildArgsString(invocation) 
               + "at least once but it wasn't called at all");
     }
   }
@@ -111,8 +75,8 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     } else {
       // TODO Stringbuilder...... on both of these (above).
       throw new AssertionFailedError(
-          "Expected mock " + methodName + ellipsisDesc(methodDesc) + " to be called " 
-              + buildArgsString(invocation) 
+          "Expected mock " + methodName + TypeStringUtils.ellipsisDesc(methodDesc) + " to be called " 
+              + TypeStringUtils.buildArgsString(invocation) 
               + "exactly " + readableTimes(times) + ", but it was called " 
               + readableTimes(actual));      
     }
@@ -145,8 +109,8 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     } else {
       // TODO Stringbuilder...... on both of these (above).
       throw new AssertionFailedError(
-          "Expected mock " + methodName + ellipsisDesc(methodDesc) + " to be called " 
-              + buildArgsString(invocation) 
+          "Expected mock " + methodName + TypeStringUtils.ellipsisDesc(methodDesc) + " to be called " 
+              + TypeStringUtils.buildArgsString(invocation) 
               + "at least " + readableTimes(times) + ", but it was called " 
               + readableTimes(actual));
     }
@@ -164,8 +128,8 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     } else {
       // TODO Stringbuilder...... on both of these (above).
       throw new AssertionFailedError(
-          "Expected mock " + methodName + ellipsisDesc(methodDesc) + " to be called " 
-              + buildArgsString(invocation) 
+          "Expected mock " + methodName + TypeStringUtils.ellipsisDesc(methodDesc) + " to be called " 
+              + TypeStringUtils.buildArgsString(invocation) 
               + "at most " + readableTimes(times) + ", but it was called " 
               + readableTimes(actual));
     }
@@ -203,8 +167,8 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     
     if (actual > 0) {
       throw new AssertionFailedError(
-          "Expected mock " + methodName + ellipsisDesc(methodDesc) + " "
-              + buildArgsString(invocation) 
+          "Expected mock " + methodName + TypeStringUtils.ellipsisDesc(methodDesc) + " "
+              + TypeStringUtils.buildArgsString(invocation) 
               + "never to throw exception class " + throwableClass.getName()
               + ", but it was thrown " + readableTimes(actual));
           
@@ -227,8 +191,8 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     
     if (actual > 0) {
       throw new AssertionFailedError(
-          "Expected mock " + methodName + ellipsisDesc(methodDesc) + " "
-              + buildArgsString(invocation) 
+          "Expected mock " + methodName + TypeStringUtils.ellipsisDesc(methodDesc) + " "
+              + TypeStringUtils.buildArgsString(invocation) 
               + "never to throw exception " + throwable
               + ", but it was thrown " + readableTimes(actual));
           
@@ -251,8 +215,8 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     
     if (actual > 0) {
       throw new AssertionFailedError(
-          "Expected mock " + methodName + ellipsisDesc(methodDesc) + " " 
-              + buildArgsString(invocation) 
+          "Expected mock " + methodName + TypeStringUtils.ellipsisDesc(methodDesc) + " " 
+              + TypeStringUtils.buildArgsString(invocation) 
               + "never to throw any exception, but exceptions were thrown " + readableTimes(actual));
     } else {
       return this;

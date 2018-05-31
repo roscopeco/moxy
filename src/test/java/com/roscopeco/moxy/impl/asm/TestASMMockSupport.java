@@ -23,7 +23,11 @@ public class TestASMMockSupport extends AbstractImplTest {
   public void setUp() {
     this.engine = new ASMMoxyEngine();
     this.mock = (ASMMockSupport)engine.mock(SimpleClass.class);
-    this.invoc = new Invocation(mock, "test", "()V", Arrays.asList("arg1", "arg2"));
+    this.invoc = new Invocation(mock,
+                                "test",
+                                "(Ljava/lang/String;Ljava/lang/String;)V",
+                                Arrays.asList("arg1", "arg2"));
+    
     this.recorder = engine.getRecorder();
     this.matcherEngine = engine.getASMMatcherEngine();
   }
@@ -62,6 +66,42 @@ public class TestASMMockSupport extends AbstractImplTest {
         this.mock.__moxy_asm_setThrowOrReturn(this.invoc, this.throwMarker, false)
     )
         .isInstanceOf(IllegalStateException.class)
-        .hasMessage("Cannot set both throw and return for test()V");
+        .hasMessage("Cannot set throw for 'void test(java.lang.String, java.lang.String)' with arguments (\"arg1\", \"arg2\") as it has already been stubbed to return or call real method");
+  }
+  
+  @Test
+  public void testSetThrowAndReturnFails() {
+    this.mock.__moxy_asm_setThrowOrReturn(this.invoc, this.throwMarker, false);
+    
+    assertThatThrownBy(() ->
+        this.mock.__moxy_asm_setThrowOrReturn(this.invoc, this.returnMarker, true)
+    )
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Cannot set return for 'void test(java.lang.String, java.lang.String)' with arguments (\"arg1\", \"arg2\") as it has already been stubbed to throw or call real method");
+  }
+  
+  @Test
+  public void testSetCallSuper() {
+    assertThat(this.mock.__moxy_asm_shouldCallSuperForInvocation(this.invoc)).isFalse();
+    
+    this.mock.__moxy_asm_setShouldCallSuper(this.invoc, true);
+    assertThat(this.mock.__moxy_asm_shouldCallSuperForInvocation(this.invoc)).isTrue();
+  }
+  
+  @Test
+  public void testSetReturnAndThrowFailFastIfSetCallSuper() {
+    this.mock.__moxy_asm_setShouldCallSuper(this.invoc, true);
+
+    assertThatThrownBy(() ->
+        this.mock.__moxy_asm_setThrowOrReturn(this.invoc, this.returnMarker, true)
+    )
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Cannot set return for 'void test(java.lang.String, java.lang.String)' with arguments (\"arg1\", \"arg2\") as it has already been stubbed to throw or call real method");
+    
+    assertThatThrownBy(() ->
+        this.mock.__moxy_asm_setThrowOrReturn(this.invoc, this.throwMarker, false)
+    )
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Cannot set throw for 'void test(java.lang.String, java.lang.String)' with arguments (\"arg1\", \"arg2\") as it has already been stubbed to return or call real method");
   }
 }

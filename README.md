@@ -173,6 +173,19 @@ you're testing (or to whoever else needs it really). If you've stubbed
 appropriately, the clients will never know they're not talking to the
 real deal and you can test with impunity.
 
+##### Spying
+
+Instead of stubbing, you can turn your mock into a spy by having it call 
+the real method, like so:
+
+```java
+when(() -> mock.connectDatabase("invalid")).thenCallRealMethod();
+```
+
+Obviously this only applies if your mock isn't based on an Interface and the 
+real method isn't `abstract`. If either of those conditions are true, you'll
+receive a helpful exception when the would-be spy is called.
+
 ##### Verifying
 
 So you passed in your mocks, and you appear to have gotten away with it -
@@ -431,9 +444,10 @@ MyClass mock = mockClass
 Those six extra lines might seem like a bit of a pain, but think of the 
 extra work as a reminder that partial mocking is a little bit dangerous.
 
-**Side note**
-> For true spying, those in the know will be yelling that they can't call
-the real method, which is true. But don't worry, it's on the TODO list.
+Often, the behaviour you'll achieve with partial mocking can also be 
+accomplished with the `MoxyStubber.thenCallRealMethod()` method,
+or you might find you need a combination of the two. In any event, 
+you can happily use them together as the need arises.
 
 ### How does it work?
 

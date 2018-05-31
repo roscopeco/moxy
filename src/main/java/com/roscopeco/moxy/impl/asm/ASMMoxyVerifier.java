@@ -189,6 +189,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
       .size();
   }
   
+  @Override
   public MoxyVerifier neverThrew(Class<? extends Throwable> throwableClass) {
     Invocation invocation = getTheInvocation();
     final String methodName = invocation.getMethodName();
@@ -212,6 +213,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     }
   }
   
+  @Override
   public MoxyVerifier neverThrew(Throwable throwable) {
     final Invocation invocation = getTheInvocation();
     final String methodName = invocation.getMethodName();
@@ -235,6 +237,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     }
   }
   
+  @Override
   public MoxyVerifier neverThrewAnyException() {
     Invocation invocation = getTheInvocation();
     final String methodName = invocation.getMethodName();

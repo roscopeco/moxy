@@ -22,8 +22,11 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   protected static final AtomicInteger mockNumber = new AtomicInteger();
   private static final List<Pattern> PROHIBITED_PACKAGES = Arrays.asList(
       Pattern.compile("java\\..*"),
+      Pattern.compile("javax\\..*"),
+      Pattern.compile("javafx\\..*"),
       Pattern.compile("sun\\..*"),
-      Pattern.compile("com\\.sun\\..*")
+      Pattern.compile("com\\.sun\\..*"),
+      Pattern.compile("oracle\\..*")      
     );
   
   /*

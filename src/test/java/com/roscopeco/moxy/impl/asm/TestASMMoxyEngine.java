@@ -489,9 +489,9 @@ class TestASMMoxyEngine extends AbstractImplTest {
       .extracting("name", "desc")
           .containsOnly(tuple("<init>",                  "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
                         tuple("__moxy_asm_getEngine",    "()Lcom/roscopeco/moxy/impl/asm/ASMMoxyEngine;"),
-                        tuple("__moxy_asm_getReturnMap", "()Ljava/util/HashMap;"),
-                        tuple("__moxy_asm_getThrowMap",  "()Ljava/util/HashMap;"),
-                        tuple("__moxy_asm_getCallSuperMap",  "()Ljava/util/HashMap;"),
+                        tuple("__moxy_asm_getReturnMap", "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_getThrowMap",  "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_getCallSuperMap",  "()Ljava/util/Map;"),
                         tuple("returnByte",              "()B"));    
   }
   
@@ -512,9 +512,9 @@ class TestASMMoxyEngine extends AbstractImplTest {
       .extracting("name", "desc")
           .containsOnly(tuple("<init>",                  "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
                         tuple("__moxy_asm_getEngine",    "()Lcom/roscopeco/moxy/impl/asm/ASMMoxyEngine;"),
-                        tuple("__moxy_asm_getReturnMap", "()Ljava/util/HashMap;"),
-                        tuple("__moxy_asm_getThrowMap",  "()Ljava/util/HashMap;"),
-                        tuple("__moxy_asm_getCallSuperMap",  "()Ljava/util/HashMap;"),
+                        tuple("__moxy_asm_getReturnMap", "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_getThrowMap",  "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_getCallSuperMap",  "()Ljava/util/Map;"),
                         tuple("returnByte",              "()B"),
                         tuple("returnChar",              "()C"),
                         tuple("returnShort",             "()S"),
@@ -543,8 +543,8 @@ class TestASMMoxyEngine extends AbstractImplTest {
       .extracting("name", "desc")
           .containsOnly(tuple("<init>",                  "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
                         tuple("__moxy_asm_getEngine",    "()Lcom/roscopeco/moxy/impl/asm/ASMMoxyEngine;"),
-                        tuple("__moxy_asm_getReturnMap", "()Ljava/util/HashMap;"),
-                        tuple("__moxy_asm_getThrowMap",  "()Ljava/util/HashMap;"),
-                        tuple("__moxy_asm_getCallSuperMap",  "()Ljava/util/HashMap;"));
+                        tuple("__moxy_asm_getReturnMap", "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_getThrowMap",  "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_getCallSuperMap",  "()Ljava/util/Map;"));
   }
 }

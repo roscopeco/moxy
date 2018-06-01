@@ -85,17 +85,17 @@ public class MoxyPassThroughConstructorVisitor extends MethodVisitor {
     this.delegate.visitTypeInsn(NEW, HASHMAP_INTERNAL_NAME);
     this.delegate.visitInsn(DUP);
     this.delegate.visitMethodInsn(INVOKESPECIAL, HASHMAP_INTERNAL_NAME, INIT_NAME, VOID_VOID_DESCRIPTOR, false);
-    this.delegate.visitFieldInsn(PUTFIELD, this.generatingClass, SUPPORT_RETURNMAP_FIELD_NAME, HASHMAP_DESCRIPTOR);
+    this.delegate.visitFieldInsn(PUTFIELD, this.generatingClass, SUPPORT_RETURNMAP_FIELD_NAME, MAP_DESCRIPTOR);
     
     this.delegate.visitTypeInsn(NEW, HASHMAP_INTERNAL_NAME);
     this.delegate.visitInsn(DUP);
     this.delegate.visitMethodInsn(INVOKESPECIAL, HASHMAP_INTERNAL_NAME, INIT_NAME, VOID_VOID_DESCRIPTOR, false);
-    this.delegate.visitFieldInsn(PUTFIELD, this.generatingClass, SUPPORT_THROWMAP_FIELD_NAME, HASHMAP_DESCRIPTOR);
+    this.delegate.visitFieldInsn(PUTFIELD, this.generatingClass, SUPPORT_THROWMAP_FIELD_NAME, MAP_DESCRIPTOR);
     
     this.delegate.visitTypeInsn(NEW, HASHMAP_INTERNAL_NAME);
     this.delegate.visitInsn(DUP);
     this.delegate.visitMethodInsn(INVOKESPECIAL, HASHMAP_INTERNAL_NAME, INIT_NAME, VOID_VOID_DESCRIPTOR, false);
-    this.delegate.visitFieldInsn(PUTFIELD, this.generatingClass, SUPPORT_SUPERMAP_FIELD_NAME, HASHMAP_DESCRIPTOR);
+    this.delegate.visitFieldInsn(PUTFIELD, this.generatingClass, SUPPORT_SUPERMAP_FIELD_NAME, MAP_DESCRIPTOR);
     
     this.delegate.visitInsn(RETURN);
   }

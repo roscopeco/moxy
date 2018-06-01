@@ -79,13 +79,13 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
     FieldVisitor fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_ENGINE_FIELD_NAME, MOXY_ASM_ENGINE_DESCRIPTOR, null, null);
     fv.visitEnd();
 
-    fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_RETURNMAP_FIELD_NAME, HASHMAP_DESCRIPTOR, null, null);
+    fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_RETURNMAP_FIELD_NAME, MAP_DESCRIPTOR, null, null);
     fv.visitEnd();
 
-    fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_THROWMAP_FIELD_NAME, HASHMAP_DESCRIPTOR, null, null);
+    fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_THROWMAP_FIELD_NAME, MAP_DESCRIPTOR, null, null);
     fv.visitEnd();
 
-    fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_SUPERMAP_FIELD_NAME, HASHMAP_DESCRIPTOR, null, null);
+    fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_SUPERMAP_FIELD_NAME, MAP_DESCRIPTOR, null, null);
     fv.visitEnd();
   }
   
@@ -98,17 +98,17 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
     this.generateSupportGetter(SUPPORT_GETRETURNMAP_METHOD_NAME,
                                SUPPORT_GETRETURNMAP_DESCRIPTOR,
                                SUPPORT_RETURNMAP_FIELD_NAME,
-                               HASHMAP_DESCRIPTOR);
+                               MAP_DESCRIPTOR);
     
     this.generateSupportGetter(SUPPORT_GETTHROWMAP_METHOD_NAME,
                                SUPPORT_GETTHROWMAP_DESCRIPTOR,
                                SUPPORT_THROWMAP_FIELD_NAME,
-                               HASHMAP_DESCRIPTOR);
+                               MAP_DESCRIPTOR);
     
     this.generateSupportGetter(SUPPORT_GETSUPERMAP_METHOD_NAME,
                                SUPPORT_GETSUPERMAP_DESCRIPTOR,
                                SUPPORT_SUPERMAP_FIELD_NAME,
-                               HASHMAP_DESCRIPTOR);
+                               MAP_DESCRIPTOR);
   }
   
   private void generateSupportGetter(String methodName,

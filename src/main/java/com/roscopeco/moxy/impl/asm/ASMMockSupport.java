@@ -3,6 +3,7 @@ package com.roscopeco.moxy.impl.asm;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * All mocks implement this interface. It (ab)uses default methods
@@ -20,11 +21,11 @@ public interface ASMMockSupport {
   
   // Using Deque here for efficient add-at-front, so when
   // we stream we see the most recent stubbing...
-  public HashMap<StubMethod, Deque<StubReturn>> __moxy_asm_getReturnMap();
-  public HashMap<StubMethod, Deque<StubThrow>> __moxy_asm_getThrowMap();
+  public Map<StubMethod, Deque<StubReturn>> __moxy_asm_getReturnMap();
+  public Map<StubMethod, Deque<StubThrow>> __moxy_asm_getThrowMap();
   
   // Present and true: call super; otherwise, use stubbing.
-  public HashMap<StubMethod, Deque<StubSuper>> __moxy_asm_getCallSuperMap(); 
+  public Map<StubMethod, Deque<StubSuper>> __moxy_asm_getCallSuperMap(); 
   
   /* Implemented by default */
   public default ThreadLocalInvocationRecorder __moxy_asm_getRecorder() {
@@ -32,39 +33,21 @@ public interface ASMMockSupport {
   }
   
   public default Deque<StubReturn>__moxy_asm_ensureStubReturnDeque(      
-      HashMap<StubMethod, Deque<StubReturn>> returnMap,
+      Map<StubMethod, Deque<StubReturn>> returnMap,
       StubMethod method) {
-    Deque<StubReturn> deque = returnMap.get(method);
-    
-    if (deque == null) {
-      returnMap.put(method, deque = new ArrayDeque<>());      
-    }
-    
-    return deque;
+    return returnMap.computeIfAbsent(method, k -> new ArrayDeque<>());
   }
   
   public default Deque<StubThrow>__moxy_asm_ensureStubThrowDeque(
-      HashMap<StubMethod, Deque<StubThrow>> throwMap,
+      Map<StubMethod, Deque<StubThrow>> throwMap,
       StubMethod method) {
-    Deque<StubThrow> deque = throwMap.get(method);
-
-    if (deque == null) {
-      throwMap.put(method, deque = new ArrayDeque<>());
-    }
-    
-    return deque;    
+    return throwMap.computeIfAbsent(method, k -> new ArrayDeque<>());
   }
   
   public default Deque<StubSuper>__moxy_asm_ensureStubSuperDeque(
-      HashMap<StubMethod, Deque<StubSuper>> superMap,
+      Map<StubMethod, Deque<StubSuper>> superMap,
       StubMethod method) {
-    Deque<StubSuper> deque = superMap.get(method);
-
-    if (deque == null) {
-      superMap.put(method, deque = new ArrayDeque<>());
-    }
-    
-    return deque;
+    return superMap.computeIfAbsent(method, k-> new ArrayDeque<>());
   }
   
   public default void __moxy_asm_setThrowOrReturn(Invocation invocation,
@@ -81,7 +64,7 @@ public interface ASMMockSupport {
                                         + TypeStringUtils.buildArgsString(invocation)
                                         + "as it has already been stubbed to throw or call real method");
       } else {
-        final HashMap<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_getReturnMap();
+        final Map<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_getReturnMap();
         final Deque<StubReturn> deque = __moxy_asm_ensureStubReturnDeque(
             returnMap, 
             new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
@@ -96,7 +79,7 @@ public interface ASMMockSupport {
                                         + TypeStringUtils.buildArgsString(invocation)
                                         + "as it has already been stubbed to return or call real method");
       } else {
-        final HashMap<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_getThrowMap();      
+        final Map<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_getThrowMap();      
         final Deque<StubThrow> deque = __moxy_asm_ensureStubThrowDeque(
             throwMap, 
             new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
@@ -120,7 +103,7 @@ public interface ASMMockSupport {
                                     + TypeStringUtils.buildArgsString(invocation)
                                     + "as it has already been stubbed");
     } else {
-      final HashMap<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_getCallSuperMap();
+      final Map<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_getCallSuperMap();
       final Deque<StubSuper> deque = __moxy_asm_ensureStubSuperDeque(
           superMap, 
           new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
@@ -129,7 +112,7 @@ public interface ASMMockSupport {
   }
   
   public default Throwable __moxy_asm_getThrowForInvocation(Invocation invocation) {
-    final HashMap<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_getThrowMap();
+    final Map<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_getThrowMap();
     final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
     final Deque<StubThrow> deque = throwMap.get(
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
@@ -147,7 +130,7 @@ public interface ASMMockSupport {
   }
 
   public default Object __moxy_asm_getReturnForInvocation(Invocation invocation) {
-    final HashMap<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_getReturnMap();
+    final Map<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_getReturnMap();
     final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
     final Deque<StubReturn> deque = returnMap.get(
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
@@ -165,7 +148,7 @@ public interface ASMMockSupport {
   }
 
   public default boolean __moxy_asm_shouldCallSuperForInvocation(Invocation invocation) {
-    final HashMap<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_getCallSuperMap();
+    final Map<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_getCallSuperMap();
     final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
     final Deque<StubSuper> deque = superMap.get(
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));

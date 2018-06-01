@@ -2,6 +2,7 @@ package com.roscopeco.moxy.impl.asm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.objectweb.asm.Type;
 
@@ -23,9 +24,11 @@ public final class TypesAndDescriptors {
   public static final String OBJECT_INTERNAL_NAME = Type.getInternalName(Object.class);
   public static final String OBJECT_DESCRIPTOR = "L" + OBJECT_INTERNAL_NAME + ";";
   public static final String ARRAYLIST_INTERNAL_NAME = Type.getInternalName(ArrayList.class);
-  public static final String HASHMAP_INTERNAL_NAME = Type.getInternalName(HashMap.class);
   public static final String THROWABLE_INTERNAL_NAME = Type.getInternalName(Throwable.class);
   public static final String THROWABLE_DESCRIPTOR = "L" + THROWABLE_INTERNAL_NAME +";";
+  public static final String MAP_INTERNAL_NAME = Type.getInternalName(Map.class);
+  public static final String MAP_DESCRIPTOR = "L" + MAP_INTERNAL_NAME + ";";
+  public static final String HASHMAP_INTERNAL_NAME = Type.getInternalName(HashMap.class);  
   public static final String HASHMAP_DESCRIPTOR = "L" + HASHMAP_INTERNAL_NAME + ";";
   public static final String STRING_INTERNAL_NAME = Type.getInternalName(String.class);
   public static final String STRING_DESCRIPTOR = "L" + STRING_INTERNAL_NAME + ";";
@@ -60,11 +63,11 @@ public final class TypesAndDescriptors {
   public static final String SUPPORT_GETENGINE_METHOD_NAME = "__moxy_asm_getEngine";
   public static final String SUPPORT_GETENGINE_DESCRIPTOR = "()" + MOXY_ASM_ENGINE_DESCRIPTOR;
   public static final String SUPPORT_GETRETURNMAP_METHOD_NAME = "__moxy_asm_getReturnMap";
-  public static final String SUPPORT_GETRETURNMAP_DESCRIPTOR = "()" + HASHMAP_DESCRIPTOR;
+  public static final String SUPPORT_GETRETURNMAP_DESCRIPTOR = "()" + MAP_DESCRIPTOR;
   public static final String SUPPORT_GETTHROWMAP_METHOD_NAME = "__moxy_asm_getThrowMap";
-  public static final String SUPPORT_GETTHROWMAP_DESCRIPTOR = "()" + HASHMAP_DESCRIPTOR;
+  public static final String SUPPORT_GETTHROWMAP_DESCRIPTOR = "()" + MAP_DESCRIPTOR;
   public static final String SUPPORT_GETSUPERMAP_METHOD_NAME = "__moxy_asm_getCallSuperMap";
-  public static final String SUPPORT_GETSUPERMAP_DESCRIPTOR = "()" + HASHMAP_DESCRIPTOR;  
+  public static final String SUPPORT_GETSUPERMAP_DESCRIPTOR = "()" + MAP_DESCRIPTOR;  
   public static final String SUPPORT_GETCURRENTTHROW_METHOD_NAME = "__moxy_asm_getThrowForCurrentInvocation";
   public static final String SUPPORT_GETCURRENTRETURN_METHOD_NAME = "__moxy_asm_getReturnForCurrentInvocation";
   public static final String SUPPORT_NULL_CONSTRUCTOR_THROWER_METHOD_NAME = "__moxy_asm_throwNullConstructorException";

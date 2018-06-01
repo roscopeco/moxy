@@ -19,6 +19,11 @@ class ASMMoxyVoidStubber extends HasEngineAndInvocation implements MoxyVoidStubb
   
   @Override
   public MoxyVoidStubber thenCallRealMethod() {
+    final Invocation invocation = this.theInvocation;
+    ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
+    
+    receiver.__moxy_asm_setShouldCallSuper(invocation, true);    
+
     return this;
   }
 }

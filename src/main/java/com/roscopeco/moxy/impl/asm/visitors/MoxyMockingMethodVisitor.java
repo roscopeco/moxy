@@ -94,32 +94,84 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
                                   MOXY_RECORDER_RECORD_METHOD_NAME,
                                   MOXY_RECORDER_RECORD_DESCRIPTOR,
                                   false);
+  }
     
-    // Get the value this method will return (unless it also has a throw) or null if none.
-    this.delegate.visitVarInsn(ALOAD, 0);
-    this.delegate.visitInsn(DUP);
-    this.delegate.visitInsn(DUP);
-    this.delegate.visitMethodInsn(INVOKEINTERFACE,
-                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
-                                  SUPPORT_GETCURRENTRETURN_METHOD_NAME,
-                                  OBJECT_VOID_DESCRIPTOR,
-                                  true);
-    
-    // Get the exception this method will throw (or null if none)
-    this.delegate.visitInsn(SWAP);    
-    this.delegate.visitMethodInsn(INVOKEINTERFACE,
-                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
-                                  SUPPORT_GETCURRENTTHROW_METHOD_NAME,
-                                  THROWABLE_VOID_DESCRIPTOR,
-                                  true);    
-
-    // Update the current invocation's returned and thrown fields.
-    this.delegate.visitMethodInsn(INVOKEINTERFACE,
-                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
-                                  SUPPORT_UPDATECURRENTRETURNED_METHOD_NAME,
-                                  VOID_OBJECT_THROWABLE_DESCRIPTOR,
-                                  true);
-    
+  /*
+   * Generate autoboxing if required (type is not L, V or [).
+   * If type is non-prim, generates nothing.
+   */
+  void generateAutobox(char primType) {
+    switch (primType) {
+    case BYTE_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitMethodInsn(INVOKESTATIC, 
+                                    BYTE_CLASS_INTERNAL_NAME, 
+                                    VALUEOF_METHOD_NAME, 
+                                    BYTE_VALUEOF_DESCRIPTOR,
+                                    false);
+      break;
+    case CHAR_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitMethodInsn(INVOKESTATIC, 
+                                    CHAR_CLASS_INTERNAL_NAME, 
+                                    VALUEOF_METHOD_NAME, 
+                                    CHAR_VALUEOF_DESCRIPTOR,
+                                    false);
+      break;
+    case SHORT_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitMethodInsn(INVOKESTATIC, 
+                                    SHORT_CLASS_INTERNAL_NAME, 
+                                    VALUEOF_METHOD_NAME, 
+                                    SHORT_VALUEOF_DESCRIPTOR,
+                                    false);
+      break;
+    case INT_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitMethodInsn(INVOKESTATIC, 
+                                    INT_CLASS_INTERNAL_NAME, 
+                                    VALUEOF_METHOD_NAME, 
+                                    INT_VALUEOF_DESCRIPTOR,
+                                    false);
+      break;
+    case BOOL_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitMethodInsn(INVOKESTATIC, 
+                                    BOOL_CLASS_INTERNAL_NAME, 
+                                    VALUEOF_METHOD_NAME, 
+                                    BOOL_VALUEOF_DESCRIPTOR,
+                                    false);
+      break;
+    case LONG_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitMethodInsn(INVOKESTATIC, 
+                                    LONG_CLASS_INTERNAL_NAME, 
+                                    VALUEOF_METHOD_NAME, 
+                                    LONG_VALUEOF_DESCRIPTOR,
+                                    false);
+      break;
+    case FLOAT_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitMethodInsn(INVOKESTATIC, 
+                                    FLOAT_CLASS_INTERNAL_NAME, 
+                                    VALUEOF_METHOD_NAME, 
+                                    FLOAT_VALUEOF_DESCRIPTOR,
+                                    false);
+      break;
+    case DOUBLE_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitMethodInsn(INVOKESTATIC, 
+                                    DOUBLE_CLASS_INTERNAL_NAME, 
+                                    VALUEOF_METHOD_NAME, 
+                                    DOUBLE_VALUEOF_DESCRIPTOR,
+                                    false);
+      break;
+    case ARRAY_PRIMITIVE_INTERNAL_NAME:
+    case OBJECT_PRIMITIVE_INTERNAL_NAME:
+    case VOID_PRIMITIVE_INTERNAL_NAME:
+      /* do nothing */
+      break;
+    default:
+      throw new IllegalArgumentException("Unrecognised JVM primitive type: '" + primType + "'.\n"
+          + "Your JVM must be super-new and improved.\n"
+          + "To fix, add mysterious new type to switch in MoxyMockingMethodVisitor#generateLoadAndAutoboxing()");
+    }
+  }
+  
+  void generateAutobox(Type type) {
+    generateAutobox(type.getDescriptor().charAt(0));
   }
   
   /* Little bit of weirdness going on here!
@@ -131,17 +183,17 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
    * The caller should add the result to any iterator variable or whatever
    * they're using to keep track of locals.
    */
-  // TODO this could probably be DRYed...
-  
   /*
-   * Always autobox
+   * Load from slot; Always autobox.
+   * Returns number of slots taken by the loaded type.
    */
   int generateLoadAndAutoboxing(int argNum, int currentLocalSlot) {
     return generateLoadOptionalAutoboxing(argNum, currentLocalSlot, true);
   }
   
   /*
-   * Optionally autobox
+   * Load from slot; Optionally autobox
+   * Returns number of slots taken by the loaded type.
    */
   int generateLoadOptionalAutoboxing(int argNum, int currentLocalSlot, boolean autoBoxRequired) {
     char argType = this.argTypes[argNum].toString().charAt(0);
@@ -150,83 +202,51 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     case BYTE_PRIMITIVE_INTERNAL_NAME:
       this.delegate.visitVarInsn(ILOAD, currentLocalSlot);
       if (autoBoxRequired) {
-        this.delegate.visitMethodInsn(INVOKESTATIC, 
-                                      BYTE_CLASS_INTERNAL_NAME, 
-                                      VALUEOF_METHOD_NAME, 
-                                      BYTE_VALUEOF_DESCRIPTOR,
-                                      false);
+        generateAutobox(argType);
       }
       break;
     case CHAR_PRIMITIVE_INTERNAL_NAME:
       this.delegate.visitVarInsn(ILOAD, currentLocalSlot);
       if (autoBoxRequired) {
-        this.delegate.visitMethodInsn(INVOKESTATIC, 
-                                      CHAR_CLASS_INTERNAL_NAME, 
-                                      VALUEOF_METHOD_NAME, 
-                                      CHAR_VALUEOF_DESCRIPTOR,
-                                      false);
+        generateAutobox(argType);
       }
       break;
     case SHORT_PRIMITIVE_INTERNAL_NAME:
       this.delegate.visitVarInsn(ILOAD, currentLocalSlot);
       if (autoBoxRequired) {
-        this.delegate.visitMethodInsn(INVOKESTATIC, 
-                                      SHORT_CLASS_INTERNAL_NAME, 
-                                      VALUEOF_METHOD_NAME, 
-                                      SHORT_VALUEOF_DESCRIPTOR,
-                                      false);
+        generateAutobox(argType);
       }
       break;
     case INT_PRIMITIVE_INTERNAL_NAME:
       this.delegate.visitVarInsn(ILOAD, currentLocalSlot);
       if (autoBoxRequired) {
-        this.delegate.visitMethodInsn(INVOKESTATIC, 
-                                      INT_CLASS_INTERNAL_NAME, 
-                                      VALUEOF_METHOD_NAME, 
-                                      INT_VALUEOF_DESCRIPTOR,
-                                      false);
+        generateAutobox(argType);
       }
       break;
     case BOOL_PRIMITIVE_INTERNAL_NAME:
       this.delegate.visitVarInsn(ILOAD, currentLocalSlot);
       if (autoBoxRequired) {
-        this.delegate.visitMethodInsn(INVOKESTATIC, 
-                                      BOOL_CLASS_INTERNAL_NAME, 
-                                      VALUEOF_METHOD_NAME, 
-                                      BOOL_VALUEOF_DESCRIPTOR,
-                                      false);
+        generateAutobox(argType);
       }
       break;
     case LONG_PRIMITIVE_INTERNAL_NAME:
       localSlots = 2;
       this.delegate.visitVarInsn(LLOAD, currentLocalSlot);
       if (autoBoxRequired) {
-        this.delegate.visitMethodInsn(INVOKESTATIC, 
-                                      LONG_CLASS_INTERNAL_NAME, 
-                                      VALUEOF_METHOD_NAME, 
-                                      LONG_VALUEOF_DESCRIPTOR,
-                                      false);
+        generateAutobox(argType);
       }
       break;
     case FLOAT_PRIMITIVE_INTERNAL_NAME:
       this.delegate.visitVarInsn(FLOAD, currentLocalSlot);
       if (autoBoxRequired) {
-        this.delegate.visitMethodInsn(INVOKESTATIC, 
-                                      FLOAT_CLASS_INTERNAL_NAME, 
-                                      VALUEOF_METHOD_NAME, 
-                                      FLOAT_VALUEOF_DESCRIPTOR,
-                                      false);
+        generateAutobox(argType);
       }
       break;
     case DOUBLE_PRIMITIVE_INTERNAL_NAME:
       localSlots = 2;
       this.delegate.visitVarInsn(DLOAD, currentLocalSlot);
       if (autoBoxRequired) {
-        this.delegate.visitMethodInsn(INVOKESTATIC, 
-                                      DOUBLE_CLASS_INTERNAL_NAME, 
-                                      VALUEOF_METHOD_NAME, 
-                                      DOUBLE_VALUEOF_DESCRIPTOR,
-                                      false);
+        generateAutobox(argType);
       }
       break;
     case ARRAY_PRIMITIVE_INTERNAL_NAME:
@@ -241,7 +261,36 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     return localSlots;
   }
   
-  // TODO this could probably be DRYed
+  boolean isVoidMethod() {
+    return (this.returnType.getDescriptor().charAt(0) == 'V');
+  }
+  
+  void generateTypeAppropriateDup(Type type) {
+    char primType = type.getDescriptor().charAt(0);
+    if (primType == 'J' || primType == 'D') {
+      this.delegate.visitInsn(DUP2);
+    } else {
+      this.delegate.visitInsn(DUP);
+    }    
+  }
+  
+  /*
+   * JVM has no SWAP2, so this emulates a swap if necessary
+   * where the second from top value is a cat2. 
+   * 
+   * NOTE the top MUST be a cat1 or this will go awry...
+   */
+  void generateTypeAppropriateSwap(Type secondFromTopType) {
+    char primType = secondFromTopType.getDescriptor().charAt(0);
+    if (primType == 'J' || primType == 'D') {
+      this.delegate.visitInsn(DUP_X2);
+      this.delegate.visitInsn(POP);      
+    } else {
+      this.delegate.visitInsn(SWAP);
+    }    
+  }
+
+  // NOTE this isn't super-efficient, but it's easier to grok this way...
   void generateReturn() {
     final Label loadStubReturnLabel = new Label();
     final Label returnLabel = new Label();
@@ -269,12 +318,54 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
         currentLocalSlot += this.generateLoadOptionalAutoboxing(i, currentLocalSlot, false);
       }
       
+      // Labels for try/catch
+      Label superTryStart = new Label(), superTryEnd = new Label(), superTryHandler = new Label();
+      
+      this.delegate.visitTryCatchBlock(superTryStart, superTryEnd, superTryHandler, THROWABLE_INTERNAL_NAME);
+      
+      // try {
+      this.delegate.visitLabel(superTryStart);
+      
       // call super
       this.delegate.visitMethodInsn(INVOKESPECIAL,
                                     this.originalClass,
                                     this.methodName,
                                     this.methodDescriptor, false);
-      this.delegate.visitJumpInsn(GOTO, returnLabel);      
+      
+      if (!this.isVoidMethod()) {
+        // Update the current invocation's return field to reflect the result
+        generateTypeAppropriateDup(this.returnType);
+        this.delegate.visitVarInsn(ALOAD, 0);
+        generateTypeAppropriateSwap(this.returnType);
+        generateAutobox(this.returnType);
+        this.delegate.visitInsn(ACONST_NULL);
+        this.delegate.visitMethodInsn(INVOKEINTERFACE,
+                                      MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
+                                      SUPPORT_UPDATECURRENTRETURNED_METHOD_NAME,
+                                      VOID_OBJECT_THROWABLE_DESCRIPTOR,
+                                      true);
+      }
+      
+      this.delegate.visitLabel(superTryEnd);
+      this.delegate.visitJumpInsn(GOTO, returnLabel);
+      
+      // catch (...) {    : exception is now on top of stack.
+      this.delegate.visitLabel(superTryHandler);
+      this.delegate.visitInsn(DUP);             // dup for later rethrow
+
+      // Update the current invocation's thrown field to reflect the exception
+      this.delegate.visitVarInsn(ALOAD, 0);     
+      this.delegate.visitInsn(SWAP);
+      this.delegate.visitInsn(ACONST_NULL);
+      this.delegate.visitInsn(SWAP);
+
+      this.delegate.visitMethodInsn(INVOKEINTERFACE,
+                                    MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
+                                    SUPPORT_UPDATECURRENTRETURNED_METHOD_NAME,
+                                    VOID_OBJECT_THROWABLE_DESCRIPTOR,
+                                    true);
+      
+      this.delegate.visitInsn(ATHROW);      
     } else {
       // Throw InvalidStubbing (can't call super to abstract)
       this.delegate.visitTypeInsn(NEW, INVALID_STUBBING_INTERNAL_NAME);
@@ -288,10 +379,37 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
       this.delegate.visitInsn(ATHROW);      
     }
     
-    // No super call, so continue.
+    // Not calling super, so go with stubbing.
+    //
+    // Firstly, we'll record the exception we are stubbed to throw, if any
     this.delegate.visitLabel(noCallSuperLabel);
 
-    // Not calling super, so go with stubbing. always do exception first. 
+    // Get the value this method will return (unless it also has a throw) or null if none.
+    this.delegate.visitVarInsn(ALOAD, 0);
+    this.delegate.visitInsn(DUP);
+    this.delegate.visitInsn(DUP);
+    this.delegate.visitMethodInsn(INVOKEINTERFACE,
+                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
+                                  SUPPORT_GETCURRENTRETURN_METHOD_NAME,
+                                  OBJECT_VOID_DESCRIPTOR,
+                                  true);
+    
+    // Get the exception this method will throw (or null if none)
+    this.delegate.visitInsn(SWAP);    
+    this.delegate.visitMethodInsn(INVOKEINTERFACE,
+                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
+                                  SUPPORT_GETCURRENTTHROW_METHOD_NAME,
+                                  THROWABLE_VOID_DESCRIPTOR,
+                                  true);    
+
+    // Update the current invocation's returned and thrown fields.
+    this.delegate.visitMethodInsn(INVOKEINTERFACE,
+                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
+                                  SUPPORT_UPDATECURRENTRETURNED_METHOD_NAME,
+                                  VOID_OBJECT_THROWABLE_DESCRIPTOR,
+                                  true);
+
+    // Always do exception first. 
     // Should never have both anyway, this is/ enforced in ASMMoxyMockSupport
     // when the fields are set.
     this.delegate.visitVarInsn(ALOAD, 0);

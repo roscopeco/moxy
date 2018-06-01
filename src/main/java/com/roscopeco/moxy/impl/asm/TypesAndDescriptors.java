@@ -24,7 +24,8 @@ public final class TypesAndDescriptors {
   public static final String OBJECT_DESCRIPTOR = "L" + OBJECT_INTERNAL_NAME + ";";
   public static final String ARRAYLIST_INTERNAL_NAME = Type.getInternalName(ArrayList.class);
   public static final String HASHMAP_INTERNAL_NAME = Type.getInternalName(HashMap.class);
-  public static final String THROWABLE_DESCRIPTOR = "L" + Type.getInternalName(Throwable.class) +";";
+  public static final String THROWABLE_INTERNAL_NAME = Type.getInternalName(Throwable.class);
+  public static final String THROWABLE_DESCRIPTOR = "L" + THROWABLE_INTERNAL_NAME +";";
   public static final String HASHMAP_DESCRIPTOR = "L" + HASHMAP_INTERNAL_NAME + ";";
   public static final String STRING_INTERNAL_NAME = Type.getInternalName(String.class);
   public static final String STRING_DESCRIPTOR = "L" + STRING_INTERNAL_NAME + ";";

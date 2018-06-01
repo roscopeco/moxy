@@ -10,7 +10,6 @@ public class MethodWithPrimitiveArguments {
                      float arg7,
                      double arg8,
                      boolean arg9) {
-    // do nothing
-    return 0;
+    return 42;
   }
 }

@@ -27,11 +27,11 @@ public interface ASMMockSupport {
   public HashMap<StubMethod, Deque<StubSuper>> __moxy_asm_getCallSuperMap(); 
   
   /* Implemented by default */
-  default public ThreadLocalInvocationRecorder __moxy_asm_getRecorder() {
+  public default ThreadLocalInvocationRecorder __moxy_asm_getRecorder() {
     return __moxy_asm_getEngine().getRecorder();    
   }
   
-  default public Deque<StubReturn>__moxy_asm_ensureStubReturnDeque(      
+  public default Deque<StubReturn>__moxy_asm_ensureStubReturnDeque(      
       HashMap<StubMethod, Deque<StubReturn>> returnMap,
       StubMethod method) {
     Deque<StubReturn> deque = returnMap.get(method);
@@ -43,7 +43,7 @@ public interface ASMMockSupport {
     return deque;
   }
   
-  default public Deque<StubThrow>__moxy_asm_ensureStubThrowDeque(
+  public default Deque<StubThrow>__moxy_asm_ensureStubThrowDeque(
       HashMap<StubMethod, Deque<StubThrow>> throwMap,
       StubMethod method) {
     Deque<StubThrow> deque = throwMap.get(method);
@@ -55,7 +55,7 @@ public interface ASMMockSupport {
     return deque;    
   }
   
-  default public Deque<StubSuper>__moxy_asm_ensureStubSuperDeque(
+  public default Deque<StubSuper>__moxy_asm_ensureStubSuperDeque(
       HashMap<StubMethod, Deque<StubSuper>> superMap,
       StubMethod method) {
     Deque<StubSuper> deque = superMap.get(method);
@@ -67,7 +67,7 @@ public interface ASMMockSupport {
     return deque;
   }
   
-  default public void __moxy_asm_setThrowOrReturn(Invocation invocation,
+  public default void __moxy_asm_setThrowOrReturn(Invocation invocation,
                                                   Object object,
                                                   boolean isReturn) {    
 
@@ -128,7 +128,7 @@ public interface ASMMockSupport {
     }
   }
   
-  default public Throwable __moxy_asm_getThrowForInvocation(Invocation invocation) {
+  public default Throwable __moxy_asm_getThrowForInvocation(Invocation invocation) {
     final HashMap<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_getThrowMap();
     final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
     final Deque<StubThrow> deque = throwMap.get(
@@ -146,7 +146,7 @@ public interface ASMMockSupport {
     return null;
   }
 
-  default public Object __moxy_asm_getReturnForInvocation(Invocation invocation) {
+  public default Object __moxy_asm_getReturnForInvocation(Invocation invocation) {
     final HashMap<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_getReturnMap();
     final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
     final Deque<StubReturn> deque = returnMap.get(
@@ -164,7 +164,7 @@ public interface ASMMockSupport {
     return null;
   }
 
-  default public boolean __moxy_asm_shouldCallSuperForInvocation(Invocation invocation) {
+  public default boolean __moxy_asm_shouldCallSuperForInvocation(Invocation invocation) {
     final HashMap<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_getCallSuperMap();
     final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
     final Deque<StubSuper> deque = superMap.get(
@@ -186,7 +186,7 @@ public interface ASMMockSupport {
    * recorded. It relies on the fact that getLastInvocation will always be the current 
    * invocation just prior to throw or return.
    */
-  default public Throwable __moxy_asm_getThrowForCurrentInvocation() {
+  public default Throwable __moxy_asm_getThrowForCurrentInvocation() {
     return __moxy_asm_getThrowForInvocation(
         __moxy_asm_getEngine().getRecorder().getLastInvocation());    
   }
@@ -195,7 +195,7 @@ public interface ASMMockSupport {
    * recorded. It relies on the fact that getLastInvocation will always be the current 
    * invocation just prior to throw or return.
    */
-  default public Object __moxy_asm_getReturnForCurrentInvocation() {
+  public default Object __moxy_asm_getReturnForCurrentInvocation() {
     return __moxy_asm_getReturnForInvocation(
         __moxy_asm_getEngine().getRecorder().getLastInvocation());
   }
@@ -213,7 +213,7 @@ public interface ASMMockSupport {
    * recorded. It relies on the fact that getLastInvocation will always be the current 
    * invocation just prior to throw or return.
    */
-  default public void __moxy_asm_updateCurrentInvocationReturnThrow(Object returned, Throwable threw) {
+  public default void __moxy_asm_updateCurrentInvocationReturnThrow(Object returned, Throwable threw) {
     final Invocation invocation = __moxy_asm_getEngine().getRecorder().getLastInvocation();
     invocation.setReturned(returned);
     invocation.setThrew(threw);

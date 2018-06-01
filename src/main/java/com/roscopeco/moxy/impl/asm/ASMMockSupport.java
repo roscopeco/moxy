@@ -2,7 +2,6 @@ package com.roscopeco.moxy.impl.asm;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.Map;
 
 /**

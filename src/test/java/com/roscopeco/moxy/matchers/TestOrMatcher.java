@@ -1,3 +1,26 @@
+/*
+ * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
+ *
+ * Copyright 2018 Ross Bamford
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ *   The above copyright notice and this permission notice shall be included
+ *   in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package com.roscopeco.moxy.matchers;
 
 import static com.roscopeco.moxy.Moxy.*;
@@ -14,7 +37,7 @@ import com.roscopeco.moxy.model.MethodWithArguments;
 public class TestOrMatcher {
   @Test
   public void testMoxyMockVerifyWithOrByteMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testByte((byte) 0);
     mock.testByte((byte) 63);
@@ -27,8 +50,8 @@ public class TestOrMatcher {
 
   @Test
   public void testMoxyMockWhenWithOrByteMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
-    
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
+
     when(() -> mock.testByte(orByte(eqByte((byte)8), eqByte(Byte.MAX_VALUE)))).thenReturn(PASSED);
 
     assertThat(mock.testByte((byte) 0)).isEqualTo(null);
@@ -40,7 +63,7 @@ public class TestOrMatcher {
 
   @Test
   public void testMoxyMockVerifyWithOrCharMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testChar('a');
     mock.testChar('b');
@@ -51,7 +74,7 @@ public class TestOrMatcher {
 
   @Test
   public void testMoxyMockWhenWithOrCharMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testChar(orChar(eqChar('c'), eqChar('f')))).thenReturn(PASSED);
 
@@ -75,7 +98,7 @@ public class TestOrMatcher {
 
   @Test
   public void testMoxyMockVerifyWithOrShortMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testShort((short) 0);
     mock.testShort((short) 1);
@@ -87,7 +110,7 @@ public class TestOrMatcher {
 
   @Test
   public void testMoxyMockWhenWithOrShortMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testShort(orShort(eqShort((short)128), eqShort((short)256)))).thenReturn(PASSED);
 
@@ -100,7 +123,7 @@ public class TestOrMatcher {
 
   @Test
   public void testMoxyMockVerifyWithOrIntMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testInt(0);
     mock.testInt(1);
@@ -113,7 +136,7 @@ public class TestOrMatcher {
 
   @Test
   public void testMoxyMockWhenWithOrIntMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testInt(orInt(eqInt(256), eqInt(Integer.MAX_VALUE - 1)))).thenReturn(PASSED);
 
@@ -126,7 +149,7 @@ public class TestOrMatcher {
 
   @Test
   public void testMoxyMockVerifyWithOrLongMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testLong(0);
     mock.testLong(1);
@@ -139,7 +162,7 @@ public class TestOrMatcher {
 
   @Test
   public void testMoxyMockWhenWithOrLongMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testLong(orLong(eqLong(11), eqLong(256), eqLong(999)))).thenReturn(PASSED);
 
@@ -155,7 +178,7 @@ public class TestOrMatcher {
 
   @Test
   public void testMoxyMockVerifyWithOrFloatMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testFloat(0.0f);
     mock.testFloat(1.4f);
@@ -166,7 +189,7 @@ public class TestOrMatcher {
 
   @Test
   public void testMoxyMockWhenWithOrFloatMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testFloat(orFloat(eqFloat(256.7f), eqFloat(Float.MAX_VALUE)))).thenReturn(PASSED);
 
@@ -179,7 +202,7 @@ public class TestOrMatcher {
 
   @Test
   public void testMoxyMockVerifyWithOrDoubleMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testDouble(0.0d);
     mock.testDouble(1.4d);
@@ -190,7 +213,7 @@ public class TestOrMatcher {
 
   @Test
   public void testMoxyMockWhenWithOrDoubleMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testDouble(orDouble(eqDouble(6.0d), eqDouble(9.0d)))).thenReturn(PASSED);
 
@@ -200,12 +223,12 @@ public class TestOrMatcher {
     assertThat(mock.testDouble(Double.MIN_VALUE)).isEqualTo(null);
     assertThat(mock.testDouble(Double.MAX_VALUE)).isEqualTo(null);
   }
-  
+
   // TODO test Bool match when we've got matchers that make sense to OR for bools.
 
   @Test
   public void testMoxyMockVerifyWithOrObjectMatcherWorks() {
-    MethodWithArguments mock = mock(MethodWithArguments.class);
+    final MethodWithArguments mock = mock(MethodWithArguments.class);
 
     mock.hasArgs("AAAA", "DDDD");
     mock.hasArgs("BBBB", "DDDD");
@@ -217,7 +240,7 @@ public class TestOrMatcher {
 
   @Test
   public void testMoxyMockWhenWithOrObjectMatcherWorks() {
-    MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
+    final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
 
     when(() -> mock.sayHelloTo(or(eq("BBBB"), eq("CCCC")))).thenReturn(PASSED);
 

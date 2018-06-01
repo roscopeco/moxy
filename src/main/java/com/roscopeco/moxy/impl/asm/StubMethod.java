@@ -1,3 +1,26 @@
+/*
+ * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
+ *
+ * Copyright 2018 Ross Bamford
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ *   The above copyright notice and this permission notice shall be included
+ *   in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package com.roscopeco.moxy.impl.asm;
 
 /*
@@ -7,39 +30,39 @@ package com.roscopeco.moxy.impl.asm;
 class StubMethod {
   final String methodName;
   final String methodDesc;
-  
+
   public StubMethod(final String methodName, final String methodDesc) {
     super();
     this.methodName = methodName;
     this.methodDesc = methodDesc;
   }
-  
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((methodDesc == null) ? 0 : methodDesc.hashCode());
-    result = prime * result + ((methodName == null) ? 0 : methodName.hashCode());
+    result = prime * result + ((this.methodDesc == null) ? 0 : this.methodDesc.hashCode());
+    result = prime * result + ((this.methodName == null) ? 0 : this.methodName.hashCode());
     return result;
   }
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (this == obj)
       return true;
     if (obj == null)
       return false;
-    if (getClass() != obj.getClass())
+    if (this.getClass() != obj.getClass())
       return false;
-    StubMethod other = (StubMethod) obj;
-    if (methodDesc == null) {
+    final StubMethod other = (StubMethod) obj;
+    if (this.methodDesc == null) {
       if (other.methodDesc != null)
         return false;
-    } else if (!methodDesc.equals(other.methodDesc))
+    } else if (!this.methodDesc.equals(other.methodDesc))
       return false;
-    if (methodName == null) {
+    if (this.methodName == null) {
       if (other.methodName != null)
         return false;
-    } else if (!methodName.equals(other.methodName))
+    } else if (!this.methodName.equals(other.methodName))
       return false;
     return true;
   }

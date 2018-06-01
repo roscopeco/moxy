@@ -1,3 +1,26 @@
+/*
+ * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
+ *
+ * Copyright 2018 Ross Bamford
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ *   The above copyright notice and this permission notice shall be included
+ *   in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package com.roscopeco.moxy.matchers;
 
 import static com.roscopeco.moxy.Moxy.*;
@@ -14,7 +37,7 @@ import com.roscopeco.moxy.model.MethodWithArguments;
 public class TestEqualsMatcher {
   @Test
   public void testMoxyMockVerifyWithEqualsByteMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testByte((byte) 0);
     mock.testByte((byte) 128);
@@ -25,7 +48,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithEqualsByteMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testByte(eqByte(Byte.MAX_VALUE))).thenReturn(PASSED);
 
@@ -38,7 +61,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithEqualsCharMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testChar('a');
     mock.testChar('b');
@@ -49,7 +72,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithEqualsCharMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testChar(eqChar('c'))).thenReturn(PASSED);
 
@@ -63,7 +86,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithEqualsShortMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testShort((short) 0);
     mock.testShort((short) 256);
@@ -74,7 +97,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithEqualsShortMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testShort(eqShort(Short.MAX_VALUE))).thenReturn(PASSED);
 
@@ -87,7 +110,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithEqualsIntMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testInt(0);
     mock.testInt(1);
@@ -98,7 +121,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithEqualsIntMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testInt(eqInt(Integer.MAX_VALUE))).thenReturn(PASSED);
 
@@ -112,7 +135,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithEqualsLongMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testLong(0);
     mock.testLong(1);
@@ -123,7 +146,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithEqualsLongMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testLong(eqLong(Long.MAX_VALUE))).thenReturn(PASSED);
 
@@ -137,7 +160,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithEqualsFloatMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testFloat(0.0f);
     mock.testFloat(1.4f);
@@ -148,7 +171,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithEqualsFloatMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testFloat(eqFloat(Float.MAX_VALUE))).thenReturn(PASSED);
 
@@ -161,7 +184,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithEqualsDoubleMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testDouble(0.0d);
     mock.testDouble(1.4d);
@@ -172,7 +195,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithEqualsDoubleMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testDouble(eqDouble(Double.MAX_VALUE))).thenReturn(PASSED);
 
@@ -185,7 +208,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithEqualsBoolMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testBoolean(Boolean.TRUE);
     mock.testBoolean(Boolean.FALSE);
@@ -196,7 +219,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithEqualsBoolMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testBoolean(eqBool(Boolean.TRUE))).thenReturn(PASSED);
 
@@ -206,7 +229,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithEqualsObjectMatcherWorks() {
-    MethodWithArguments mock = mock(MethodWithArguments.class);
+    final MethodWithArguments mock = mock(MethodWithArguments.class);
 
     mock.hasArgs("one", "two");
     mock.hasArgs("three", "four");
@@ -220,7 +243,7 @@ public class TestEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithEqualsObjectMatcherWorks() {
-    MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
+    final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
 
     when(() -> mock.sayHelloTo(eq("Steve"))).thenReturn(PASSED);
     when(() -> mock.sayHelloTo(eq(null))).thenReturn(PASSED);

@@ -1,3 +1,26 @@
+/*
+ * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
+ *
+ * Copyright 2018 Ross Bamford
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ *   The above copyright notice and this permission notice shall be included
+ *   in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package com.roscopeco.moxy.impl.asm.visitors;
 
 import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
@@ -16,51 +39,51 @@ import com.roscopeco.moxy.api.Mock;
 
 /**
  * Creates mocks from classes.
- * 
+ *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
-public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {  
+public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
   private final String originalClassInternalName;
   private final Set<Method> mockMethods;
 
-  public MoxyMockClassVisitor(Class<?> originalClass, Set<Method> methods) {
+  public MoxyMockClassVisitor(final Class<?> originalClass, final Set<Method> methods) {
     super(AbstractMoxyTypeVisitor.makeMockName(originalClass));
- 
+
     this.originalClassInternalName = Type.getInternalName(originalClass);
     this.mockMethods = methods == null ? Collections.emptySet() : methods;
   }
 
   @Override
-  public void visit(int version, 
-                    int access, 
-                    String name, 
-                    String signature, 
-                    String superName,
-                    String[] originalInterfaces) {
-    ArrayList<String> newInterfaces = new ArrayList<>(originalInterfaces.length + 1);
+  public void visit(final int version,
+                    final int access,
+                    final String name,
+                    final String signature,
+                    final String superName,
+                    final String[] originalInterfaces) {
+    final ArrayList<String> newInterfaces = new ArrayList<>(originalInterfaces.length + 1);
     newInterfaces.add(MOXY_SUPPORT_INTERFACE_INTERNAL_NAME);
     newInterfaces.addAll(Arrays.asList(originalInterfaces));
 
-    super.visit(version, 
-                access & ~ACC_ABSTRACT | ACC_SYNTHETIC | ACC_SUPER, 
+    super.visit(version,
+                access & ~ACC_ABSTRACT | ACC_SYNTHETIC | ACC_SUPER,
                 super.getNewClassInternalName(),
-                signature, 
-                originalClassInternalName, 
+                signature,
+                this.originalClassInternalName,
                 newInterfaces.toArray(new String[newInterfaces.size()]));
-    
+
     this.visitAnnotation(Type.getDescriptor(Mock.class), true).visitEnd();
   }
-  
-  private boolean isToMock(String name, String desc) {
-    return mockMethods.stream()
-      .anyMatch((m) -> m.getName().equals(name) && Type.getMethodDescriptor(m).equals(desc));
+
+  private boolean isToMock(final String name, final String desc) {
+    return this.mockMethods.stream()
+      .anyMatch(m -> m.getName().equals(name) && Type.getMethodDescriptor(m).equals(desc));
   }
 
   /*
    * Used when generating constructors, inserts MoxyEngine as the first argument
    * in a method descriptor.
    */
-  private String prependMethodArgsDescriptorWithEngine(String descriptor) {
+  private String prependMethodArgsDescriptorWithEngine(final String descriptor) {
     if (descriptor == null) {
       return MOCK_CONSTRUCTOR_DESCRIPTOR;
     } else {
@@ -69,14 +92,14 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
   }
 
   @Override
-  public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+  public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
     // Generate field for method return value
-    boolean isAbstract = (access & ACC_ABSTRACT) != 0;
-    
+    final boolean isAbstract = (access & ACC_ABSTRACT) != 0;
+
     if (INIT_NAME.equals(name)) {
       // Generate pass-through constructors
-      String newDesc = prependMethodArgsDescriptorWithEngine(desc); /* this is the new descriptor */
-      return new MoxyPassThroughConstructorVisitor(cv.visitMethod(access & ~ACC_ABSTRACT | ACC_SYNTHETIC, 
+      final String newDesc = this.prependMethodArgsDescriptorWithEngine(desc); /* this is the new descriptor */
+      return new MoxyPassThroughConstructorVisitor(this.cv.visitMethod(access & ~ACC_ABSTRACT | ACC_SYNTHETIC,
                                                            name, newDesc, signature, exceptions),
                                                            this.originalClassInternalName,
                                                            this.getNewClassInternalName(),
@@ -84,9 +107,9 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
                                                            Type.getArgumentTypes(desc));
     } else {
       // Always mock abstract methods (or it won't verify), decide for concrete based on mockMethods.
-      if (isAbstract || isToMock(name, desc)) {
+      if (isAbstract || this.isToMock(name, desc)) {
         // Do the mocking
-        return new MoxyMockingMethodVisitor(cv.visitMethod(access & ~ACC_ABSTRACT | ACC_SYNTHETIC, 
+        return new MoxyMockingMethodVisitor(this.cv.visitMethod(access & ~ACC_ABSTRACT | ACC_SYNTHETIC,
                                                            name, desc, signature, exceptions),
                                                            this.originalClassInternalName,
                                                            name,
@@ -96,7 +119,7 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
                                                            isAbstract);
       } else {
         // Don't mock, just super.
-        return null; 
+        return null;
       }
     }
   }

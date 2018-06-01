@@ -1,3 +1,26 @@
+/*
+ * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
+ *
+ * Copyright 2018 Ross Bamford
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ *   The above copyright notice and this permission notice shall be included
+ *   in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package com.roscopeco.moxy.impl.asm.visitors;
 
 import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
@@ -15,10 +38,10 @@ import org.objectweb.asm.tree.ClassNode;
 
 /**
  * Superclass for both class and interface visitors.
- * 
+ *
  * Generates a ClassNode.
  */
-public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {   
+public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   protected static final AtomicInteger mockNumber = new AtomicInteger();
   private static final List<Pattern> PROHIBITED_PACKAGES = Arrays.asList(
       Pattern.compile("java\\..*"),
@@ -26,27 +49,27 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
       Pattern.compile("javafx\\..*"),
       Pattern.compile("sun\\..*"),
       Pattern.compile("com\\.sun\\..*"),
-      Pattern.compile("oracle\\..*")      
+      Pattern.compile("oracle\\..*")
     );
-  
+
   /*
    * Ensures we don't try to use any of the prohibited packages
    * (e.g. java.lang).
    */
-  private static String makeMockPackageInternalName(Package originalPackage) {
+  private static String makeMockPackageInternalName(final Package originalPackage) {
     final String originalName = originalPackage.getName();
-    
+
     if (PROHIBITED_PACKAGES.stream().anyMatch(regex -> regex.matcher(originalName).find())) {
       // default package
-      return "";      
+      return "";
     } else {
       return originalName.replace('.', '/') + "/";
-    }    
+    }
   }
-  
-  protected static String makeMockName(Class<?> originalClass) {
-    return makeMockPackageInternalName(originalClass.getPackage()) + "Mock " 
-           + originalClass.getSimpleName() 
+
+  protected static String makeMockName(final Class<?> originalClass) {
+    return makeMockPackageInternalName(originalClass.getPackage()) + "Mock "
+           + originalClass.getSimpleName()
            + " {"
            + AbstractMoxyTypeVisitor.mockNumber.getAndIncrement()
            + "}";
@@ -54,19 +77,19 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
 
   private final ClassNode node = new ClassNode();
   private final String newClassInternalName;
-  
+
   protected AbstractMoxyTypeVisitor(final String newClassInternalName) {
     super(ASM6);
     this.cv = this.node;
     this.newClassInternalName = newClassInternalName;
   }
-    
+
   protected String getNewClassInternalName() {
-    return newClassInternalName;
+    return this.newClassInternalName;
   }
-  
+
   @Override
-  public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
+  public FieldVisitor visitField(final int access, final String name, final String descriptor, final String signature, final Object value) {
     // Don't visit, we don't need to copy fields...
     return null;
   }
@@ -77,7 +100,7 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
     this.generateSupportMethods();
     super.visitEnd();
   }
-  
+
   void generateSupportFields() {
     FieldVisitor fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_ENGINE_FIELD_NAME, MOXY_ASM_ENGINE_DESCRIPTOR, null, null);
     fv.visitEnd();
@@ -91,46 +114,46 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
     fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_SUPERMAP_FIELD_NAME, MAP_DESCRIPTOR, null, null);
     fv.visitEnd();
   }
-  
+
   void generateSupportMethods() {
     this.generateSupportGetter(SUPPORT_GETENGINE_METHOD_NAME,
                                SUPPORT_GETENGINE_DESCRIPTOR,
                                SUPPORT_ENGINE_FIELD_NAME,
                                MOXY_ASM_ENGINE_DESCRIPTOR);
-    
+
     this.generateSupportGetter(SUPPORT_GETRETURNMAP_METHOD_NAME,
                                SUPPORT_GETRETURNMAP_DESCRIPTOR,
                                SUPPORT_RETURNMAP_FIELD_NAME,
                                MAP_DESCRIPTOR);
-    
+
     this.generateSupportGetter(SUPPORT_GETTHROWMAP_METHOD_NAME,
                                SUPPORT_GETTHROWMAP_DESCRIPTOR,
                                SUPPORT_THROWMAP_FIELD_NAME,
                                MAP_DESCRIPTOR);
-    
+
     this.generateSupportGetter(SUPPORT_GETSUPERMAP_METHOD_NAME,
                                SUPPORT_GETSUPERMAP_DESCRIPTOR,
                                SUPPORT_SUPERMAP_FIELD_NAME,
                                MAP_DESCRIPTOR);
   }
-  
-  private void generateSupportGetter(String methodName,
-                             String methodDescriptor,
-                             String fieldName,
-                             String fieldDescriptor) {
-    MethodVisitor mv = this.cv.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC, 
+
+  private void generateSupportGetter(final String methodName,
+                             final String methodDescriptor,
+                             final String fieldName,
+                             final String fieldDescriptor) {
+    final MethodVisitor mv = this.cv.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC,
                                            methodName,
                                            methodDescriptor,
-                                           null, 
+                                           null,
                                            EMPTY_STRING_ARRAY);
     mv.visitCode();
     mv.visitVarInsn(ALOAD, 0);
-    mv.visitFieldInsn(GETFIELD, newClassInternalName, fieldName, fieldDescriptor);
+    mv.visitFieldInsn(GETFIELD, this.newClassInternalName, fieldName, fieldDescriptor);
     mv.visitInsn(ARETURN);
-    mv.visitEnd();    
+    mv.visitEnd();
   }
-  
+
   public ClassNode getNode() {
     return this.node;
-  }  
+  }
 }

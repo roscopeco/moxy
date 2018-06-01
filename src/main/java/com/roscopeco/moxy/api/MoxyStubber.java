@@ -48,6 +48,7 @@ public interface MoxyStubber<T> {
    * @param object The <code>Object</code> to return for matching invocations.
    *
    * @return <code>this</code>
+   * @since 1.0
    */
   public MoxyStubber<T> thenReturn(T object);
 
@@ -62,6 +63,7 @@ public interface MoxyStubber<T> {
    * @param throwable The <code>Throwable</code> to throw for matching invocations.
    *
    * @return <code>this</code>
+   * @since 1.0
    */
   public MoxyStubber<T> thenThrow(Throwable throwable);
 
@@ -77,6 +79,7 @@ public interface MoxyStubber<T> {
    * {@link InvalidStubbingException} will be thrown when the mock is invoked.</p>
    *
    * @return <code>this</code>
+   * @since 1.0
    */
   public MoxyStubber<T> thenCallRealMethod();
 }

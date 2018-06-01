@@ -254,6 +254,43 @@ public final class Moxy {
   }
 
   /**
+   * <p>Reset the supplied mock, removing all stubbing that was previously applied.</p>
+   *
+   * <p>Note that this <strong>does not</strong> operate on a thread-local basis,
+   * (since stubbing is not thread-local) and that it does not reset previous
+   * invocation data for the mock. If you wish to reset that, see {@link MoxyEngine#reset()}.</p>
+   *
+   * @param mock The mock to reset.
+   *
+   * @see MoxyEngine#reset()
+   * @see Moxy#resetMock(MoxyEngine, Object)
+   * @see MoxyEngine#resetMock(Object)
+   * @since 1.0
+   */
+  public static void resetMock(final Object mock) {
+    resetMock(ensureMoxyEngine(), mock);
+  }
+
+  /**
+   * <p>Reset the supplied mock using the supplied engine, removing all stubbing
+   * that was previously applied.</p>
+   *
+   * <p>Note that this <strong>does not</strong> operate on a thread-local basis,
+   * (since stubbing is not thread-local) and that it does not reset previous
+   * invocation data for the mock. If you wish to reset that, see {@link MoxyEngine#reset()}.</p>
+   *
+   * @param engine The {@link MoxyEngine} to use.
+   * @param mock The mock to reset.
+   *
+   * @see MoxyEngine#reset()
+   * @see MoxyEngine#resetMock(Object)
+   * @since 1.0
+   */
+  public static void resetMock(final MoxyEngine engine, final Object mock) {
+    engine.resetMock(mock);
+  }
+
+  /**
    * <p>Determines whether the supplied class is a mock class in the context
    * of the supplied {@link MoxyEngine}.</p>
    *

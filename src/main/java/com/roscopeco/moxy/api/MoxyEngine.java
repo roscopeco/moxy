@@ -456,6 +456,20 @@ public interface MoxyEngine {
   public boolean isMock(Object obj);
 
   /**
+   * <p>Reset the supplied mock, removing all stubbing that was previously applied.</p>
+   *
+   * <p>Note that this <strong>does not</strong> operate on a thread-local basis,
+   * (since stubbing is not thread-local) and that it does not reset previous
+   * invocation data for the mock. If you wish to reset that, see {@link MoxyEngine#reset()}.</p>
+   *
+   * @param mock The mock to reset
+   *
+   * @see MoxyEngine#reset()
+   * @since 1.0
+   */
+  public void resetMock(Object mock);
+
+  /**
    * <p>Starts stubbing of the mock invocation in the supplied lambda
    * expression.</p>
    *

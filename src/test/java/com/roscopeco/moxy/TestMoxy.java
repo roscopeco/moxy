@@ -879,4 +879,43 @@ public class TestMoxy {
         .isInstanceOf(InvalidStubbingException.class)
         .hasMessage("Cannot call real method 'java.lang.String returnHello()' (it is abstract)");
   }
+
+  @Test
+  public void testMoxyMockThenStubThenResetWorksProperly() {
+    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+
+    final Exception ex = new Exception("No-one to say hello to");
+
+    // Given I've stubbed some mocks...
+    Moxy.when(() -> mock.sayHelloTo("Bill")).thenCallRealMethod();
+    Moxy.when(() -> mock.sayHelloTo("Steve")).thenReturn("Oh hi, Steve");
+    Moxy.when(() -> mock.sayHelloTo(null)).thenThrow(ex);
+
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hello, Bill");
+    assertThat(mock.sayHelloTo("Steve")).isEqualTo("Oh hi, Steve");
+    assertThatThrownBy(() ->
+        mock.sayHelloTo(null)
+    )
+        .isSameAs(ex);
+
+    // When I reset,
+    Moxy.resetMock(mock);
+
+    // Then the stubs are gone.
+    assertThat(mock.sayHelloTo("Bill")).isNull();
+    assertThat(mock.sayHelloTo("Steve")).isNull();
+    assertThat(mock.sayHelloTo(null)).isNull();
+
+    // And I can stub again.
+    Moxy.when(() -> mock.sayHelloTo("Steve")).thenCallRealMethod();
+    Moxy.when(() -> mock.sayHelloTo(null)).thenReturn("Oh hi, null");
+    Moxy.when(() -> mock.sayHelloTo("Bill")).thenThrow(ex);
+
+    assertThat(mock.sayHelloTo("Steve")).isEqualTo("Hello, Steve");
+    assertThat(mock.sayHelloTo(null)).isEqualTo("Oh hi, null");
+    assertThatThrownBy(() ->
+        mock.sayHelloTo("Bill")
+    )
+        .isSameAs(ex);
+  }
 }

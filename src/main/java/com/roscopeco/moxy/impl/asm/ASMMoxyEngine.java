@@ -220,6 +220,15 @@ public class ASMMoxyEngine implements MoxyEngine {
     return this.isMock(obj.getClass());
   }
 
+  @Override
+  public void resetMock(final Object mock) {
+    if (!this.isMock(mock)) {
+      throw new IllegalArgumentException("Cannot reset '" + mock.toString() + "' - Object is not a mock");
+    }
+
+    this.initializeMock(mock.getClass(), mock);
+  }
+
   boolean isMockCandidate(final Method m) {
     return ((m.getModifiers() & Opcodes.ACC_FINAL) == 0)
         && (((m.getModifiers() & Opcodes.ACC_PUBLIC) > 0)
@@ -318,17 +327,28 @@ public class ASMMoxyEngine implements MoxyEngine {
     return new ASMMoxyVerifier(this);
   }
 
+  @SuppressWarnings("restriction")
+  <T> T instantiateMock(final Class<? extends T> mockClass) {
+    try {
+      final Object mock = UNSAFE.allocateInstance(mockClass);
+      return this.initializeMock(mockClass, mock);
+    } catch (final MoxyException e) {
+      throw e;
+    } catch (final Exception e) {
+      throw new MoxyException("Unrecoverable error: Instantiation exception; see cause", e);
+    }
+  }
+
   /*
    * Instantiate a mock of the given class
    */
   @SuppressWarnings({ "unchecked", "restriction", "rawtypes" })
-  <T> T instantiateMock(final Class<? extends T> mockClass) {
+  <T> T initializeMock(final Class<? extends T> mockClass, final Object mock) {
     try {
       final Field engineField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_ENGINE_FIELD_NAME);
       final Field returnMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_RETURNMAP_FIELD_NAME);
       final Field throwMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_THROWMAP_FIELD_NAME);
       final Field superMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_SUPERMAP_FIELD_NAME);
-      final Object mock = UNSAFE.allocateInstance(mockClass);
       UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(engineField), this);
       UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(returnMapField), new HashMap());
       UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(throwMapField), new HashMap());

@@ -34,6 +34,22 @@ import java.util.stream.Collectors;
 import com.roscopeco.moxy.Moxy;
 import com.roscopeco.moxy.api.MoxyEngine;
 
+/*
+ * NOTE: When using this to mock ASMMoxyEngine, take care that you do the
+ * following:
+ *
+ *   * All whens/asserts on the ENGINE should be done using Moxy.when/Moxy.assert.
+ *     This is because the mock engine will have been created with the default
+ *     engine.
+ *
+ *   * BUT, whens/assers on MOCKS created with the mock engine should be done
+ *     using that mock engine, since that is the engine that will have created
+ *     them.
+ *
+ * Failing to observe this may lead to rage, hair loss, depression, extended
+ * periods of pointless debugging, and ultimately death (of your computer from
+ * blunt-force trauma).
+ */
 public abstract class AbstractImplTest {
   protected ASMMoxyEngine makePartialMock(final boolean injectMocks, final Method... mockMethods)
   throws Exception {

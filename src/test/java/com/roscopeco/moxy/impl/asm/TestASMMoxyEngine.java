@@ -33,7 +33,9 @@ import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -468,6 +470,36 @@ class TestASMMoxyEngine extends AbstractImplTest {
   }
 
   @Test
+  public void testInitializeMock() {
+    final ASMMoxyEngine engine = new ASMMoxyEngine();
+    final SimpleClass mock = engine.mock(SimpleClass.class);
+
+    final ASMMockSupport mockSupp = (ASMMockSupport)mock;
+
+    final Map<StubMethod, Deque<StubReturn>> originalReturnMap = mockSupp.__moxy_asm_getReturnMap();
+    final Map<StubMethod, Deque<StubThrow>> originalThrowMap = mockSupp.__moxy_asm_getThrowMap();
+    final Map<StubMethod, Deque<StubSuper>> originalSuperMap = mockSupp.__moxy_asm_getCallSuperMap();
+
+    engine.initializeMock(mock.getClass(), mock);
+
+    assertThat(mockSupp.__moxy_asm_getReturnMap())
+        .isNotNull()
+        .isNotSameAs(originalReturnMap);
+
+    assertThat(mockSupp.__moxy_asm_getThrowMap())
+        .isNotNull()
+        .isNotSameAs(originalThrowMap);
+
+    assertThat(mockSupp.__moxy_asm_getCallSuperMap())
+        .isNotNull()
+        .isNotSameAs(originalSuperMap);
+
+    assertThat(mockSupp.__moxy_asm_getEngine())
+        .isNotNull()
+        .isSameAs(engine);
+  }
+
+  @Test
   public void testInstantiateMock() {
     final ASMMoxyEngine engine = new ASMMoxyEngine();
 
@@ -569,5 +601,37 @@ class TestASMMoxyEngine extends AbstractImplTest {
                         tuple("__moxy_asm_getReturnMap", "()Ljava/util/Map;"),
                         tuple("__moxy_asm_getThrowMap",  "()Ljava/util/Map;"),
                         tuple("__moxy_asm_getCallSuperMap",  "()Ljava/util/Map;"));
+  }
+
+  @Test
+  public void testResetMockObject() throws Exception {
+    final ASMMoxyEngine mockEngine = this.makePartialMock(false,
+        ASMMoxyEngine.class.getDeclaredMethod("isMock", Object.class),
+        ASMMoxyEngine.class.getDeclaredMethod("initializeMock", Class.class, Object.class));
+
+    when(() -> mockEngine.isMock((Object)any())).thenCallRealMethod();
+    when(() -> mockEngine.initializeMock(any(), any())).thenCallRealMethod();
+
+    final SimpleClass mock = mockEngine.mock(SimpleClass.class);
+
+    mockEngine.resetMock(mock);
+
+    assertMock(() -> mockEngine.isMock(mock)).wasCalledOnce();
+
+    // Called twice - once during mock instantiation, again during reset
+    assertMock(() -> mockEngine.initializeMock(mock.getClass(), mock)).wasCalledTwice();
+  }
+
+  @Test
+  public void testResetMockObjectNotAMock() throws Exception {
+    final ASMMoxyEngine engine = new ASMMoxyEngine();
+
+    final String notAMock = "Not a mock ;)";
+
+    assertThatThrownBy(() ->
+        engine.resetMock(notAMock)
+    )
+      .isInstanceOf(IllegalArgumentException.class)
+      .hasMessage("Cannot reset 'Not a mock ;)' - Object is not a mock");
   }
 }

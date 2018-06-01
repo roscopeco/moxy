@@ -383,8 +383,8 @@ assertMock(() -> mock.method(custom(new MyMatcher<String>()))).wasCalled();
 
 Note that a `default` implementation of `addToStack()` is provided by the interface,
 so if you're implementing the interface because your matcher is too long for a readable 
-lambda, or because you're not yet on Java 1.8, then you don't _have_ to implement it,
-as long as your matcher only needs to be pushed to the stack (like 90% of all matchers do).
+lambda then you don't _have_ to implement it, as long as your matcher only needs to be 
+pushed to the stack (like 90% of all matchers do).
 
 **Side note**
 > The _matcher stack_? Yup, this is an advanced topic. See the documentation on the MoxyMatcher class for more details.
@@ -402,7 +402,7 @@ _partial mocking_, where only _some_ of the methods in a given class are mocked,
 the rest with their original implementation.
 
 Partial mocking is inherently trickier than straight-up complete mocking, mostly because
-**Moxy doesn't call call constructors**. This means that, if the methods you don't mock
+**Moxy doesn't call constructors**. This means that, if the methods you don't mock
 require any state that is set in a constructor, they're likely to fail miserably.
 
 For this reason, the usual static _Moxy.mock(...)_ API doesn't support partial mocking -

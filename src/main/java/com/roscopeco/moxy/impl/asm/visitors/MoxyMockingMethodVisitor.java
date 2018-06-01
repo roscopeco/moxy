@@ -329,7 +329,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
 
       this.delegate.visitTryCatchBlock(superTryStart, superTryEnd, superTryHandler, THROWABLE_INTERNAL_NAME);
 
-      // start of try {
+      // start of try
       this.delegate.visitLabel(superTryStart);
 
       // call super
@@ -352,11 +352,11 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
                                       true);
       }
 
-      // end of try }
+      // end of try
       this.delegate.visitLabel(superTryEnd);
       this.delegate.visitJumpInsn(GOTO, returnLabel);
 
-      // start of catch (...) {    : exception is now on top of stack.
+      // start of catch (...) : exception is now on top of stack.
       this.delegate.visitLabel(superTryHandler);
       this.delegate.visitInsn(DUP);             // dup for later rethrow
 
@@ -374,7 +374,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
 
       this.delegate.visitInsn(ATHROW);
 
-      // end of catch }
+      // end of catch
     } else {
       // Throw InvalidStubbing (can't call super to abstract)
       this.delegate.visitTypeInsn(NEW, INVALID_STUBBING_INTERNAL_NAME);

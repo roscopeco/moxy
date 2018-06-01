@@ -31,9 +31,12 @@ import org.opentest4j.AssertionFailedError;
 import com.roscopeco.moxy.api.MoxyVerifier;
 
 class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
+  private static final String SPACE = " ";
   private static final String EXPECTED_MOCK = "Expected mock ";
   private static final String TO_BE_CALLED = " to be called ";
+  private static final String NEVER_TO_THROW_EXCEPTION = "never to throw exception ";
   private static final String BUT_IT_WAS_CALLED = ", but it was called ";
+  private static final String BUT_IT_WAS_THROWN = ", but it was thrown ";
 
   public ASMMoxyVerifier(final ASMMoxyEngine engine) {
     super(engine);
@@ -70,9 +73,14 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
       return this;
     } else {
       throw new AssertionFailedError(
-          EXPECTED_MOCK + methodName + TypeStringUtils.ellipsisDesc(methodDesc) + TO_BE_CALLED
-              + TypeStringUtils.buildArgsString(invocation)
-              + "at least once but it wasn't called at all");
+          new StringBuilder()
+            .append(EXPECTED_MOCK)
+            .append(methodName)
+            .append(TypeStringUtils.ellipsisDesc(methodDesc))
+            .append(TO_BE_CALLED)
+            .append(TypeStringUtils.buildArgsString(invocation))
+            .append("at least once but it wasn't called at all")
+                .toString());
     }
   }
 
@@ -100,12 +108,18 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     if (actual == times) {
       return this;
     } else {
-      // TODO Stringbuilder...... on both of these (above).
       throw new AssertionFailedError(
-          EXPECTED_MOCK + methodName + TypeStringUtils.ellipsisDesc(methodDesc) + TO_BE_CALLED
-              + TypeStringUtils.buildArgsString(invocation)
-              + "exactly " + this.readableTimes(times) + BUT_IT_WAS_CALLED
-              + this.readableTimes(actual));
+          new StringBuilder()
+            .append(EXPECTED_MOCK)
+            .append(methodName)
+            .append(TypeStringUtils.ellipsisDesc(methodDesc))
+            .append(TO_BE_CALLED)
+            .append(TypeStringUtils.buildArgsString(invocation))
+            .append("exactly ")
+            .append(this.readableTimes(times))
+            .append(BUT_IT_WAS_CALLED)
+            .append(this.readableTimes(actual))
+                .toString());
     }
   }
 
@@ -134,12 +148,18 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     if (actual >= times) {
       return this;
     } else {
-      // TODO Stringbuilder...... on both of these (above).
       throw new AssertionFailedError(
-          EXPECTED_MOCK + methodName + TypeStringUtils.ellipsisDesc(methodDesc) + TO_BE_CALLED
-              + TypeStringUtils.buildArgsString(invocation)
-              + "at least " + this.readableTimes(times) + BUT_IT_WAS_CALLED
-              + this.readableTimes(actual));
+          new StringBuilder()
+            .append(EXPECTED_MOCK)
+            .append(methodName)
+            .append(TypeStringUtils.ellipsisDesc(methodDesc))
+            .append(TO_BE_CALLED)
+            .append(TypeStringUtils.buildArgsString(invocation))
+            .append("at least ")
+            .append(this.readableTimes(times))
+            .append(BUT_IT_WAS_CALLED)
+            .append(this.readableTimes(actual))
+                .toString());
     }
   }
 
@@ -153,12 +173,18 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     if (actual <= times) {
       return this;
     } else {
-      // TODO Stringbuilder...... on both of these (above).
       throw new AssertionFailedError(
-          EXPECTED_MOCK + methodName + TypeStringUtils.ellipsisDesc(methodDesc) + TO_BE_CALLED
-              + TypeStringUtils.buildArgsString(invocation)
-              + "at most " + this.readableTimes(times) + BUT_IT_WAS_CALLED
-              + this.readableTimes(actual));
+          new StringBuilder()
+            .append(EXPECTED_MOCK)
+            .append(methodName)
+            .append(TypeStringUtils.ellipsisDesc(methodDesc))
+            .append(TO_BE_CALLED)
+            .append(TypeStringUtils.buildArgsString(invocation))
+            .append("at most ")
+            .append(this.readableTimes(times))
+            .append(BUT_IT_WAS_CALLED)
+            .append(this.readableTimes(actual))
+                .toString());
     }
   }
 
@@ -194,11 +220,18 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
 
     if (actual > 0) {
       throw new AssertionFailedError(
-          EXPECTED_MOCK + methodName + TypeStringUtils.ellipsisDesc(methodDesc) + " "
-              + TypeStringUtils.buildArgsString(invocation)
-              + "never to throw exception class " + throwableClass.getName()
-              + ", but it was thrown " + this.readableTimes(actual));
-
+          new StringBuilder()
+            .append(EXPECTED_MOCK)
+            .append(methodName)
+            .append(TypeStringUtils.ellipsisDesc(methodDesc))
+            .append(SPACE)
+            .append(TypeStringUtils.buildArgsString(invocation))
+            .append(NEVER_TO_THROW_EXCEPTION)
+            .append("class ")
+            .append(throwableClass.getName())
+            .append(BUT_IT_WAS_THROWN)
+            .append(this.readableTimes(actual))
+                .toString());
     } else {
       return this;
     }
@@ -218,10 +251,17 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
 
     if (actual > 0) {
       throw new AssertionFailedError(
-          EXPECTED_MOCK + methodName + TypeStringUtils.ellipsisDesc(methodDesc) + " "
-              + TypeStringUtils.buildArgsString(invocation)
-              + "never to throw exception " + throwable
-              + ", but it was thrown " + this.readableTimes(actual));
+          new StringBuilder()
+            .append(EXPECTED_MOCK)
+            .append(methodName)
+            .append(TypeStringUtils.ellipsisDesc(methodDesc))
+            .append(SPACE)
+            .append(TypeStringUtils.buildArgsString(invocation))
+            .append(NEVER_TO_THROW_EXCEPTION)
+            .append(throwable)
+            .append(BUT_IT_WAS_THROWN)
+            .append(this.readableTimes(actual))
+                .toString());
 
     } else {
       return this;
@@ -242,9 +282,15 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
 
     if (actual > 0) {
       throw new AssertionFailedError(
-          EXPECTED_MOCK + methodName + TypeStringUtils.ellipsisDesc(methodDesc) + " "
-              + TypeStringUtils.buildArgsString(invocation)
-              + "never to throw any exception, but exceptions were thrown " + this.readableTimes(actual));
+          new StringBuilder()
+            .append(EXPECTED_MOCK)
+            .append(methodName)
+            .append(TypeStringUtils.ellipsisDesc(methodDesc))
+            .append(SPACE)
+            .append(TypeStringUtils.buildArgsString(invocation))
+            .append("never to throw any exception, but exceptions were thrown ")
+            .append(this.readableTimes(actual))
+                .toString());
     } else {
       return this;
     }

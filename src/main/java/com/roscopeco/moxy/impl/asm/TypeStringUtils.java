@@ -68,15 +68,19 @@ final class TypeStringUtils {
   }
 
   static String javaMethodSignature(final String methodName, final String methodDesc) {
+    return javaMethodSignature(new StringBuilder(), methodName, methodDesc).toString();
+  }
+
+  static StringBuilder javaMethodSignature(final StringBuilder sb, final String methodName, final String methodDesc) {
     final Type returnType = Type.getReturnType(methodDesc);
     final Type[] argTypes = Type.getArgumentTypes(methodDesc);
 
-    return returnType.getClassName()
-              + " "
-              + methodName
-              + "("
-              + Arrays.stream(argTypes).map(Type::getClassName).collect(Collectors.joining(", "))
-              + ")";
+    return sb.append(returnType.getClassName())
+             .append(" ")
+             .append(methodName)
+             .append("(")
+             .append(Arrays.stream(argTypes).map(Type::getClassName).collect(Collectors.joining(", ")))
+             .append(")");
   }
 
   private TypeStringUtils() {

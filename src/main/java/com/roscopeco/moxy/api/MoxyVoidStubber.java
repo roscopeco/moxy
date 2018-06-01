@@ -49,5 +49,18 @@ public interface MoxyVoidStubber {
    */
   public MoxyVoidStubber thenThrow(Throwable throwable);
 
+  /**
+   * <p>Instead of stubbing, have the mock call the real method instead.</p>
+   *
+   * <p>When this method is used to have mocks call their real methods,
+   * verification is unaffected. In other words, you may verify these
+   * mocks in the same way as any other.</p>
+   *
+   * <p>For obvious reasons, this will only work where the mocked method
+   * is not <code>abstract</code>. If it is, an
+   * {@link InvalidStubbingException} will be thrown when the mock is invoked.</p>
+   *
+   * @return <code>this</code>
+   */
   public MoxyVoidStubber thenCallRealMethod();
 }

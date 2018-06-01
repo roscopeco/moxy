@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
 
 import com.roscopeco.moxy.api.InvalidMockInvocationException;
+import com.roscopeco.moxy.api.InvalidStubbingException;
 import com.roscopeco.moxy.api.Mock;
 import com.roscopeco.moxy.api.MockGenerationException;
 import com.roscopeco.moxy.api.MoxyEngine;
@@ -851,5 +852,31 @@ public class TestMoxy {
     assertThat(mock.returnFloat()).isEqualTo(10.0f);
     assertThat(mock.returnDouble()).isEqualTo(10.0d);
     assertThat(mock.returnBoolean()).isEqualTo(true);
+  }
+
+  @Test
+  public void testMoxyMockThenCallRealMethodWithAbstractClassFailsFast() {
+    final SimpleAbstractClass mock = Moxy.mock(SimpleAbstractClass.class);
+
+    Moxy.when(() -> mock.returnHello()).thenCallRealMethod();
+
+    assertThatThrownBy(() ->
+        mock.returnHello()
+    )
+        .isInstanceOf(InvalidStubbingException.class)
+        .hasMessage("Cannot call real method 'java.lang.String returnHello()' (it is abstract)");
+  }
+
+  @Test
+  public void testMoxyMockThenCallRealMethodWithInterfaceFailsFast() {
+    final SimpleInterface mock = Moxy.mock(SimpleInterface.class);
+
+    Moxy.when(() -> mock.returnHello()).thenCallRealMethod();
+
+    assertThatThrownBy(() ->
+        mock.returnHello()
+    )
+        .isInstanceOf(InvalidStubbingException.class)
+        .hasMessage("Cannot call real method 'java.lang.String returnHello()' (it is abstract)");
   }
 }

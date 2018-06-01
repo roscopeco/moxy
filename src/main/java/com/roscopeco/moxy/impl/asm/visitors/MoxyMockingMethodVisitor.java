@@ -379,11 +379,24 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
       // Throw InvalidStubbing (can't call super to abstract)
       this.delegate.visitTypeInsn(NEW, INVALID_STUBBING_INTERNAL_NAME);
       this.delegate.visitInsn(DUP);
-      this.delegate.visitLdcInsn("Cannot call real method (it is abstract)");
+
+      // Load format string
+      this.delegate.visitLdcInsn("Cannot call real method '%s' (it is abstract)");
+
+      // Make Java method signature
+      this.delegate.visitVarInsn(ALOAD, 0);
+      this.delegate.visitLdcInsn(this.methodName);
+      this.delegate.visitLdcInsn(this.methodDescriptor);
+      this.delegate.visitMethodInsn(INVOKEINTERFACE,
+                                    MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
+                                    SUPPORT_MAKE_JAVA_SIGNATURE_METHOD_NAME,
+                                    SUPPORT_MAKE_JAVA_SIGNATURE_DESCRIPTOR,
+                                    true);
+
       this.delegate.visitMethodInsn(INVOKESPECIAL,
                                     INVALID_STUBBING_INTERNAL_NAME,
                                     INIT_NAME,
-                                    VOID_STRING_DESCRIPTOR,
+                                    VOID_STRING_STRING_DESCRIPTOR,
                                     false);
       this.delegate.visitInsn(ATHROW);
     }

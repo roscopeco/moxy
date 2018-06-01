@@ -72,6 +72,10 @@ public interface ASMMockSupport {
     return superMap.computeIfAbsent(method, k-> new ArrayDeque<>());
   }
 
+  public default String __asm_moxy_makeJavaSignature(final String name, final String desc) {
+    return TypeStringUtils.javaMethodSignature(name, desc);
+  }
+
   public default void __moxy_asm_setThrowOrReturn(final Invocation invocation,
                                                   final Object object,
                                                   final boolean isReturn) {

@@ -63,6 +63,7 @@ public final class TypesAndDescriptors {
   public static final String OBJECT_VOID_DESCRIPTOR = "()L" + OBJECT_INTERNAL_NAME + ";";
   public static final String THROWABLE_VOID_DESCRIPTOR = "()" + THROWABLE_DESCRIPTOR;
   public static final String VOID_STRING_DESCRIPTOR = "(" + STRING_DESCRIPTOR + ")V";
+  public static final String VOID_STRING_STRING_DESCRIPTOR = "(" + STRING_DESCRIPTOR + STRING_DESCRIPTOR + ")V";
   public static final String BOOLEAN_OBJECT_DESCRIPTOR = "(L" + OBJECT_INTERNAL_NAME + ";)Z";
   public static final String VOID_OBJECT_THROWABLE_DESCRIPTOR = "(" + OBJECT_DESCRIPTOR + THROWABLE_DESCRIPTOR + ")V";
 
@@ -104,6 +105,9 @@ public final class TypesAndDescriptors {
   public static final String SUPPORT_SUPERMAP_FIELD_NAME = "__moxy_asm_superMap";
   public static final String SUPPORT_SHOULD_CALL_SUPER_METHOD_NAME = "__moxy_asm_shouldCallSuperForCurrentInvocation";
   public static final String SUPPORT_SHOULD_CALL_SUPER_DESCRIPTOR = "()Z";
+  public static final String SUPPORT_MAKE_JAVA_SIGNATURE_METHOD_NAME = "__asm_moxy_makeJavaSignature";
+  public static final String SUPPORT_MAKE_JAVA_SIGNATURE_DESCRIPTOR =
+      "(" + STRING_DESCRIPTOR + STRING_DESCRIPTOR + ")" + STRING_DESCRIPTOR;
 
   /* primitives and their corresponding box types */
   public static final String VALUEOF_METHOD_NAME = "valueOf";

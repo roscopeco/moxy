@@ -36,6 +36,10 @@ public class InvalidStubbingException extends MoxyException {
     super(message);
   }
 
+  public InvalidStubbingException(final String message, final String method) {
+    super(String.format(message, method));
+  }
+
   public InvalidStubbingException(final String message, final Throwable cause) {
     super(message, cause);
   }

@@ -191,7 +191,7 @@ goodness that Moxy provides, so you can still use matchers, for example,
 or check how many times it was called and make sure it didn't throw exceptions.
 
 **Side note**
-> It is worth noting that a mock set to call it's real method will do so
+> It is worth noting that a mock set to call its real method will do so
 every time it's invoked, including when it's invoked in an `assertMock`
 call. So be careful when calling real methods that have side-effects...
 

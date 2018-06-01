@@ -186,6 +186,15 @@ Obviously this only applies if your mock isn't based on an Interface and the
 real method isn't `abstract`. If either of those conditions are true, you'll
 receive a helpful exception when the would-be spy is called.
 
+When using `thenCallRealMethod`, you still get all the usual verification
+goodness that Moxy provides, so you can still use matchers, for example,
+or check how many times it was called and make sure it didn't throw exceptions.
+
+**Side note**
+> It is worth noting that a mock set to call it's real method will do so
+every time it's invoked, including when it's invoked in an `assertMock`
+call. So be careful when calling real methods that have side-effects...
+
 ##### Verifying
 
 So you passed in your mocks, and you appear to have gotten away with it -

@@ -27,7 +27,7 @@ package com.roscopeco.moxy.impl.asm;
  * This is used as the key in the stubbed method maps
  * on the mocks.
  */
-class StubMethod {
+final class StubMethod {
   final String methodName;
   final String methodDesc;
 

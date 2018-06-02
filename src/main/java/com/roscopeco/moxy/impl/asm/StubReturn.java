@@ -29,7 +29,7 @@ import java.util.List;
  * This is used as the value in the stubbed returnMap
  * on the mocks.
  */
-class StubReturn {
+final class StubReturn {
   final List<Object> args;
   final Object toReturn;
 

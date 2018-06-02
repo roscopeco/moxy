@@ -79,27 +79,48 @@ To summarise, the aims of Moxy are:
 
 #### Getting the code
 
-Eventually this will probably end up in a Maven repo, so you'll be able
-to just add it to your POM (or whatever Gradle uses if that's your bag)
-but for now you'll have to clone it from GitHub if you want to use it.
+##### Maven 
 
-Then just set it up as a dependent project/module/whatever in your IDE,
-or make sure it's somewhere on your classpath, and you should be good
-to go. 
+Moxy releases are available in Maven Central. You can pull it in with the 
+following dependency in your POM:
+
+```xml
+<dependency>
+	<groupId>com.roscopeco</groupId>
+	<artifactId>moxy</artifactId>
+	<version>0.82</version>
+</dependency>
+```
+
+##### Gradle
+
+Something like the following should have you set up:
+
+```groovy
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile 'com.roscopeco:moxy:0.82'
+}
+```
+
+##### Clone from Git
+
+You can clone the latest code (or any release using the appropriate tag) 
+directly from GitHub, and just set it up as a dependent project/module/whatever 
+in your IDE, or make sure it's somewhere on your classpath, and you should
+be good to go. 
 
 The project is built with Maven, so just running `mvn package` will grab 
 the dependencies and build you a `.jar` file in the `target/` directory.
 
 If you do `mvn install` you'll be able to reference it from your other
-Maven projects locally in the usual way. I'm afraid I don't know if/how that'll
-work with gradle since I don't use it unless I'm absolutely forced to (I'm
-looking at you, dayjob...)
+Maven projects locally in the usual way.
 
-You can generate a bit of Javadoc with either `mvn site` (generates
-the Maven site in `target/site`, public API Javadocs are under the 
-'project reports' link on the left-hand side) or `mvn javadoc:javadoc`
-(generates the Javadoc in the same place, but includes the whole 
-project, private methods and all). 
+You can generate a bit of Javadoc with `mvn javadoc:javadoc`,
+which generates the docs in `target/apidocs`.
 
 #### Using the code
 

@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"com.roscopeco.moxy"},{"l":"com.roscopeco.moxy.api"},{"l":"com.roscopeco.moxy.impl.asm"},{"l":"com.roscopeco.moxy.impl.asm.visitors"},{"l":"com.roscopeco.moxy.matchers"}]
+packageSearchIndex = [{"l":"com.roscopeco.moxy"},{"l":"com.roscopeco.moxy.api"},{"l":"com.roscopeco.moxy.matchers"}]

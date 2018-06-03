@@ -1,5 +1,3 @@
 com.roscopeco.moxy
 com.roscopeco.moxy.api
-com.roscopeco.moxy.impl.asm
-com.roscopeco.moxy.impl.asm.visitors
 com.roscopeco.moxy.matchers

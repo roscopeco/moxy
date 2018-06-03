@@ -124,6 +124,10 @@ which generates the docs in `target/apidocs`.
 
 #### Using the code
 
+##### Javadoc
+
+Full JavaDoc for the latest available release can be found at https://roscopeco.github.io/moxy/
+
 ##### Creating mocks 
 
 The API is, in a general sense, modelled after other mocking frameworks

@@ -35,4 +35,8 @@ public class MethodWithArgAndReturn {
   public String hasTwoArgs(final String arg1, final int arg2) {
     return "" + arg1 + arg2;
   }
+
+  public String objectMethod(final Object o) {
+    return o.toString();
+  }
 }

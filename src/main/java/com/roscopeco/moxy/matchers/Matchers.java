@@ -3841,7 +3841,6 @@ public class Matchers {
    * @param regex The string containing the regular expression that arguments must match in order to match.
    *
    * @return null (ignored).
-   * @see #regexMatch(MoxyEngine, String)
    * @since 1.0
    */
   public static String regexMatch(final MoxyEngine engine, final String regex) {
@@ -3849,9 +3848,49 @@ public class Matchers {
     return null;
   }
 
+  /**
+   * <p>Create a matcher for <code>T</code> arguments that matches if the
+   * argument is an <code>instanceof</code> the specified class.
+   * The matcher is created in the default {@link MoxyEngine}.</p>
+   *
+   * <p>More specifically, this matcher will match if the specified
+   * class <code>isAssignableFrom</code> the runtime class of the
+   * argument.</p>
+   *
+   * @param clz The class this matcher will match instances of.
+   *
+   * @return null (Ignored).
+   * @see #instanceOf(MoxyEngine, Class)
+   * @since 1.0
+   */
+  public static <T> T instanceOf(final Class<T> clz) {
+    return instanceOf(Moxy.getMoxyEngine(), clz);
+  }
+
+  /**
+   * <p>Create a matcher for <code>T</code> arguments that matches if the
+   * argument is an <code>instanceof</code> the specified class.
+   * The matcher is created in the specified {@link MoxyEngine}.</p>
+   *
+   * <p>More specifically, this matcher will match if the specified
+   * class <code>isAssignableFrom</code> the runtime class of the
+   * argument.</p>
+   *
+   * @param engine The {@link MoxyEngine} to which this matcher applies.
+   * @param clz The class this matcher will match instances of.
+   *
+   * @return null (Ignored).
+   * @see #instanceOf(MoxyEngine, Class)
+   * @since 1.0
+   * @return
+   */
+  public static <T> T instanceOf(final MoxyEngine engine, final Class<T> clz) {
+    engine.getMatcherEngine().registerMatcher(new InstanceOfMatcher<>(clz));
+    return null;
+  }
+
   private Matchers() {
     throw new UnsupportedOperationException(
         "com.roscopeco.moxy.matchers.Matchers is not designed for instantiation");
   }
-
 }

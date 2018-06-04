@@ -14,11 +14,17 @@
 	<packaging>jar</packaging>
 	
 	<properties>
+		<byte.buddy.agent.version>1.8.12</byte.buddy.agent.version>
 		<asm.version>6.2</asm.version>
 		<commons.lang3.version>3.7</commons.lang3.version>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>net.bytebuddy</groupId>
+			<artifactId>byte-buddy-agent</artifactId>
+			<version>${byte.buddy.agent.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.ow2.asm</groupId>
 			<artifactId>asm</artifactId>

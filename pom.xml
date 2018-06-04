@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.roscopeco</groupId>
 	<artifactId>moxy</artifactId>
-	<version>0.81-SNAPSHOT</version>
+	<version>0.83-SNAPSHOT</version>
 	<name>Moxy</name>
 	<description>Fluent API mocking/spying framework for Java.</description>
 	<inceptionYear>2018</inceptionYear>
@@ -32,6 +32,12 @@
 		</developer>
 	</developers>
 
+	<scm>
+		<connection>scm:git:https://github.com/roscopeco/moxy.git</connection>
+		<developerConnection>scm:git:https://github.com/roscopeco/moxy.git</developerConnection>
+		<url>https://github.com/roscopeco/moxy.git</url>
+	</scm>
+
 	<properties>
 		<source.version>9</source.version>
 		<target.version>9</target.version>
@@ -40,6 +46,7 @@
 		<junit.jupiter.version>5.1.1</junit.jupiter.version>
 		<junit.platform.version>1.1.1</junit.platform.version>
 		<assertj.core.version>3.8.0</assertj.core.version>
+		<equalsverifier.version>2.4.6</equalsverifier.version>
 
 		<maven.compiler.source>${source.version}</maven.compiler.source>
 		<maven.compiler.target>${target.version}</maven.compiler.target>
@@ -91,7 +98,20 @@
 			<version>${assertj.core.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>nl.jqno.equalsverifier</groupId>
+			<artifactId>equalsverifier</artifactId>
+			<version>${equalsverifier.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<build>
 		<plugins>
@@ -146,33 +166,70 @@
 				</dependencies>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.0</version>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.7</version>
+				<extensions>true</extensions>
 				<configuration>
-					<show>private</show>
-					<nohelp>true</nohelp>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
 
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.0</version>
-				<configuration>
-					<show>public</show>
-					<excludePackageNames>com.roscopeco.moxy.impl.*</excludePackageNames>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.9</version>
-			</plugin>
-		</plugins>
-	</reporting>
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.0.0</version>
+						<configuration>
+							<show>public</show>
+							<excludePackageNames>com.roscopeco.moxy.impl.*</excludePackageNames>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>3.0.1</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

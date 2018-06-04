@@ -1,9 +1,32 @@
+/*
+ * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
+ *
+ * Copyright 2018 Ross Bamford
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ *   The above copyright notice and this permission notice shall be included
+ *   in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 package com.roscopeco.moxy.matchers;
 
 import static com.roscopeco.moxy.Moxy.*;
 import static com.roscopeco.moxy.matchers.Matchers.*;
+import static com.roscopeco.moxy.matchers.TestMoxyMatchers.*;
 import static org.assertj.core.api.Assertions.*;
-import static com.roscopeco.moxy.matchers.TestMoxyMatchers.PASSED;
 
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +37,7 @@ import com.roscopeco.moxy.model.MethodWithArguments;
 public class TestNotEqualsMatcher {
   @Test
   public void testMoxyMockVerifyWithNotEqualsByteMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testByte((byte) 0);
     mock.testByte((byte) 128);
@@ -25,7 +48,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithNotEqualsByteMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testByte(neqByte(Byte.MAX_VALUE))).thenReturn(PASSED);
 
@@ -38,7 +61,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithNotEqualsCharMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testChar('a');
     mock.testChar('b');
@@ -49,7 +72,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithNotEqualsCharMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testChar(neqChar('c'))).thenReturn(PASSED);
 
@@ -63,7 +86,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithNotEqualsShortMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testShort((short) 0);
     mock.testShort((short) 256);
@@ -74,7 +97,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithNotEqualsShortMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testShort(neqShort(Short.MAX_VALUE))).thenReturn(PASSED);
 
@@ -87,7 +110,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithNotEqualsIntMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testInt(0);
     mock.testInt(1);
@@ -98,7 +121,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithNotEqualsIntMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testInt(neqInt(Integer.MAX_VALUE))).thenReturn(PASSED);
 
@@ -112,7 +135,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithNotEqualsLongMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testLong(0);
     mock.testLong(1);
@@ -123,7 +146,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithNotEqualsLongMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testLong(neqLong(Long.MAX_VALUE))).thenReturn(PASSED);
 
@@ -137,7 +160,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithNotEqualsFloatMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testFloat(0.0f);
     mock.testFloat(1.4f);
@@ -148,7 +171,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithNotEqualsFloatMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testFloat(neqFloat(Float.MAX_VALUE))).thenReturn(PASSED);
 
@@ -161,7 +184,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithNotEqualsDoubleMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testDouble(0.0d);
     mock.testDouble(1.4d);
@@ -172,7 +195,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithNotEqualsDoubleMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testDouble(neqDouble(Double.MAX_VALUE))).thenReturn(PASSED);
 
@@ -185,7 +208,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithNotEqualsBoolMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     mock.testBoolean(Boolean.TRUE);
     mock.testBoolean(Boolean.FALSE);
@@ -196,7 +219,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithNotEqualsBoolMatcherWorks() {
-    MatcherTestClass mock = mock(MatcherTestClass.class);
+    final MatcherTestClass mock = mock(MatcherTestClass.class);
 
     when(() -> mock.testBoolean(neqBool(Boolean.TRUE))).thenReturn(PASSED);
 
@@ -206,7 +229,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithNotEqualsObjectMatcherWorks() {
-    MethodWithArguments mock = mock(MethodWithArguments.class);
+    final MethodWithArguments mock = mock(MethodWithArguments.class);
 
     mock.hasArgs("one", "two");
     mock.hasArgs("three", "four");
@@ -218,7 +241,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockVerifyWithNotEqualsObjectMatcherWorksWithNull() {
-    MethodWithArguments mock = mock(MethodWithArguments.class);
+    final MethodWithArguments mock = mock(MethodWithArguments.class);
 
     mock.hasArgs("one", "two");
     mock.hasArgs("three", "four");
@@ -229,7 +252,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithNotEqualsObjectMatcherWorks() {
-    MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
+    final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
 
     when(() -> mock.sayHelloTo(neq("Steve"))).thenReturn(PASSED);
 
@@ -239,7 +262,7 @@ public class TestNotEqualsMatcher {
 
   @Test
   public void testMoxyMockWhenWithNotEqualsObjectMatcherWorksWithNull() {
-    MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
+    final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
 
     when(() -> mock.sayHelloTo(neq(null))).thenReturn(PASSED);
 

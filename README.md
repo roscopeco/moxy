@@ -79,29 +79,54 @@ To summarise, the aims of Moxy are:
 
 #### Getting the code
 
-Eventually this will probably end up in a Maven repo, so you'll be able
-to just add it to your POM (or whatever Gradle uses if that's your bag)
-but for now you'll have to clone it from GitHub if you want to use it.
+##### Maven 
 
-Then just set it up as a dependent project/module/whatever in your IDE,
-or make sure it's somewhere on your classpath, and you should be good
-to go. 
+Moxy releases are available in Maven Central. You can pull it in with the 
+following dependency in your POM:
+
+```xml
+<dependency>
+	<groupId>com.roscopeco</groupId>
+	<artifactId>moxy</artifactId>
+	<version>0.82</version>
+</dependency>
+```
+
+##### Gradle
+
+Something like the following should have you set up:
+
+```groovy
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile 'com.roscopeco:moxy:0.82'
+}
+```
+
+##### Clone from Git
+
+You can clone the latest code (or any release using the appropriate tag) 
+directly from GitHub, and just set it up as a dependent project/module/whatever 
+in your IDE, or make sure it's somewhere on your classpath, and you should
+be good to go. 
 
 The project is built with Maven, so just running `mvn package` will grab 
 the dependencies and build you a `.jar` file in the `target/` directory.
 
 If you do `mvn install` you'll be able to reference it from your other
-Maven projects locally in the usual way. I'm afraid I don't know if/how that'll
-work with gradle since I don't use it unless I'm absolutely forced to (I'm
-looking at you, dayjob...)
+Maven projects locally in the usual way.
 
-You can generate a bit of Javadoc with either `mvn site` (generates
-the Maven site in `target/site`, public API Javadocs are under the 
-'project reports' link on the left-hand side) or `mvn javadoc:javadoc`
-(generates the Javadoc in the same place, but includes the whole 
-project, private methods and all). 
+You can generate a bit of Javadoc with `mvn javadoc:javadoc`,
+which generates the docs in `target/apidocs`.
 
 #### Using the code
+
+##### Javadoc
+
+Full JavaDoc for the latest available release can be found at https://roscopeco.github.io/moxy/
 
 ##### Creating mocks 
 
@@ -172,6 +197,28 @@ Once you're done stubbing, you can go ahead and pass your mock to the class
 you're testing (or to whoever else needs it really). If you've stubbed 
 appropriately, the clients will never know they're not talking to the
 real deal and you can test with impunity.
+
+##### Spying
+
+Instead of stubbing, you can turn your mock into a spy by having it call 
+the real method, like so:
+
+```java
+when(() -> mock.connectDatabase("invalid")).thenCallRealMethod();
+```
+
+Obviously this only applies if your mock isn't based on an Interface and the 
+real method isn't `abstract`. If either of those conditions are true, you'll
+receive a helpful exception when the would-be spy is called.
+
+When using `thenCallRealMethod`, you still get all the usual verification
+goodness that Moxy provides, so you can still use matchers, for example,
+or check how many times it was called and make sure it didn't throw exceptions.
+
+**Side note**
+> It is worth noting that a mock set to call its real method will do so
+every time it's invoked, including when it's invoked in an `assertMock`
+call. So be careful when calling real methods that have side-effects...
 
 ##### Verifying
 
@@ -361,8 +408,8 @@ assertMock(() -> mock.method(custom(new MyMatcher<String>()))).wasCalled();
 
 Note that a `default` implementation of `addToStack()` is provided by the interface,
 so if you're implementing the interface because your matcher is too long for a readable 
-lambda, or because you're not yet on Java 1.8, then you don't _have_ to implement it,
-as long as your matcher only needs to be pushed to the stack (like 90% of all matchers do).
+lambda then you don't _have_ to implement it, as long as your matcher only needs to be 
+pushed to the stack (like 90% of all matchers do).
 
 **Side note**
 > The _matcher stack_? Yup, this is an advanced topic. See the documentation on the MoxyMatcher class for more details.
@@ -380,7 +427,7 @@ _partial mocking_, where only _some_ of the methods in a given class are mocked,
 the rest with their original implementation.
 
 Partial mocking is inherently trickier than straight-up complete mocking, mostly because
-**Moxy doesn't call call constructors**. This means that, if the methods you don't mock
+**Moxy doesn't call constructors**. This means that, if the methods you don't mock
 require any state that is set in a constructor, they're likely to fail miserably.
 
 For this reason, the usual static _Moxy.mock(...)_ API doesn't support partial mocking -
@@ -431,9 +478,10 @@ MyClass mock = mockClass
 Those six extra lines might seem like a bit of a pain, but think of the 
 extra work as a reminder that partial mocking is a little bit dangerous.
 
-**Side note**
-> For true spying, those in the know will be yelling that they can't call
-the real method, which is true. But don't worry, it's on the TODO list.
+Often, the behaviour you'll achieve with partial mocking can also be 
+accomplished with the `MoxyStubber.thenCallRealMethod()` method,
+or you might find you need a combination of the two. In any event, 
+you can happily use them together as the need arises.
 
 ### How does it work?
 

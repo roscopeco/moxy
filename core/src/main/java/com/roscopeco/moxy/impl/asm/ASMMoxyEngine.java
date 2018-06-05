@@ -481,7 +481,7 @@ public class ASMMoxyEngine implements MoxyEngine {
     }
 
     if ((clz.getModifiers() & Opcodes.ACC_FINAL) > 0) {
-      throw new MockGenerationException("Mocking of final classes is not yet supported");
+      throw new MockGenerationException("Mocking of final classes is not supported with classic mocking; Try the class mock API (Moxy.mockClasses(...))");
     }
 
     final String clzInternalName = Type.getInternalName(clz);

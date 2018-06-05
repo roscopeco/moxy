@@ -227,4 +227,8 @@ public interface ASMMockSupport {
     invocation.setReturned(returned);
     invocation.setThrew(threw);
   }
+
+  public default boolean __moxy_asm_isMockStubbingDisabledOnThisThread() {
+    return __moxy_asm_getEngine().isMockStubbingDisabledOnThisThread();
+  }
 }

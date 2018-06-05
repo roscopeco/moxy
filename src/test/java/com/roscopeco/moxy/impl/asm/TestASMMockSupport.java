@@ -127,4 +127,15 @@ public class TestASMMockSupport extends AbstractImplTest {
         .isInstanceOf(IllegalStateException.class)
         .hasMessage("Cannot set throw for 'void test(java.lang.String, java.lang.String)' with arguments (\"arg1\", \"arg2\") as it has already been stubbed to return or call real method");
   }
+
+  @Test
+  public void testIsMockStubbingDisabledOnThisThread() {
+    assertThat(this.mock.__moxy_asm_isMockStubbingDisabledOnThisThread()).isFalse();
+
+    this.engine.disableMockStubbingOnThisThread();
+    assertThat(this.mock.__moxy_asm_isMockStubbingDisabledOnThisThread()).isTrue();
+
+    this.engine.enableMockStubbingOnThisThread();
+    assertThat(this.mock.__moxy_asm_isMockStubbingDisabledOnThisThread()).isFalse();
+  }
 }

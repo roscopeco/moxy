@@ -66,6 +66,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   private static final String UNRECOVERABLE_ERROR = "Unrecoverable Error";
   private static final String CANNOT_MOCK_NULL_CLASS = "Cannot mock null class";
 
+  private final ThreadLocal<Boolean> threadLocalStubbingDisabled;
   private final ThreadLocalInvocationRecorder recorder;
   private final ASMMoxyMatcherEngine matcherEngine;
 
@@ -90,11 +91,15 @@ public class ASMMoxyEngine implements MoxyEngine {
   public ASMMoxyEngine() {
     this.recorder = new ThreadLocalInvocationRecorder(this);
     this.matcherEngine = new ASMMoxyMatcherEngine(this);
+    this.threadLocalStubbingDisabled = new ThreadLocal<>();
+    this.threadLocalStubbingDisabled.set(false);
   }
 
   ASMMoxyEngine(final ThreadLocalInvocationRecorder recorder, final ASMMoxyMatcherEngine matcherEngine) {
     this.recorder = recorder;
     this.matcherEngine = matcherEngine;
+    this.threadLocalStubbingDisabled = new ThreadLocal<>();
+    this.threadLocalStubbingDisabled.set(false);
   }
 
   public ThreadLocalInvocationRecorder getRecorder() {
@@ -301,6 +306,20 @@ public class ASMMoxyEngine implements MoxyEngine {
   void deleteLatestInvocationFromList() {
     this.getRecorder().unrecordLastInvocation();
     this.getASMMatcherEngine().validateStackConsistency();
+  }
+
+  void disableMockStubbingOnThisThread() {
+    this.threadLocalStubbingDisabled.set(true);
+
+  }
+
+  void enableMockStubbingOnThisThread() {
+    this.threadLocalStubbingDisabled.set(false);
+  }
+
+  boolean isMockStubbingDisabledOnThisThread() {
+    final Boolean disabled = this.threadLocalStubbingDisabled.get();
+    return (disabled != null && disabled != false);
   }
 
   @Override

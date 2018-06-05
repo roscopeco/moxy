@@ -634,4 +634,17 @@ class TestASMMoxyEngine extends AbstractImplTest {
       .isInstanceOf(IllegalArgumentException.class)
       .hasMessage("Cannot reset 'Not a mock ;)' - Object is not a mock");
   }
+
+  @Test
+  public void testIsMockStubbingDisabledOnThisThread() {
+    final ASMMoxyEngine engine = new ASMMoxyEngine();
+
+    assertThat(engine.isMockStubbingDisabledOnThisThread()).isFalse();
+
+    engine.disableMockStubbingOnThisThread();
+    assertThat(engine.isMockStubbingDisabledOnThisThread()).isTrue();
+
+    engine.enableMockStubbingOnThisThread();
+    assertThat(engine.isMockStubbingDisabledOnThisThread()).isFalse();
+  }
 }

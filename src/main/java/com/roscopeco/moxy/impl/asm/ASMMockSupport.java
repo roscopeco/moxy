@@ -27,6 +27,8 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
 
+import com.roscopeco.moxy.api.InvalidMockInvocationException;
+
 /**
  * All mocks implement this interface. It (ab)uses default methods
  * to allow us to do less bytecode generation.
@@ -174,6 +176,11 @@ public interface ASMMockSupport {
   }
 
   public default boolean __moxy_asm_shouldCallSuperForInvocation(final Invocation invocation) {
+    if (invocation == null) {
+      throw new InvalidMockInvocationException("[BUG] Mock callback to support with no recorded invocation\n"
+                                             + "(If you're testing the framework; may indicate an incomplete partial mock engine)");
+    }
+
     final Map<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_getCallSuperMap();
     final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
     final Deque<StubSuper> deque = superMap.get(
@@ -228,7 +235,7 @@ public interface ASMMockSupport {
     invocation.setThrew(threw);
   }
 
-  public default boolean __moxy_asm_isMockStubbingDisabledOnThisThread() {
+  public default boolean __moxy_asm_isMockBehaviourDisabledOnThisThread() {
     return __moxy_asm_getEngine().isMockStubbingDisabledOnThisThread();
   }
 }

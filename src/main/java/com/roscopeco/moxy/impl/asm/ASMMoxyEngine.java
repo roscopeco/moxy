@@ -43,6 +43,7 @@ import com.roscopeco.moxy.api.InvocationRunnable;
 import com.roscopeco.moxy.api.InvocationSupplier;
 import com.roscopeco.moxy.api.Mock;
 import com.roscopeco.moxy.api.MockGenerationException;
+import com.roscopeco.moxy.api.MonitoredInvocationException;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.api.MoxyMatcherEngine;
@@ -63,10 +64,14 @@ import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
  *
  */
 public class ASMMoxyEngine implements MoxyEngine {
+  static interface MonitoredInvocation {
+    public void invoke() throws Exception;
+  }
+
   private static final String UNRECOVERABLE_ERROR = "Unrecoverable Error";
   private static final String CANNOT_MOCK_NULL_CLASS = "Cannot mock null class";
 
-  private final ThreadLocal<Boolean> threadLocalStubbingDisabled;
+  private final ThreadLocal<Boolean> threadLocalMockBehaviourDisabled;
   private final ThreadLocalInvocationRecorder recorder;
   private final ASMMoxyMatcherEngine matcherEngine;
 
@@ -91,15 +96,15 @@ public class ASMMoxyEngine implements MoxyEngine {
   public ASMMoxyEngine() {
     this.recorder = new ThreadLocalInvocationRecorder(this);
     this.matcherEngine = new ASMMoxyMatcherEngine(this);
-    this.threadLocalStubbingDisabled = new ThreadLocal<>();
-    this.threadLocalStubbingDisabled.set(false);
+    this.threadLocalMockBehaviourDisabled = new ThreadLocal<>();
+    this.threadLocalMockBehaviourDisabled.set(false);
   }
 
   ASMMoxyEngine(final ThreadLocalInvocationRecorder recorder, final ASMMoxyMatcherEngine matcherEngine) {
     this.recorder = recorder;
     this.matcherEngine = matcherEngine;
-    this.threadLocalStubbingDisabled = new ThreadLocal<>();
-    this.threadLocalStubbingDisabled.set(false);
+    this.threadLocalMockBehaviourDisabled = new ThreadLocal<>();
+    this.threadLocalMockBehaviourDisabled.set(false);
   }
 
   public ThreadLocalInvocationRecorder getRecorder() {
@@ -261,13 +266,14 @@ public class ASMMoxyEngine implements MoxyEngine {
   /*
    * Validates matcher stack consistency.
    */
-  void naivelyInvokeAndSwallowExceptions(final InvocationRunnable doInvoke) {
+  void runMonitoredInvocation(final MonitoredInvocation invocation) {
     this.ensureEngineConsistencyBeforeMonitoredInvocation();
     try {
-      doInvoke.run();
+      this.disableMockBehaviourOnThisThread();
+      invocation.invoke();
     } catch (final MoxyException e) {
-      // Framework error - rethrow this.
-      throw e;
+      // Framework exception; don't wrap
+      throw(e);
     } catch (final NullPointerException e) {
       // Often an autoboxing error, give (hopefully) useful error message.
       throw new PossibleMatcherUsageError(
@@ -275,28 +281,10 @@ public class ASMMoxyEngine implements MoxyEngine {
         + "correct type (e.g. anyInt() rather than any()), especially when nesting.\n"
         + "Otherwise, the causing exception may have more information.", e);
     } catch (final Exception e) {
-      // naively swallow everything else.
-    }
-  }
-
-  /*
-   * Validates matcher stack consistency.
-   */
-  <T> void naivelyInvokeAndSwallowExceptions(final InvocationSupplier<T> doInvoke) {
-    this.ensureEngineConsistencyBeforeMonitoredInvocation();
-    try {
-      doInvoke.get();
-    } catch (final MoxyException e) {
-      // Framework error - rethrow this.
-      throw e;
-    } catch (final NullPointerException e) {
-      // Often an autoboxing error, give (hopefully) useful error message.
-      throw new PossibleMatcherUsageError(
-          "NPE in invocation: If you're using primitive matchers, ensure you're using the "
-        + "correct type (e.g. anyInt() rather than any()), especially when nesting.\n"
-        + "Otherwise, the causing exception may have more information.", e);
-    } catch (final Exception e) {
-      // naively swallow everything else.
+      // Wrap in framework exception
+      throw new MonitoredInvocationException(e);
+    } finally {
+      this.enableMockBehaviourOnThisThread();
     }
   }
 
@@ -308,23 +296,23 @@ public class ASMMoxyEngine implements MoxyEngine {
     this.getASMMatcherEngine().validateStackConsistency();
   }
 
-  void disableMockStubbingOnThisThread() {
-    this.threadLocalStubbingDisabled.set(true);
+  void disableMockBehaviourOnThisThread() {
+    this.threadLocalMockBehaviourDisabled.set(true);
 
   }
 
-  void enableMockStubbingOnThisThread() {
-    this.threadLocalStubbingDisabled.set(false);
+  void enableMockBehaviourOnThisThread() {
+    this.threadLocalMockBehaviourDisabled.set(false);
   }
 
   boolean isMockStubbingDisabledOnThisThread() {
-    final Boolean disabled = this.threadLocalStubbingDisabled.get();
+    final Boolean disabled = this.threadLocalMockBehaviourDisabled.get();
     return (disabled != null && disabled != false);
   }
 
   @Override
   public <T> MoxyStubber<T> when(final InvocationSupplier<T> invocation) {
-    this.naivelyInvokeAndSwallowExceptions(invocation);
+    this.runMonitoredInvocation(() -> invocation.get());
     this.getRecorder().replaceInvocationArgsWithMatchers();
     this.deleteLatestInvocationFromList();
     return new ASMMoxyStubber<>(this);
@@ -332,7 +320,7 @@ public class ASMMoxyEngine implements MoxyEngine {
 
   @Override
   public MoxyVoidStubber when(final InvocationRunnable invocation) {
-    this.naivelyInvokeAndSwallowExceptions(invocation);
+    this.runMonitoredInvocation(() -> invocation.run());
     this.getRecorder().replaceInvocationArgsWithMatchers();
     this.deleteLatestInvocationFromList();
     return new ASMMoxyVoidStubber(this);
@@ -340,7 +328,7 @@ public class ASMMoxyEngine implements MoxyEngine {
 
   @Override
   public MoxyVerifier assertMock(final InvocationRunnable invocation) {
-    this.naivelyInvokeAndSwallowExceptions(invocation);
+    this.runMonitoredInvocation(() -> invocation.run());
     this.getRecorder().replaceInvocationArgsWithMatchers();
     this.deleteLatestInvocationFromList();
     return new ASMMoxyVerifier(this);

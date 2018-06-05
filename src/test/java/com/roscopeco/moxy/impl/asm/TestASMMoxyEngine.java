@@ -46,10 +46,10 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import com.roscopeco.moxy.Moxy;
-import com.roscopeco.moxy.api.InvocationRunnable;
-import com.roscopeco.moxy.api.InvocationSupplier;
+import com.roscopeco.moxy.api.MonitoredInvocationException;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyException;
+import com.roscopeco.moxy.impl.asm.ASMMoxyEngine.MonitoredInvocation;
 import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
 import com.roscopeco.moxy.model.ClassWithPrimitiveReturns;
 import com.roscopeco.moxy.model.DifferentAccessModifiers;
@@ -319,8 +319,12 @@ class TestASMMoxyEngine extends AbstractImplTest {
     }
   }
 
+  private void throwException(final Exception e) throws Exception {
+    throw e;
+  }
+
   @Test
-  public void testNaivelyInvokeAndSwallowException() throws Exception {
+  public void testRunMonitoredInvocation() throws Exception {
     final ASMMoxyEngine mockEngine = this.makePartialMock(true,
         ASMMoxyEngine.class.getDeclaredMethod("ensureEngineConsistencyBeforeMonitoredInvocation"));
 
@@ -329,11 +333,11 @@ class TestASMMoxyEngine extends AbstractImplTest {
     final Exception generalException = new Exception("MARKER");
 
     assertThatThrownBy(() ->
-        mockEngine.naivelyInvokeAndSwallowExceptions(() -> this.throwRTE(moxyException))
+        mockEngine.runMonitoredInvocation(() -> this.throwRTE(moxyException))
     ).isSameAs(moxyException);
 
     assertThatThrownBy(() ->
-        mockEngine.naivelyInvokeAndSwallowExceptions(() -> this.throwRTE(nullPointerException))
+        mockEngine.runMonitoredInvocation(() -> this.throwRTE(nullPointerException))
     )
         .isInstanceOf(PossibleMatcherUsageError.class)
         .hasMessage("NPE in invocation: If you're using primitive matchers, ensure you're using the "
@@ -343,11 +347,12 @@ class TestASMMoxyEngine extends AbstractImplTest {
             .hasSize(1)
             .hasSameElementsAs(Lists.newArrayList(nullPointerException));
 
-    try {
-      mockEngine.naivelyInvokeAndSwallowExceptions(() -> this.throwRTE(generalException));
-    } catch (final Exception e) {
-      fail("Exception was not swallowed");
-    }
+    assertThatThrownBy(() ->
+        mockEngine.runMonitoredInvocation(() -> this.throwException(generalException))
+    )
+        .isInstanceOf(MonitoredInvocationException.class)
+        .hasMessage("An unexpected exception occurred during a monitored invocation; See cause")
+        .hasCause(generalException);
 
     assertMock(() -> mockEngine.ensureEngineConsistencyBeforeMonitoredInvocation())
         .wasCalled(3);
@@ -367,10 +372,11 @@ class TestASMMoxyEngine extends AbstractImplTest {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void testWhenSupplier() throws Exception {
     final ASMMoxyEngine mockEngine = this.makePartialMock(true,
-        ASMMoxyEngine.class.getDeclaredMethod("naivelyInvokeAndSwallowExceptions", InvocationSupplier.class),
+        ASMMoxyEngine.class.getDeclaredMethod("runMonitoredInvocation", MonitoredInvocation.class),
+        ASMMoxyEngine.class.getDeclaredMethod("disableMockBehaviourOnThisThread"),
+        ASMMoxyEngine.class.getDeclaredMethod("enableMockBehaviourOnThisThread"),
         ASMMoxyEngine.class.getDeclaredMethod("deleteLatestInvocationFromList"));
 
     final SimpleClass simpleMock = mockEngine.mock(SimpleClass.class);
@@ -378,6 +384,10 @@ class TestASMMoxyEngine extends AbstractImplTest {
     final Invocation testInvocation = new Invocation(simpleMock, "test", "test", Collections.emptyList());
 
     final ThreadLocalInvocationRecorder recorder = mockEngine.getRecorder();
+
+    when(() -> mockEngine.runMonitoredInvocation(any())).thenCallRealMethod();
+    when(() -> mockEngine.disableMockBehaviourOnThisThread()).thenCallRealMethod();
+    when(() -> mockEngine.enableMockBehaviourOnThisThread()).thenCallRealMethod();
     when(() -> recorder.getAndClearLastInvocation()).thenReturn(testInvocation);
 
     final ASMMoxyStubber<String> stubber = (ASMMoxyStubber<String>)
@@ -395,7 +405,9 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(stubber.theInvocation.getArgs()).isEqualTo(Collections.emptyList());
 
     // Ensure engine state consistency was maintained behind the scenes
-    assertMock(() -> mockEngine.naivelyInvokeAndSwallowExceptions((InvocationSupplier<String>)any())).wasCalledOnce();
+    assertMock(() -> mockEngine.runMonitoredInvocation((MonitoredInvocation)any())).wasCalledOnce();
+    assertMock(() -> mockEngine.disableMockBehaviourOnThisThread()).wasCalledOnce();
+    assertMock(() -> mockEngine.enableMockBehaviourOnThisThread()).wasCalledOnce();
     assertMock(() -> recorder.replaceInvocationArgsWithMatchers()).wasCalledOnce();
     assertMock(() -> recorder.getAndClearLastInvocation()).wasCalledOnce();
     assertMock(() -> mockEngine.deleteLatestInvocationFromList()).wasCalledOnce();
@@ -404,7 +416,9 @@ class TestASMMoxyEngine extends AbstractImplTest {
   @Test
   public void testWhenRunnable() throws Exception {
     final ASMMoxyEngine mockEngine = this.makePartialMock(true,
-        ASMMoxyEngine.class.getDeclaredMethod("naivelyInvokeAndSwallowExceptions", InvocationRunnable.class),
+        ASMMoxyEngine.class.getDeclaredMethod("runMonitoredInvocation", MonitoredInvocation.class),
+        ASMMoxyEngine.class.getDeclaredMethod("disableMockBehaviourOnThisThread"),
+        ASMMoxyEngine.class.getDeclaredMethod("enableMockBehaviourOnThisThread"),
         ASMMoxyEngine.class.getDeclaredMethod("deleteLatestInvocationFromList"));
 
     final MethodWithArguments voidReturnMock = mockEngine.mock(MethodWithArguments.class);
@@ -412,6 +426,10 @@ class TestASMMoxyEngine extends AbstractImplTest {
     final Invocation testInvocation = new Invocation(voidReturnMock, "test", "test", Collections.emptyList());
 
     final ThreadLocalInvocationRecorder recorder = mockEngine.getRecorder();
+
+    when(() -> mockEngine.runMonitoredInvocation(any())).thenCallRealMethod();
+    when(() -> mockEngine.disableMockBehaviourOnThisThread()).thenCallRealMethod();
+    when(() -> mockEngine.enableMockBehaviourOnThisThread()).thenCallRealMethod();
     when(() -> recorder.getAndClearLastInvocation()).thenReturn(testInvocation);
 
     final ASMMoxyVoidStubber stubber = (ASMMoxyVoidStubber)
@@ -429,7 +447,9 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(stubber.theInvocation.getArgs()).isEqualTo(Collections.emptyList());
 
     // Ensure engine state consistency was maintained behind the scenes
-    assertMock(() -> mockEngine.naivelyInvokeAndSwallowExceptions((InvocationRunnable)any())).wasCalledOnce();
+    assertMock(() -> mockEngine.runMonitoredInvocation((MonitoredInvocation)any())).wasCalledOnce();
+    assertMock(() -> mockEngine.disableMockBehaviourOnThisThread()).wasCalledOnce();
+    assertMock(() -> mockEngine.enableMockBehaviourOnThisThread()).wasCalledOnce();
     assertMock(() -> recorder.replaceInvocationArgsWithMatchers()).wasCalledOnce();
     assertMock(() -> recorder.getAndClearLastInvocation()).wasCalledOnce();
     assertMock(() -> mockEngine.deleteLatestInvocationFromList()).wasCalledOnce();
@@ -438,7 +458,9 @@ class TestASMMoxyEngine extends AbstractImplTest {
   @Test
   public void testAssertMockRunnable() throws Exception {
     final ASMMoxyEngine mockEngine = this.makePartialMock(true,
-        ASMMoxyEngine.class.getDeclaredMethod("naivelyInvokeAndSwallowExceptions", InvocationRunnable.class),
+        ASMMoxyEngine.class.getDeclaredMethod("runMonitoredInvocation", MonitoredInvocation.class),
+        ASMMoxyEngine.class.getDeclaredMethod("disableMockBehaviourOnThisThread"),
+        ASMMoxyEngine.class.getDeclaredMethod("enableMockBehaviourOnThisThread"),
         ASMMoxyEngine.class.getDeclaredMethod("deleteLatestInvocationFromList"));
 
     final MethodWithArguments voidReturnMock = mockEngine.mock(MethodWithArguments.class);
@@ -446,6 +468,10 @@ class TestASMMoxyEngine extends AbstractImplTest {
     final Invocation testInvocation = new Invocation(voidReturnMock, "test", "test", Collections.emptyList());
 
     final ThreadLocalInvocationRecorder recorder = mockEngine.getRecorder();
+
+    when(() -> mockEngine.runMonitoredInvocation(any())).thenCallRealMethod();
+    when(() -> mockEngine.disableMockBehaviourOnThisThread()).thenCallRealMethod();
+    when(() -> mockEngine.enableMockBehaviourOnThisThread()).thenCallRealMethod();
     when(() -> recorder.getAndClearLastInvocation()).thenReturn(testInvocation);
 
     final ASMMoxyVerifier verifier = (ASMMoxyVerifier)
@@ -463,7 +489,9 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(verifier.theInvocation.getArgs()).isEqualTo(Collections.emptyList());
 
     // Ensure engine state consistency was maintained behind the scenes
-    assertMock(() -> mockEngine.naivelyInvokeAndSwallowExceptions((InvocationRunnable)any())).wasCalledOnce();
+    assertMock(() -> mockEngine.runMonitoredInvocation((MonitoredInvocation)any())).wasCalledOnce();
+    assertMock(() -> mockEngine.disableMockBehaviourOnThisThread()).wasCalledOnce();
+    assertMock(() -> mockEngine.enableMockBehaviourOnThisThread()).wasCalledOnce();
     assertMock(() -> recorder.replaceInvocationArgsWithMatchers()).wasCalledOnce();
     assertMock(() -> recorder.getAndClearLastInvocation()).wasCalledOnce();
     assertMock(() -> mockEngine.deleteLatestInvocationFromList()).wasCalledOnce();
@@ -641,10 +669,10 @@ class TestASMMoxyEngine extends AbstractImplTest {
 
     assertThat(engine.isMockStubbingDisabledOnThisThread()).isFalse();
 
-    engine.disableMockStubbingOnThisThread();
+    engine.disableMockBehaviourOnThisThread();
     assertThat(engine.isMockStubbingDisabledOnThisThread()).isTrue();
 
-    engine.enableMockStubbingOnThisThread();
+    engine.enableMockBehaviourOnThisThread();
     assertThat(engine.isMockStubbingDisabledOnThisThread()).isFalse();
   }
 }

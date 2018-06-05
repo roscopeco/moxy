@@ -33,6 +33,7 @@ import org.objectweb.asm.Type;
 class MoxyMockingMethodVisitor extends MethodVisitor {
   private static final String UNRECOGNISED_PRIMITIVE_TYPE = "Unrecognised JVM primitive type: '";
   private static final String SUPER_NEW_JVM = "Your JVM must be super-new and improved.\n";
+  private static final String TO_FIX = "To fix, add mysterious new type to switch in ";
 
   private final MethodVisitor delegate;
   private final boolean wasAbstract;
@@ -190,7 +191,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     default:
       throw new IllegalArgumentException(UNRECOGNISED_PRIMITIVE_TYPE + primType + "'.\n"
           + SUPER_NEW_JVM
-          + "To fix, add mysterious new type to switch in MoxyMockingMethodVisitor#generateLoadAndAutoboxing()");
+          + TO_FIX + "MoxyMockingMethodVisitor#generateLoadAndAutoboxing()");
     }
   }
 
@@ -260,7 +261,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     default:
       throw new IllegalArgumentException(UNRECOGNISED_PRIMITIVE_TYPE + argType + "'.\n"
           + SUPER_NEW_JVM
-          + "To fix, add mysterious new type to switch in MoxyMockingMethodVisitor#generateLoadAndAutoboxing()");
+          + TO_FIX + "MoxyMockingMethodVisitor#generateLoadAndAutoboxing()");
     }
     return localSlots;
   }
@@ -295,13 +296,35 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
   }
 
   // NOTE this isn't super-efficient, but it's easier to grok this way...
+  //
+  // TODO This method is ridiculously long...
   void generateReturn() {
+    final Label checkCallSuperLabel = new Label();
     final Label loadStubReturnLabel = new Label();
     final Label returnLabel = new Label();
     final Label noCallSuperLabel = new Label();
 
-    // Firstly, check if we should be calling super. Super call trumps stubbing.
+    // Firstly, if stubbing is currently disabled, just generate a default
+    // value and jump directly to return; Don't call super, don't return or throw,
+    // don't collect two-hundred pounds.
+    this.delegate.visitVarInsn(ALOAD, 0);
+    this.delegate.visitMethodInsn(INVOKEINTERFACE,
+                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
+                                  SUPPORT_IS_STUBBING_DISABLED_METHOD_NAME,
+                                  SUPPORT_IS_STUBBING_DISABLED_DESCRIPTOR,
+                                  true);
+
+    this.delegate.visitInsn(ICONST_0);
+    this.delegate.visitJumpInsn(IF_ICMPEQ, checkCallSuperLabel);
+
+    // All stubbing is disabled, load default
+    this.generateDefaultValue(this.returnType);
+    this.delegate.visitJumpInsn(GOTO, returnLabel);
+
+    // All stubbing is enabled, so continue.
+    // Check if we should be calling super. Super call trumps stubbing.
     // Higher-level API ensures we don't mix stubbing and supers.
+    this.delegate.visitLabel(checkCallSuperLabel);
     this.delegate.visitVarInsn(ALOAD, 0);
     this.delegate.visitMethodInsn(INVOKEINTERFACE,
                                   MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
@@ -403,7 +426,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
 
     // Not calling super, so go with stubbing.
     //
-    // Firstly, we'll record the exception we are stubbed to throw, if any
+    // Firstly, we'll record the return and exception we are stubbed with, if any
     this.delegate.visitLabel(noCallSuperLabel);
 
     // Get the value this method will return (unless it also has a throw) or null if none.
@@ -540,7 +563,43 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     default:
       throw new IllegalArgumentException(UNRECOGNISED_PRIMITIVE_TYPE + this.returnType + "'.\n"
                                        + SUPER_NEW_JVM
-                                       + "To fix, add mysterious new type to switch in MoxyMockingMethodVisitor#generateReturn()");
+                                       + TO_FIX + "MoxyMockingMethodVisitor#generateReturn()");
+    }
+  }
+
+  /*
+   * Generate an appropriate default value for the given type.
+   * This is used when stubbing is disabled (i.e. in a when or assertMock).
+   */
+  void generateDefaultValue(final Type returnType) {
+    final char primitiveReturnType = returnType.toString().charAt(0);
+    switch (primitiveReturnType) {
+    case BYTE_PRIMITIVE_INTERNAL_NAME:
+    case CHAR_PRIMITIVE_INTERNAL_NAME:
+    case SHORT_PRIMITIVE_INTERNAL_NAME:
+    case INT_PRIMITIVE_INTERNAL_NAME:
+    case BOOL_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitInsn(ICONST_0);
+      break;
+    case LONG_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitInsn(LCONST_0);
+      break;
+    case FLOAT_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitInsn(FCONST_0);
+      break;
+    case DOUBLE_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitInsn(DCONST_0);
+      break;
+    case ARRAY_PRIMITIVE_INTERNAL_NAME:
+    case OBJECT_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitInsn(ACONST_NULL);
+      break;
+    case VOID_PRIMITIVE_INTERNAL_NAME:
+      break;
+    default:
+      throw new IllegalArgumentException(UNRECOGNISED_PRIMITIVE_TYPE + this.returnType + "'.\n"
+          + SUPER_NEW_JVM
+          + TO_FIX + "MoxyMockingMethodVisitor#generateDefaultValue()");
     }
   }
 

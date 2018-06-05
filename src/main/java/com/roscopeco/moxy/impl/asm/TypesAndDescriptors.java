@@ -59,6 +59,7 @@ public final class TypesAndDescriptors {
   public static final String ADD_NAME = "add";
   public static final String VOID_TYPE = "V";
   public static final String VOID_VOID_DESCRIPTOR = "()V";
+  public static final String BOOLEAN_VOID_DESCRIPTOR = "()Z";
   public static final String VOID_INT_DESCRIPTOR = "(I)V";
   public static final String OBJECT_VOID_DESCRIPTOR = "()L" + OBJECT_INTERNAL_NAME + ";";
   public static final String THROWABLE_VOID_DESCRIPTOR = "()" + THROWABLE_DESCRIPTOR;
@@ -104,10 +105,12 @@ public final class TypesAndDescriptors {
   public static final String SUPPORT_THROWMAP_FIELD_NAME = "__moxy_asm_throwMap";
   public static final String SUPPORT_SUPERMAP_FIELD_NAME = "__moxy_asm_superMap";
   public static final String SUPPORT_SHOULD_CALL_SUPER_METHOD_NAME = "__moxy_asm_shouldCallSuperForCurrentInvocation";
-  public static final String SUPPORT_SHOULD_CALL_SUPER_DESCRIPTOR = "()Z";
+  public static final String SUPPORT_SHOULD_CALL_SUPER_DESCRIPTOR = BOOLEAN_VOID_DESCRIPTOR;
   public static final String SUPPORT_MAKE_JAVA_SIGNATURE_METHOD_NAME = "__asm_moxy_makeJavaSignature";
   public static final String SUPPORT_MAKE_JAVA_SIGNATURE_DESCRIPTOR =
       "(" + STRING_DESCRIPTOR + STRING_DESCRIPTOR + ")" + STRING_DESCRIPTOR;
+  public static final String SUPPORT_IS_STUBBING_DISABLED_METHOD_NAME = "__moxy_asm_isMockBehaviourDisabledOnThisThread";
+  public static final String SUPPORT_IS_STUBBING_DISABLED_DESCRIPTOR = BOOLEAN_VOID_DESCRIPTOR;
 
   /* primitives and their corresponding box types */
   public static final String VALUEOF_METHOD_NAME = "valueOf";
@@ -158,7 +161,7 @@ public final class TypesAndDescriptors {
   public static final String BOOL_CLASS_INTERNAL_NAME = Type.getInternalName(Boolean.class);
   public static final String BOOL_VALUEOF_DESCRIPTOR = "(Z)Ljava/lang/Boolean;";
   public static final String BOOLVALUE_METHOD_NAME = "booleanValue";
-  public static final String BOOLVALUE_DESCRIPTOR = "()Z";
+  public static final String BOOLVALUE_DESCRIPTOR = BOOLEAN_VOID_DESCRIPTOR;
 
   public static final char VOID_PRIMITIVE_INTERNAL_NAME = 'V';
   public static final String VOID_CLASS_INTERNAL_NAME = Type.getInternalName(Void.class);

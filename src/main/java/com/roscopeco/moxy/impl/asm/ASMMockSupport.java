@@ -24,9 +24,13 @@
 package com.roscopeco.moxy.impl.asm;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
+import com.roscopeco.moxy.api.AnswerProvider;
 import com.roscopeco.moxy.api.InvalidMockInvocationException;
 
 /**
@@ -51,6 +55,8 @@ public interface ASMMockSupport {
   // Present and true: call super; otherwise, use stubbing.
   public Map<StubMethod, Deque<StubSuper>> __moxy_asm_getCallSuperMap();
 
+  public Map<StubMethod, List<StubDoActions>> __moxy_asm_getDoActionsMap();
+
   /* Implemented by default */
   public default ThreadLocalInvocationRecorder __moxy_asm_getRecorder() {
     return __moxy_asm_getEngine().getRecorder();
@@ -68,10 +74,16 @@ public interface ASMMockSupport {
     return throwMap.computeIfAbsent(method, k -> new ArrayDeque<>());
   }
 
-  public default Deque<StubSuper>__moxy_asm_ensureStubSuperDeque(
+  public default Deque<StubSuper> __moxy_asm_ensureStubSuperDeque(
       final Map<StubMethod, Deque<StubSuper>> superMap,
       final StubMethod method) {
     return superMap.computeIfAbsent(method, k-> new ArrayDeque<>());
+  }
+
+  public default List<StubDoActions> __moxy_asm_ensureDoActionsList(
+      final Map<StubMethod, List<StubDoActions>> doActionsMap,
+      final StubMethod method) {
+    return doActionsMap.computeIfAbsent(method, k -> new ArrayList<>());
   }
 
   public default String __asm_moxy_makeJavaSignature(final String name, final String desc) {
@@ -82,6 +94,11 @@ public interface ASMMockSupport {
                                                   final Object object,
                                                   final boolean isReturn) {
 
+
+    if (invocation == null) {
+      throw new InvalidMockInvocationException("[BUG] Stubbing call to support with no recorded invocation\n"
+                                             + "(If you're testing the framework; may indicate an incomplete partial mock engine)");
+    }
 
     if (isReturn) {
       if (__moxy_asm_getThrowForInvocation(invocation) != null
@@ -123,6 +140,11 @@ public interface ASMMockSupport {
 
   public default void __moxy_asm_setShouldCallSuper(final Invocation invocation,
                                                     final boolean callSuper) {
+    if (invocation == null) {
+      throw new InvalidMockInvocationException("[BUG] Stubbing call to support with no recorded invocation\n"
+                                             + "(If you're testing the framework; may indicate an incomplete partial mock engine)");
+    }
+
     if (__moxy_asm_getThrowForInvocation(invocation) != null
         || __moxy_asm_getReturnForInvocation(invocation) != null) {
       throw new IllegalStateException("Cannot call real method for '"
@@ -136,6 +158,35 @@ public interface ASMMockSupport {
           superMap,
           new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
       deque.addFirst(new StubSuper(invocation.getArgs(), true));
+    }
+  }
+
+  public default void __moxy_asm_addDoAction(final Invocation invocation,
+                                             final Consumer<List<? extends Object>> action) {
+    if (invocation == null) {
+      throw new InvalidMockInvocationException("[BUG] Stubbing call to support with no recorded invocation\n"
+                                             + "(If you're testing the framework; may indicate an incomplete partial mock engine)");
+    }
+
+    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
+    final Map<StubMethod, List<StubDoActions>> doActionsMap = __moxy_asm_getDoActionsMap();
+    final List<StubDoActions> list = __moxy_asm_ensureDoActionsList(
+        doActionsMap,
+        new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
+
+    StubDoActions matchingStub = null;
+
+    for (final StubDoActions actions : list) {
+      if (matchEngine.argsMatch(invocation.getArgs(), actions.args)) {
+        matchingStub = actions;
+        break;
+      }
+    }
+
+    if (matchingStub == null) {
+      list.add(new StubDoActions(invocation.getArgs(), action));
+    } else {
+      matchingStub.actions.add(action);
     }
   }
 
@@ -157,6 +208,7 @@ public interface ASMMockSupport {
     return null;
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public default Object __moxy_asm_getReturnForInvocation(final Invocation invocation) {
     final Map<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_getReturnMap();
     final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
@@ -167,7 +219,13 @@ public interface ASMMockSupport {
     if (deque != null) {
       for (final StubReturn stubReturn : deque) {
         if (matchEngine.argsMatch(invocation.getArgs(), stubReturn.args)) {
-          return stubReturn.toReturn;
+          final Object toReturn = stubReturn.toReturn;
+
+          if (toReturn instanceof AnswerProvider) {
+            return ((AnswerProvider)toReturn).provide(invocation.getArgs());
+          } else {
+            return stubReturn.toReturn;
+          }
         }
       }
     }
@@ -198,6 +256,30 @@ public interface ASMMockSupport {
     return false;
   }
 
+  public default void __moxy_asm_runDoActionsForInvocation(final Invocation invocation) {
+    if (invocation == null) {
+      throw new InvalidMockInvocationException("[BUG] Mock callback to support with no recorded invocation\n"
+                                             + "(If you're testing the framework; may indicate an incomplete partial mock engine)");
+    }
+
+    final Map<StubMethod, List<StubDoActions>> superMap = __moxy_asm_getDoActionsMap();
+    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
+    final List<StubDoActions> list = superMap.get(
+        new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
+
+    // Old-fashioned but a tad more efficient...
+    //
+    // Note that this runs _all_ actions that match the arguments. If using matchers,
+    // this could run ones that weren't necessarily intended. This needs to be documented!
+    if (list != null) {
+      for (final StubDoActions stubDoActions : list) {
+        if (matchEngine.argsMatch(invocation.getArgs(), stubDoActions.args)) {
+          stubDoActions.actions.forEach(action -> action.accept(invocation.getArgs()));
+        }
+      }
+    }
+  }
+
   /* This MUST only ever be called from mocked methods AFTER the invocation has been
    * recorded. It relies on the fact that getLastInvocation will always be the current
    * invocation just prior to throw or return.
@@ -222,6 +304,15 @@ public interface ASMMockSupport {
    */
   public default boolean __moxy_asm_shouldCallSuperForCurrentInvocation() {
     return __moxy_asm_shouldCallSuperForInvocation(
+        __moxy_asm_getEngine().getRecorder().getLastInvocation());
+  }
+
+  /* This MUST only ever be called from mocked methods AFTER the invocation has been
+   * recorded. It relies on the fact that getLastInvocation will always be the current
+   * invocation just prior to throw or return.
+   */
+  public default void __moxy_asm_runDoActionsForCurrentInvocation() {
+    __moxy_asm_runDoActionsForInvocation(
         __moxy_asm_getEngine().getRecorder().getLastInvocation());
   }
 

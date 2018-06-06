@@ -260,11 +260,11 @@ public class ASMMoxyEngine implements MoxyEngine {
 
   void ensureEngineConsistencyBeforeMonitoredInvocation() {
     this.getRecorder().clearLastInvocation();
-    this.getASMMatcherEngine().validateStackConsistency();
+    this.getASMMatcherEngine().ensureStackConsistency();
   }
 
   /*
-   * Validates matcher stack consistency.
+   * ensures engine and matcher stack consistency.
    */
   void runMonitoredInvocation(final MonitoredInvocation invocation) {
     this.ensureEngineConsistencyBeforeMonitoredInvocation();
@@ -273,14 +273,30 @@ public class ASMMoxyEngine implements MoxyEngine {
       invocation.invoke();
     } catch (final MoxyException e) {
       // Framework exception; don't wrap
+      // We'll never get to the code that deletes the invocation and ensures consistency,
+      // so do that now before we throw...
+      this.deleteLatestInvocationFromListAndClearStack();
       throw(e);
     } catch (final NullPointerException e) {
+      // We'll never get to the code that deletes the invocation and ensures consistency,
+      // so do that now before we throw...
+      this.deleteLatestInvocationFromListAndClearStack();
+
       // Often an autoboxing error, give (hopefully) useful error message.
-      throw new PossibleMatcherUsageError(
-          "NPE in invocation: If you're using primitive matchers, ensure you're using the "
-        + "correct type (e.g. anyInt() rather than any()), especially when nesting.\n"
-        + "Otherwise, the causing exception may have more information.", e);
+      if (!e.getStackTrace()[0].getClassName().startsWith("com.roscopeco.moxy.impl")) {
+        // Not in our code, so almost certainly an autobox issue
+        throw new PossibleMatcherUsageError(
+            "If you're using primitive matchers, ensure you're using the "
+          + "correct type (e.g. anyInt() rather than any()), especially when nesting", e);
+      } else {
+        throw new MoxyException("[BUG] NPE in engine invocation code; Probable framework bug", e);
+      }
     } catch (final Exception e) {
+      // We'll never get to the code that deletes the invocation and ensures consistency,
+      // so do that now before we throw...
+      this.deleteLatestInvocationFromListAndClearStack();
+
+
       // Wrap in framework exception
       throw new MonitoredInvocationException(e);
     } finally {
@@ -289,11 +305,25 @@ public class ASMMoxyEngine implements MoxyEngine {
   }
 
   /*
-   * Deletes latest invocation, and validates matcher stack consistency.
+   * Deletes latest invocation and clears stack, but does not validate
+   * (i.e. doesn't throw if the stack was not clear already).
+   *
+   * This is used when we're already going to throw for some other reason
+   * and just need to clear the stack.
    */
-  void deleteLatestInvocationFromList() {
+  private void deleteLatestInvocationFromListAndClearStack() {
     this.getRecorder().unrecordLastInvocation();
-    this.getASMMatcherEngine().validateStackConsistency();
+    this.getASMMatcherEngine().clearMatcherStack();
+  }
+
+  /*
+   * Deletes latest invocation, and ensures matcher stack consistency.
+   *
+   * If stack was not empty, this throws InconsistentMatchersException.
+   */
+  void deleteLatestInvocationFromListAndValidateStack() {
+    this.getRecorder().unrecordLastInvocation();
+    this.getASMMatcherEngine().ensureStackConsistency();
   }
 
   void disableMockBehaviourOnThisThread() {
@@ -314,7 +344,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   public <T> MoxyStubber<T> when(final InvocationSupplier<T> invocation) {
     this.runMonitoredInvocation(() -> invocation.get());
     this.getRecorder().replaceInvocationArgsWithMatchers();
-    this.deleteLatestInvocationFromList();
+    this.deleteLatestInvocationFromListAndValidateStack();
     return new ASMMoxyStubber<>(this);
   }
 
@@ -322,7 +352,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   public MoxyVoidStubber when(final InvocationRunnable invocation) {
     this.runMonitoredInvocation(() -> invocation.run());
     this.getRecorder().replaceInvocationArgsWithMatchers();
-    this.deleteLatestInvocationFromList();
+    this.deleteLatestInvocationFromListAndValidateStack();
     return new ASMMoxyVoidStubber(this);
   }
 
@@ -330,7 +360,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   public MoxyVerifier assertMock(final InvocationRunnable invocation) {
     this.runMonitoredInvocation(() -> invocation.run());
     this.getRecorder().replaceInvocationArgsWithMatchers();
-    this.deleteLatestInvocationFromList();
+    this.deleteLatestInvocationFromListAndValidateStack();
     return new ASMMoxyVerifier(this);
   }
 
@@ -356,10 +386,12 @@ public class ASMMoxyEngine implements MoxyEngine {
       final Field returnMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_RETURNMAP_FIELD_NAME);
       final Field throwMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_THROWMAP_FIELD_NAME);
       final Field superMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_SUPERMAP_FIELD_NAME);
+      final Field doActionsMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_DOACTIONSMAP_FIELD_NAME);
       UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(engineField), this);
       UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(returnMapField), new HashMap());
       UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(throwMapField), new HashMap());
       UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(superMapField), new HashMap());
+      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(doActionsMapField), new HashMap());
       return (T)mock;
     } catch (final Exception e) {
       throw new MoxyException("Unrecoverable error: Instantiation exception; see cause", e);

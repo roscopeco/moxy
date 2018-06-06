@@ -54,10 +54,10 @@ public class MoxyPassThroughConstructorVisitor extends MethodVisitor {
 
   @Override
   public void visitCode() {
-    // one for super call, one for field store, one each for throws/return/super map
+    // one for super call, one for engine store, one each for throws/return/super/actions map
     this.delegate.visitVarInsn(ALOAD, 0);
     this.delegate.visitInsn(DUP);
-    this.delegate.visitInsn(DUP);
+    this.delegate.visitInsn(DUP2);
     this.delegate.visitInsn(DUP2);
 
     // super call
@@ -104,7 +104,7 @@ public class MoxyPassThroughConstructorVisitor extends MethodVisitor {
     this.delegate.visitTypeInsn(CHECKCAST, MOXY_ASM_ENGINE_INTERNAL_NAME);
     this.delegate.visitFieldInsn(PUTFIELD, this.generatingClass, SUPPORT_ENGINE_FIELD_NAME, MOXY_ASM_ENGINE_DESCRIPTOR);
 
-    // create and store return and throws maps
+    // create and store return/throws/super maps
     this.delegate.visitTypeInsn(NEW, HASHMAP_INTERNAL_NAME);
     this.delegate.visitInsn(DUP);
     this.delegate.visitMethodInsn(INVOKESPECIAL, HASHMAP_INTERNAL_NAME, INIT_NAME, VOID_VOID_DESCRIPTOR, false);
@@ -120,6 +120,12 @@ public class MoxyPassThroughConstructorVisitor extends MethodVisitor {
     this.delegate.visitMethodInsn(INVOKESPECIAL, HASHMAP_INTERNAL_NAME, INIT_NAME, VOID_VOID_DESCRIPTOR, false);
     this.delegate.visitFieldInsn(PUTFIELD, this.generatingClass, SUPPORT_SUPERMAP_FIELD_NAME, MAP_DESCRIPTOR);
 
+    this.delegate.visitTypeInsn(NEW, HASHMAP_INTERNAL_NAME);
+    this.delegate.visitInsn(DUP);
+    this.delegate.visitMethodInsn(INVOKESPECIAL, HASHMAP_INTERNAL_NAME, INIT_NAME, VOID_VOID_DESCRIPTOR, false);
+    this.delegate.visitFieldInsn(PUTFIELD, this.generatingClass, SUPPORT_DOACTIONSMAP_FIELD_NAME, MAP_DESCRIPTOR);
+
+    // create doactions list
     this.delegate.visitInsn(RETURN);
   }
 }

@@ -23,6 +23,9 @@
  */
 package com.roscopeco.moxy.api;
 
+import java.util.List;
+import java.util.function.Consumer;
+
 /**
  * <p>Implementations of this interface allow mocks to be stubbed to
  * throw or return given values. They are returned by the
@@ -47,10 +50,9 @@ public interface MoxyStubber<T> {
    *
    * @param object The <code>Object</code> to return for matching invocations.
    *
-   * @return <code>this</code>
    * @since 1.0
    */
-  public MoxyStubber<T> thenReturn(T object);
+  public void thenReturn(T object);
 
   /**
    * <p>Stubs the mock invocation to throw the given <code>Throwable</code>.</p>
@@ -62,10 +64,9 @@ public interface MoxyStubber<T> {
    *
    * @param throwable The <code>Throwable</code> to throw for matching invocations.
    *
-   * @return <code>this</code>
    * @since 1.0
    */
-  public MoxyStubber<T> thenThrow(Throwable throwable);
+  public void thenThrow(Throwable throwable);
 
   /**
    * <p>Instead of stubbing, have the mock call the real method instead.</p>
@@ -78,8 +79,11 @@ public interface MoxyStubber<T> {
    * is not <code>abstract</code>. If it is, an
    * {@link InvalidStubbingException} will be thrown when the mock is invoked.</p>
    *
-   * @return <code>this</code>
    * @since 1.0
    */
-  public MoxyStubber<T> thenCallRealMethod();
+  public void thenCallRealMethod();
+
+  public void thenAnswer(AnswerProvider<T> provider);
+
+  public MoxyStubber<T> thenDo(Consumer<List<? extends Object>> action);
 }

@@ -322,9 +322,18 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     this.delegate.visitJumpInsn(GOTO, returnLabel);
 
     // All stubbing is enabled, so continue.
+    this.delegate.visitLabel(checkCallSuperLabel);
+
+    // Firstly, run any thenDo actions.
+    this.delegate.visitVarInsn(ALOAD, 0);
+    this.delegate.visitMethodInsn(INVOKEINTERFACE,
+                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
+                                  SUPPORT_RUN_DOACTIONS_METHOD_NAME,
+                                  SUPPORT_RUN_DOACTIONS_METHOD_DESCRIPTOR,
+                                  true);
+
     // Check if we should be calling super. Super call trumps stubbing.
     // Higher-level API ensures we don't mix stubbing and supers.
-    this.delegate.visitLabel(checkCallSuperLabel);
     this.delegate.visitVarInsn(ALOAD, 0);
     this.delegate.visitMethodInsn(INVOKEINTERFACE,
                                   MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
@@ -436,7 +445,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     this.delegate.visitMethodInsn(INVOKEINTERFACE,
                                   MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
                                   SUPPORT_GETCURRENTRETURN_METHOD_NAME,
-                                  OBJECT_VOID_DESCRIPTOR,
+                                  SUPPORT_GETCURRENTRETURN_DESCRIPTOR,
                                   true);
 
     // Get the exception this method will throw (or null if none)
@@ -444,14 +453,14 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     this.delegate.visitMethodInsn(INVOKEINTERFACE,
                                   MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
                                   SUPPORT_GETCURRENTTHROW_METHOD_NAME,
-                                  THROWABLE_VOID_DESCRIPTOR,
+                                  SUPPORT_GETCURRENTTHROW_DESCRIPTOR,
                                   true);
 
     // Update the current invocation's returned and thrown fields.
     this.delegate.visitMethodInsn(INVOKEINTERFACE,
                                   MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
                                   SUPPORT_UPDATECURRENTRETURNED_METHOD_NAME,
-                                  VOID_OBJECT_THROWABLE_DESCRIPTOR,
+                                  SUPPORT_UPDATECURRENTRETURNED_DESCRIPTOR,
                                   true);
 
     // Always do exception first.

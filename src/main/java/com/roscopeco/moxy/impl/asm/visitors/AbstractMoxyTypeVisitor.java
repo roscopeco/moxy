@@ -115,6 +115,7 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
     fv.visitEnd();
 
     fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_DOACTIONSMAP_FIELD_NAME, MAP_DESCRIPTOR, null, null);
+    fv.visitEnd();
   }
 
   void generateSupportMethods() {

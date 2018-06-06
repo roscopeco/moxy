@@ -116,12 +116,10 @@ class ASMMoxyMatcherEngine implements MoxyMatcherEngine {
 
   boolean clearMatcherStack() {
     final ArrayDeque<MoxyMatcher<?>> stack = this.matcherStack.get();
-    if (!(stack == null || stack.isEmpty())) {
+    if (stack != null && !stack.isEmpty()) {
       // clear stack as per contract of InconsistentMatchersException
-      if (stack != null) {
-        stack.clear();
-        return true;
-      }
+      stack.clear();
+      return true;
     }
     return false;
 

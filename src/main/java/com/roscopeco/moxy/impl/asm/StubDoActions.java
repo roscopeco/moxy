@@ -42,6 +42,6 @@ final class StubDoActions {
     this.args = args;
     this.actions = new ArrayList<>();
 
-    Arrays.stream(actions).forEach(action -> this.actions.add(action));
+    Arrays.stream(actions).forEach(this.actions::add);
   }
 }

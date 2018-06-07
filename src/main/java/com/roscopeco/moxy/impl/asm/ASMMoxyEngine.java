@@ -403,7 +403,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   boolean isMockStubbingDisabledOnThisThread() {
     final Boolean disabled = this.threadLocalMockBehaviourDisabled.get();
-    return (disabled != null && !disabled);
+    return (disabled != null && disabled);
   }
 
   /*

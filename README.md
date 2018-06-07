@@ -111,9 +111,9 @@ dependencies {
 ##### Clone from Git
 
 You can clone the latest code (or any release using the appropriate tag) 
-directly from GitHub, and just set it up as a dependent project/module/whatever 
-in your IDE, or make sure it's somewhere on your classpath, and you should
-be good to go. 
+[directly from GitHub](https://github.com/roscopeco/moxy), and just set it
+up as a dependent project/module/whatever in your IDE, or make sure it's 
+somewhere on your classpath, and you should be good to go. 
 
 The project is built with Maven, so just running `mvn package` will grab 
 the dependencies and build you a `.jar` file in the `target/` directory.
@@ -270,7 +270,7 @@ assertMock(() -> /* mock method call... */)
 ```
 
 For a full list of the available asserts, take a look at the
-[com.roscopeco.moxy.api.MoxyVerifier](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyVerifier.html) class.
+[MoxyVerifier](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyVerifier.html) class.
 
 ##### Argument matchers
 
@@ -337,7 +337,9 @@ Ahh, good old primitives. They've not overcomplicated the matcher API at all...
 Most of the matchers provided by Moxy support primitive arguments as well as reference types.
 However, it's important that you make sure you use the appropriate primitive variants
 of the matcher methods when creating your matchers. So, e.g. for an `int`, you'd use
-`anyInt()` rather than plain [any()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#any--). 
+[anyInt()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#anyInt--)
+rather than plain
+[any()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#any--). 
 
 Sadly, due to the ~~stupid~~ way Java generics and autoboxing are implemented, the
 compiler won't catch you if you forget this rule, and one of two things will 
@@ -380,18 +382,18 @@ The following matcher types are supported out-of-the-box:
 * [any()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#any--) - Matches anything
 * [any(Class)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#any-java.lang.Class-) - Matches any instance of the given class. Alias for [instanceOf(Class)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#instanceOf-java.lang.Class-).
 * [anyOf(Object1, Object2, ..., ObjectN)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#anyOf-T...-) - Matches if the argument is in the list.
-* [endsWith(String)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#endsWith-java.lang.String-) - Matches if the `String` argument ends with the given string. *****
+* [endsWith(String)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#endsWith-java.lang.String-) - Matches if the `String` argument ends with the given string. **&#x2731;**
 * [eq(Object)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#eq-T-) - Matches if the argument `.equals()` the given object. Supports null.
 * [gt(Object)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#gt-T-) - Matches if the `Comparable` argument is greater-than the given object.
-* [instanceOf(Class)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#instanceOf-java.lang.Class-) - Matches if the argument is an `instanceof` the specified class. For convenience, this is also aliased as [any(Class)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#any-java.lang.Class-).
+* [instanceOf(Class)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#instanceOf-java.lang.Class-) - Matches if the argument is an `instanceof` the specified class.<br>For convenience, this is also aliased as [any(Class)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#any-java.lang.Class-).
 * [lt(Object)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#gt-T-) - Matches if the `Comparable` argument is less-than the given object.
 * [neq(Object)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#neq-T-) - Matches if the argument doesn't `.equals()` the given object. Supports null.
 * [not(matcher)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#not-T-) - Negates the given matcher. Note the difference between this and [neq()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#neq-T-).
 * [or(matcher1, matcher2, ..., matcherN)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#or-T...-) - Matches if any of the nested matchers match.
-* [regexMatch(String)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#regexMatch-java.lang.String-) - Matches if the String argument matches the supplied regular expression. *****
-* [startsWith(String)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#startsWith-java.lang.String-) - Matches if the `String` argument starts with the given string. *****
+* [regexMatch(String)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#regexMatch-java.lang.String-) - Matches if the String argument matches the supplied regular expression. **&#x2731;**
+* [startsWith(String)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#startsWith-java.lang.String-) - Matches if the `String` argument starts with the given string. **&#x2731;**
 
- ***** These matchers have no primitive equivalent.
+ **&#x2731;** _These matchers have no primitive equivalent._
  
 There are lots more matcher types planned, so take a look at the 
 [Matchers](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html)

@@ -3862,9 +3862,27 @@ public class Matchers {
    * @return null (Ignored).
    * @see #instanceOf(MoxyEngine, Class)
    * @since 1.0
+   *
+   * @param <T> The type this matcher checks instanceof.
    */
   public static <T> T instanceOf(final Class<T> clz) {
     return instanceOf(Moxy.getMoxyEngine(), clz);
+  }
+
+  /**
+   * Convenience alias of {@link #instanceOf(Class)}.
+   *
+   * @param clz The class this matcher will match instances of.
+   *
+   * @return null (Ignored).
+   * @see #instanceOf(Class)
+   * @see #any(MoxyEngine, Class)
+   * @since 1.0
+   *
+   * @param <T> The type this matcher checks instanceof.
+   */
+  public static <T> T any(final Class<T> clz) {
+    return instanceOf(clz);
   }
 
   /**
@@ -3882,11 +3900,29 @@ public class Matchers {
    * @return null (Ignored).
    * @see #instanceOf(MoxyEngine, Class)
    * @since 1.0
-   * @return
+   *
+   * @param <T> The type this matcher checks instanceof.
    */
   public static <T> T instanceOf(final MoxyEngine engine, final Class<T> clz) {
     engine.getMatcherEngine().registerMatcher(new InstanceOfMatcher<>(clz));
     return null;
+  }
+
+  /**
+   * Convenience alias of {@link #instanceOf(MoxyEngine, Class)}.
+   *
+   * @param engine The {@link MoxyEngine} to which this matcher applies.
+   * @param clz The class this matcher will match instances of.
+   *
+   * @return null (Ignored).
+   * @see #instanceOf(MoxyEngine, Class)
+   * @see #any(Class)
+   * @since 1.0
+   *
+   * @param <T> The type this matcher checks instanceof.
+   */
+  public static <T> T any(final MoxyEngine engine, final Class<T> clz) {
+    return instanceOf(engine, clz);
   }
 
   private Matchers() {

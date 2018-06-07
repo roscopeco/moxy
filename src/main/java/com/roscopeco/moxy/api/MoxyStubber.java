@@ -114,7 +114,7 @@ public interface MoxyStubber<T> {
    * for example:</p>
    *
    * <pre><code>
-   *   Moxy.when(() -> mock.something("arg"))
+   *   Moxy.when(() -&gt; mock.something("arg"))
    *       .thenDo(args -&gt; System.out.println("mock.something called"))
    *       .thenDo(args -&gt; customRecorder.record("something", args))
    *       .thenCallRealMethod();
@@ -132,8 +132,8 @@ public interface MoxyStubber<T> {
    *     .thenDo(() -&gt; System.out.println("Action 1"));
    *     .thenDo(() -&gt; System.out.println("Action 2"));
    *
-   *   Moxy.when(() -&gt mock.hasTwoArgs(Matchers.eq("Bill"), Matchers.anyInt()))
-   *     .thenDo(() -&gt System.out.println("Action 3"));
+   *   Moxy.when(() -&gt; mock.hasTwoArgs(Matchers.eq("Bill"), Matchers.anyInt()))
+   *     .thenDo(() -&gt; System.out.println("Action 3"));
    *
    *   mock.hasTwoArgs("Bill", 5);
    * </code></pre>

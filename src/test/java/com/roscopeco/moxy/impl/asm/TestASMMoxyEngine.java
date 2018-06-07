@@ -74,7 +74,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
         .isNotNull()
         .isInstanceOf(ASMMoxyMatcherEngine.class);
 
-    assertThat(engine.getASMMatcherEngine())
+    assertThat(engine.getMatcherEngine())
         .isNotNull()
         .isInstanceOf(ASMMoxyMatcherEngine.class)
         .isEqualTo(engine.getMatcherEngine());
@@ -303,7 +303,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     final ASMMoxyEngine engine = this.makePartialMock(true, MoxyEngine.NO_METHODS);
 
     final ThreadLocalInvocationRecorder mockRecorder = engine.getRecorder();
-    final ASMMoxyMatcherEngine mockMatcherEngine = engine.getASMMatcherEngine();
+    final ASMMoxyMatcherEngine mockMatcherEngine = engine.getMatcherEngine();
 
     engine.ensureEngineConsistencyBeforeMonitoredInvocation();
 
@@ -363,7 +363,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     final ASMMoxyEngine mockEngine = this.makePartialMock(true, MoxyEngine.NO_METHODS);
 
     final ThreadLocalInvocationRecorder mockRecorder = mockEngine.getRecorder();
-    final ASMMoxyMatcherEngine mockMatcherEngine = mockEngine.getASMMatcherEngine();
+    final ASMMoxyMatcherEngine mockMatcherEngine = mockEngine.getMatcherEngine();
 
     mockEngine.deleteLatestInvocationFromList();
 

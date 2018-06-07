@@ -141,7 +141,7 @@ public interface ASMMockSupport {
 
   public default Throwable __moxy_asm_getThrowForInvocation(final Invocation invocation) {
     final Map<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_getThrowMap();
-    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
+    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getMatcherEngine();
     final Deque<StubThrow> deque = throwMap.get(
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
 
@@ -159,7 +159,7 @@ public interface ASMMockSupport {
 
   public default Object __moxy_asm_getReturnForInvocation(final Invocation invocation) {
     final Map<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_getReturnMap();
-    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
+    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getMatcherEngine();
     final Deque<StubReturn> deque = returnMap.get(
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
 
@@ -182,7 +182,7 @@ public interface ASMMockSupport {
     }
 
     final Map<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_getCallSuperMap();
-    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
+    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getMatcherEngine();
     final Deque<StubSuper> deque = superMap.get(
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
 

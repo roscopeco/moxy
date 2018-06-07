@@ -5,6 +5,8 @@
 
 ## Lean-and-mean mocking framework for Java with a fluent API.
 
+See also [Javadoc](https://roscopeco.github.io/moxy/).
+
 ### Contents
 
 * [What is this?](#what-is-this)
@@ -102,7 +104,7 @@ repositories {
 }
 
 dependencies {
-    testCompile 'com.roscopeco:moxy:0.82'
+    testCompile 'com.roscopeco:moxy:0.84'
 }
 ```
 
@@ -120,13 +122,10 @@ If you do `mvn install` you'll be able to reference it from your other
 Maven projects locally in the usual way.
 
 You can generate a bit of Javadoc with `mvn javadoc:javadoc`,
-which generates the docs in `target/apidocs`.
+which generates the docs in `target/apidocs`. The Javadoc for the current
+release can always be found at https://roscopeco.github.io/moxy/ .
 
 #### Using the code
-
-##### Javadoc
-
-Full JavaDoc for the latest available release can be found at https://roscopeco.github.io/moxy/
 
 ##### Creating mocks 
 
@@ -162,7 +161,8 @@ be a class (abstract or concrete) - the API is exactly the same regardless.
 
 By default, this will mock all public methods of the class, and make them
 all return sensible defaults (think zeroes, nulls, falseys). If you want to
-make a given method return something else, you would _stub_ it, like so:
+make a given method return something else, you would _stub_ it, 
+using the [thenReturn()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenReturn-T-), [thenAnswer()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenAnswer-com.roscopeco.moxy.api.AnswerProvider-) or [thenThrow()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenThrow-java.lang.Throwable-) methods like so:
 
 ```java
 // Given 'String AmazingButSlowDatabaseService.connect(String)'...
@@ -190,7 +190,7 @@ a combination of (potentially different) returns and throws as you need.
 
 **Side note**
 > Incidentally, Moxy is smart enough to know if you're stubbing a void method,
-in which case you won't have the option to `thenReturn`, because stubbing
+in which case you won't have the option to [thenReturn()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenReturn-T-), because stubbing
 a return value for a void method would be, well, pointless.
 
 Once you're done stubbing, you can go ahead and pass your mock to the class
@@ -211,34 +211,34 @@ Obviously this only applies if your mock isn't based on an Interface and the
 real method isn't `abstract`. If either of those conditions are true, you'll
 receive a helpful exception when the would-be spy is called.
 
-When using `thenCallRealMethod`, you still get all the usual verification
+When using [thenCallRealMethod()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenCallRealMethod--), 
+you still get all the usual verification
 goodness that Moxy provides, so you can still use matchers, for example,
 or check how many times it was called and make sure it didn't throw exceptions.
 
 ##### Actions
 
 In addition to stubbing your mocks or setting them up as spies, you can
-also have them execute arbitrary actions using the `thenDo` method which
+also have them execute arbitrary actions using the [thenDo()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenDo-java.util.function.Consumer-) method which
 accepts a lambda (or anonymous class if they're more your thing), like so:
 
 ```java
 Moxy.when(() -> mock.something("arg"))
-    .thenDo(args -&gt; System.out.println("mock.something called"))
-    .thenDo(args -&gt; customRecorder.record("something", args));
+    .thenDo(args -> System.out.println("mock.something called"))
+    .thenDo(args -> customRecorder.record("something", args));
 ```
 
-And of course you can still using stubbing/spying in the usual way:
+And of course you can still use stubbing/spying in the usual way:
 
 ```java
 Moxy.when(() -> mock.something("arg"))
-    .thenDo(args -&gt; System.out.println("mock.something called"))
+    .thenDo(args -> System.out.println("mock.something called"))
     .thenCallRealMethod();
 ```
 
 There's one case where you'll want to be a bit careful when using actions,
 specifically when using them with matchers. For more details, check out
-the JavaDoc at 
-https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenDo--
+the [JavaDoc](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenDo-java.util.function.Consumer-).
 
 ##### Verifying
 
@@ -256,9 +256,9 @@ with the given arguments, once. There are a variety of other assertions
 you can make. Here are just a few:
 
 ```java
-assertMock(() -> /* mock method call... */).wasCalledTwice();	// twice
-assertMock(() -> /* mock method call... */).wasCalled(5);			// 5 times
-assertMock(() -> /* mock method call... */).wasCalledAtLeast(2);	// >= twice
+assertMock(() -> /* mock method call... */).wasCalledTwice();      // twice
+assertMock(() -> /* mock method call... */).wasCalled(5);          // 5 times
+assertMock(() -> /* mock method call... */).wasCalledAtLeast(2);   // >= twice
 ```
 
 And you can chain them:
@@ -270,14 +270,14 @@ assertMock(() -> /* mock method call... */)
 ```
 
 For a full list of the available asserts, take a look at the
-`com.roscopeco.moxy.api.MoxyVerifier` class.
+[com.roscopeco.moxy.api.MoxyVerifier](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyVerifier.html) class.
 
 ##### Argument matchers
 
 When the time comes that matching methods based on simple immediate arguments
 just isn't enough, you'll want to take a look at _argument matchers_. 
 
-Simply put, matchers are used in `when()` and `assertMock()` calls to
+Simply put, matchers are used in [when()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html#when-com.roscopeco.moxy.api.InvocationSupplier-) and [assertMock()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html#assertMock-com.roscopeco.moxy.api.InvocationRunnable-) calls to
 allow you to specify variable arguments based on some condition. 
 
 For example, say you want your `connectDatabase` method to _always_ return
@@ -287,16 +287,16 @@ For example, say you want your `connectDatabase` method to _always_ return
 when(() -> mock.connectDatabase(any())).thenReturn("OK");
 ```
 
-That `any()` right there is a special argument that signals to Moxy that
+That [any()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#any--) right there is a special argument that signals to Moxy that
 it shouldn't care what argument is passed - it should just always return 
-`"OK"`. `any()` is probably the simplest _argument matcher_ Moxy has,
+`"OK"`. [any()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#any--) is probably the simplest _argument matcher_ Moxy has,
 and also one that you'll probably use quite a lot.
 
 Argument matchers work using some dark magic and a bit of luck under the 
 hood, and that means there are unfortunately some caveats to using them:
 
 * For a given invocation, once you pass one argument a matcher, you **must** pass the rest with matchers too (see below).
-* You **must not** use any of the argument matchers outside of a `when()` or `assertMock` call. Although there really isn't any reason you'd want to anyway.
+* You **must not** use any of the argument matchers outside of a [when()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html#when-com.roscopeco.moxy.api.InvocationSupplier-) or [assertMock()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html#assertMock-com.roscopeco.moxy.api.InvocationRunnable-) call. Although there really isn't any reason you'd want to anyway.
 * You may occasionally receive an odd error message when using matchers. The aim is that this should always be in the right place (not at some indeterminate future time) though, and should always give you an error message telling you what went wrong and why. If ever that's not the case, then I consider it a potential bug and would be grateful if you'd report it on GitHub.
 
 **Side note**
@@ -316,13 +316,12 @@ Once again, we've got you covered:
 when(() -> mock.hasThreeArguments(any(), eq("exact"), eq("arguments")))
 ```
 
-`eq()` is another matcher that's custom designed for this very purpose. Using 
+[eq()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#eq-T-) is another matcher that's custom designed for this very purpose. Using 
 it, you can pass exact arguments as matchers.
 
 ##### Matcher-based assertions
 
-Matchers work exactly the same way in `assertMock()` as they do in `when()`,
-except instead of stubbing a return or throws value, they match invocations to
+Matchers work exactly the same way in [assertMock()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html#assertMock-com.roscopeco.moxy.api.InvocationRunnable-) as they do in [when()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html#when-com.roscopeco.moxy.api.InvocationSupplier-), except instead of stubbing a return or throws value, they match invocations to
 be asserted against. So:
 
 ```java
@@ -338,7 +337,7 @@ Ahh, good old primitives. They've not overcomplicated the matcher API at all...
 Most of the matchers provided by Moxy support primitive arguments as well as reference types.
 However, it's important that you make sure you use the appropriate primitive variants
 of the matcher methods when creating your matchers. So, e.g. for an `int`, you'd use
-`anyInt()` rather than plain `any()`. 
+`anyInt()` rather than plain [any()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#any--). 
 
 Sadly, due to the ~~stupid~~ way Java generics and autoboxing are implemented, the
 compiler won't catch you if you forget this rule, and one of two things will 
@@ -349,7 +348,7 @@ happen at runtime:
 
 So if you do get that seemingly random NPE, and you're using matchers, check carefully
 that you're using primitive matchers as appropriate. A common vector for getting this 
-wrong seems to be when using primitive `and()` and `or()` matchers - the matchers 
+wrong seems to be when using primitive [and()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#and-T...-) and [or()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#or-T...-) matchers - the matchers 
 that are being and'ed and or'ed _also_ need to be primitive. So, e.g., instead of:
 
 ```java
@@ -377,36 +376,43 @@ The proper suffixes for the primitive variants of the matcher methods are:
 
 The following matcher types are supported out-of-the-box:
 
-* `and(matcher1, matcher2, ..., matcherN)` - Matches only if all nested matchers match.
-* `any()` - Matches anything
-* `anyOf(Object1, Object2, ..., ObjectN)` - Matches if the argument is in the list.
-* `endsWith(String)` - Matches if the `String` argument ends with the given string. *****
-* `eq(Object)` - Matches if the argument `.equals()` the given object. Supports null.
-* `gt(Object)` - Matches if the `Comparable` argument is greater-than the given object.
-* `lt(Object)` - Matches if the `Comparable` argument is less-than the given object.
-* `neq(Object)` - Matches if the argument doesn't `.equals()` the given object. Supports null.
-* `not(matcher)` - Negates the given matcher. Note the difference between this and `neq()`.
-* `or(matcher1, matcher2, ..., matcherN)` - Matches if any of the nested matchers match.
-* `regexMatch(String)` - Matches if the String argument matches the supplied regular expression. *****
-* `startsWith(String)` - Matches if the `String` argument starts with the given string. *****
+* [and(matcher1, matcher2, ..., matcherN)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#and-T...-) - Matches only if all nested matchers match.
+* [any()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#any--) - Matches anything
+* [any(Class)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#any-java.lang.Class-) - Matches any instance of the given class. Alias for [instanceOf(Class)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#instanceOf-java.lang.Class-).
+* [anyOf(Object1, Object2, ..., ObjectN)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#anyOf-T...-) - Matches if the argument is in the list.
+* [endsWith(String)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#endsWith-java.lang.String-) - Matches if the `String` argument ends with the given string. *****
+* [eq(Object)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#eq-T-) - Matches if the argument `.equals()` the given object. Supports null.
+* [gt(Object)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#gt-T-) - Matches if the `Comparable` argument is greater-than the given object.
+* [instanceOf(Class)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#instanceOf-java.lang.Class-) - Matches if the argument is an `instanceof` the specified class. For convenience, this is also aliased as [any(Class)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#any-java.lang.Class-).
+* [lt(Object)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#gt-T-) - Matches if the `Comparable` argument is less-than the given object.
+* [neq(Object)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#neq-T-) - Matches if the argument doesn't `.equals()` the given object. Supports null.
+* [not(matcher)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#not-T-) - Negates the given matcher. Note the difference between this and [neq()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#neq-T-).
+* [or(matcher1, matcher2, ..., matcherN)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#or-T...-) - Matches if any of the nested matchers match.
+* [regexMatch(String)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#regexMatch-java.lang.String-) - Matches if the String argument matches the supplied regular expression. *****
+* [startsWith(String)](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#startsWith-java.lang.String-) - Matches if the `String` argument starts with the given string. *****
 
  ***** These matchers have no primitive equivalent.
  
 There are lots more matcher types planned, so take a look at the 
-`com.roscopeco.moxy.matchers.Matchers` class documentation for up-to-the minute 
-matcher type support. It's also a good place to find full details for all the matchers.
+[Matchers](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html)
+class documentation for up-to-the minute matcher type support. It's also a good place 
+to find full details for all the matchers.
 
 ##### Custom matchers
 
 You can implement your own matchers in one of two ways:
 
-* For simple matchers, the `custom()` matcher accepts a Java 1.8 lambda expression which receives the actual argument and is expected to return a boolean indicating whether it matches or not. E.g:
+* For simple matchers, the [custom()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#custom-com.roscopeco.moxy.matchers.MoxyMatcher-) matcher accepts a Java 1.8 lambda expression which receives 
+the actual argument and is expected to return a boolean indicating whether it matches or not. E.g:
 
 ```java
 assertMock(() -> mock.method(custom((arg) -> arg instanceof String))).wasCalled();
 ```
 
-* For more complicated matchers, you can create your own implementation of `MoxyMatcher` and pass that to the `custom()` method instead of a lambda expression. You will need to do this, for example, if your matcher has more complex requirements and needs to manipulate the matcher stack. E.g.
+* For more complicated matchers, you can create your own implementation of 
+[MoxyMatcher](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/MoxyMatcher.html)
+and pass that to the [custom()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#custom-com.roscopeco.moxy.matchers.MoxyMatcher-) method instead of a lambda expression. You will need to do this, for example, 
+if your matcher has more complex requirements and needs to manipulate the matcher stack. E.g.
 
 ```java
 class MyMatcher<T> implements MoxyMatcher<T> {
@@ -426,10 +432,10 @@ class MyMatcher<T> implements MoxyMatcher<T> {
 assertMock(() -> mock.method(custom(new MyMatcher<String>()))).wasCalled();
 ```
 
-Note that a `default` implementation of `addToStack()` is provided by the interface,
-so if you're implementing the interface because your matcher is too long for a readable 
-lambda then you don't _have_ to implement it, as long as your matcher only needs to be 
-pushed to the stack (like 90% of all matchers do).
+Note that a `default` implementation of [addToStack()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/MoxyMatcher.html#addToStack-java.util.Deque-)
+is provided by the interface, so if you're implementing the interface because your 
+matcher is too long for a readable lambda then you don't _have_ to implement it, as 
+long as your matcher only needs to be pushed to the stack (like 90% of all matchers do).
 
 **Side note**
 > The _matcher stack_? Yup, this is an advanced topic. See the documentation on the MoxyMatcher class for more details.
@@ -474,7 +480,7 @@ public MyClass(String arg1, int arg2) { ... }
 You simply need to generate the class, and then instantiate it with reflection.
 The only thing to note is that the mock class will have an extra constructor 
 argument, prepended to the normal constructor arguments, into which you'll 
-pass the `MoxyEngine` that created the class. So the generated constructor
+pass the [MoxyEngine](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyEngine.html) that created the class. So the generated constructor
 will look like:
 
 ```java

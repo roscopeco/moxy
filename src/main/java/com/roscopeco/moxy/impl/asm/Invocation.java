@@ -131,33 +131,45 @@ final class Invocation {
 
   @Override
   public boolean equals(final Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (this.getClass() != obj.getClass())
+    }
+    if (this.getClass() != obj.getClass()) {
       return false;
+    }
     final Invocation other = (Invocation) obj;
     if (this.args == null) {
-      if (other.args != null)
+      if (other.args != null) {
         return false;
-    } else if (!this.args.equals(other.args))
+      }
+    } else if (!this.args.equals(other.args)) {
       return false;
+    }
+
     if (this.methodDesc == null) {
-      if (other.methodDesc != null)
+      if (other.methodDesc != null) {
         return false;
-    } else if (!this.methodDesc.equals(other.methodDesc))
+      }
+    } else if (!this.methodDesc.equals(other.methodDesc)) {
       return false;
+    }
     if (this.methodName == null) {
-      if (other.methodName != null)
+      if (other.methodName != null) {
         return false;
-    } else if (!this.methodName.equals(other.methodName))
+      }
+    } else if (!this.methodName.equals(other.methodName)) {
       return false;
+    }
     if (this.receiver == null) {
-      if (other.receiver != null)
+      if (other.receiver != null) {
         return false;
-    } else if (!this.receiver.equals(other.receiver))
+      }
+    } else if (!this.receiver.equals(other.receiver)) {
       return false;
+    }
     return true;
   }
 }

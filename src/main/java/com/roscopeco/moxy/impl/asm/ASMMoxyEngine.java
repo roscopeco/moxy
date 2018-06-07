@@ -403,7 +403,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   boolean isMockStubbingDisabledOnThisThread() {
     final Boolean disabled = this.threadLocalMockBehaviourDisabled.get();
-    return (disabled != null && disabled != false);
+    return (disabled != null && !disabled);
   }
 
   /*
@@ -412,7 +412,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <T> MoxyStubber<T> when(final InvocationSupplier<T> invocation) {
-    this.runMonitoredInvocation(() -> invocation.get());
+    this.runMonitoredInvocation(invocation::get);
     this.getRecorder().replaceInvocationArgsWithMatchers();
     this.deleteLatestInvocationFromListAndValidateStack();
     return new ASMMoxyStubber<>(this);
@@ -424,7 +424,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public MoxyVoidStubber when(final InvocationRunnable invocation) {
-    this.runMonitoredInvocation(() -> invocation.run());
+    this.runMonitoredInvocation(invocation::run);
     this.getRecorder().replaceInvocationArgsWithMatchers();
     this.deleteLatestInvocationFromListAndValidateStack();
     return new ASMMoxyVoidStubber(this);
@@ -436,7 +436,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public MoxyVerifier assertMock(final InvocationRunnable invocation) {
-    this.runMonitoredInvocation(() -> invocation.run());
+    this.runMonitoredInvocation(invocation::run);
     this.getRecorder().replaceInvocationArgsWithMatchers();
     this.deleteLatestInvocationFromListAndValidateStack();
     return new ASMMoxyVerifier(this);

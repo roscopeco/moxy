@@ -215,10 +215,30 @@ When using `thenCallRealMethod`, you still get all the usual verification
 goodness that Moxy provides, so you can still use matchers, for example,
 or check how many times it was called and make sure it didn't throw exceptions.
 
-**Side note**
-> It is worth noting that a mock set to call its real method will do so
-every time it's invoked, including when it's invoked in an `assertMock`
-call. So be careful when calling real methods that have side-effects...
+##### Actions
+
+In addition to stubbing your mocks or setting them up as spies, you can
+also have them execute arbitrary actions using the `thenDo` method which
+accepts a lambda (or anonymous class if they're more your thing), like so:
+
+```java
+Moxy.when(() -> mock.something("arg"))
+    .thenDo(args -&gt; System.out.println("mock.something called"))
+    .thenDo(args -&gt; customRecorder.record("something", args));
+```
+
+And of course you can still using stubbing/spying in the usual way:
+
+```java
+Moxy.when(() -> mock.something("arg"))
+    .thenDo(args -&gt; System.out.println("mock.something called"))
+    .thenCallRealMethod();
+```
+
+There's one case where you'll want to be a bit careful when using actions,
+specifically when using them with matchers. For more details, check out
+the JavaDoc at 
+https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenDo--
 
 ##### Verifying
 

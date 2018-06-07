@@ -39,6 +39,9 @@ import com.roscopeco.moxy.api.MockGenerationException;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
+import com.roscopeco.moxy.matchers.InconsistentMatchersException;
+import com.roscopeco.moxy.matchers.Matchers;
+import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
 import com.roscopeco.moxy.model.ClassWithNoNullConstructor;
 import com.roscopeco.moxy.model.ClassWithPrimitiveReturns;
 import com.roscopeco.moxy.model.FieldsClass;
@@ -298,34 +301,6 @@ public class TestMoxy {
 
     assertThatThrownBy(() -> mock.returnHello())
         .isSameAs(theException);
-  }
-
-  @Test
-  public void testMoxyAssertMockWithMockThenThrowThenReturnFailsProperly() {
-    final SimpleClass mock = Moxy.mock(SimpleClass.class);
-
-    final RuntimeException theException = new RuntimeException("Oops!");
-
-    assertThatThrownBy(() -> Moxy.when(() -> mock.returnHello()).thenThrow(theException).thenReturn("hello"))
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessage("Cannot set return for 'java.lang.String returnHello()' as it has already been stubbed to throw or call real method");
-
-    assertThatThrownBy(() -> mock.returnHello())
-        .isSameAs(theException);
-  }
-
-  @Test
-  public void testMoxyAssertMockWithMockThenReturnThenThrowFailsProperly() {
-    final SimpleClass mock = Moxy.mock(SimpleClass.class);
-
-    final RuntimeException theException = new RuntimeException("Oops!");
-
-    assertThatThrownBy(() -> Moxy.when(() -> mock.returnHello()).thenReturn("hello").thenThrow(theException))
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessage("Cannot set throw for 'java.lang.String returnHello()' as it has already been stubbed to return or call real method");
-
-    assertThat(mock.returnHello())
-        .isEqualTo("hello");
   }
 
   @Test
@@ -738,7 +713,7 @@ public class TestMoxy {
 
     // Ensure we've only got the support fields, and haven't copied any...
     assertThat(mock.getClass().getDeclaredFields())
-        .hasSize(4)
+        .hasSize(5)
         .doesNotContainAnyElementsOf(
             Lists.newArrayList(
                 FieldsClass.class.getDeclaredField("intField"),
@@ -917,5 +892,116 @@ public class TestMoxy {
         mock.sayHelloTo("Bill")
     )
         .isSameAs(ex);
+  }
+
+  @Test
+  public void testMoxyMockThenAnswerWorksCorrectly() {
+    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+
+    Moxy.when(() -> mock.sayHelloTo("Steve")).thenAnswer(args -> "Bonjour, " + args.get(0));
+
+    assertThat(mock.sayHelloTo("Steve")).isEqualTo("Bonjour, Steve");
+  }
+
+  @Test
+  public void testMoxyMockThenDoWorksCorrectly() {
+    final MethodWithArguments mock = Moxy.mock(MethodWithArguments.class);
+
+    final String[] string = new String[1];
+
+    assertThat(string[0]).isNull();
+
+    Moxy.when(() -> mock.hasArgs("one", "two")).thenDo(args -> string[0] = args.get(0).toString());
+
+    mock.hasArgs("one", "two");
+
+    assertThat(string[0]).isEqualTo("one");
+  }
+
+  @Test
+  public void testMoxyMockThenDoThenAnswerWorksCorrectly() {
+    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+
+    final String[] string = new String[1];
+
+    assertThat(string[0]).isNull();
+
+    Moxy.when(() -> mock.sayHelloTo(Matchers.any()))
+        .thenDo(args -> string[0] = args.get(0).toString())
+        .thenAnswer(args -> "Hallo, " + args.get(0));
+
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hallo, Bill");
+
+    assertThat(string[0]).isEqualTo("Bill");
+  }
+
+  @Test
+  public void testMoxyMockThenDoMultipleThenAnswerWorksCorrectly() {
+    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+
+    final String[] string = new String[3];
+
+    assertThat(string[0]).isNull();
+
+    Moxy.when(() -> mock.sayHelloTo(Matchers.any()))
+        .thenDo(args -> string[0] = args.get(0).toString())
+        .thenDo(args -> string[1] = args.get(0).toString().toLowerCase())
+        .thenDo(args -> string[2] = args.get(0).toString().toUpperCase())
+        .thenAnswer(args -> "Hallo, " + args.get(0));
+
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hallo, Bill");
+
+    assertThat(string[0]).isEqualTo("Bill");
+    assertThat(string[1]).isEqualTo("bill");
+    assertThat(string[2]).isEqualTo("BILL");
+  }
+
+  @Test
+  public void testMoxyMockThenDoMultipleMatchesAllAreExecuted_whichMaySeemOdd_butIsDocumented() {
+    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+
+    final String[] string = new String[2];
+
+    assertThat(string[0]).isNull();
+
+    Moxy.when(() -> mock.hasTwoArgs(Matchers.any(), Matchers.eqInt(5)))
+      .thenDo(args -> string[0] = args.get(0).toString())
+      .thenAnswer(args -> "Yo, " + args.get(0));
+
+    Moxy.when(() -> mock.hasTwoArgs(Matchers.eq("Bill"), Matchers.anyInt()))
+      .thenDo(args -> string[1] = args.get(1).toString())
+      .thenAnswer(args -> "Yo, " + args.get(0));
+
+    assertThat(mock.hasTwoArgs("Bill", 5)).isEqualTo("Yo, Bill");
+
+    assertThat(string[0]).isEqualTo("Bill");
+    assertThat(string[1]).isEqualTo("5");
+  }
+
+  @Test
+  public void testThatMockMockWithMatcherUsageErrorThrowsProperly() {
+    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+
+    assertThatThrownBy(() ->
+        Moxy.when(() -> mock.hasTwoArgs(Matchers.any(), 5))
+    )
+        .isInstanceOf(InconsistentMatchersException.class)
+        .hasMessage("Inconsistent use of matchers: if using matchers, *all* arguments must be supplied with them.\n"
+            + "This limitation will (hopefully) be lifted in the future");
+
+    assertThatThrownBy(() ->
+        Moxy.when(() -> mock.hasTwoArgs("illegal bare arg", Matchers.anyInt()))
+    )
+        .isInstanceOf(InconsistentMatchersException.class)
+        .hasMessage("Inconsistent use of matchers: if using matchers, *all* arguments must be supplied with them.\n"
+            + "This limitation will (hopefully) be lifted in the future");
+
+    assertThatThrownBy(() ->
+        Moxy.when(() -> mock.hasTwoArgs(Matchers.any(), Matchers.any()))
+    )
+      .isInstanceOf(PossibleMatcherUsageError.class)
+      .hasMessage("If you're using primitive matchers, ensure you're using the "
+          + "correct type (e.g. anyInt() rather than any()), especially when nesting");
+
   }
 }

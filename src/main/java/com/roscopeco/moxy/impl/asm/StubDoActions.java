@@ -21,33 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.matchers;
+package com.roscopeco.moxy.impl.asm;
 
-import com.roscopeco.moxy.api.MoxyException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
 
-class InstanceOfMatcher<T> implements MoxyMatcher<T> {
-  private final Class<T> clz;
+/*
+ * This is used as the value in the stubbed returnMap
+ * on the mocks.
+ */
+final class StubDoActions {
+  final List<Object> args;
+  final List<Consumer<List<?extends Object>>> actions;
 
-  public InstanceOfMatcher(final Class<T> clz) {
-    if (clz == null) {
-      throw new MoxyException("Null argument; see cause",
-          new IllegalArgumentException("Cannot match to null"));
-    }
+  @SafeVarargs
+  public StubDoActions(final List<Object> args, final Consumer<List<?extends Object>>... actions) {
+    super();
+    this.args = args;
+    this.actions = new ArrayList<>();
 
-    this.clz = clz;
-  }
-
-  @Override
-  public boolean matches(final T arg) {
-    if (arg != null) {
-      return this.clz.isAssignableFrom(arg.getClass());
-    } else {
-      return false;
-    }
-  }
-
-  @Override
-  public String toString() {
-    return "<instanceOf: " + this.clz + ">";
+    Arrays.stream(actions).forEach(this.actions::add);
   }
 }

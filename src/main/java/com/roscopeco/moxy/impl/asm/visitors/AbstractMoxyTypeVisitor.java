@@ -113,6 +113,9 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
 
     fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_SUPERMAP_FIELD_NAME, MAP_DESCRIPTOR, null, null);
     fv.visitEnd();
+
+    fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_DOACTIONSMAP_FIELD_NAME, MAP_DESCRIPTOR, null, null);
+    fv.visitEnd();
   }
 
   void generateSupportMethods() {
@@ -134,6 +137,11 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
     this.generateSupportGetter(SUPPORT_GETSUPERMAP_METHOD_NAME,
                                SUPPORT_GETSUPERMAP_DESCRIPTOR,
                                SUPPORT_SUPERMAP_FIELD_NAME,
+                               MAP_DESCRIPTOR);
+
+    this.generateSupportGetter(SUPPORT_GETDOACTIONSMAP_METHOD_NAME,
+                               SUPPORT_GETDOACTIONSMAP_DESCRIPTOR,
+                               SUPPORT_DOACTIONSMAP_FIELD_NAME,
                                MAP_DESCRIPTOR);
   }
 

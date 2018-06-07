@@ -112,20 +112,25 @@ class ASMMoxyMatcherEngine {
     return result;
   }
 
+  boolean clearMatcherStack() {
+    final ArrayDeque<MoxyMatcher<?>> stack = this.matcherStack.get();
+    if (stack != null && !stack.isEmpty()) {
+      // clear stack as per contract of InconsistentMatchersException
+      stack.clear();
+      return true;
+    }
+    return false;
+
+  }
+
   /*
    * Verifies the stack is empty. Called at entry and exit to the
    * framework (i.e. start and end of when() and assert() calls).
    *
    * If non-empty, throws InconsistentMatchersException.
    */
-  void validateStackConsistency() {
-    final ArrayDeque<MoxyMatcher<?>> stack = this.matcherStack.get();
-    if (!(stack == null || stack.isEmpty())) {
-      // clear stack as per contract of InconsistentMatchersException
-      if (stack != null) {
-        stack.clear();
-      }
-
+  void ensureStackConsistency() {
+    if (this.clearMatcherStack()) {
       throw new InconsistentMatchersException(0, this.matcherStack.get());
     }
   }

@@ -50,7 +50,6 @@ import com.roscopeco.moxy.api.MonitoredInvocationException;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.impl.asm.ASMMoxyEngine.MonitoredInvocation;
-import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
 import com.roscopeco.moxy.model.ClassWithPrimitiveReturns;
 import com.roscopeco.moxy.model.DifferentAccessModifiers;
 import com.roscopeco.moxy.model.MethodWithArguments;
@@ -308,7 +307,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     engine.ensureEngineConsistencyBeforeMonitoredInvocation();
 
     assertMock(() -> mockRecorder.clearLastInvocation()).wasCalledOnce();
-    assertMock(() -> mockMatcherEngine.validateStackConsistency()).wasCalledOnce();
+    assertMock(() -> mockMatcherEngine.ensureStackConsistency()).wasCalledOnce();
   }
 
   private void throwRTE(final Exception e) {
@@ -339,10 +338,8 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThatThrownBy(() ->
         mockEngine.runMonitoredInvocation(() -> this.throwRTE(nullPointerException))
     )
-        .isInstanceOf(PossibleMatcherUsageError.class)
-        .hasMessage("NPE in invocation: If you're using primitive matchers, ensure you're using the "
-                  + "correct type (e.g. anyInt() rather than any()), especially when nesting.\n"
-                  + "Otherwise, the causing exception may have more information.")
+        .isInstanceOf(MoxyException.class)
+        .hasMessage("[BUG] NPE in engine invocation code; Probable framework bug")
         .extracting(e -> e.getCause())
             .hasSize(1)
             .hasSameElementsAs(Lists.newArrayList(nullPointerException));
@@ -365,10 +362,10 @@ class TestASMMoxyEngine extends AbstractImplTest {
     final ThreadLocalInvocationRecorder mockRecorder = mockEngine.getRecorder();
     final ASMMoxyMatcherEngine mockMatcherEngine = mockEngine.getMatcherEngine();
 
-    mockEngine.deleteLatestInvocationFromList();
+    mockEngine.deleteLatestInvocationFromListAndValidateStack();
 
     assertMock(() -> mockRecorder.unrecordLastInvocation()).wasCalledOnce();
-    assertMock(() -> mockMatcherEngine.validateStackConsistency()).wasCalledOnce();
+    assertMock(() -> mockMatcherEngine.ensureStackConsistency()).wasCalledOnce();
   }
 
   @Test
@@ -377,7 +374,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
         ASMMoxyEngine.class.getDeclaredMethod("runMonitoredInvocation", MonitoredInvocation.class),
         ASMMoxyEngine.class.getDeclaredMethod("disableMockBehaviourOnThisThread"),
         ASMMoxyEngine.class.getDeclaredMethod("enableMockBehaviourOnThisThread"),
-        ASMMoxyEngine.class.getDeclaredMethod("deleteLatestInvocationFromList"));
+        ASMMoxyEngine.class.getDeclaredMethod("deleteLatestInvocationFromListAndValidateStack"));
 
     final SimpleClass simpleMock = mockEngine.mock(SimpleClass.class);
 
@@ -410,7 +407,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertMock(() -> mockEngine.enableMockBehaviourOnThisThread()).wasCalledOnce();
     assertMock(() -> recorder.replaceInvocationArgsWithMatchers()).wasCalledOnce();
     assertMock(() -> recorder.getAndClearLastInvocation()).wasCalledOnce();
-    assertMock(() -> mockEngine.deleteLatestInvocationFromList()).wasCalledOnce();
+    assertMock(() -> mockEngine.deleteLatestInvocationFromListAndValidateStack()).wasCalledOnce();
   }
 
   @Test
@@ -419,7 +416,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
         ASMMoxyEngine.class.getDeclaredMethod("runMonitoredInvocation", MonitoredInvocation.class),
         ASMMoxyEngine.class.getDeclaredMethod("disableMockBehaviourOnThisThread"),
         ASMMoxyEngine.class.getDeclaredMethod("enableMockBehaviourOnThisThread"),
-        ASMMoxyEngine.class.getDeclaredMethod("deleteLatestInvocationFromList"));
+        ASMMoxyEngine.class.getDeclaredMethod("deleteLatestInvocationFromListAndValidateStack"));
 
     final MethodWithArguments voidReturnMock = mockEngine.mock(MethodWithArguments.class);
 
@@ -452,7 +449,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertMock(() -> mockEngine.enableMockBehaviourOnThisThread()).wasCalledOnce();
     assertMock(() -> recorder.replaceInvocationArgsWithMatchers()).wasCalledOnce();
     assertMock(() -> recorder.getAndClearLastInvocation()).wasCalledOnce();
-    assertMock(() -> mockEngine.deleteLatestInvocationFromList()).wasCalledOnce();
+    assertMock(() -> mockEngine.deleteLatestInvocationFromListAndValidateStack()).wasCalledOnce();
   }
 
   @Test
@@ -461,7 +458,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
         ASMMoxyEngine.class.getDeclaredMethod("runMonitoredInvocation", MonitoredInvocation.class),
         ASMMoxyEngine.class.getDeclaredMethod("disableMockBehaviourOnThisThread"),
         ASMMoxyEngine.class.getDeclaredMethod("enableMockBehaviourOnThisThread"),
-        ASMMoxyEngine.class.getDeclaredMethod("deleteLatestInvocationFromList"));
+        ASMMoxyEngine.class.getDeclaredMethod("deleteLatestInvocationFromListAndValidateStack"));
 
     final MethodWithArguments voidReturnMock = mockEngine.mock(MethodWithArguments.class);
 
@@ -494,7 +491,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertMock(() -> mockEngine.enableMockBehaviourOnThisThread()).wasCalledOnce();
     assertMock(() -> recorder.replaceInvocationArgsWithMatchers()).wasCalledOnce();
     assertMock(() -> recorder.getAndClearLastInvocation()).wasCalledOnce();
-    assertMock(() -> mockEngine.deleteLatestInvocationFromList()).wasCalledOnce();
+    assertMock(() -> mockEngine.deleteLatestInvocationFromListAndValidateStack()).wasCalledOnce();
   }
 
   @Test
@@ -567,15 +564,16 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(node.superName).isEqualTo("com/roscopeco/moxy/model/ClassWithPrimitiveReturns");
 
     assertThat(node.methods)
-      .hasSize(6)
+      .hasSize(7)
       .hasOnlyElementsOfType(MethodNode.class)
       .extracting("name", "desc")
-          .containsOnly(tuple("<init>",                  "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
-                        tuple("__moxy_asm_getEngine",    "()Lcom/roscopeco/moxy/impl/asm/ASMMoxyEngine;"),
-                        tuple("__moxy_asm_getReturnMap", "()Ljava/util/Map;"),
-                        tuple("__moxy_asm_getThrowMap",  "()Ljava/util/Map;"),
-                        tuple("__moxy_asm_getCallSuperMap",  "()Ljava/util/Map;"),
-                        tuple("returnByte",              "()B"));
+          .containsOnly(tuple("<init>",                       "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
+                        tuple("__moxy_asm_getEngine",         "()Lcom/roscopeco/moxy/impl/asm/ASMMoxyEngine;"),
+                        tuple("__moxy_asm_getReturnMap",      "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_getThrowMap",       "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_getCallSuperMap",   "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_getDoActionsMap",   "()Ljava/util/Map;"),
+                        tuple("returnByte",                   "()B"));
   }
 
   @Test
@@ -590,23 +588,24 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(node.superName).isEqualTo("com/roscopeco/moxy/model/ClassWithPrimitiveReturns");
 
     assertThat(node.methods)
-      .hasSize(14)
+      .hasSize(15)
       .hasOnlyElementsOfType(MethodNode.class)
       .extracting("name", "desc")
-          .containsOnly(tuple("<init>",                  "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
-                        tuple("__moxy_asm_getEngine",    "()Lcom/roscopeco/moxy/impl/asm/ASMMoxyEngine;"),
-                        tuple("__moxy_asm_getReturnMap", "()Ljava/util/Map;"),
-                        tuple("__moxy_asm_getThrowMap",  "()Ljava/util/Map;"),
-                        tuple("__moxy_asm_getCallSuperMap",  "()Ljava/util/Map;"),
-                        tuple("returnByte",              "()B"),
-                        tuple("returnChar",              "()C"),
-                        tuple("returnShort",             "()S"),
-                        tuple("returnInt",               "()I"),
-                        tuple("returnLong",              "()J"),
-                        tuple("returnFloat",             "()F"),
-                        tuple("returnDouble",            "()D"),
-                        tuple("returnBoolean",           "()Z"),
-                        tuple("returnVoid",              "()V"));
+          .containsOnly(tuple("<init>",                       "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
+                        tuple("__moxy_asm_getEngine",         "()Lcom/roscopeco/moxy/impl/asm/ASMMoxyEngine;"),
+                        tuple("__moxy_asm_getReturnMap",      "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_getThrowMap",       "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_getCallSuperMap",   "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_getDoActionsMap",   "()Ljava/util/Map;"),
+                        tuple("returnByte",                   "()B"),
+                        tuple("returnChar",                   "()C"),
+                        tuple("returnShort",                  "()S"),
+                        tuple("returnInt",                    "()I"),
+                        tuple("returnLong",                   "()J"),
+                        tuple("returnFloat",                  "()F"),
+                        tuple("returnDouble",                 "()D"),
+                        tuple("returnBoolean",                "()Z"),
+                        tuple("returnVoid",                   "()V"));
   }
 
   @Test
@@ -621,15 +620,16 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(node.superName).isEqualTo("com/roscopeco/moxy/model/ClassWithPrimitiveReturns");
 
     assertThat(node.methods)
-      .hasSize(5)
+      .hasSize(6)
       .hasOnlyElementsOfType(MethodNode.class)
       .extracting("name", "desc")
-          .containsOnly(tuple("<init>",                  "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
-                        tuple("__moxy_asm_getEngine",    "()Lcom/roscopeco/moxy/impl/asm/ASMMoxyEngine;"),
-                        tuple("__moxy_asm_getReturnMap", "()Ljava/util/Map;"),
-                        tuple("__moxy_asm_getThrowMap",  "()Ljava/util/Map;"),
-                        tuple("__moxy_asm_getCallSuperMap",  "()Ljava/util/Map;"));
-  }
+          .containsOnly(tuple("<init>",                       "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
+                        tuple("__moxy_asm_getEngine",         "()Lcom/roscopeco/moxy/impl/asm/ASMMoxyEngine;"),
+                        tuple("__moxy_asm_getReturnMap",      "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_getThrowMap",       "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_getCallSuperMap",   "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_getDoActionsMap",   "()Ljava/util/Map;"));
+ }
 
   @Test
   public void testResetMockObject() throws Exception {

@@ -77,7 +77,7 @@ public class Matchers {
    * @since 1.0
    */
   public static byte anyByte(final MoxyEngine engine) {
-    engine.getMatcherEngine().registerMatcher(new AnyMatcher<Byte>());
+    engine.registerMatcher(new AnyMatcher<Byte>());
     return 0;
   }
 
@@ -103,7 +103,7 @@ public class Matchers {
    * @since 1.0
    */
   public static char anyChar(final MoxyEngine engine) {
-    engine.getMatcherEngine().registerMatcher(new AnyMatcher<Character>());
+    engine.registerMatcher(new AnyMatcher<Character>());
     return 0;
   }
 
@@ -129,7 +129,7 @@ public class Matchers {
    * @since 1.0
    */
   public static short anyShort(final MoxyEngine engine) {
-    engine.getMatcherEngine().registerMatcher(new AnyMatcher<Short>());
+    engine.registerMatcher(new AnyMatcher<Short>());
     return 0;
   }
 
@@ -155,7 +155,7 @@ public class Matchers {
    * @since 1.0
    */
   public static int anyInt(final MoxyEngine engine) {
-    engine.getMatcherEngine().registerMatcher(new AnyMatcher<Integer>());
+    engine.registerMatcher(new AnyMatcher<Integer>());
     return 0;
   }
 
@@ -181,7 +181,7 @@ public class Matchers {
    * @since 1.0
    */
   public static long anyLong(final MoxyEngine engine) {
-    engine.getMatcherEngine().registerMatcher(new AnyMatcher<Long>());
+    engine.registerMatcher(new AnyMatcher<Long>());
     return 0;
   }
 
@@ -207,7 +207,7 @@ public class Matchers {
    * @since 1.0
    */
   public static float anyFloat(final MoxyEngine engine) {
-    engine.getMatcherEngine().registerMatcher(new AnyMatcher<Float>());
+    engine.registerMatcher(new AnyMatcher<Float>());
     return 0;
   }
 
@@ -233,7 +233,7 @@ public class Matchers {
    * @since 1.0
    */
   public static double anyDouble(final MoxyEngine engine) {
-    engine.getMatcherEngine().registerMatcher(new AnyMatcher<Double>());
+    engine.registerMatcher(new AnyMatcher<Double>());
     return 0;
   }
 
@@ -259,7 +259,7 @@ public class Matchers {
    * @since 1.0
    */
   public static boolean anyBool(final MoxyEngine engine) {
-    engine.getMatcherEngine().registerMatcher(new AnyMatcher<Boolean>());
+    engine.registerMatcher(new AnyMatcher<Boolean>());
     return false;
   }
 
@@ -298,7 +298,7 @@ public class Matchers {
    * @param <T> The type this matcher will operate on.
    */
   public static <T> T any(final MoxyEngine engine) {
-    engine.getMatcherEngine().registerMatcher(new AnyMatcher<T>());
+    engine.registerMatcher(new AnyMatcher<T>());
     return null;
   }
 
@@ -329,7 +329,7 @@ public class Matchers {
    * @since 1.0
    */
   public static byte eqByte(final MoxyEngine engine, final byte value) {
-    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<Byte>(value));
+    engine.registerMatcher(new EqualsMatcher<Byte>(value));
     return 0;
   }
 
@@ -358,7 +358,7 @@ public class Matchers {
    * @since 1.0
    */
   public static char eqChar(final MoxyEngine engine, final char value) {
-    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<Character>(value));
+    engine.registerMatcher(new EqualsMatcher<Character>(value));
     return 0;
   }
 
@@ -387,7 +387,7 @@ public class Matchers {
    * @since 1.0
    */
   public static short eqShort(final MoxyEngine engine, final short value) {
-    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<Short>(value));
+    engine.registerMatcher(new EqualsMatcher<Short>(value));
     return 0;
   }
 
@@ -416,7 +416,7 @@ public class Matchers {
    * @since 1.0
    */
   public static int eqInt(final MoxyEngine engine, final int value) {
-    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<Integer>(value));
+    engine.registerMatcher(new EqualsMatcher<Integer>(value));
     return 0;
   }
 
@@ -445,7 +445,7 @@ public class Matchers {
    * @since 1.0
    */
   public static long eqLong(final MoxyEngine engine, final long value) {
-    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<Long>(value));
+    engine.registerMatcher(new EqualsMatcher<Long>(value));
     return 0;
   }
 
@@ -474,7 +474,7 @@ public class Matchers {
    * @since 1.0
    */
   public static float eqFloat(final MoxyEngine engine, final float value) {
-    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<Float>(value));
+    engine.registerMatcher(new EqualsMatcher<Float>(value));
     return 0;
   }
 
@@ -503,7 +503,7 @@ public class Matchers {
    * @since 1.0
    */
   public static double eqDouble(final MoxyEngine engine, final double value) {
-    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<Double>(value));
+    engine.registerMatcher(new EqualsMatcher<Double>(value));
     return 0;
   }
 
@@ -532,7 +532,7 @@ public class Matchers {
    * @since 1.0
    */
   public static boolean eqBool(final MoxyEngine engine, final boolean value) {
-    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<Boolean>(value));
+    engine.registerMatcher(new EqualsMatcher<Boolean>(value));
     return false;
   }
 
@@ -574,7 +574,7 @@ public class Matchers {
    * @param <T> The type this matcher will operate on
    */
   public static <T> T eq(final MoxyEngine engine, final T value) {
-    engine.getMatcherEngine().registerMatcher(new EqualsMatcher<T>(value));
+    engine.registerMatcher(new EqualsMatcher<T>(value));
     return null;
   }
 
@@ -605,7 +605,7 @@ public class Matchers {
    * @since 1.0
    */
   public static byte neqByte(final MoxyEngine engine, final byte value) {
-    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<Byte>(value));
+    engine.registerMatcher(new NotEqualsMatcher<Byte>(value));
     return 0;
   }
 
@@ -634,7 +634,7 @@ public class Matchers {
    * @since 1.0
    */
   public static char neqChar(final MoxyEngine engine, final char value) {
-    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<Character>(value));
+    engine.registerMatcher(new NotEqualsMatcher<Character>(value));
     return 0;
   }
 
@@ -663,7 +663,7 @@ public class Matchers {
    * @since 1.0
    */
   public static short neqShort(final MoxyEngine engine, final short value) {
-    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<Short>(value));
+    engine.registerMatcher(new NotEqualsMatcher<Short>(value));
     return 0;
   }
 
@@ -692,7 +692,7 @@ public class Matchers {
    * @since 1.0
    */
   public static int neqInt(final MoxyEngine engine, final int value) {
-    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<Integer>(value));
+    engine.registerMatcher(new NotEqualsMatcher<Integer>(value));
     return 0;
   }
 
@@ -721,7 +721,7 @@ public class Matchers {
    * @since 1.0
    */
   public static long neqLong(final MoxyEngine engine, final long value) {
-    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<Long>(value));
+    engine.registerMatcher(new NotEqualsMatcher<Long>(value));
     return 0;
   }
 
@@ -750,7 +750,7 @@ public class Matchers {
    * @since 1.0
    */
   public static float neqFloat(final MoxyEngine engine, final float value) {
-    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<Float>(value));
+    engine.registerMatcher(new NotEqualsMatcher<Float>(value));
     return 0;
   }
 
@@ -779,7 +779,7 @@ public class Matchers {
    * @since 1.0
    */
   public static double neqDouble(final MoxyEngine engine, final double value) {
-    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<Double>(value));
+    engine.registerMatcher(new NotEqualsMatcher<Double>(value));
     return 0;
   }
 
@@ -808,7 +808,7 @@ public class Matchers {
    * @since 1.0
    */
   public static boolean neqBool(final MoxyEngine engine, final boolean value) {
-    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<Boolean>(value));
+    engine.registerMatcher(new NotEqualsMatcher<Boolean>(value));
     return false;
   }
 
@@ -850,7 +850,7 @@ public class Matchers {
    * @param <T> The type this matcher will operate on
    */
   public static <T> T neq(final MoxyEngine engine, final T value) {
-    engine.getMatcherEngine().registerMatcher(new NotEqualsMatcher<T>(value));
+    engine.registerMatcher(new NotEqualsMatcher<T>(value));
     return null;
   }
 
@@ -881,7 +881,7 @@ public class Matchers {
    * @since 1.0
    */
   public static byte ltByte(final MoxyEngine engine, final byte value) {
-    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<Byte>(value));
+    engine.registerMatcher(new LessThanMatcher<Byte>(value));
     return 0;
   }
 
@@ -910,7 +910,7 @@ public class Matchers {
    * @since 1.0
    */
   public static char ltChar(final MoxyEngine engine, final char value) {
-    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<Character>(value));
+    engine.registerMatcher(new LessThanMatcher<Character>(value));
     return 0;
   }
 
@@ -939,7 +939,7 @@ public class Matchers {
    * @since 1.0
    */
   public static short ltShort(final MoxyEngine engine, final short value) {
-    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<Short>(value));
+    engine.registerMatcher(new LessThanMatcher<Short>(value));
     return 0;
   }
 
@@ -968,7 +968,7 @@ public class Matchers {
    * @since 1.0
    */
   public static int ltInt(final MoxyEngine engine, final int value) {
-    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<Integer>(value));
+    engine.registerMatcher(new LessThanMatcher<Integer>(value));
     return 0;
   }
 
@@ -997,7 +997,7 @@ public class Matchers {
    * @since 1.0
    */
   public static long ltLong(final MoxyEngine engine, final long value) {
-    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<Long>(value));
+    engine.registerMatcher(new LessThanMatcher<Long>(value));
     return 0;
   }
 
@@ -1026,7 +1026,7 @@ public class Matchers {
    * @since 1.0
    */
   public static float ltFloat(final MoxyEngine engine, final float value) {
-    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<Float>(value));
+    engine.registerMatcher(new LessThanMatcher<Float>(value));
     return 0;
   }
 
@@ -1055,7 +1055,7 @@ public class Matchers {
    * @since 1.0
    */
   public static double ltDouble(final MoxyEngine engine, final double value) {
-    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<Double>(value));
+    engine.registerMatcher(new LessThanMatcher<Double>(value));
     return 0;
   }
 
@@ -1084,7 +1084,7 @@ public class Matchers {
    * @since 1.0
    */
   public static boolean ltBool(final MoxyEngine engine, final boolean value) {
-    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<Boolean>(value));
+    engine.registerMatcher(new LessThanMatcher<Boolean>(value));
     return false;
   }
 
@@ -1122,7 +1122,7 @@ public class Matchers {
    * @param <T> The type this matcher will operate on
    */
   public static <T extends Comparable<T>> T lt(final MoxyEngine engine, final T value) {
-    engine.getMatcherEngine().registerMatcher(new LessThanMatcher<T>(value));
+    engine.registerMatcher(new LessThanMatcher<T>(value));
     return null;
   }
 
@@ -1153,7 +1153,7 @@ public class Matchers {
    * @since 1.0
    */
   public static byte gtByte(final MoxyEngine engine, final byte value) {
-    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<Byte>(value));
+    engine.registerMatcher(new GreaterThanMatcher<Byte>(value));
     return 0;
   }
 
@@ -1182,7 +1182,7 @@ public class Matchers {
    * @since 1.0
    */
   public static char gtChar(final MoxyEngine engine, final char value) {
-    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<Character>(value));
+    engine.registerMatcher(new GreaterThanMatcher<Character>(value));
     return 0;
   }
 
@@ -1211,7 +1211,7 @@ public class Matchers {
    * @since 1.0
    */
   public static short gtShort(final MoxyEngine engine, final short value) {
-    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<Short>(value));
+    engine.registerMatcher(new GreaterThanMatcher<Short>(value));
     return 0;
   }
 
@@ -1240,7 +1240,7 @@ public class Matchers {
    * @since 1.0
    */
   public static int gtInt(final MoxyEngine engine, final int value) {
-    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<Integer>(value));
+    engine.registerMatcher(new GreaterThanMatcher<Integer>(value));
     return 0;
   }
 
@@ -1269,7 +1269,7 @@ public class Matchers {
    * @since 1.0
    */
   public static long gtLong(final MoxyEngine engine, final long value) {
-    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<Long>(value));
+    engine.registerMatcher(new GreaterThanMatcher<Long>(value));
     return 0;
   }
 
@@ -1298,7 +1298,7 @@ public class Matchers {
    * @since 1.0
    */
   public static float gtFloat(final MoxyEngine engine, final float value) {
-    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<Float>(value));
+    engine.registerMatcher(new GreaterThanMatcher<Float>(value));
     return 0;
   }
 
@@ -1327,7 +1327,7 @@ public class Matchers {
    * @since 1.0
    */
   public static double gtDouble(final MoxyEngine engine, final double value) {
-    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<Double>(value));
+    engine.registerMatcher(new GreaterThanMatcher<Double>(value));
     return 0;
   }
 
@@ -1356,7 +1356,7 @@ public class Matchers {
    * @since 1.0
    */
   public static boolean gtBool(final MoxyEngine engine, final boolean value) {
-    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<Boolean>(value));
+    engine.registerMatcher(new GreaterThanMatcher<Boolean>(value));
     return false;
   }
 
@@ -1394,7 +1394,7 @@ public class Matchers {
    * @param <T> The type this matcher will operate on
    */
   public static <T extends Comparable<T>> T gt(final MoxyEngine engine, final T value) {
-    engine.getMatcherEngine().registerMatcher(new GreaterThanMatcher<T>(value));
+    engine.registerMatcher(new GreaterThanMatcher<T>(value));
     return null;
   }
 
@@ -1442,7 +1442,7 @@ public class Matchers {
    * @since 1.0
    */
   public static byte anyOfByte(final MoxyEngine engine, final List<Byte> possibilities) {
-    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<Byte>(possibilities));
+    engine.registerMatcher(new AnyOfMatcher<Byte>(possibilities));
     return 0;
   }
 
@@ -1488,7 +1488,7 @@ public class Matchers {
    * @since 1.0
    */
   public static char anyOfChar(final MoxyEngine engine, final List<Character> possibilities) {
-    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<Character>(possibilities));
+    engine.registerMatcher(new AnyOfMatcher<Character>(possibilities));
     return 0;
   }
 
@@ -1534,7 +1534,7 @@ public class Matchers {
    * @since 1.0
    */
   public static short anyOfShort(final MoxyEngine engine, final List<Short> possibilities) {
-    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<Short>(possibilities));
+    engine.registerMatcher(new AnyOfMatcher<Short>(possibilities));
     return 0;
   }
 
@@ -1580,7 +1580,7 @@ public class Matchers {
    * @since 1.0
    */
   public static int anyOfInt(final MoxyEngine engine, final List<Integer> possibilities) {
-    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<Integer>(possibilities));
+    engine.registerMatcher(new AnyOfMatcher<Integer>(possibilities));
     return 0;
   }
 
@@ -1626,7 +1626,7 @@ public class Matchers {
    * @since 1.0
    */
   public static long anyOfLong(final MoxyEngine engine, final List<Long> possibilities) {
-    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<Long>(possibilities));
+    engine.registerMatcher(new AnyOfMatcher<Long>(possibilities));
     return 0l;
   }
 
@@ -1672,7 +1672,7 @@ public class Matchers {
    * @since 1.0
    */
   public static float anyOfFloat(final MoxyEngine engine, final List<Float> possibilities) {
-    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<Float>(possibilities));
+    engine.registerMatcher(new AnyOfMatcher<Float>(possibilities));
     return 0.0f;
   }
 
@@ -1718,7 +1718,7 @@ public class Matchers {
    * @since 1.0
    */
   public static double anyOfDouble(final MoxyEngine engine, final List<Double> possibilities) {
-    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<Double>(possibilities));
+    engine.registerMatcher(new AnyOfMatcher<Double>(possibilities));
     return 0.0d;
   }
 
@@ -1764,7 +1764,7 @@ public class Matchers {
    * @since 1.0
    */
   public static boolean anyOfBool(final MoxyEngine engine, final List<Boolean> possibilities) {
-    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<Boolean>(possibilities));
+    engine.registerMatcher(new AnyOfMatcher<Boolean>(possibilities));
     return false;
   }
 
@@ -1824,7 +1824,7 @@ public class Matchers {
    * @param <T> The type this matcher will operate on
    */
   public static <T> T anyOf(final MoxyEngine engine, final List<? extends T> possibilities) {
-    engine.getMatcherEngine().registerMatcher(new AnyOfMatcher<T>(possibilities));
+    engine.registerMatcher(new AnyOfMatcher<T>(possibilities));
     return null;
   }
 
@@ -1877,7 +1877,7 @@ public class Matchers {
    * @since 1.0
    */
   public static byte andByte(final MoxyEngine engine, final Byte... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new AndMatcher<Byte>(fromMatchers));
+    engine.registerMatcher(new AndMatcher<Byte>(fromMatchers));
     return 0;
   }
 
@@ -1928,7 +1928,7 @@ public class Matchers {
    * @since 1.0
    */
   public static char andChar(final MoxyEngine engine, final Character... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new AndMatcher<Character>(fromMatchers));
+    engine.registerMatcher(new AndMatcher<Character>(fromMatchers));
     return 0;
   }
 
@@ -1979,7 +1979,7 @@ public class Matchers {
    * @since 1.0
    */
   public static short andShort(final MoxyEngine engine, final Short... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new AndMatcher<Short>(fromMatchers));
+    engine.registerMatcher(new AndMatcher<Short>(fromMatchers));
     return 0;
   }
 
@@ -2030,7 +2030,7 @@ public class Matchers {
    * @since 1.0
    */
   public static int andInt(final MoxyEngine engine, final Integer... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new AndMatcher<Integer>(fromMatchers));
+    engine.registerMatcher(new AndMatcher<Integer>(fromMatchers));
     return 0;
   }
 
@@ -2081,7 +2081,7 @@ public class Matchers {
    * @since 1.0
    */
   public static long andLong(final MoxyEngine engine, final Long... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new AndMatcher<Long>(fromMatchers));
+    engine.registerMatcher(new AndMatcher<Long>(fromMatchers));
     return 0;
   }
 
@@ -2132,7 +2132,7 @@ public class Matchers {
    * @since 1.0
    */
   public static float andFloat(final MoxyEngine engine, final Float... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new AndMatcher<Float>(fromMatchers));
+    engine.registerMatcher(new AndMatcher<Float>(fromMatchers));
     return 0;
   }
 
@@ -2183,7 +2183,7 @@ public class Matchers {
    * @since 1.0
    */
   public static double andDouble(final MoxyEngine engine, final Double... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new AndMatcher<Double>(fromMatchers));
+    engine.registerMatcher(new AndMatcher<Double>(fromMatchers));
     return 0;
   }
 
@@ -2234,7 +2234,7 @@ public class Matchers {
    * @since 1.0
    */
   public static boolean andBool(final MoxyEngine engine, final Boolean... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new AndMatcher<Boolean>(fromMatchers));
+    engine.registerMatcher(new AndMatcher<Boolean>(fromMatchers));
     return false;
   }
 
@@ -2271,7 +2271,7 @@ public class Matchers {
    */
   @SafeVarargs
   public static <T> T and(final MoxyEngine engine, final T... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new AndMatcher<T>(fromMatchers));
+    engine.registerMatcher(new AndMatcher<T>(fromMatchers));
     return null;
   }
 
@@ -2332,7 +2332,7 @@ public class Matchers {
    * @since 1.0
    */
   public static byte orByte(final MoxyEngine engine, final Byte... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new OrMatcher<Byte>(fromMatchers));
+    engine.registerMatcher(new OrMatcher<Byte>(fromMatchers));
     return 0;
   }
 
@@ -2391,7 +2391,7 @@ public class Matchers {
    * @since 1.0
    */
   public static char orChar(final MoxyEngine engine, final Character... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new OrMatcher<Character>(fromMatchers));
+    engine.registerMatcher(new OrMatcher<Character>(fromMatchers));
     return 0;
   }
 
@@ -2450,7 +2450,7 @@ public class Matchers {
    * @since 1.0
    */
   public static short orShort(final MoxyEngine engine, final Short... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new OrMatcher<Short>(fromMatchers));
+    engine.registerMatcher(new OrMatcher<Short>(fromMatchers));
     return 0;
   }
 
@@ -2509,7 +2509,7 @@ public class Matchers {
    * @since 1.0
    */
   public static int orInt(final MoxyEngine engine, final Integer... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new OrMatcher<Integer>(fromMatchers));
+    engine.registerMatcher(new OrMatcher<Integer>(fromMatchers));
     return 0;
   }
 
@@ -2568,7 +2568,7 @@ public class Matchers {
    * @since 1.0
    */
   public static long orLong(final MoxyEngine engine, final Long... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new OrMatcher<Long>(fromMatchers));
+    engine.registerMatcher(new OrMatcher<Long>(fromMatchers));
     return 0;
   }
 
@@ -2627,7 +2627,7 @@ public class Matchers {
    * @since 1.0
    */
   public static float orFloat(final MoxyEngine engine, final Float... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new OrMatcher<Float>(fromMatchers));
+    engine.registerMatcher(new OrMatcher<Float>(fromMatchers));
     return 0;
   }
 
@@ -2686,7 +2686,7 @@ public class Matchers {
    * @since 1.0
    */
   public static double orDouble(final MoxyEngine engine, final Double... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new OrMatcher<Double>(fromMatchers));
+    engine.registerMatcher(new OrMatcher<Double>(fromMatchers));
     return 0;
   }
 
@@ -2745,7 +2745,7 @@ public class Matchers {
    * @since 1.0
    */
   public static boolean orBool(final MoxyEngine engine, final Boolean... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new OrMatcher<Boolean>(fromMatchers));
+    engine.registerMatcher(new OrMatcher<Boolean>(fromMatchers));
     return false;
   }
 
@@ -2791,7 +2791,7 @@ public class Matchers {
    */
   @SafeVarargs
   public static <T> T or(final MoxyEngine engine, final T... fromMatchers) {
-    engine.getMatcherEngine().registerMatcher(new OrMatcher<T>(fromMatchers));
+    engine.registerMatcher(new OrMatcher<T>(fromMatchers));
     return null;
   }
 
@@ -2846,7 +2846,7 @@ public class Matchers {
    * @since 1.0
    */
   public static byte notByte(final MoxyEngine engine, final byte fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<Byte>());
+    engine.registerMatcher(new NotMatcher<Byte>());
     return 0;
   }
 
@@ -2899,7 +2899,7 @@ public class Matchers {
    * @since 1.0
    */
   public static char notChar(final MoxyEngine engine, final char fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<Character>());
+    engine.registerMatcher(new NotMatcher<Character>());
     return 0;
   }
 
@@ -2952,7 +2952,7 @@ public class Matchers {
    * @since 1.0
    */
   public static short notShort(final MoxyEngine engine, final short fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<Short>());
+    engine.registerMatcher(new NotMatcher<Short>());
     return 0;
   }
 
@@ -3005,7 +3005,7 @@ public class Matchers {
    * @since 1.0
    */
   public static int notInt(final MoxyEngine engine, final int fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<Integer>());
+    engine.registerMatcher(new NotMatcher<Integer>());
     return 0;
   }
 
@@ -3058,7 +3058,7 @@ public class Matchers {
    * @since 1.0
    */
   public static long notLong(final MoxyEngine engine, final long fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<Long>());
+    engine.registerMatcher(new NotMatcher<Long>());
     return 0;
   }
 
@@ -3111,7 +3111,7 @@ public class Matchers {
    * @since 1.0
    */
   public static float notFloat(final MoxyEngine engine, final float fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<Float>());
+    engine.registerMatcher(new NotMatcher<Float>());
     return 0;
   }
 
@@ -3164,7 +3164,7 @@ public class Matchers {
    * @since 1.0
    */
   public static double notDouble(final MoxyEngine engine, final double fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<Double>());
+    engine.registerMatcher(new NotMatcher<Double>());
     return 0;
   }
 
@@ -3217,7 +3217,7 @@ public class Matchers {
    * @since 1.0
    */
   public static boolean notBool(final MoxyEngine engine, final boolean fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<Boolean>());
+    engine.registerMatcher(new NotMatcher<Boolean>());
     return false;
   }
 
@@ -3254,7 +3254,7 @@ public class Matchers {
    * @param <T> The type this matcher will operate on
    */
   public static <T> T not(final MoxyEngine engine, final T fromMatcher) {
-    engine.getMatcherEngine().registerMatcher(new NotMatcher<T>());
+    engine.registerMatcher(new NotMatcher<T>());
     return null;
   }
 
@@ -3309,7 +3309,7 @@ public class Matchers {
    * @since 1.0
    */
   public static byte customByte(final MoxyEngine engine, final MoxyMatcher<Byte> matcher) {
-    engine.getMatcherEngine().registerMatcher(matcher);
+    engine.registerMatcher(matcher);
     return 0;
   }
 
@@ -3362,7 +3362,7 @@ public class Matchers {
    * @since 1.0
    */
   public static char customChar(final MoxyEngine engine, final MoxyMatcher<Character> matcher) {
-    engine.getMatcherEngine().registerMatcher(matcher);
+    engine.registerMatcher(matcher);
     return 0;
   }
 
@@ -3415,7 +3415,7 @@ public class Matchers {
    * @since 1.0
    */
   public static short customShort(final MoxyEngine engine, final MoxyMatcher<Short> matcher) {
-    engine.getMatcherEngine().registerMatcher(matcher);
+    engine.registerMatcher(matcher);
     return 0;
   }
 
@@ -3468,7 +3468,7 @@ public class Matchers {
    * @since 1.0
    */
   public static int customInt(final MoxyEngine engine, final MoxyMatcher<Integer> matcher) {
-    engine.getMatcherEngine().registerMatcher(matcher);
+    engine.registerMatcher(matcher);
     return 0;
   }
 
@@ -3521,7 +3521,7 @@ public class Matchers {
    * @since 1.0
    */
   public static long customLong(final MoxyEngine engine, final MoxyMatcher<Long> matcher) {
-    engine.getMatcherEngine().registerMatcher(matcher);
+    engine.registerMatcher(matcher);
     return 0;
   }
 
@@ -3574,7 +3574,7 @@ public class Matchers {
    * @since 1.0
    */
   public static float customFloat(final MoxyEngine engine, final MoxyMatcher<Float> matcher) {
-    engine.getMatcherEngine().registerMatcher(matcher);
+    engine.registerMatcher(matcher);
     return 0;
   }
 
@@ -3627,7 +3627,7 @@ public class Matchers {
    * @since 1.0
    */
   public static double customDouble(final MoxyEngine engine, final MoxyMatcher<Double> matcher) {
-    engine.getMatcherEngine().registerMatcher(matcher);
+    engine.registerMatcher(matcher);
     return 0;
   }
 
@@ -3680,7 +3680,7 @@ public class Matchers {
    * @since 1.0
    */
   public static boolean customBool(final MoxyEngine engine, final MoxyMatcher<Boolean> matcher) {
-    engine.getMatcherEngine().registerMatcher(matcher);
+    engine.registerMatcher(matcher);
     return false;
   }
 
@@ -3735,7 +3735,7 @@ public class Matchers {
    * @param <T> The type this matcher will operate on
    */
   public static <T> T custom(final MoxyEngine engine, final MoxyMatcher<T> matcher) {
-    engine.getMatcherEngine().registerMatcher(matcher);
+    engine.registerMatcher(matcher);
     return null;
   }
 
@@ -3768,7 +3768,7 @@ public class Matchers {
    * @since 1.0
    */
   public static String startsWith(final MoxyEngine engine, final String string) {
-    engine.getMatcherEngine().registerMatcher(new StartsWithMatcher(string));
+    engine.registerMatcher(new StartsWithMatcher(string));
     return null;
   }
 
@@ -3801,7 +3801,7 @@ public class Matchers {
    * @since 1.0
    */
   public static String endsWith(final MoxyEngine engine, final String string) {
-    engine.getMatcherEngine().registerMatcher(new EndsWithMatcher(string));
+    engine.registerMatcher(new EndsWithMatcher(string));
     return null;
   }
 
@@ -3844,7 +3844,7 @@ public class Matchers {
    * @since 1.0
    */
   public static String regexMatch(final MoxyEngine engine, final String regex) {
-    engine.getMatcherEngine().registerMatcher(new RegexMatcher(regex));
+    engine.registerMatcher(new RegexMatcher(regex));
     return null;
   }
 
@@ -3904,7 +3904,7 @@ public class Matchers {
    * @param <T> The type this matcher checks instanceof.
    */
   public static <T> T instanceOf(final MoxyEngine engine, final Class<T> clz) {
-    engine.getMatcherEngine().registerMatcher(new InstanceOfMatcher<>(clz));
+    engine.registerMatcher(new InstanceOfMatcher<>(clz));
     return null;
   }
 

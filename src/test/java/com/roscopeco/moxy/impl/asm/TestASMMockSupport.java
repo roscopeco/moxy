@@ -52,7 +52,7 @@ public class TestASMMockSupport extends AbstractImplTest {
                                 Arrays.asList("arg1", "arg2"));
 
     this.recorder = this.engine.getRecorder();
-    this.matcherEngine = this.engine.getASMMatcherEngine();
+    this.matcherEngine = this.engine.getMatcherEngine();
   }
 
   @Test

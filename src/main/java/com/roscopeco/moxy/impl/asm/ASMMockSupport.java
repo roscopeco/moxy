@@ -169,7 +169,7 @@ public interface ASMMockSupport {
                                              + "(If you're testing the framework; may indicate an incomplete partial mock engine)");
     }
 
-    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
+    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getMatcherEngine();
     final Map<StubMethod, List<StubDoActions>> doActionsMap = __moxy_asm_getDoActionsMap();
     final List<StubDoActions> list = __moxy_asm_ensureDoActionsList(
         doActionsMap,
@@ -193,7 +193,7 @@ public interface ASMMockSupport {
 
   public default Throwable __moxy_asm_getThrowForInvocation(final Invocation invocation) {
     final Map<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_getThrowMap();
-    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
+    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getMatcherEngine();
     final Deque<StubThrow> deque = throwMap.get(
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
 
@@ -212,7 +212,7 @@ public interface ASMMockSupport {
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public default Object __moxy_asm_getReturnForInvocation(final Invocation invocation) {
     final Map<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_getReturnMap();
-    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
+    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getMatcherEngine();
     final Deque<StubReturn> deque = returnMap.get(
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
 
@@ -244,7 +244,7 @@ public interface ASMMockSupport {
     }
 
     final Map<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_getCallSuperMap();
-    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
+    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getMatcherEngine();
     final Deque<StubSuper> deque = superMap.get(
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
 
@@ -267,7 +267,7 @@ public interface ASMMockSupport {
     }
 
     final Map<StubMethod, List<StubDoActions>> superMap = __moxy_asm_getDoActionsMap();
-    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getASMMatcherEngine();
+    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getMatcherEngine();
     final List<StubDoActions> list = superMap.get(
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
 

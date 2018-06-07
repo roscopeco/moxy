@@ -49,7 +49,7 @@ public class ThreadLocalInvocationRecorder {
    * the arguments from the last invocation with them.
    */
   void replaceInvocationArgsWithMatchers() {
-    final ASMMoxyMatcherEngine mengine = this.engine.getASMMatcherEngine();
+    final ASMMoxyMatcherEngine mengine = this.engine.getMatcherEngine();
     final List<MoxyMatcher<?>> matchers = mengine.popMatchers();
     if (matchers != null) {
       final Invocation lastInvocation = this.getLastInvocation();

@@ -28,11 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.roscopeco.moxy.api.MoxyException;
-import com.roscopeco.moxy.api.MoxyMatcherEngine;
 import com.roscopeco.moxy.matchers.InconsistentMatchersException;
 import com.roscopeco.moxy.matchers.MoxyMatcher;
 
-class ASMMoxyMatcherEngine implements MoxyMatcherEngine {
+class ASMMoxyMatcherEngine {
   final ASMMoxyEngine engine;
 
   ASMMoxyMatcherEngine(final ASMMoxyEngine engine) {
@@ -63,8 +62,7 @@ class ASMMoxyMatcherEngine implements MoxyMatcherEngine {
     }
   }
 
-  @Override
-  public void registerMatcher(final MoxyMatcher<?> matcher) {
+  void registerMatcher(final MoxyMatcher<?> matcher) {
     this.verifyMatcherNotNull(matcher);
     matcher.addToStack(this.ensureMatcherStack());
   }

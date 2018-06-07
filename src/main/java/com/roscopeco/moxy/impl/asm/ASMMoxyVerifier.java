@@ -67,7 +67,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
                                methodDesc)
         .stream()
         .anyMatch(e -> this.getEngine()
-                             .getASMMatcherEngine()
+                             .getMatcherEngine()
                              .argsMatch(e.getArgs(), invocation.getArgs())
     )) {
       return this;
@@ -92,7 +92,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
                            methodDesc)
     .stream()
     .filter(e -> this.getEngine()
-                        .getASMMatcherEngine()
+                        .getMatcherEngine()
                         .argsMatch(e.getArgs(), invocation.getArgs()) )
     .collect(Collectors.toList())
     .size();
@@ -199,7 +199,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
                            methodDesc)
       .stream()
       .filter( e -> this.getEngine()
-                      .getASMMatcherEngine()
+                      .getMatcherEngine()
                       .argsMatch(e.getArgs(), invocation.getArgs()) )
       .filter(filterPredicate)
       .collect(Collectors.toList())

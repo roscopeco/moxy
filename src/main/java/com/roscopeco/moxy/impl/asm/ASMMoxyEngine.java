@@ -46,13 +46,13 @@ import com.roscopeco.moxy.api.MockGenerationException;
 import com.roscopeco.moxy.api.MonitoredInvocationException;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyException;
-import com.roscopeco.moxy.api.MoxyMatcherEngine;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
 import com.roscopeco.moxy.api.MoxyVoidStubber;
 import com.roscopeco.moxy.impl.asm.visitors.AbstractMoxyTypeVisitor;
 import com.roscopeco.moxy.impl.asm.visitors.MoxyMockClassVisitor;
 import com.roscopeco.moxy.impl.asm.visitors.MoxyMockInterfaceVisitor;
+import com.roscopeco.moxy.matchers.MoxyMatcher;
 import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
 
 /**
@@ -64,6 +64,12 @@ import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
  *
  */
 public class ASMMoxyEngine implements MoxyEngine {
+  /*
+   * Functional interface for monitored invocations.
+   *
+   * See #runMonitoredInvocation
+   */
+  @FunctionalInterface
   static interface MonitoredInvocation {
     public void invoke() throws Exception;
   }
@@ -119,13 +125,7 @@ public class ASMMoxyEngine implements MoxyEngine {
     return this.recorder;
   }
 
-  @Override
-  public MoxyMatcherEngine getMatcherEngine() {
-    return this.matcherEngine;
-  }
-
-  /* Obtain the matcher engine in use by this engine */
-  ASMMoxyMatcherEngine getASMMatcherEngine() {
+  ASMMoxyMatcherEngine getMatcherEngine() {
     return this.matcherEngine;
   }
 
@@ -299,7 +299,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   void ensureEngineConsistencyBeforeMonitoredInvocation() {
     this.getRecorder().clearLastInvocation();
-    this.getASMMatcherEngine().ensureStackConsistency();
+    this.getMatcherEngine().ensureStackConsistency();
   }
 
   /*
@@ -359,7 +359,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   private void deleteLatestInvocationFromListAndClearStack() {
     this.getRecorder().unrecordLastInvocation();
-    this.getASMMatcherEngine().clearMatcherStack();
+    this.getMatcherEngine().clearMatcherStack();
   }
 
   /*
@@ -369,7 +369,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   void deleteLatestInvocationFromListAndValidateStack() {
     this.getRecorder().unrecordLastInvocation();
-    this.getASMMatcherEngine().ensureStackConsistency();
+    this.getMatcherEngine().ensureStackConsistency();
   }
 
   /*
@@ -440,6 +440,15 @@ public class ASMMoxyEngine implements MoxyEngine {
     this.getRecorder().replaceInvocationArgsWithMatchers();
     this.deleteLatestInvocationFromListAndValidateStack();
     return new ASMMoxyVerifier(this);
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.roscopeco.moxy.api.MoxyEngine#registerMatcher(com.roscopeco.moxy.matchers.MoxyMatcher)
+   */
+  @Override
+  public void registerMatcher(final MoxyMatcher<?> matcher) {
+    this.getMatcherEngine().registerMatcher(matcher);
   }
 
   /*

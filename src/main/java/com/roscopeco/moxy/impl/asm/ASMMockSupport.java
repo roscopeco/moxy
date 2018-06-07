@@ -25,6 +25,7 @@ package com.roscopeco.moxy.impl.asm;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
@@ -222,7 +223,10 @@ public interface ASMMockSupport {
           final Object toReturn = stubReturn.toReturn;
 
           if (toReturn instanceof AnswerProvider) {
-            return ((AnswerProvider)toReturn).provide(invocation.getArgs());
+            final List<? extends Object> immutableArgs =
+                Collections.unmodifiableList(invocation.getArgs());
+
+            return ((AnswerProvider)toReturn).provide(immutableArgs);
           } else {
             return stubReturn.toReturn;
           }
@@ -271,10 +275,13 @@ public interface ASMMockSupport {
     //
     // Note that this runs _all_ actions that match the arguments. If using matchers,
     // this could run ones that weren't necessarily intended. This needs to be documented!
+    final List<? extends Object> immutableArgs =
+        Collections.unmodifiableList(invocation.getArgs());
+
     if (list != null) {
       for (final StubDoActions stubDoActions : list) {
         if (matchEngine.argsMatch(invocation.getArgs(), stubDoActions.args)) {
-          stubDoActions.actions.forEach(action -> action.accept(invocation.getArgs()));
+          stubDoActions.actions.forEach(action -> action.accept(immutableArgs));
         }
       }
     }

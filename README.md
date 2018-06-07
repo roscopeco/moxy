@@ -265,8 +265,8 @@ And you can chain them:
 
 ```java
 assertMock(() -> /* mock method call... */)
-		.wasCalledAtLeast(2)							// >= twice
-		.wasCalledAtMost(5)							// and <= 5
+		.wasCalledAtLeast(2)                                       // >= twice
+		.wasCalledAtMost(5)                                        // and <= 5
 ```
 
 For a full list of the available asserts, take a look at the

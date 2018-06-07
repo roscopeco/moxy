@@ -36,7 +36,7 @@ import com.roscopeco.moxy.matchers.MoxyMatcher;
  * according to whatever strategy it is designed to use.</p>
  *
  * <p>It usually also coordinates activities of mocks, as well as
- * integrating the matchers (in concert with {@link MoxyMatcherEngine}).</p>
+ * integrating the matchers.</p>
  *
  * <p>The default implementation uses the ASM library to generate mocks
  * at runtime. If you wish to replace that implementation, see

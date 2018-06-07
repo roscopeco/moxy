@@ -88,7 +88,7 @@ following dependency in your POM:
 <dependency>
 	<groupId>com.roscopeco</groupId>
 	<artifactId>moxy</artifactId>
-	<version>0.82</version>
+	<version>0.84</version>
 </dependency>
 ```
 

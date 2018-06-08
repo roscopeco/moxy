@@ -200,7 +200,7 @@ real deal and you can test with impunity.
 
 ##### Spying
 
-Instead of stubbing, you can turn your mock into a spy by having it call 
+Instead of stubbing, you can turn your mock into a partial spy by having it call 
 the real method, like so:
 
 ```java
@@ -215,6 +215,19 @@ When using [thenCallRealMethod()](https://roscopeco.github.io/moxy/com/roscopeco
 you still get all the usual verification
 goodness that Moxy provides, so you can still use matchers, for example,
 or check how many times it was called and make sure it didn't throw exceptions.
+
+For extra convenience, the [Moxy](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html)
+class provides a number of _spy(...)_ methods that can be used to generate spies from
+classes or existing mock instances. It should be noted that these methods do not
+currently call constructors when instantiating classes, which may cause more pain
+with spies than it does with mocks since they rely on the real method implementations
+on the spied class. 
+
+If you need constructor calls in your spies, you'll currently need to create your
+mock in the same way as when doing partial mocking, and pass it into the _Moxy.spy(Object)_
+method to convert it to a spy once you instantiated it appropriately. The
+[Partial Mocking and Spying](#partial-mocking-and-spying) section has more details
+and an example.
 
 ##### Actions
 
@@ -503,10 +516,32 @@ MyClass mock = mockClass
     .newInstance(Moxy.getMoxyEngine(), "Some string", 42);
 ```
 
-Those six extra lines might seem like a bit of a pain, but think of the 
+Those few extra lines might seem like a bit of a pain, but think of the 
 extra work as a reminder that partial mocking is a little bit dangerous.
 
-Often, the behaviour you'll achieve with partial mocking can also be 
+Alternatively, if you're looking to create a spy that needs a constructor
+call, you'd generally mock _all_ the methods, and then pass the resulting
+mock to the _Moxy.spy(Object)_ method. There is a convenient constant you
+can use to achieve that. The following example demonstrates a typical
+snippet used to generate a spy where a constructor call is needed:
+
+```java
+Class<? extends MyClass> mockClass = 
+    Moxy.getMoxyEngine().getMockClass(MyClass.class, MoxyEngine.ALL_METHODS);
+
+MyClass mock = mockClass
+    .getConstructor(MoxyEngine.class, String.class, int.class)
+    .newInstance(Moxy.getMoxyEngine(), "Some string", 42);
+
+MyClass spy = Moxy.spy(mock);
+```
+
+There are more convenient wrappers for both _mock_ and _spy_ coming in
+a future release that will make this easier, but they aren't quite ready
+yet.
+
+**Side Note**
+> Often, the behaviour you'll achieve with partial mocking can also be 
 accomplished with the `MoxyStubber.thenCallRealMethod()` method,
 or you might find you need a combination of the two. In any event, 
 you can happily use them together as the need arises.

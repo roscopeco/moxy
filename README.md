@@ -22,9 +22,9 @@ See also [Javadoc](https://roscopeco.github.io/moxy/).
     * [Verifying](#verifying)
     * [Argument matchers](#argument-matchers)
       * [Passing all arguments as matchers](#passing-all-arguments-as-matchers)
-      * [Primitive matchers](primitive-matchers)
-      * [Standard matcher types](matcher-types)
-      * [Custom matchers](custom-matchers)
+      * [Primitive matchers](#primitive-matchers)
+      * [Standard matcher types](#matcher-types)
+      * [Custom matchers](#custom-matchers)
     * [Partial Mocking and Spying](#partial-mocking-and-spying)
     
 ### What is this?

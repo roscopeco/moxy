@@ -1002,6 +1002,133 @@ public class TestMoxy {
       .isInstanceOf(PossibleMatcherUsageError.class)
       .hasMessage("If you're using primitive matchers, ensure you're using the "
           + "correct type (e.g. anyInt() rather than any()), especially when nesting");
+  }
 
+  @Test
+  public void testMoxySpyCreatesASpyForNoArgMethods() {
+    final SimpleClass spy = Moxy.spy(SimpleClass.class);
+
+    assertThat(Moxy.isMock(spy));
+    assertThat(spy.returnHello()).isEqualTo("Hello");
+
+    Moxy.assertMock(() -> spy.returnHello()).wasCalledOnce();
+  }
+
+  @Test
+  public void testMoxySpyClassCreatesASpyWithObjectArguments() {
+    final MethodWithArguments spy = Moxy.spy(MethodWithArguments.class);
+
+    assertThat(Moxy.isMock(spy));
+
+    spy.hasArgs("one", "two");
+
+    Moxy.assertMock(() -> spy.hasArgs("one", "two")).wasCalledOnce();
+    Moxy.assertMock(() -> spy.hasArgs("three", "four")).wasNotCalled();
+    Moxy.assertMock(() -> spy.hasArgs(Matchers.any(), Matchers.any())).wasCalledOnce();
+  }
+
+  @Test
+  public void testMoxySpyClassCreatesASpyWithMixedObjectAndIntArgs() {
+    final MethodWithArgAndReturn spy = Moxy.spy(MethodWithArgAndReturn.class);
+
+    assertThat(Moxy.isMock(spy));
+    assertThat(spy.hasTwoArgs("Level", 42)).isEqualTo("Level42");
+    assertThat(spy.sayHelloTo("Bill")).isEqualTo("Hello, Bill");
+
+    Moxy.assertMock(() -> spy.hasTwoArgs("Level", 42)).wasCalledOnce();
+    Moxy.assertMock(() -> spy.hasTwoArgs("Nonsense", 99)).wasNotCalled();
+    Moxy.assertMock(() -> spy.sayHelloTo("Bill")).wasCalledOnce();
+    Moxy.assertMock(() -> spy.sayHelloTo("Steve")).wasNotCalled();
+  }
+
+  @Test
+  public void testMoxySpyClassCreatesASpyWithAllPrimitiveTypeArguments() {
+    final MethodWithPrimitiveArguments spy = Moxy.spy(MethodWithPrimitiveArguments.class);
+
+    assertThat(Moxy.isMock(spy));
+    assertThat(spy.hasArgs("one",
+                           (byte)10,
+                           'a',
+                           (short)11,
+                           12,
+                           13L,
+                           14.0f,
+                           15.0d,
+                           true)).isEqualTo(42);
+
+    Moxy.assertMock(() -> spy.hasArgs("one",
+                                      (byte)10,
+                                      'a',
+                                      (short)11,
+                                      12,
+                                      13L,
+                                      14.0f,
+                                      15.0d,
+                                      true)
+    ).wasCalledOnce();
+
+    Moxy.assertMock(() -> spy.hasArgs("two",
+                                      (byte)10,
+                                      'a',
+                                      (short)11,
+                                      12,
+                                      13L,
+                                      14.0f,
+                                      15.0d,
+                                      true)
+    ).wasNotCalled();
+
+    Moxy.assertMock(() -> spy.hasArgs(Matchers.any(),
+                                      Matchers.anyByte(),
+                                      Matchers.anyChar(),
+                                      Matchers.anyShort(),
+                                      Matchers.anyInt(),
+                                      Matchers.anyLong(),
+                                      Matchers.anyFloat(),
+                                      Matchers.anyDouble(),
+                                      Matchers.anyBool())
+    ).wasCalledOnce();
+
+  }
+
+  @Test
+  public void testMoxySpyObjectFailsToConvertNonMock() {
+    assertThatThrownBy(() -> Moxy.spy(new Object()))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageMatching("Cannot convert java\\.lang\\.Object@[0-9a-f]+ to spy - it is not a mock");
+  }
+
+  @Test
+  void testMoxySpyObjectCanConvertExistingMock() {
+    // Given I have a mock
+    final SimpleClass mock = Moxy.mock(SimpleClass.class);
+    assertThat(mock.returnHello()).isNull();
+
+    // When I convert it to a spy
+    final SimpleClass spy = Moxy.spy(mock);
+
+    // Then the spy calls its real methods
+    assertThat(spy.returnHello()).isEqualTo("Hello");
+
+    // And the spy is not a copy
+    assertThat(spy).isSameAs(mock);
+    assertThat(mock.returnHello()).isEqualTo("Hello");
+  }
+
+  @Test
+  public void testMoxySpyObjectCanConvertExistingMockAfterStubbing() {
+    // Given I have a mock
+    final SimpleClass mock = Moxy.mock(SimpleClass.class);
+    assertThat(mock.returnHello()).isNull();
+
+    // And it has existing stubbing
+    Moxy.when(() -> mock.returnHello()).thenReturn("Goodbye");
+    assertThat(mock.returnHello()).isEqualTo("Goodbye");
+
+    // When I convert it to a spy
+    final SimpleClass spy = Moxy.spy(mock);
+
+    // Then the stubbing is discarded and it becomes a spy
+    assertThat(spy.returnHello()).isEqualTo("Hello");
   }
 }

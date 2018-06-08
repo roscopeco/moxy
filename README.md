@@ -17,8 +17,14 @@ See also [Javadoc](https://roscopeco.github.io/moxy/).
   * [Using the code](#using-the-code)
     * [Creating mocks](#creating-mocks)
     * [Stubbing](#stubbing)
+    * [Spying](#spying)
+    * [Actions](#actions)
     * [Verifying](#verifying)
     * [Argument matchers](#argument-matchers)
+      * [Passing all arguments as matchers](#passing-all-arguments-as-matchers)
+      * [Primitive matchers](primitive-matchers)
+      * [Standard matcher types](matcher-types)
+      * [Custom matchers](custom-matchers)
     * [Partial Mocking and Spying](#partial-mocking-and-spying)
     
 ### What is this?

@@ -46,21 +46,11 @@ import com.roscopeco.moxy.api.InvalidMockInvocationException;
  */
 public interface ASMMockSupport {
   /* For mocks to implement */
-  public ASMMoxyEngine __moxy_asm_getEngine();
-
-  // Using Deque here for efficient add-at-front, so when
-  // we stream we see the most recent stubbing...
-  public Map<StubMethod, Deque<StubReturn>> __moxy_asm_getReturnMap();
-  public Map<StubMethod, Deque<StubThrow>> __moxy_asm_getThrowMap();
-
-  // Present and true: call super; otherwise, use stubbing.
-  public Map<StubMethod, Deque<StubSuper>> __moxy_asm_getCallSuperMap();
-
-  public Map<StubMethod, List<StubDoActions>> __moxy_asm_getDoActionsMap();
+  public ASMMockInstanceVars __moxy_asm_ivars();
 
   /* Implemented by default */
   public default ThreadLocalInvocationRecorder __moxy_asm_getRecorder() {
-    return __moxy_asm_getEngine().getRecorder();
+    return __moxy_asm_ivars().getEngine().getRecorder();
   }
 
   public default Deque<StubReturn>__moxy_asm_ensureStubReturnDeque(
@@ -110,7 +100,7 @@ public interface ASMMockSupport {
                                         + TypeStringUtils.buildArgsString(invocation)
                                         + "as it has already been stubbed to throw or call real method");
       } else {
-        final Map<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_getReturnMap();
+        final Map<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_ivars().getReturnMap();
         final Deque<StubReturn> deque = __moxy_asm_ensureStubReturnDeque(
             returnMap,
             new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
@@ -125,7 +115,7 @@ public interface ASMMockSupport {
                                         + TypeStringUtils.buildArgsString(invocation)
                                         + "as it has already been stubbed to return or call real method");
       } else {
-        final Map<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_getThrowMap();
+        final Map<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_ivars().getThrowMap();
         final Deque<StubThrow> deque = __moxy_asm_ensureStubThrowDeque(
             throwMap,
             new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
@@ -154,7 +144,7 @@ public interface ASMMockSupport {
                                     + TypeStringUtils.buildArgsString(invocation)
                                     + "as it has already been stubbed");
     } else {
-      final Map<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_getCallSuperMap();
+      final Map<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_ivars().getCallSuperMap();
       final Deque<StubSuper> deque = __moxy_asm_ensureStubSuperDeque(
           superMap,
           new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
@@ -169,8 +159,10 @@ public interface ASMMockSupport {
                                              + "(If you're testing the framework; may indicate an incomplete partial mock engine)");
     }
 
-    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getMatcherEngine();
-    final Map<StubMethod, List<StubDoActions>> doActionsMap = __moxy_asm_getDoActionsMap();
+    final ASMMockInstanceVars ivars = this.__moxy_asm_ivars();
+
+    final ASMMoxyMatcherEngine matchEngine = ivars.getEngine().getMatcherEngine();
+    final Map<StubMethod, List<StubDoActions>> doActionsMap = ivars.getDoActionsMap();
     final List<StubDoActions> list = __moxy_asm_ensureDoActionsList(
         doActionsMap,
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
@@ -192,8 +184,9 @@ public interface ASMMockSupport {
   }
 
   public default Throwable __moxy_asm_getThrowForInvocation(final Invocation invocation) {
-    final Map<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_getThrowMap();
-    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getMatcherEngine();
+    final ASMMockInstanceVars ivars = this.__moxy_asm_ivars();
+    final Map<StubMethod, Deque<StubThrow>> throwMap = ivars.getThrowMap();
+    final ASMMoxyMatcherEngine matchEngine = ivars.getEngine().getMatcherEngine();
     final Deque<StubThrow> deque = throwMap.get(
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
 
@@ -211,8 +204,9 @@ public interface ASMMockSupport {
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public default Object __moxy_asm_getReturnForInvocation(final Invocation invocation) {
-    final Map<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_getReturnMap();
-    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getMatcherEngine();
+    final ASMMockInstanceVars ivars = this.__moxy_asm_ivars();
+    final Map<StubMethod, Deque<StubReturn>> returnMap = ivars.getReturnMap();
+    final ASMMoxyMatcherEngine matchEngine = ivars.getEngine().getMatcherEngine();
     final Deque<StubReturn> deque = returnMap.get(
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
 
@@ -243,8 +237,10 @@ public interface ASMMockSupport {
                                              + "(If you're testing the framework; may indicate an incomplete partial mock engine)");
     }
 
-    final Map<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_getCallSuperMap();
-    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getMatcherEngine();
+    final ASMMockInstanceVars ivars = this.__moxy_asm_ivars();
+
+    final Map<StubMethod, Deque<StubSuper>> superMap = ivars.getCallSuperMap();
+    final ASMMoxyMatcherEngine matchEngine = ivars.getEngine().getMatcherEngine();
     final Deque<StubSuper> deque = superMap.get(
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
 
@@ -266,8 +262,9 @@ public interface ASMMockSupport {
                                              + "(If you're testing the framework; may indicate an incomplete partial mock engine)");
     }
 
-    final Map<StubMethod, List<StubDoActions>> superMap = __moxy_asm_getDoActionsMap();
-    final ASMMoxyMatcherEngine matchEngine = this.__moxy_asm_getEngine().getMatcherEngine();
+    final ASMMockInstanceVars ivars = this.__moxy_asm_ivars();
+    final Map<StubMethod, List<StubDoActions>> superMap = ivars.getDoActionsMap();
+    final ASMMoxyMatcherEngine matchEngine = ivars.getEngine().getMatcherEngine();
     final List<StubDoActions> list = superMap.get(
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
 
@@ -293,7 +290,7 @@ public interface ASMMockSupport {
    */
   public default Throwable __moxy_asm_getThrowForCurrentInvocation() {
     return __moxy_asm_getThrowForInvocation(
-        __moxy_asm_getEngine().getRecorder().getLastInvocation());
+        __moxy_asm_ivars().getEngine().getRecorder().getLastInvocation());
   }
 
   /* This MUST only ever be called from mocked methods AFTER the invocation has been
@@ -302,7 +299,7 @@ public interface ASMMockSupport {
    */
   public default Object __moxy_asm_getReturnForCurrentInvocation() {
     return __moxy_asm_getReturnForInvocation(
-        __moxy_asm_getEngine().getRecorder().getLastInvocation());
+        __moxy_asm_ivars().getEngine().getRecorder().getLastInvocation());
   }
 
   /* This MUST only ever be called from mocked methods AFTER the invocation has been
@@ -311,7 +308,7 @@ public interface ASMMockSupport {
    */
   public default boolean __moxy_asm_shouldCallSuperForCurrentInvocation() {
     return __moxy_asm_shouldCallSuperForInvocation(
-        __moxy_asm_getEngine().getRecorder().getLastInvocation());
+        __moxy_asm_ivars().getEngine().getRecorder().getLastInvocation());
   }
 
   /* This MUST only ever be called from mocked methods AFTER the invocation has been
@@ -320,7 +317,7 @@ public interface ASMMockSupport {
    */
   public default void __moxy_asm_runDoActionsForCurrentInvocation() {
     __moxy_asm_runDoActionsForInvocation(
-        __moxy_asm_getEngine().getRecorder().getLastInvocation());
+        __moxy_asm_ivars().getEngine().getRecorder().getLastInvocation());
   }
 
   /* This MUST only ever be called from mocked methods AFTER the invocation has been
@@ -328,12 +325,12 @@ public interface ASMMockSupport {
    * invocation just prior to throw or return.
    */
   public default void __moxy_asm_updateCurrentInvocationReturnThrow(final Object returned, final Throwable threw) {
-    final Invocation invocation = __moxy_asm_getEngine().getRecorder().getLastInvocation();
+    final Invocation invocation = __moxy_asm_ivars().getEngine().getRecorder().getLastInvocation();
     invocation.setReturned(returned);
     invocation.setThrew(threw);
   }
 
   public default boolean __moxy_asm_isMockBehaviourDisabledOnThisThread() {
-    return __moxy_asm_getEngine().isMockStubbingDisabledOnThisThread();
+    return __moxy_asm_ivars().getEngine().isMockStubbingDisabledOnThisThread();
   }
 }

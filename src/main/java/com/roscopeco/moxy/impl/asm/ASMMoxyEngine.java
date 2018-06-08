@@ -28,7 +28,6 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -483,19 +482,11 @@ public class ASMMoxyEngine implements MoxyEngine {
    * When called on an existing mock, this method has the effect of
    * resetting all stubbing on that mock.
    */
-  @SuppressWarnings({ "unchecked", "restriction", "rawtypes" })
+  @SuppressWarnings({ "unchecked", "restriction" })
   <T> T initializeMock(final Class<? extends T> mockClass, final Object mock) {
     try {
-      final Field engineField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_ENGINE_FIELD_NAME);
-      final Field returnMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_RETURNMAP_FIELD_NAME);
-      final Field throwMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_THROWMAP_FIELD_NAME);
-      final Field superMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_SUPERMAP_FIELD_NAME);
-      final Field doActionsMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_DOACTIONSMAP_FIELD_NAME);
-      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(engineField), this);
-      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(returnMapField), new HashMap());
-      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(throwMapField), new HashMap());
-      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(superMapField), new HashMap());
-      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(doActionsMapField), new HashMap());
+      final Field ivarsField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_ivars_FIELD_NAME);
+      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(ivarsField), new ASMMockInstanceVars(this));
       return (T)mock;
     } catch (final Exception e) {
       throw new MoxyException("Unrecoverable error: Instantiation exception; see cause", e);

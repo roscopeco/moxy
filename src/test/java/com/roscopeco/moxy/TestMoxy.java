@@ -713,7 +713,7 @@ public class TestMoxy {
 
     // Ensure we've only got the support fields, and haven't copied any...
     assertThat(mock.getClass().getDeclaredFields())
-        .hasSize(5)
+        .hasSize(1)
         .doesNotContainAnyElementsOf(
             Lists.newArrayList(
                 FieldsClass.class.getDeclaredField("intField"),

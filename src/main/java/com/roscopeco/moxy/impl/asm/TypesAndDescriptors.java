@@ -76,6 +76,9 @@ public final class TypesAndDescriptors {
   public static final String MOCK_CONSTRUCTOR_DESCRIPTOR = "(" + MOXY_ENGINE_DESCRIPTOR + ")V";
 
   public static final String MOXY_SUPPORT_INTERFACE_INTERNAL_NAME = Type.getInternalName(ASMMockSupport.class);
+  public static final String MOXY_SUPPORT_ivars_INTERNAL_NAME = Type.getInternalName(ASMMockInstanceVars.class);
+  public static final String MOXY_SUPPORT_ivars_DESCRIPTOR = "L" + MOXY_SUPPORT_ivars_INTERNAL_NAME + ";";
+
   public static final String MOXY_ENGINE_INTERNAL_NAME = Type.getInternalName(MoxyEngine.class);
 
   public static final String INVALID_STUBBING_INTERNAL_NAME = Type.getInternalName(InvalidStubbingException.class);
@@ -111,16 +114,15 @@ public final class TypesAndDescriptors {
   public static final String SUPPORT_GETRECORDER_DESCRIPTOR = "()" + MOXY_RECORDER_DESCRIPTOR;
   public static final String SUPPORT_UPDATECURRENTRETURNED_METHOD_NAME = "__moxy_asm_updateCurrentInvocationReturnThrow";
   public static final String SUPPORT_UPDATECURRENTRETURNED_DESCRIPTOR = VOID_OBJECT_THROWABLE_DESCRIPTOR;
-  public static final String SUPPORT_ENGINE_FIELD_NAME = "__moxy_asm_engine";
-  public static final String SUPPORT_RETURNMAP_FIELD_NAME = "__moxy_asm_returnMap";
-  public static final String SUPPORT_THROWMAP_FIELD_NAME = "__moxy_asm_throwMap";
-  public static final String SUPPORT_SUPERMAP_FIELD_NAME = "__moxy_asm_superMap";
-  public static final String SUPPORT_DOACTIONSMAP_FIELD_NAME = "__moxy_asm_doActions";
   public static final String SUPPORT_MAKE_JAVA_SIGNATURE_METHOD_NAME = "__asm_moxy_makeJavaSignature";
   public static final String SUPPORT_MAKE_JAVA_SIGNATURE_DESCRIPTOR =
       "(" + STRING_DESCRIPTOR + STRING_DESCRIPTOR + ")" + STRING_DESCRIPTOR;
   public static final String SUPPORT_IS_STUBBING_DISABLED_METHOD_NAME = "__moxy_asm_isMockBehaviourDisabledOnThisThread";
   public static final String SUPPORT_IS_STUBBING_DISABLED_DESCRIPTOR = BOOLEAN_VOID_DESCRIPTOR;
+  public static final String SUPPORT_ivars_FIELD_NAME = "__moxy_asm_ivars";
+  public static final String SUPPORT_GET_ivars_METHOD_NAME = "__moxy_asm_ivars";
+  public static final String SUPPORT_GET_ivars_DESCRIPTOR = "()" + MOXY_SUPPORT_ivars_DESCRIPTOR;
+  public static final String SUPPORT_ivars_CTOR_DESCRIPTOR = "(" + MOXY_ASM_ENGINE_DESCRIPTOR + ")V";
 
   /* primitives and their corresponding box types */
   public static final String VALUEOF_METHOD_NAME = "valueOf";

@@ -501,25 +501,25 @@ class TestASMMoxyEngine extends AbstractImplTest {
 
     final ASMMockSupport mockSupp = (ASMMockSupport)mock;
 
-    final Map<StubMethod, Deque<StubReturn>> originalReturnMap = mockSupp.__moxy_asm_getReturnMap();
-    final Map<StubMethod, Deque<StubThrow>> originalThrowMap = mockSupp.__moxy_asm_getThrowMap();
-    final Map<StubMethod, Deque<StubSuper>> originalSuperMap = mockSupp.__moxy_asm_getCallSuperMap();
+    final Map<StubMethod, Deque<StubReturn>> originalReturnMap = mockSupp.__moxy_asm_ivars().getReturnMap();
+    final Map<StubMethod, Deque<StubThrow>> originalThrowMap = mockSupp.__moxy_asm_ivars().getThrowMap();
+    final Map<StubMethod, Deque<StubSuper>> originalSuperMap = mockSupp.__moxy_asm_ivars().getCallSuperMap();
 
     engine.initializeMock(mock.getClass(), mock);
 
-    assertThat(mockSupp.__moxy_asm_getReturnMap())
+    assertThat(mockSupp.__moxy_asm_ivars().getReturnMap())
         .isNotNull()
         .isNotSameAs(originalReturnMap);
 
-    assertThat(mockSupp.__moxy_asm_getThrowMap())
+    assertThat(mockSupp.__moxy_asm_ivars().getThrowMap())
         .isNotNull()
         .isNotSameAs(originalThrowMap);
 
-    assertThat(mockSupp.__moxy_asm_getCallSuperMap())
+    assertThat(mockSupp.__moxy_asm_ivars().getCallSuperMap())
         .isNotNull()
         .isNotSameAs(originalSuperMap);
 
-    assertThat(mockSupp.__moxy_asm_getEngine())
+    assertThat(mockSupp.__moxy_asm_ivars().getEngine())
         .isNotNull()
         .isSameAs(engine);
   }
@@ -537,14 +537,14 @@ class TestASMMoxyEngine extends AbstractImplTest {
     final ASMMockSupport mockSupp = (ASMMockSupport)mock;
 
     // Ensure fields are set up properly in instantiation
-    assertThat(mockSupp.__moxy_asm_getEngine()).isSameAs(engine);
+    assertThat(mockSupp.__moxy_asm_ivars().getEngine()).isSameAs(engine);
 
-    assertThat(mockSupp.__moxy_asm_getReturnMap())
+    assertThat(mockSupp.__moxy_asm_ivars().getReturnMap())
         .isNotNull()
         .isInstanceOf(HashMap.class)
         .isEmpty();
 
-    assertThat(mockSupp.__moxy_asm_getReturnMap())
+    assertThat(mockSupp.__moxy_asm_ivars().getReturnMap())
         .isNotNull()
         .isInstanceOf(HashMap.class)
         .isEmpty();
@@ -564,15 +564,11 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(node.superName).isEqualTo("com/roscopeco/moxy/model/ClassWithPrimitiveReturns");
 
     assertThat(node.methods)
-      .hasSize(7)
+      .hasSize(3)
       .hasOnlyElementsOfType(MethodNode.class)
       .extracting("name", "desc")
           .containsOnly(tuple("<init>",                       "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
-                        tuple("__moxy_asm_getEngine",         "()Lcom/roscopeco/moxy/impl/asm/ASMMoxyEngine;"),
-                        tuple("__moxy_asm_getReturnMap",      "()Ljava/util/Map;"),
-                        tuple("__moxy_asm_getThrowMap",       "()Ljava/util/Map;"),
-                        tuple("__moxy_asm_getCallSuperMap",   "()Ljava/util/Map;"),
-                        tuple("__moxy_asm_getDoActionsMap",   "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_ivars",             "()Lcom/roscopeco/moxy/impl/asm/ASMMockInstanceVars;"),
                         tuple("returnByte",                   "()B"));
   }
 
@@ -588,15 +584,11 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(node.superName).isEqualTo("com/roscopeco/moxy/model/ClassWithPrimitiveReturns");
 
     assertThat(node.methods)
-      .hasSize(15)
+      .hasSize(11)
       .hasOnlyElementsOfType(MethodNode.class)
       .extracting("name", "desc")
           .containsOnly(tuple("<init>",                       "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
-                        tuple("__moxy_asm_getEngine",         "()Lcom/roscopeco/moxy/impl/asm/ASMMoxyEngine;"),
-                        tuple("__moxy_asm_getReturnMap",      "()Ljava/util/Map;"),
-                        tuple("__moxy_asm_getThrowMap",       "()Ljava/util/Map;"),
-                        tuple("__moxy_asm_getCallSuperMap",   "()Ljava/util/Map;"),
-                        tuple("__moxy_asm_getDoActionsMap",   "()Ljava/util/Map;"),
+                        tuple("__moxy_asm_ivars",             "()Lcom/roscopeco/moxy/impl/asm/ASMMockInstanceVars;"),
                         tuple("returnByte",                   "()B"),
                         tuple("returnChar",                   "()C"),
                         tuple("returnShort",                  "()S"),
@@ -620,15 +612,11 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(node.superName).isEqualTo("com/roscopeco/moxy/model/ClassWithPrimitiveReturns");
 
     assertThat(node.methods)
-      .hasSize(6)
+      .hasSize(2)
       .hasOnlyElementsOfType(MethodNode.class)
       .extracting("name", "desc")
           .containsOnly(tuple("<init>",                       "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
-                        tuple("__moxy_asm_getEngine",         "()Lcom/roscopeco/moxy/impl/asm/ASMMoxyEngine;"),
-                        tuple("__moxy_asm_getReturnMap",      "()Ljava/util/Map;"),
-                        tuple("__moxy_asm_getThrowMap",       "()Ljava/util/Map;"),
-                        tuple("__moxy_asm_getCallSuperMap",   "()Ljava/util/Map;"),
-                        tuple("__moxy_asm_getDoActionsMap",   "()Ljava/util/Map;"));
+                        tuple("__moxy_asm_ivars",             "()Lcom/roscopeco/moxy/impl/asm/ASMMockInstanceVars;"));
  }
 
   @Test

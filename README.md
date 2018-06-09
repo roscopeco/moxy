@@ -100,6 +100,14 @@ following dependency in your POM:
 </dependency>
 ```
 
+Development snapshots are sometimes made available in Maven via some extra
+configuration. See [this wiki page](https://github.com/roscopeco/moxy/wiki/Maven-Coordinates)
+for more information.
+
+Note that, depending on where we are in the release cycle, it is possible for the
+latest snapshot to be _behind_ the current release. Check version numbers before
+using a snapshot.
+
 ##### Gradle
 
 Something like the following should have you set up:

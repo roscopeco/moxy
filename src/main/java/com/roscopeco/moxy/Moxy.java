@@ -246,8 +246,8 @@ public final class Moxy {
    */
   public static <T> T spy(final T mock) {
     if (!isMock(mock)) {
-      throw new IllegalArgumentException("Cannot convert " 
-                                         + mock.toString() 
+      throw new IllegalArgumentException("Cannot convert "
+                                         + mock.toString()
                                          + " to spy - it is not a mock");
     }
 
@@ -255,8 +255,7 @@ public final class Moxy {
 
     Arrays.stream(mock.getClass().getDeclaredMethods()).forEach(method -> {
       if (!method.getName().startsWith("__moxy_asm")) {
-        Moxy.when(() -> {
-          method.invoke(mock,
+        Moxy.when(() -> method.invoke(mock,
               Arrays.stream(method.getParameterTypes()).map(type -> {
                 switch (type.toString()) {
                 case PRIMITIVE_BYTE_TYPE:
@@ -278,8 +277,8 @@ public final class Moxy {
                 default:
                   return Matchers.any();
                 }
-              }).toArray());
-        }).thenCallRealMethod();
+              }).toArray())
+        ).thenCallRealMethod();
       }
     });
 

@@ -17,15 +17,15 @@ See also [Javadoc](https://roscopeco.github.io/moxy/).
   * [Using the code](#using-the-code)
     * [Creating mocks](#creating-mocks)
     * [Stubbing](#stubbing)
-    * [Spying](#spying)
     * [Actions](#actions)
+    * [Creating spies](#creating-spies)
     * [Verifying](#verifying)
     * [Argument matchers](#argument-matchers)
       * [Passing all arguments as matchers](#passing-all-arguments-as-matchers)
       * [Primitive matchers](#primitive-matchers)
       * [Standard matcher types](#matcher-types)
       * [Custom matchers](#custom-matchers)
-    * [Partial Mocking and Spying](#partial-mocking-and-spying)
+    * [Partial Mocking](#partial-mocking)
     
 ### What is this?
 
@@ -171,6 +171,25 @@ AmazingButSlowDatabaseService mock = mock(AmazingButSlowDatabaseService.class);
 > In this case, we said it was an interface, but it could just as easily
 be a class (abstract or concrete) - the API is exactly the same regardless.
 
+It's important to note that Moxy mocks are _complete_ - not only do they
+mock out all method behaviour, they also do not call any superclass
+constructor. 
+
+This is generally a good thing, however there are caveats if you're
+planning to utilise [thenCallRealMethod()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenCallRealMethod--)
+or convert your mocks into spies (see [#creating-spies], below).
+
+For those times when you want to call a constructor on your mock,
+Moxy provides the _constructMock()_ family of methods, which will select
+a best-fit constructor based on the arguments you supply:
+
+```java
+NeedsConstruction mock = constructMock(AmazingButSlowDatabaseService.class, "something", 2);
+```
+
+_constructMock()_ (and the associated _constructSpy()_ family) all support
+primitive arguments using standard Java auto boxing/unboxing.
+
 ##### Stubbing
 
 By default, this will mock all public methods of the class, and make them
@@ -212,37 +231,6 @@ you're testing (or to whoever else needs it really). If you've stubbed
 appropriately, the clients will never know they're not talking to the
 real deal and you can test with impunity.
 
-##### Spying
-
-Instead of stubbing, you can turn your mock into a partial spy by having it call 
-the real method, like so:
-
-```java
-when(() -> mock.connectDatabase("invalid")).thenCallRealMethod();
-```
-
-Obviously this only applies if your mock isn't based on an Interface and the 
-real method isn't `abstract`. If either of those conditions are true, you'll
-receive a helpful exception when the would-be spy is called.
-
-When using [thenCallRealMethod()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenCallRealMethod--), 
-you still get all the usual verification
-goodness that Moxy provides, so you can still use matchers, for example,
-or check how many times it was called and make sure it didn't throw exceptions.
-
-For extra convenience, the [Moxy](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html)
-class provides a number of _spy(...)_ methods that can be used to generate spies from
-classes or existing mock instances. It should be noted that these methods do not
-currently call constructors when instantiating classes, which may cause more pain
-with spies than it does with mocks since they rely on the real method implementations
-on the spied class. 
-
-If you need constructor calls in your spies, you'll currently need to create your
-mock in the same way as when doing partial mocking, and pass it into the _Moxy.spy(Object)_
-method to convert it to a spy once you instantiated it appropriately. The
-[Partial Mocking and Spying](#partial-mocking-and-spying) section has more details
-and an example.
-
 ##### Actions
 
 In addition to stubbing your mocks or setting them up as spies, you can
@@ -266,6 +254,52 @@ Moxy.when(() -> mock.something("arg"))
 There's one case where you'll want to be a bit careful when using actions,
 specifically when using them with matchers. For more details, check out
 the [JavaDoc](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenDo-java.util.function.Consumer-).
+
+##### Creating spies
+
+For convenience, the [Moxy](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html)
+class provides a number of _spy(...)_ and _constructSpy(...)_ methods that can be used 
+to generate spies from classes or existing mock instances. 
+
+When spying it's generally recommended that the _constructSpy()_ family of methods are used,
+since these allow an appropriate constructor to be called on the spy, initialising 
+any state that may be required by the real method implementations.
+
+If you're sure the class you're spying doesn't initialise any such state, you can
+of course call the _spy()_ methods, which do not call any constructor. This may
+also be useful where the spied class performs heavyweight initialisation in 
+its constructor, and you can initialise state in some other way (e.g. setter methods).
+
+Under the hood, spies are just mocks with all methods set to use 
+[thenCallRealMethod()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenCallRealMethod--),
+so you still have access to all the usual verification supported by mocks,
+and still use exactly the same API.
+
+##### Partial spies
+
+Instead of stubbing, you can turn your mock into a partial spy by having it call 
+the real method, like so:
+
+```java
+when(() -> mock.connectDatabase("invalid")).thenCallRealMethod();
+```
+
+Obviously this only applies if your mock isn't based on an Interface and the 
+real method isn't `abstract`. If either of those conditions are true, you'll
+receive a helpful exception when the would-be spy is called.
+
+When using [thenCallRealMethod()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenCallRealMethod--), 
+you still get all the usual verification
+goodness that Moxy provides, so you can still use matchers, for example,
+or check how many times it was called and make sure it didn't throw exceptions.
+
+**Note** that it's often required to call a constructor on the class when using 
+[thenCallRealMethod()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenCallRealMethod--)
+as real implementations may rely on state initialised in a constructor.
+
+For this reason, it's recommended to use the _Moxy.constructMock()_ family of
+methods to create such mocks, which will allow you to call an appropriate
+constructor.
 
 ##### Verifying
 
@@ -475,7 +509,13 @@ do suggest it for inclusion into the core Moxy distribution. GitHub pull request
 preferred format for such suggestions, but if you don't have time for that feel free to submit
 a bug/feature request instead.
 
-##### Partial Mocking and Spying
+##### Partial Mocking
+
+**Side note**
+> This section has largely been superseded by the _constructMock()_ family of methods
+and the functionality provided by [thenCallRealMethod()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenCallRealMethod--).
+It may however remain useful in some more advanced scenarios, and so has been retained
+in the documentation. 
 
 In addition to the standard behaviour of mocking all public methods, Moxy also supports
 _partial mocking_, where only _some_ of the methods in a given class are mocked, leaving

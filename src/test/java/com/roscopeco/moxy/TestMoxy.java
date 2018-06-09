@@ -51,6 +51,7 @@ import com.roscopeco.moxy.model.MethodWithArguments;
 import com.roscopeco.moxy.model.MethodWithPrimitiveArguments;
 import com.roscopeco.moxy.model.SimpleAbstractClass;
 import com.roscopeco.moxy.model.SimpleClass;
+import com.roscopeco.moxy.model.SimpleConstructorClass;
 import com.roscopeco.moxy.model.SimpleInterface;
 
 /*
@@ -1130,5 +1131,75 @@ public class TestMoxy {
 
     // Then the stubbing is discarded and it becomes a spy
     assertThat(spy.returnHello()).isEqualTo("Hello");
+  }
+
+  @Test
+  public void testMoxyConstructMockWorksWithNullConstructor() {
+    final SimpleConstructorClass mock = Moxy.constructMock(SimpleConstructorClass.class);
+
+    Moxy.when(() -> mock.returnString()).thenCallRealMethod();
+
+    assertThat(mock.returnString()).isEqualTo("Hello");
+  }
+
+  @Test
+  public void testMoxyConstructMockWorksWithOneArgConstructor() {
+    final SimpleConstructorClass mock =
+        Moxy.constructMock(SimpleConstructorClass.class, "Goodbye");
+
+    Moxy.when(() -> mock.returnString()).thenCallRealMethod();
+
+    assertThat(mock.returnString()).isEqualTo("Goodbye");
+  }
+
+  @Test
+  public void testMoxyConstructMockWorksWithTwoArgConstructor() {
+    final SimpleConstructorClass mock =
+        Moxy.constructMock(SimpleConstructorClass.class, "Good", "bye");
+
+    Moxy.when(() -> mock.returnString()).thenCallRealMethod();
+
+    assertThat(mock.returnString()).isEqualTo("Goodbye");
+  }
+
+  @Test
+  public void testMoxyConstructMockWorksWithPrimitiveArgConstructor() {
+    final SimpleConstructorClass mock =
+        Moxy.constructMock(SimpleConstructorClass.class, "Level", 42);
+
+    Moxy.when(() -> mock.returnString()).thenCallRealMethod();
+
+    assertThat(mock.returnString()).isEqualTo("Level42");
+  }
+
+  @Test
+  public void testMoxyConstructSpyWorksWithNullConstructor() {
+    final SimpleConstructorClass mock = Moxy.constructSpy(SimpleConstructorClass.class);
+
+    assertThat(mock.returnString()).isEqualTo("Hello");
+  }
+
+  @Test
+  public void testMoxyConstructSpyWorksWithOneArgConstructor() {
+    final SimpleConstructorClass mock =
+        Moxy.constructSpy(SimpleConstructorClass.class, "Goodbye");
+
+    assertThat(mock.returnString()).isEqualTo("Goodbye");
+  }
+
+  @Test
+  public void testMoxyConstructSpyWorksWithTwoArgConstructor() {
+    final SimpleConstructorClass mock =
+        Moxy.constructSpy(SimpleConstructorClass.class, "Good", "bye");
+
+    assertThat(mock.returnString()).isEqualTo("Goodbye");
+  }
+
+  @Test
+  public void testMoxyConstructSpyWorksWithPrimitiveArgConstructor() {
+    final SimpleConstructorClass mock =
+        Moxy.constructSpy(SimpleConstructorClass.class, "Level", 42);
+
+    assertThat(mock.returnString()).isEqualTo("Level42");
   }
 }

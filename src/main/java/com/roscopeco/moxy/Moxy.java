@@ -360,7 +360,7 @@ public final class Moxy {
     final Class<? extends T> mockClz = engine.getMockClass(clz, trace);
 
     final Class<?>[] argTypes = ArrayUtils.addAll(MOXY_ENGINE_SINGLETON_ARRAY,
-        (Class<?>[])Arrays.stream(args).map(o -> o.getClass()).toArray(Class<?>[]::new));
+        (Class<?>[])Arrays.stream(args).map(Object::getClass).toArray(Class<?>[]::new));
 
     final Constructor<? extends T> ctor =
         ConstructorUtils.getMatchingAccessibleConstructor(mockClz, argTypes);
@@ -368,7 +368,7 @@ public final class Moxy {
     if (ctor == null) {
       final String typesStr =
           "[" + Arrays.stream(argTypes)
-              .map(e -> e.getCanonicalName())
+              .map(Class::getCanonicalName)
               .collect(Collectors.joining(", "))
           + "]";
 

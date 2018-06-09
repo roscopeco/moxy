@@ -594,15 +594,9 @@ MyClass mock = mockClass
 MyClass spy = Moxy.spy(mock);
 ```
 
-There are more convenient wrappers for both _mock_ and _spy_ coming in
-a future release that will make this easier, but they aren't quite ready
-yet.
-
 **Side Note**
-> Often, the behaviour you'll achieve with partial mocking can also be 
-accomplished with the `MoxyStubber.thenCallRealMethod()` method,
-or you might find you need a combination of the two. In any event, 
-you can happily use them together as the need arises.
+> This too has been superseded, and you can now use the _constructSpy()_ family
+of methods to achieve the same result, in 99% of cases, in one line of code.
 
 ### How does it work?
 

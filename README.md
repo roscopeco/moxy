@@ -367,12 +367,6 @@ hood, and that means there are unfortunately some caveats to using them:
 * You **must not** use any of the argument matchers outside of a [when()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html#when-com.roscopeco.moxy.api.InvocationSupplier-) or [assertMock()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html#assertMock-com.roscopeco.moxy.api.InvocationRunnable-) call. Although there really isn't any reason you'd want to anyway.
 * You may occasionally receive an odd error message when using matchers. The aim is that this should always be in the right place (not at some indeterminate future time) though, and should always give you an error message telling you what went wrong and why. If ever that's not the case, then I consider it a potential bug and would be grateful if you'd report it on GitHub.
 
-**Side note**
-> I'm working hard to eliminate as many of these caveats as possible. Especially the one about passing all arguments as matchers, that one's got me up nights trying to figure a way around it.
-
-If you've used certain other mock frameworks, then you'll be familiar with some of these caveats.
-I'm guessing their matchers work in more or less the same way as Moxy's.
-
 ##### Passing all arguments as matchers
 
 So you've used a matcher for one of the arguments to a method, let's call it 
@@ -396,7 +390,7 @@ be asserted against. So:
 assertMock(() -> mock.method(any())).wasCalledOnce();
 ```
 
-is simply saying "Assert that mock.method was called once, with any arguments. Simples!
+is simply saying "Assert that mock.method was called once, with any arguments". Simples!
 
 ##### Primitive matchers
 
@@ -410,13 +404,11 @@ rather than plain
 [any()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#any--). 
 
 Sadly, due to the ~~stupid~~ way Java generics and autoboxing are implemented, the
-compiler won't catch you if you forget this rule, and one of two things will 
-happen at runtime:
+compiler won't catch you if you forget this rule, and get you'll get an exception
+at runtime with a helpful error message telling you that it appears you may have forgotten
+to use a primitive matcher.
 
-* _Most of the time_ Moxy will catch it, and you'll get a helpful error message telling you that it appears you may have forgotten to use a primitive matcher.
-* _But some of the time_ you'll get a no-message `NullPointerException` from some seemingly-random place in your code that is actually the result of the JVM trying to auto-unbox a null to a primitive wrapper class.
-
-So if you do get that seemingly random NPE, and you're using matchers, check carefully
+So if you do get that exception, and you're using matchers, check carefully
 that you're using primitive matchers as appropriate. A common vector for getting this 
 wrong seems to be when using primitive [and()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#and-T...-) and [or()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#or-T...-) matchers - the matchers 
 that are being and'ed and or'ed _also_ need to be primitive. So, e.g., instead of:
@@ -529,8 +521,8 @@ _partial mocking_, where only _some_ of the methods in a given class are mocked,
 the rest with their original implementation.
 
 Partial mocking is inherently trickier than straight-up complete mocking, mostly because
-**Moxy doesn't call constructors**. This means that, if the methods you don't mock
-require any state that is set in a constructor, they're likely to fail miserably.
+by default, **Moxy doesn't call constructors**. This means that, if the methods you don't
+mock require any state that is set in a constructor, they're likely to fail miserably.
 
 For this reason, the usual static _Moxy.mock(...)_ API doesn't support partial mocking -
 you'll have to get a little deeper into the API and call a constructor yourself.
@@ -576,6 +568,11 @@ MyClass mock = mockClass
     .getConstructor(MoxyEngine.class, String.class, int.class)
     .newInstance(Moxy.getMoxyEngine(), "Some string", 42);
 ```
+
+**Side note**
+> Much of this has been superseded by the _Moxy.constructMock()_ family of
+methods, so unless you have advanced requirements you should probably
+use those instead of generating the class manually.
 
 Those few extra lines might seem like a bit of a pain, but think of the 
 extra work as a reminder that partial mocking is a little bit dangerous.

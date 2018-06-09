@@ -76,8 +76,8 @@ public final class TypesAndDescriptors {
   public static final String MOCK_CONSTRUCTOR_DESCRIPTOR = "(" + MOXY_ENGINE_DESCRIPTOR + ")V";
 
   public static final String MOXY_SUPPORT_INTERFACE_INTERNAL_NAME = Type.getInternalName(ASMMockSupport.class);
-  public static final String MOXY_SUPPORT_ivars_INTERNAL_NAME = Type.getInternalName(ASMMockInstanceVars.class);
-  public static final String MOXY_SUPPORT_ivars_DESCRIPTOR = "L" + MOXY_SUPPORT_ivars_INTERNAL_NAME + ";";
+  public static final String MOXY_SUPPORT_IVARS_INTERNAL_NAME = Type.getInternalName(ASMMockInstanceVars.class);
+  public static final String MOXY_SUPPORT_ivars_DESCRIPTOR = "L" + MOXY_SUPPORT_IVARS_INTERNAL_NAME + ";";
 
   public static final String MOXY_ENGINE_INTERNAL_NAME = Type.getInternalName(MoxyEngine.class);
 

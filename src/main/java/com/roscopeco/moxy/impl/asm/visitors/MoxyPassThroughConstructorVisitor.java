@@ -98,14 +98,14 @@ public class MoxyPassThroughConstructorVisitor extends MethodVisitor {
     this.delegate.visitMethodInsn(INVOKESPECIAL, this.originalClass, INIT_NAME, this.methodDescriptor, false);
 
     // Create ivars object
-    this.delegate.visitTypeInsn(NEW, MOXY_SUPPORT_ivars_INTERNAL_NAME);
+    this.delegate.visitTypeInsn(NEW, MOXY_SUPPORT_IVARS_INTERNAL_NAME);
     this.delegate.visitInsn(DUP);
 
     // construct with engine
     this.delegate.visitVarInsn(ALOAD, 1);
     this.delegate.visitTypeInsn(CHECKCAST, MOXY_ASM_ENGINE_INTERNAL_NAME);
     this.delegate.visitMethodInsn(INVOKESPECIAL,
-                                  MOXY_SUPPORT_ivars_INTERNAL_NAME,
+                                  MOXY_SUPPORT_IVARS_INTERNAL_NAME,
                                   INIT_NAME,
                                   SUPPORT_ivars_CTOR_DESCRIPTOR,
                                   false);

@@ -246,8 +246,8 @@ public final class Moxy {
    */
   public static <T> T spy(final T mock) {
     if (!isMock(mock)) {
-      throw new IllegalArgumentException("Cannot convert "
-                                         + mock.toString()
+      throw new IllegalArgumentException("Cannot convert " 
+                                         + mock.toString() 
                                          + " to spy - it is not a mock");
     }
 

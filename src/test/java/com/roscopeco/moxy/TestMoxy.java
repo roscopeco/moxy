@@ -1008,7 +1008,7 @@ public class TestMoxy {
   public void testMoxySpyCreatesASpyForNoArgMethods() {
     final SimpleClass spy = Moxy.spy(SimpleClass.class);
 
-    assertThat(Moxy.isMock(spy));
+    assertThat(Moxy.isMock(spy)).isTrue();
     assertThat(spy.returnHello()).isEqualTo("Hello");
 
     Moxy.assertMock(() -> spy.returnHello()).wasCalledOnce();
@@ -1018,7 +1018,7 @@ public class TestMoxy {
   public void testMoxySpyClassCreatesASpyWithObjectArguments() {
     final MethodWithArguments spy = Moxy.spy(MethodWithArguments.class);
 
-    assertThat(Moxy.isMock(spy));
+    assertThat(Moxy.isMock(spy)).isTrue();
 
     spy.hasArgs("one", "two");
 
@@ -1031,7 +1031,7 @@ public class TestMoxy {
   public void testMoxySpyClassCreatesASpyWithMixedObjectAndIntArgs() {
     final MethodWithArgAndReturn spy = Moxy.spy(MethodWithArgAndReturn.class);
 
-    assertThat(Moxy.isMock(spy));
+    assertThat(Moxy.isMock(spy)).isTrue();
     assertThat(spy.hasTwoArgs("Level", 42)).isEqualTo("Level42");
     assertThat(spy.sayHelloTo("Bill")).isEqualTo("Hello, Bill");
 
@@ -1045,7 +1045,7 @@ public class TestMoxy {
   public void testMoxySpyClassCreatesASpyWithAllPrimitiveTypeArguments() {
     final MethodWithPrimitiveArguments spy = Moxy.spy(MethodWithPrimitiveArguments.class);
 
-    assertThat(Moxy.isMock(spy));
+    assertThat(Moxy.isMock(spy)).isTrue();
     assertThat(spy.hasArgs("one",
                            (byte)10,
                            'a',

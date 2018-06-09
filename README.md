@@ -177,7 +177,7 @@ constructor.
 
 This is generally a good thing, however there are caveats if you're
 planning to utilise [thenCallRealMethod()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenCallRealMethod--)
-or convert your mocks into spies (see [#creating-spies], below).
+or convert your mocks into spies (see [the section on spies](#creating-spies), below).
 
 For those times when you want to call a constructor on your mock,
 Moxy provides the _constructMock()_ family of methods, which will select
@@ -192,7 +192,7 @@ primitive arguments using standard Java auto boxing/unboxing.
 
 ##### Stubbing
 
-By default, this will mock all public methods of the class, and make them
+By default, Moxy will mock all public methods of the class, and make them
 all return sensible defaults (think zeroes, nulls, falseys). If you want to
 make a given method return something else, you would _stub_ it, 
 using the [thenReturn()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenReturn-T-), [thenAnswer()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenAnswer-com.roscopeco.moxy.api.AnswerProvider-) or [thenThrow()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenThrow-java.lang.Throwable-) methods like so:
@@ -223,8 +223,8 @@ a combination of (potentially different) returns and throws as you need.
 
 **Side note**
 > Incidentally, Moxy is smart enough to know if you're stubbing a void method,
-in which case you won't have the option to [thenReturn()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenReturn-T-), because stubbing
-a return value for a void method would be, well, pointless.
+in which case you won't have the option to [thenReturn()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenReturn-T-) or
+[thenAnswer()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenAnswer-com.roscopeco.moxy.api.AnswerProvider-), because stubbing a return value for a void method would be, well, pointless.
 
 Once you're done stubbing, you can go ahead and pass your mock to the class
 you're testing (or to whoever else needs it really). If you've stubbed 
@@ -274,6 +274,13 @@ Under the hood, spies are just mocks with all methods set to use
 [thenCallRealMethod()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenCallRealMethod--),
 so you still have access to all the usual verification supported by mocks,
 and still use exactly the same API.
+
+**Side note** 
+>While spies don't support stubbing (i.e. [thenReturn()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenReturn-T-),
+[thenAnswer()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenAnswer-com.roscopeco.moxy.api.AnswerProvider-) or [thenThrow()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenThrow-java.lang.Throwable-))
+because their behaviour is determined by the real method, it's probably worth noting that you can
+still apply [doActions](#actions) to spies, which will be executed in the usual way,
+_prior_ to calling the real method. 
 
 ##### Partial spies
 

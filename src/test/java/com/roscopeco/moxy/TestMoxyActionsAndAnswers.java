@@ -25,6 +25,7 @@ package com.roscopeco.moxy;
 
 import static org.assertj.core.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.roscopeco.moxy.matchers.Matchers;
@@ -32,6 +33,11 @@ import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
 
 public class TestMoxyActionsAndAnswers {
+  @BeforeEach
+  public void setUp() {
+    Moxy.getMoxyEngine().reset();
+  }
+
   @Test
   public void testMoxyMockThenAnswerWorksCorrectly() {
     final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);

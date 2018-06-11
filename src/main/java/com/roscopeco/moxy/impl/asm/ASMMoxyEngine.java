@@ -29,6 +29,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.objectweb.asm.ClassReader;
@@ -69,7 +70,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    * See #runMonitoredInvocation
    */
   @FunctionalInterface
-  static interface MonitoredInvocation {
+  static interface InvocationMonitor {
     public void invoke() throws Exception;
   }
 
@@ -297,12 +298,13 @@ public class ASMMoxyEngine implements MoxyEngine {
    * an InconsistentMatchersException is thrown.
    */
   void ensureEngineConsistencyBeforeMonitoredInvocation() {
-    this.getRecorder().clearLastInvocation();
+    this.getRecorder().clearCurrentInvocation();
     this.getMatcherEngine().ensureStackConsistency();
   }
 
   /*
-   * Run a monitored invocation.
+   * Run a monitored invocation and returns the Invocations that were
+   * recorded.
    *
    * Ensures engine and matcher stack consistency, and
    * guarantees consistency at exit, whether through return or throw.
@@ -311,11 +313,12 @@ public class ASMMoxyEngine implements MoxyEngine {
    * (see #disableMockBehaviourOnThisThread), and is guaranteed to
    * be re-enabled at exit.
    */
-  void runMonitoredInvocation(final MonitoredInvocation invocation) {
+  List<Invocation> runMonitoredInvocation(final InvocationMonitor monitor) {
     this.ensureEngineConsistencyBeforeMonitoredInvocation();
     try {
-      this.disableMockBehaviourOnThisThread();
-      invocation.invoke();
+      this.startMonitoredInvocation();
+      monitor.invoke();
+      return this.getRecorder().getCurrentMonitoredInvocations();
     } catch (final MoxyException e) {
       // Framework exception; don't wrap
       // We'll never get to the code that deletes the invocation and ensures consistency,
@@ -341,11 +344,10 @@ public class ASMMoxyEngine implements MoxyEngine {
       // so do that now before we throw...
       this.deleteLatestInvocationFromListAndClearStack();
 
-
       // Wrap in framework exception
       throw new MonitoredInvocationException(e);
     } finally {
-      this.enableMockBehaviourOnThisThread();
+      this.endMonitoredInvocation();
     }
   }
 
@@ -362,17 +364,11 @@ public class ASMMoxyEngine implements MoxyEngine {
   }
 
   /*
-   * Deletes latest invocation, and ensures matcher stack consistency.
+   * Starts a monitored invocation.
    *
-   * If stack was not empty, this throws InconsistentMatchersException.
-   */
-  void deleteLatestInvocationFromListAndValidateStack() {
-    this.getRecorder().unrecordLastInvocation();
-    this.getMatcherEngine().ensureStackConsistency();
-  }
-
-  /*
-   * Disables mock behaviour on the current thread.
+   * * Disables mock behaviour on the current thread.
+   * * Pushes a new frame to the monitored invocation stack.
+   * * Clears the matcher stack.
    *
    * In the disabled state, mocks will still record their invocations,
    * but will not execute actions or answers, return stubbed values (they
@@ -380,19 +376,29 @@ public class ASMMoxyEngine implements MoxyEngine {
    *
    * This is used at the start of #runMonitoredInvocation.
    */
-  void disableMockBehaviourOnThisThread() {
+  void startMonitoredInvocation() {
     this.threadLocalMockBehaviourDisabled.set(true);
+    this.getRecorder().startMonitoredInvocation();
+    this.getMatcherEngine().clearMatcherStack();
   }
 
   /*
-   * Enables mock behaviour on the current thread.
+   * Ends a monitored invocation.
    *
-   * See #disableMockBehaviourOnThisThread for an explanation.
+   * * Ensures no matchers remain on the stack.
+   * * Pops the current frame from the monitored invocation stack and discards it.
+   * * Enables mock behaviour on the current thread.
    *
    * This is guaranteed to be called at the end of
    * #runMonitoredInvocation.
    */
-  void enableMockBehaviourOnThisThread() {
+  void endMonitoredInvocation() {
+    if (!this.threadLocalMockBehaviourDisabled.get()) {
+      throw new IllegalStateException("[BUG] Attempt to end an unstarted monitored invocation (in engine)");
+    }
+
+    this.getMatcherEngine().ensureStackConsistency();
+    this.getRecorder().endMonitoredInvocation();
     this.threadLocalMockBehaviourDisabled.set(false);
   }
 
@@ -411,10 +417,8 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public <T> MoxyStubber<T> when(final InvocationSupplier<T> invocation) {
-    this.runMonitoredInvocation(invocation::get);
-    this.getRecorder().replaceInvocationArgsWithMatchers();
-    this.deleteLatestInvocationFromListAndValidateStack();
-    return new ASMMoxyStubber<>(this);
+    final List<Invocation> invocations = this.runMonitoredInvocation(invocation::get);
+    return new ASMMoxyStubber<>(this, invocations);
   }
 
   /*
@@ -423,10 +427,8 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public MoxyVoidStubber when(final InvocationRunnable invocation) {
-    this.runMonitoredInvocation(invocation::run);
-    this.getRecorder().replaceInvocationArgsWithMatchers();
-    this.deleteLatestInvocationFromListAndValidateStack();
-    return new ASMMoxyVoidStubber(this);
+    final List<Invocation> invocations = this.runMonitoredInvocation(invocation::run);
+    return new ASMMoxyVoidStubber(this, invocations);
   }
 
   /*
@@ -435,10 +437,8 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public MoxyVerifier assertMock(final InvocationRunnable invocation) {
-    this.runMonitoredInvocation(invocation::run);
-    this.getRecorder().replaceInvocationArgsWithMatchers();
-    this.deleteLatestInvocationFromListAndValidateStack();
-    return new ASMMoxyVerifier(this);
+    final List<Invocation> invocations = this.runMonitoredInvocation(invocation::run);
+    return new ASMMoxyVerifier(this, invocations);
   }
 
   /*

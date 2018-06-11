@@ -23,6 +23,7 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -30,7 +31,7 @@ import org.opentest4j.AssertionFailedError;
 
 import com.roscopeco.moxy.api.MoxyVerifier;
 
-class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
+class ASMMoxyVerifier extends AbstractASMMoxyVerifier implements MoxyVerifier {
   private static final String SPACE = " ";
   private static final String EXPECTED_MOCK = "Expected mock ";
   private static final String TO_BE_CALLED = " to be called ";
@@ -38,8 +39,8 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
   private static final String BUT_IT_WAS_CALLED = ", but it was called ";
   private static final String BUT_IT_WAS_THROWN = ", but it was thrown ";
 
-  public ASMMoxyVerifier(final ASMMoxyEngine engine) {
-    super(engine);
+  public ASMMoxyVerifier(final ASMMoxyEngine engine, final List<Invocation> theInvocations) {
+    super(engine, theInvocations);
   }
 
   private String readableTimes(final int times) {
@@ -56,7 +57,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
 
   @Override
   public MoxyVerifier wasCalled() {
-    final Invocation invocation = this.getTheInvocation();
+    final Invocation invocation = this.getLastInvocation();
     final String methodName = invocation.getMethodName();
     final String methodDesc = invocation.getMethodDesc();
 
@@ -100,7 +101,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
 
   @Override
   public MoxyVerifier wasCalled(final int times) {
-    final Invocation invocation = this.getTheInvocation();
+    final Invocation invocation = this.getLastInvocation();
     final String methodName = invocation.getMethodName();
     final String methodDesc = invocation.getMethodDesc();
     final int actual = this.getCallCount(invocation, methodName, methodDesc);
@@ -140,7 +141,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
 
   @Override
   public MoxyVerifier wasCalledAtLeast(final int times) {
-    final Invocation invocation = this.getTheInvocation();
+    final Invocation invocation = this.getLastInvocation();
     final String methodName = invocation.getMethodName();
     final String methodDesc = invocation.getMethodDesc();
     final int actual = this.getCallCount(invocation, methodName, methodDesc);
@@ -165,7 +166,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
 
   @Override
   public MoxyVerifier wasCalledAtMost(final int times) {
-    final Invocation invocation = this.getTheInvocation();
+    final Invocation invocation = this.getLastInvocation();
     final String methodName = invocation.getMethodName();
     final String methodDesc = invocation.getMethodDesc();
     final int actual = this.getCallCount(invocation, methodName, methodDesc);
@@ -208,7 +209,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
 
   @Override
   public MoxyVerifier neverThrew(final Class<? extends Throwable> throwableClass) {
-    final Invocation invocation = this.getTheInvocation();
+    final Invocation invocation = this.getLastInvocation();
     final String methodName = invocation.getMethodName();
     final String methodDesc = invocation.getMethodDesc();
 
@@ -239,7 +240,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
 
   @Override
   public MoxyVerifier neverThrew(final Throwable throwable) {
-    final Invocation invocation = this.getTheInvocation();
+    final Invocation invocation = this.getLastInvocation();
     final String methodName = invocation.getMethodName();
     final String methodDesc = invocation.getMethodDesc();
 
@@ -270,7 +271,7 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
 
   @Override
   public MoxyVerifier neverThrewAnyException() {
-    final Invocation invocation = this.getTheInvocation();
+    final Invocation invocation = this.getLastInvocation();
     final String methodName = invocation.getMethodName();
     final String methodDesc = invocation.getMethodDesc();
 

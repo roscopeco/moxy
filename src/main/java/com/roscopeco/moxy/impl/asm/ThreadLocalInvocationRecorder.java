@@ -23,6 +23,7 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -34,31 +35,58 @@ import com.roscopeco.moxy.matchers.MoxyMatcher;
 public class ThreadLocalInvocationRecorder {
   private final ASMMoxyEngine engine;
 
+  /*
+   * This list keeps track of all 'standard' (i.e. unmonitored) invocations,
+   * keyed by mock class for faster searching in the single-invocation
+   * verifiers.
+   */
   private final ThreadLocal<HashMap<Class<?>, LinkedHashMap<String, List<Invocation>>>>
       invocationMapThreadLocal;
 
-  private final ThreadLocal<ArrayList<Invocation>> allInvocationsOrderedList;
+  /*
+   * This list keeps track of all 'standard' (i.e. unmonitored) invocations.
+   * These are invocations that do not occur in a when or assert.
+   *
+   * This is used by the multi-invocation verifiers.
+   */
+  private final ThreadLocal<ArrayList<Invocation>> standardInvocationsOrderedList;
 
-  private final ThreadLocal<Invocation> lastInvocationThreadLocal;
+  /*
+   * This stores the current invocation, and is valid *only* during invocation
+   * of mocked methods. It is cleared before mocks return.
+   */
+  private final ThreadLocal<Invocation> currentInvocationThreadLocal;
+
+  /*
+   * This stack keeps track of monitored invocations. Each time a monitored
+   * invocation is started, a new 'frame' is pushed, and used at the end of
+   * that invocation to retrieve the monitored invocations.
+   *
+   * It's a stack in case someone feels the need to nest when/asserts.
+   */
+  private final ThreadLocal<ArrayDeque<ArrayList<Invocation>>> monitoredInvocationStackThreadLocal;
 
   ThreadLocalInvocationRecorder(final ASMMoxyEngine engine) {
     this.engine = engine;
     this.invocationMapThreadLocal = new ThreadLocal<>();
-    this.allInvocationsOrderedList = new ThreadLocal<>();
-    this.lastInvocationThreadLocal = new ThreadLocal<>();
+    this.standardInvocationsOrderedList = new ThreadLocal<>();
+    this.currentInvocationThreadLocal = new ThreadLocal<>();
+    this.monitoredInvocationStackThreadLocal = new ThreadLocal<>();
+    this.monitoredInvocationStackThreadLocal.set(new ArrayDeque<>());
   }
 
   /*
    * This gets any matchers from the MatcherEngine's stack, and replaces
    * the arguments from the last invocation with them.
+   *
+   * This is called from the mock itself, so we're guaranteed to have
+   * an invocation at this point.
    */
-  void replaceInvocationArgsWithMatchers() {
+  void replaceInvocationArgsWithMatchers(final Invocation invocation) {
     final ASMMoxyMatcherEngine mengine = this.engine.getMatcherEngine();
     final List<MoxyMatcher<?>> matchers = mengine.popMatchers();
     if (matchers != null) {
-      final Invocation lastInvocation = this.getLastInvocation();
-
-      final List<Object> lastArgs = lastInvocation.getArgs();
+      final List<Object> lastArgs = invocation.getArgs();
       if (lastArgs.size() != matchers.size()) {
         throw new InconsistentMatchersException(lastArgs.size(), mengine.ensureMatcherStack());
       } else {
@@ -79,24 +107,36 @@ public class ThreadLocalInvocationRecorder {
         this.ensureInvocationMap(this.ensureLocalClassMap(), receiver.getClass()),
         methodName, methodDesc);
 
-    final List<Invocation> orderedInvocations = this.ensureAllInvocationsOrderedList();
-
     final Invocation invocation = new Invocation(receiver,
-                                           methodName,
-                                           methodDesc,
-                                           args);
-
-    // Add to list of invocations mapped by class (for faster lookup)
-    invocations.add(invocation);
-
-    // Add to ordered list (for in-order verification)
-    orderedInvocations.add(invocation);
-
-    // Record last invocation on this thread
-    this.lastInvocationThreadLocal.set(invocation);
+                                                 methodName,
+                                                 methodDesc,
+                                                 args);
 
     // Fixup matchers
-    this.replaceInvocationArgsWithMatchers();
+    this.replaceInvocationArgsWithMatchers(invocation);
+
+    if (this.monitoredInvocationStackThreadLocal.get().isEmpty()) {
+      // Not in a monitored invocation, add to standard map/list
+      final List<Invocation> orderedInvocations =
+          this.ensureAllInvocationsOrderedList();
+
+      // Add to list of invocations mapped by class (for faster lookup)
+      invocations.add(invocation);
+
+      // Add to ordered list (for in-order verification)
+      orderedInvocations.add(invocation);
+    } else {
+      // In a monitored invocation, just add to list at top of stack.
+      final List<Invocation> orderedInvocations =
+          this.monitoredInvocationStackThreadLocal.get().peek();
+
+      orderedInvocations.add(invocation);
+    }
+
+    // Record current invocation on this thread.
+    // Mocks rely on this to set their throws/returns,
+    // so must always be set!
+    this.currentInvocationThreadLocal.set(invocation);
   }
 
   /*
@@ -107,7 +147,7 @@ public class ThreadLocalInvocationRecorder {
    * @see comments on {@link MoxyInvocationRecorder#unrecordLastInvocation}.
    */
   void unrecordLastInvocation() {
-    final Invocation lastInvocation = this.getLastInvocation();
+    final Invocation lastInvocation = this.getCurrentInvocation();
 
     if (lastInvocation != null) {
       final List<Invocation> invocations = this.ensureInvocationList(
@@ -120,28 +160,40 @@ public class ThreadLocalInvocationRecorder {
     }
   }
 
+
+
   List<Invocation> getInvocationList(final Class<?> forClz, final String methodName, final String methodDesc) {
     return this.ensureInvocationList(this.ensureInvocationMap(this.ensureLocalClassMap(), forClz), methodName, methodDesc);
   }
 
-  Invocation getLastInvocation() {
-    return this.lastInvocationThreadLocal.get();
+  Invocation getCurrentInvocation() {
+    return this.currentInvocationThreadLocal.get();
   }
 
-  void clearLastInvocation() {
-    this.lastInvocationThreadLocal.set(null);
-  }
-
-  Invocation getAndClearLastInvocation() {
-    final Invocation invocation = this.getLastInvocation();
-    this.clearLastInvocation();
-    return invocation;
+  void clearCurrentInvocation() {
+    this.currentInvocationThreadLocal.set(null);
   }
 
   void reset() {
-    this.lastInvocationThreadLocal.set(null);
-    this.allInvocationsOrderedList.set(null);
+    this.currentInvocationThreadLocal.set(null);
+    this.standardInvocationsOrderedList.set(null);
     this.invocationMapThreadLocal.set(null);
+  }
+
+  void startMonitoredInvocation() {
+    this.monitoredInvocationStackThreadLocal.get().push(new ArrayList<>());
+  }
+
+  List<Invocation> getCurrentMonitoredInvocations() {
+    return this.monitoredInvocationStackThreadLocal.get().peek();
+  }
+
+  void endMonitoredInvocation() {
+    if (this.monitoredInvocationStackThreadLocal.get().isEmpty()) {
+      throw new IllegalStateException("[BUG] Attempt to end an unstarted monitored invocation (in recorder)");
+    }
+
+    this.monitoredInvocationStackThreadLocal.get().pop();
   }
 
   private HashMap<Class<?>, LinkedHashMap<String, List<Invocation>>> ensureLocalClassMap() {
@@ -157,11 +209,11 @@ public class ThreadLocalInvocationRecorder {
   }
 
   private List<Invocation> ensureAllInvocationsOrderedList() {
-    ArrayList<Invocation> list = this.allInvocationsOrderedList.get();
+    ArrayList<Invocation> list = this.standardInvocationsOrderedList.get();
 
     if (list == null) {
       list = new ArrayList<>();
-      this.allInvocationsOrderedList.set(list);
+      this.standardInvocationsOrderedList.set(list);
     }
 
     return list;

@@ -29,6 +29,7 @@ import java.util.List;
 
 import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.matchers.InconsistentMatchersException;
+import com.roscopeco.moxy.matchers.MatcherUsageError;
 import com.roscopeco.moxy.matchers.MoxyMatcher;
 
 class ASMMoxyMatcherEngine {
@@ -63,8 +64,14 @@ class ASMMoxyMatcherEngine {
   }
 
   void registerMatcher(final MoxyMatcher<?> matcher) {
-    this.verifyMatcherNotNull(matcher);
-    matcher.addToStack(this.ensureMatcherStack());
+    if (this.getASMMoxyEngine().isMockStubbingDisabledOnThisThread()) {
+      this.verifyMatcherNotNull(matcher);
+      matcher.addToStack(this.ensureMatcherStack());
+    } else {
+      throw new MatcherUsageError("Attempt to register matcher '"
+                                  + matcher.toString()
+                                  + "' outside when() or assertMock[s]() call");
+    }
   }
 
   List<MoxyMatcher<?>> popMatchers() {
@@ -130,6 +137,7 @@ class ASMMoxyMatcherEngine {
    * If non-empty, throws InconsistentMatchersException.
    */
   void ensureStackConsistency() {
+    // TODO this may no longer be needed - just clear matchers at start of monitored invoke?
     if (this.clearMatcherStack()) {
       throw new InconsistentMatchersException(0, this.matcherStack.get());
     }

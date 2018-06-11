@@ -77,7 +77,7 @@ public interface ASMMockSupport {
     return doActionsMap.computeIfAbsent(method, k -> new ArrayList<>());
   }
 
-  public default String __asm_moxy_makeJavaSignature(final String name, final String desc) {
+  public default String __moxy_asm_makeJavaSignature(final String name, final String desc) {
     return TypeStringUtils.javaMethodSignature(name, desc);
   }
 
@@ -290,7 +290,7 @@ public interface ASMMockSupport {
    */
   public default Throwable __moxy_asm_getThrowForCurrentInvocation() {
     return __moxy_asm_getThrowForInvocation(
-        __moxy_asm_ivars().getEngine().getRecorder().getLastInvocation());
+        __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation());
   }
 
   /* This MUST only ever be called from mocked methods AFTER the invocation has been
@@ -299,7 +299,7 @@ public interface ASMMockSupport {
    */
   public default Object __moxy_asm_getReturnForCurrentInvocation() {
     return __moxy_asm_getReturnForInvocation(
-        __moxy_asm_ivars().getEngine().getRecorder().getLastInvocation());
+        __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation());
   }
 
   /* This MUST only ever be called from mocked methods AFTER the invocation has been
@@ -308,7 +308,7 @@ public interface ASMMockSupport {
    */
   public default boolean __moxy_asm_shouldCallSuperForCurrentInvocation() {
     return __moxy_asm_shouldCallSuperForInvocation(
-        __moxy_asm_ivars().getEngine().getRecorder().getLastInvocation());
+        __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation());
   }
 
   /* This MUST only ever be called from mocked methods AFTER the invocation has been
@@ -317,7 +317,7 @@ public interface ASMMockSupport {
    */
   public default void __moxy_asm_runDoActionsForCurrentInvocation() {
     __moxy_asm_runDoActionsForInvocation(
-        __moxy_asm_ivars().getEngine().getRecorder().getLastInvocation());
+        __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation());
   }
 
   /* This MUST only ever be called from mocked methods AFTER the invocation has been
@@ -325,12 +325,19 @@ public interface ASMMockSupport {
    * invocation just prior to throw or return.
    */
   public default void __moxy_asm_updateCurrentInvocationReturnThrow(final Object returned, final Throwable threw) {
-    final Invocation invocation = __moxy_asm_ivars().getEngine().getRecorder().getLastInvocation();
+    final Invocation invocation = __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation();
     invocation.setReturned(returned);
     invocation.setThrew(threw);
   }
 
   public default boolean __moxy_asm_isMockBehaviourDisabledOnThisThread() {
     return __moxy_asm_ivars().getEngine().isMockStubbingDisabledOnThisThread();
+  }
+
+  /*
+   * Handles argument matchers for this invocation
+   */
+  public default void __moxy_asm_handleArgumentMatchers() {
+  //  this.__moxy_asm_getRecorder().replaceCurrentInvocationArgsWithMatchers();
   }
 }

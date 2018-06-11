@@ -23,19 +23,21 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
+import java.util.List;
+
 import com.roscopeco.moxy.api.InvalidMockInvocationException;
 
-class HasEngineAndInvocation {
+class AbstractASMMoxyVerifier {
   protected final ASMMoxyEngine engine;
-  protected final Invocation theInvocation;
+  protected final List<Invocation> invocations;
 
-  public HasEngineAndInvocation(final ASMMoxyEngine engine) {
+  public AbstractASMMoxyVerifier(final ASMMoxyEngine engine, final List<Invocation> invocations) {
     this.engine = engine;
-    this.theInvocation = engine.getRecorder().getAndClearLastInvocation();
+    this.invocations = invocations;
 
-    if (this.theInvocation == null ||
-        this.theInvocation.getReceiver() == null ||
-        !engine.isMock(this.theInvocation.getReceiver().getClass())) {
+    if (this.invocations == null ||
+        this.invocations.isEmpty() ||
+        this.invocations.stream().anyMatch(i -> i.getReceiver() == null)) {
       throw new InvalidMockInvocationException("No mock invocation found");
     }
   }
@@ -44,7 +46,11 @@ class HasEngineAndInvocation {
     return this.engine;
   }
 
-  protected Invocation getTheInvocation() {
-    return this.theInvocation;
+  protected Invocation getLastInvocation() {
+    return this.invocations.get(this.invocations.size() - 1);
+  }
+
+  protected List<Invocation> getInvocations() {
+    return this.invocations;
   }
 }

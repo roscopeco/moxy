@@ -28,14 +28,14 @@ import java.util.function.Consumer;
 
 import com.roscopeco.moxy.api.MoxyVoidStubber;
 
-class ASMMoxyVoidStubber extends HasEngineAndInvocation implements MoxyVoidStubber {
-  public ASMMoxyVoidStubber(final ASMMoxyEngine engine) {
-    super(engine);
+class ASMMoxyVoidStubber extends AbstractASMMoxyVerifier implements MoxyVoidStubber {
+  public ASMMoxyVoidStubber(final ASMMoxyEngine engine, final List<Invocation> invocations) {
+    super(engine, invocations);
   }
 
   @Override
   public void thenThrow(final Throwable throwable) {
-    final Invocation invocation = this.theInvocation;
+    final Invocation invocation = this.getLastInvocation();
     final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
 
     receiver.__moxy_asm_setThrowOrReturn(invocation, throwable, false);
@@ -43,7 +43,7 @@ class ASMMoxyVoidStubber extends HasEngineAndInvocation implements MoxyVoidStubb
 
   @Override
   public void thenCallRealMethod() {
-    final Invocation invocation = this.theInvocation;
+    final Invocation invocation = this.getLastInvocation();
     final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
 
     receiver.__moxy_asm_setShouldCallSuper(invocation, true);
@@ -51,7 +51,7 @@ class ASMMoxyVoidStubber extends HasEngineAndInvocation implements MoxyVoidStubb
 
   @Override
   public MoxyVoidStubber thenDo(final Consumer<List<? extends Object>> action) {
-    final Invocation invocation = this.theInvocation;
+    final Invocation invocation = this.getLastInvocation();
     final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
 
     receiver.__moxy_asm_addDoAction(invocation, action);

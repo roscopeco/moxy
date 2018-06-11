@@ -45,7 +45,7 @@ class ASMMoxyMatcherEngine {
     return this.engine;
   }
 
-  ArrayDeque<MoxyMatcher<?>> ensureMatcherStack() {
+  private ArrayDeque<MoxyMatcher<?>> ensureMatcherStack() {
     ArrayDeque<MoxyMatcher<?>> stack = this.matcherStack.get();
 
     if (stack == null) {
@@ -54,6 +54,10 @@ class ASMMoxyMatcherEngine {
     }
 
     return stack;
+  }
+
+  ArrayDeque<MoxyMatcher<?>> getMatcherStack() {
+    return this.ensureMatcherStack();
   }
 
   void verifyMatcherNotNull(final MoxyMatcher<?> matcher) {
@@ -117,6 +121,11 @@ class ASMMoxyMatcherEngine {
     }
 
     return result;
+  }
+
+  boolean anyArgsMatch(final List<Object> actualArgs, final List<Invocation> storedInvocations) {
+    return storedInvocations.stream()
+        .anyMatch(invocation -> this.argsMatch(actualArgs, invocation.getArgs()));
   }
 
   boolean clearMatcherStack() {

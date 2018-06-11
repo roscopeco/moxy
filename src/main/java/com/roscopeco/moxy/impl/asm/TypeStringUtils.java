@@ -29,6 +29,18 @@ import java.util.stream.Collectors;
 import org.objectweb.asm.Type;
 
 final class TypeStringUtils {
+  static String readableTimes(final int times) {
+    if (times == 0) {
+      return "zero times";
+    } else if (times == 1) {
+      return "once";
+    } else if (times == 2) {
+      return "twice";
+    } else {
+      return "" + times + " times";
+    }
+  }
+
   static String inspectArg(final Object arg) {
     if (arg == null) {
       return null;
@@ -53,12 +65,21 @@ final class TypeStringUtils {
     }
   }
 
-  static String ellipsisDesc(final String descriptor) {
+  private static String unqualifiedClassName(final Type type) {
+    if (type.getDescriptor().length() == 1) {
+      return type.getClassName();
+    } else {
+      final String className = type.getClassName();
+      return className.substring(className.lastIndexOf('.') + 1, className.length());
+    }
+  }
+
+  static String shortDescriptorSignature(final String descriptor) {
     if (descriptor.contains("()")) {
       return "()";
     } else {
       return "(" + Arrays.stream(Type.getArgumentTypes(descriptor))
-          .map(Type::getClassName)
+          .map(TypeStringUtils::unqualifiedClassName)
           .collect(Collectors.joining(", ")) + ")";
     }
   }

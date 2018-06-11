@@ -298,16 +298,34 @@ class TestASMMoxyEngine extends AbstractImplTest {
   }
 
   @Test
-  public void testEnsureEngineConsistencyBeforeMonitoredInvocation() throws Exception {
+  public void testEnsureEngineStartMonitoredInvocation() throws Exception {
     final ASMMoxyEngine engine = this.makePartialMock(true, MoxyEngine.NO_METHODS);
 
     final ThreadLocalInvocationRecorder mockRecorder = engine.getRecorder();
     final ASMMoxyMatcherEngine mockMatcherEngine = engine.getMatcherEngine();
 
-    engine.ensureEngineConsistencyBeforeMonitoredInvocation();
+    engine.startMonitoredInvocation();
 
-    assertMock(() -> mockRecorder.clearCurrentInvocation()).wasCalledOnce();
+    assertMock(() -> mockRecorder.startMonitoredInvocation()).wasCalledOnce();
     assertMock(() -> mockMatcherEngine.ensureStackConsistency()).wasCalledOnce();
+  }
+
+  @Test
+  public void testEnsureEngineEndMonitoredInvocation() throws Exception {
+    final ASMMoxyEngine engine = this.makePartialMock(true, MoxyEngine.NO_METHODS);
+
+    final ThreadLocalInvocationRecorder mockRecorder = engine.getRecorder();
+    final ASMMoxyMatcherEngine mockMatcherEngine = engine.getMatcherEngine();
+
+    assertThatThrownBy(() -> engine.endMonitoredInvocation())
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("[BUG] Attempt to end an unstarted monitored invocation (in engine)");
+
+    engine.startMonitoredInvocation();
+    engine.endMonitoredInvocation();
+
+    assertMock(() -> mockRecorder.endMonitoredInvocation()).wasCalledOnce();
+    assertMock(() -> mockMatcherEngine.ensureStackConsistency()).wasCalledTwice(); // once in start
   }
 
   private void throwRTE(final Exception e) {
@@ -325,7 +343,8 @@ class TestASMMoxyEngine extends AbstractImplTest {
   @Test
   public void testRunMonitoredInvocation() throws Exception {
     final ASMMoxyEngine mockEngine = this.makePartialMock(true,
-        ASMMoxyEngine.class.getDeclaredMethod("ensureEngineConsistencyBeforeMonitoredInvocation"));
+        ASMMoxyEngine.class.getDeclaredMethod("startMonitoredInvocation"),
+        ASMMoxyEngine.class.getDeclaredMethod("endMonitoredInvocation"));
 
     final MoxyException moxyException = new MoxyException("MARKER");
     final NullPointerException nullPointerException = new NullPointerException("MARKER");
@@ -351,7 +370,10 @@ class TestASMMoxyEngine extends AbstractImplTest {
         .hasMessage("An unexpected exception occurred during a monitored invocation; See cause")
         .hasCause(generalException);
 
-    assertMock(() -> mockEngine.ensureEngineConsistencyBeforeMonitoredInvocation())
+    assertMock(() -> mockEngine.startMonitoredInvocation())
+        .wasCalled(3);
+
+    assertMock(() -> mockEngine.endMonitoredInvocation())
         .wasCalled(3);
   }
 

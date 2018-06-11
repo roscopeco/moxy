@@ -43,18 +43,6 @@ class ASMMoxyVerifier extends AbstractASMMoxyVerifier implements MoxyVerifier {
     super(engine, theInvocations);
   }
 
-  private String readableTimes(final int times) {
-    if (times == 0) {
-      return "zero times";
-    } else if (times == 1) {
-      return "once";
-    } else if (times == 2) {
-      return "twice";
-    } else {
-      return "" + times + " times";
-    }
-  }
-
   @Override
   public MoxyVerifier wasCalled() {
     final Invocation invocation = this.getLastInvocation();
@@ -77,7 +65,7 @@ class ASMMoxyVerifier extends AbstractASMMoxyVerifier implements MoxyVerifier {
           new StringBuilder()
             .append(EXPECTED_MOCK)
             .append(methodName)
-            .append(TypeStringUtils.ellipsisDesc(methodDesc))
+            .append(TypeStringUtils.shortDescriptorSignature(methodDesc))
             .append(TO_BE_CALLED)
             .append(TypeStringUtils.buildArgsString(invocation))
             .append("at least once but it wasn't called at all")
@@ -113,13 +101,13 @@ class ASMMoxyVerifier extends AbstractASMMoxyVerifier implements MoxyVerifier {
           new StringBuilder()
             .append(EXPECTED_MOCK)
             .append(methodName)
-            .append(TypeStringUtils.ellipsisDesc(methodDesc))
+            .append(TypeStringUtils.shortDescriptorSignature(methodDesc))
             .append(TO_BE_CALLED)
             .append(TypeStringUtils.buildArgsString(invocation))
             .append("exactly ")
-            .append(this.readableTimes(times))
+            .append(TypeStringUtils.readableTimes(times))
             .append(BUT_IT_WAS_CALLED)
-            .append(this.readableTimes(actual))
+            .append(TypeStringUtils.readableTimes(actual))
                 .toString());
     }
   }
@@ -153,13 +141,13 @@ class ASMMoxyVerifier extends AbstractASMMoxyVerifier implements MoxyVerifier {
           new StringBuilder()
             .append(EXPECTED_MOCK)
             .append(methodName)
-            .append(TypeStringUtils.ellipsisDesc(methodDesc))
+            .append(TypeStringUtils.shortDescriptorSignature(methodDesc))
             .append(TO_BE_CALLED)
             .append(TypeStringUtils.buildArgsString(invocation))
             .append("at least ")
-            .append(this.readableTimes(times))
+            .append(TypeStringUtils.readableTimes(times))
             .append(BUT_IT_WAS_CALLED)
-            .append(this.readableTimes(actual))
+            .append(TypeStringUtils.readableTimes(actual))
                 .toString());
     }
   }
@@ -178,13 +166,13 @@ class ASMMoxyVerifier extends AbstractASMMoxyVerifier implements MoxyVerifier {
           new StringBuilder()
             .append(EXPECTED_MOCK)
             .append(methodName)
-            .append(TypeStringUtils.ellipsisDesc(methodDesc))
+            .append(TypeStringUtils.shortDescriptorSignature(methodDesc))
             .append(TO_BE_CALLED)
             .append(TypeStringUtils.buildArgsString(invocation))
             .append("at most ")
-            .append(this.readableTimes(times))
+            .append(TypeStringUtils.readableTimes(times))
             .append(BUT_IT_WAS_CALLED)
-            .append(this.readableTimes(actual))
+            .append(TypeStringUtils.readableTimes(actual))
                 .toString());
     }
   }
@@ -224,14 +212,14 @@ class ASMMoxyVerifier extends AbstractASMMoxyVerifier implements MoxyVerifier {
           new StringBuilder()
             .append(EXPECTED_MOCK)
             .append(methodName)
-            .append(TypeStringUtils.ellipsisDesc(methodDesc))
+            .append(TypeStringUtils.shortDescriptorSignature(methodDesc))
             .append(SPACE)
             .append(TypeStringUtils.buildArgsString(invocation))
             .append(NEVER_TO_THROW_EXCEPTION)
             .append("class ")
             .append(throwableClass.getName())
             .append(BUT_IT_WAS_THROWN)
-            .append(this.readableTimes(actual))
+            .append(TypeStringUtils.readableTimes(actual))
                 .toString());
     } else {
       return this;
@@ -255,13 +243,13 @@ class ASMMoxyVerifier extends AbstractASMMoxyVerifier implements MoxyVerifier {
           new StringBuilder()
             .append(EXPECTED_MOCK)
             .append(methodName)
-            .append(TypeStringUtils.ellipsisDesc(methodDesc))
+            .append(TypeStringUtils.shortDescriptorSignature(methodDesc))
             .append(SPACE)
             .append(TypeStringUtils.buildArgsString(invocation))
             .append(NEVER_TO_THROW_EXCEPTION)
             .append(throwable)
             .append(BUT_IT_WAS_THROWN)
-            .append(this.readableTimes(actual))
+            .append(TypeStringUtils.readableTimes(actual))
                 .toString());
 
     } else {
@@ -286,11 +274,11 @@ class ASMMoxyVerifier extends AbstractASMMoxyVerifier implements MoxyVerifier {
           new StringBuilder()
             .append(EXPECTED_MOCK)
             .append(methodName)
-            .append(TypeStringUtils.ellipsisDesc(methodDesc))
+            .append(TypeStringUtils.shortDescriptorSignature(methodDesc))
             .append(SPACE)
             .append(TypeStringUtils.buildArgsString(invocation))
             .append("never to throw any exception, but exceptions were thrown ")
-            .append(this.readableTimes(actual))
+            .append(TypeStringUtils.readableTimes(actual))
                 .toString());
     } else {
       return this;

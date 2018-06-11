@@ -37,6 +37,7 @@ import com.roscopeco.moxy.api.InvocationRunnable;
 import com.roscopeco.moxy.api.InvocationSupplier;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyException;
+import com.roscopeco.moxy.api.MoxyMultiVerifier;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
 import com.roscopeco.moxy.api.MoxyVoidStubber;
@@ -995,5 +996,14 @@ public final class Moxy {
    */
   public static MoxyVerifier assertMock(final MoxyEngine engine, final InvocationRunnable invocation) {
     return engine.assertMock(invocation);
+  }
+
+  public static MoxyMultiVerifier assertMocks(final InvocationRunnable invocation) {
+    return assertMocks(ensureMoxyEngine(), invocation);
+  }
+
+  public static MoxyMultiVerifier assertMocks(final MoxyEngine engine,
+                                              final InvocationRunnable invocation) {
+    return engine.assertMocks(invocation);
   }
 }

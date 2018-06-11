@@ -37,7 +37,7 @@ public class ThreadLocalInvocationRecorder {
 
   /*
    * This list keeps track of all 'standard' (i.e. unmonitored) invocations,
-   * keyed by mock class for faster searching in the single-invocation
+   * keyed by mock class, then by method for faster searching in whens and single-invocation
    * verifiers.
    */
   private final ThreadLocal<HashMap<Class<?>, LinkedHashMap<String, List<Invocation>>>>
@@ -88,7 +88,7 @@ public class ThreadLocalInvocationRecorder {
     if (matchers != null) {
       final List<Object> lastArgs = invocation.getArgs();
       if (lastArgs.size() != matchers.size()) {
-        throw new InconsistentMatchersException(lastArgs.size(), mengine.ensureMatcherStack());
+        throw new InconsistentMatchersException(lastArgs.size(), mengine.getMatcherStack());
       } else {
         for (int i = 0; i < lastArgs.size(); i++) {
           lastArgs.set(i, matchers.get(i));
@@ -160,24 +160,33 @@ public class ThreadLocalInvocationRecorder {
     }
   }
 
-
-
+  /*
+   * Get invocations for the given class/method/desc combo, in order.
+   */
   List<Invocation> getInvocationList(final Class<?> forClz, final String methodName, final String methodDesc) {
     return this.ensureInvocationList(this.ensureInvocationMap(this.ensureLocalClassMap(), forClz), methodName, methodDesc);
   }
 
-  Invocation getCurrentInvocation() {
-    return this.currentInvocationThreadLocal.get();
+  /*
+   * Get _all_ invocations, in order.
+   */
+  List<Invocation> getInvocationList() {
+    return this.ensureAllInvocationsOrderedList();
+
   }
 
-  void clearCurrentInvocation() {
-    this.currentInvocationThreadLocal.set(null);
+  /*
+   * Get the current invocation. Valid *only* during a mock invocation.
+   */
+  Invocation getCurrentInvocation() {
+    return this.currentInvocationThreadLocal.get();
   }
 
   void reset() {
     this.currentInvocationThreadLocal.set(null);
     this.standardInvocationsOrderedList.set(null);
     this.invocationMapThreadLocal.set(null);
+    this.standardInvocationsOrderedList.set(null);
   }
 
   void startMonitoredInvocation() {
@@ -193,6 +202,7 @@ public class ThreadLocalInvocationRecorder {
       throw new IllegalStateException("[BUG] Attempt to end an unstarted monitored invocation (in recorder)");
     }
 
+    this.currentInvocationThreadLocal.set(null);
     this.monitoredInvocationStackThreadLocal.get().pop();
   }
 

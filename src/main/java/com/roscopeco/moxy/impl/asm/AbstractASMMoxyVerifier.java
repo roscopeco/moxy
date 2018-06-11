@@ -35,6 +35,10 @@ class AbstractASMMoxyVerifier {
     this.engine = engine;
     this.invocations = invocations;
 
+    if (this.engine == null) {
+      throw new IllegalArgumentException("Cannot construct with null engine");
+    }
+
     if (this.invocations == null ||
         this.invocations.isEmpty() ||
         this.invocations.stream().anyMatch(i -> i.getReceiver() == null)) {
@@ -44,6 +48,10 @@ class AbstractASMMoxyVerifier {
 
   protected ASMMoxyEngine getEngine() {
     return this.engine;
+  }
+
+  protected ThreadLocalInvocationRecorder getRecorder() {
+    return this.engine.getRecorder();
   }
 
   protected Invocation getLastInvocation() {

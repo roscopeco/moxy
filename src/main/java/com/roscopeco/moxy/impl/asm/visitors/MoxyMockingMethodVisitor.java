@@ -319,23 +319,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
 
     /////////////  IS_STUBBING_DISABLED == true
     // All stubbing is disabled, we must be in either when() or assertMock[s]().
-    // First up, handle matchers.
-    //
-    //   * Note: Handling matchers here, coupled with the fact we always clear
-    //     the stack at the start of a when or assert (in runMonitoredInvocation)
-    //     _could_ mean we can now just ignore matcher calls outside of monitored
-    //    invokes.
-    //
-    //    However, we continue to fail fast and now check in registerMatcher
-    //    that we're in a proper context for registering.
-    this.delegate.visitVarInsn(ALOAD, 0);
-    this.delegate.visitMethodInsn(INVOKEINTERFACE,
-                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
-                                  SUPPORT_HANDLE_MATCHERS_METHOD_NAME,
-                                  SUPPORT_HANDLE_MATCHERS_METHOD_DESCRIPTOR,
-                                  true);
-
-    //load default
+    // First up, load default
     this.generateDefaultValue(this.returnType);
 
     // Goto return (generated _much_ later).

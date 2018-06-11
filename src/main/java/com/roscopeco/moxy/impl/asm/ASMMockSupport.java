@@ -333,11 +333,4 @@ public interface ASMMockSupport {
   public default boolean __moxy_asm_isMockBehaviourDisabledOnThisThread() {
     return __moxy_asm_ivars().getEngine().isMockStubbingDisabledOnThisThread();
   }
-
-  /*
-   * Handles argument matchers for this invocation
-   */
-  public default void __moxy_asm_handleArgumentMatchers() {
-  //  this.__moxy_asm_getRecorder().replaceCurrentInvocationArgsWithMatchers();
-  }
 }

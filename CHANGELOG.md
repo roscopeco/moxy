@@ -76,4 +76,4 @@ First public release, and the first version pushed to Maven Central.
 - Setup for CI with Travis and Sonarcloud
 
 [Unreleased]: https://github.com/roscopeco/moxy/compare/v0.84...develop
-[0.84]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.82...v0.84
+[0.84]: https://github.com/roscopeco/moxy/compare/v0.82...v0.84

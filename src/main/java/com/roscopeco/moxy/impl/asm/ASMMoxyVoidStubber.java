@@ -35,7 +35,7 @@ class ASMMoxyVoidStubber extends AbstractASMMoxyVerifier implements MoxyVoidStub
 
   @Override
   public void thenThrow(final Throwable throwable) {
-    final Invocation invocation = this.getLastInvocation();
+    final Invocation invocation = this.getLastMonitoredInvocation();
     final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
 
     receiver.__moxy_asm_setThrowOrReturn(invocation, throwable, false);
@@ -43,7 +43,7 @@ class ASMMoxyVoidStubber extends AbstractASMMoxyVerifier implements MoxyVoidStub
 
   @Override
   public void thenCallRealMethod() {
-    final Invocation invocation = this.getLastInvocation();
+    final Invocation invocation = this.getLastMonitoredInvocation();
     final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
 
     receiver.__moxy_asm_setShouldCallSuper(invocation, true);
@@ -51,7 +51,7 @@ class ASMMoxyVoidStubber extends AbstractASMMoxyVerifier implements MoxyVoidStub
 
   @Override
   public MoxyVoidStubber thenDo(final Consumer<List<? extends Object>> action) {
-    final Invocation invocation = this.getLastInvocation();
+    final Invocation invocation = this.getLastMonitoredInvocation();
     final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
 
     receiver.__moxy_asm_addDoAction(invocation, action);

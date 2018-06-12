@@ -62,7 +62,7 @@ public class TestMoxyCallRealMethod {
 
     Moxy.assertMock(() -> mock.sayHelloTo("Bill")).wasCalledOnce();
     Moxy.assertMock(() -> mock.sayHelloTo("Steve")).wasNotCalled();
-    Moxy.assertMock(() -> mock.sayHelloTo("Bill")).neverThrewAnyException();
+    Moxy.assertMock(() -> mock.sayHelloTo("Bill")).didntThrowAnyException();
   }
 
   @Test
@@ -78,10 +78,10 @@ public class TestMoxyCallRealMethod {
         .hasMessage("Hamburglar detected!");
 
     assertThatThrownBy(() ->
-        Moxy.assertMock(() -> mock.sayHelloTo("Hamburglar")).neverThrewAnyException()
+        Moxy.assertMock(() -> mock.sayHelloTo("Hamburglar")).didntThrowAnyException()
     )
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock sayHelloTo(String) with arguments (\"Hamburglar\") never to throw any exception, but exceptions were thrown once");
+        .hasMessage("Expected mock sayHelloTo(\"Hamburglar\") never to throw any exception, but exceptions were thrown once");
   }
 
   @Test

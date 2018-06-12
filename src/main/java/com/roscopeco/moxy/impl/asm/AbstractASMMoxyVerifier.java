@@ -31,9 +31,10 @@ class AbstractASMMoxyVerifier {
   protected final ASMMoxyEngine engine;
   protected final List<Invocation> invocations;
 
-  public AbstractASMMoxyVerifier(final ASMMoxyEngine engine, final List<Invocation> invocations) {
+  public AbstractASMMoxyVerifier(final ASMMoxyEngine engine,
+                                 final List<Invocation> monitoredInvocations) {
     this.engine = engine;
-    this.invocations = invocations;
+    this.invocations = monitoredInvocations;
 
     if (this.engine == null) {
       throw new IllegalArgumentException("Cannot construct with null engine");
@@ -54,11 +55,11 @@ class AbstractASMMoxyVerifier {
     return this.engine.getRecorder();
   }
 
-  protected Invocation getLastInvocation() {
+  protected Invocation getLastMonitoredInvocation() {
     return this.invocations.get(this.invocations.size() - 1);
   }
 
-  protected List<Invocation> getInvocations() {
+  protected List<Invocation> getMonitoredInvocations() {
     return this.invocations;
   }
 }

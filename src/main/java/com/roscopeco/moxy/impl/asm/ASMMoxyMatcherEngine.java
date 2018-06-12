@@ -123,11 +123,6 @@ class ASMMoxyMatcherEngine {
     return result;
   }
 
-  boolean anyArgsMatch(final List<Object> actualArgs, final List<Invocation> storedInvocations) {
-    return storedInvocations.stream()
-        .anyMatch(invocation -> this.argsMatch(actualArgs, invocation.getArgs()));
-  }
-
   boolean clearMatcherStack() {
     final ArrayDeque<MoxyMatcher<?>> stack = this.matcherStack.get();
     if (stack != null && !stack.isEmpty()) {
@@ -146,7 +141,6 @@ class ASMMoxyMatcherEngine {
    * If non-empty, throws InconsistentMatchersException.
    */
   void ensureStackConsistency() {
-    // TODO this may no longer be needed - just clear matchers at start of monitored invoke?
     if (this.clearMatcherStack()) {
       throw new InconsistentMatchersException(0, this.matcherStack.get());
     }

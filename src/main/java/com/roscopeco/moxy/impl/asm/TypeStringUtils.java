@@ -46,17 +46,35 @@ final class TypeStringUtils {
       return null;
     } else if (arg instanceof String) {
       return "\"" + arg + "\"";
+    } else if (arg instanceof Byte) {
+      return "(byte)" + arg;
     } else if (arg instanceof Character) {
       return "'" + arg + "'";
+    } else if (arg instanceof Short) {
+      return "(short)" + arg;
+    } else if (arg instanceof Integer) {
+      return arg.toString();
+    } else if (arg instanceof Long) {
+      return arg + "L";
+    } else if (arg instanceof Float) {
+      return arg + "f";
+    } else if (arg instanceof Double) {
+      return arg + "d";
     } else {
       return arg.toString();
     }
   }
 
-  static String buildArgsString(final Invocation invocation) {
+  static String inspectArgs(final Invocation invocation) {
     final String args = invocation.getArgs().stream()
         .map(TypeStringUtils::inspectArg)
         .collect(Collectors.joining(", "));
+
+    return args;
+  }
+
+  static String buildArgsString(final Invocation invocation) {
+    final String args = inspectArgs(invocation);
 
     if (args.isEmpty()) {
       return args;
@@ -106,6 +124,6 @@ final class TypeStringUtils {
 
   private TypeStringUtils() {
     throw new UnsupportedOperationException(
-        "com.roscopeco.moxy.impl.asm.TypesAndDescriptors is not designed for instantiation");
+        "com.roscopeco.moxy.impl.asm.TypeStringUtils is not designed for instantiation");
   }
 }

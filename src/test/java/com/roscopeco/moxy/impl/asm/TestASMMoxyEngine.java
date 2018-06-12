@@ -404,10 +404,10 @@ class TestASMMoxyEngine extends AbstractImplTest {
       .isInstanceOf(ASMMoxyStubber.class);
 
     // Ensure stubber got correct invocation
-    assertThat(stubber.getLastInvocation().getReceiver()).isEqualTo(simpleMock);
-    assertThat(stubber.getLastInvocation().getMethodName()).isEqualTo("test");
-    assertThat(stubber.getLastInvocation().getMethodDesc()).isEqualTo("test");
-    assertThat(stubber.getLastInvocation().getArgs()).isEqualTo(Collections.emptyList());
+    assertThat(stubber.getLastMonitoredInvocation().getReceiver()).isEqualTo(simpleMock);
+    assertThat(stubber.getLastMonitoredInvocation().getMethodName()).isEqualTo("test");
+    assertThat(stubber.getLastMonitoredInvocation().getMethodDesc()).isEqualTo("test");
+    assertThat(stubber.getLastMonitoredInvocation().getArgs()).isEqualTo(Collections.emptyList());
 
     // Ensure engine state consistency was maintained behind the scenes
     assertMock(() -> mockEngine.runMonitoredInvocation((InvocationMonitor)any())).wasCalledOnce();
@@ -446,10 +446,10 @@ class TestASMMoxyEngine extends AbstractImplTest {
       .isInstanceOf(ASMMoxyVoidStubber.class);
 
     // Ensure stubber got correct invocation
-    assertThat(stubber.getLastInvocation().getReceiver()).isEqualTo(voidReturnMock);
-    assertThat(stubber.getLastInvocation().getMethodName()).isEqualTo("test");
-    assertThat(stubber.getLastInvocation().getMethodDesc()).isEqualTo("test");
-    assertThat(stubber.getLastInvocation().getArgs()).isEqualTo(Collections.emptyList());
+    assertThat(stubber.getLastMonitoredInvocation().getReceiver()).isEqualTo(voidReturnMock);
+    assertThat(stubber.getLastMonitoredInvocation().getMethodName()).isEqualTo("test");
+    assertThat(stubber.getLastMonitoredInvocation().getMethodDesc()).isEqualTo("test");
+    assertThat(stubber.getLastMonitoredInvocation().getArgs()).isEqualTo(Collections.emptyList());
 
     // Ensure engine state consistency was maintained behind the scenes
     assertMock(() -> mockEngine.runMonitoredInvocation((InvocationMonitor)any())).wasCalledOnce();
@@ -488,10 +488,10 @@ class TestASMMoxyEngine extends AbstractImplTest {
       .isInstanceOf(ASMMoxyVerifier.class);
 
     // Ensure verifier got correct invocation
-    assertThat(verifier.getLastInvocation().getReceiver()).isEqualTo(voidReturnMock);
-    assertThat(verifier.getLastInvocation().getMethodName()).isEqualTo("test");
-    assertThat(verifier.getLastInvocation().getMethodDesc()).isEqualTo("test");
-    assertThat(verifier.getLastInvocation().getArgs()).isEqualTo(Collections.emptyList());
+    assertThat(verifier.getLastMonitoredInvocation().getReceiver()).isEqualTo(voidReturnMock);
+    assertThat(verifier.getLastMonitoredInvocation().getMethodName()).isEqualTo("test");
+    assertThat(verifier.getLastMonitoredInvocation().getMethodDesc()).isEqualTo("test");
+    assertThat(verifier.getLastMonitoredInvocation().getArgs()).isEqualTo(Collections.emptyList());
 
     // Ensure engine state consistency was maintained behind the scenes
     assertMock(() -> mockEngine.runMonitoredInvocation((InvocationMonitor)any())).wasCalledOnce();

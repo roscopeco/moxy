@@ -112,6 +112,14 @@ final class Invocation {
     this.returned = returned;
   }
 
+  /*
+   * Returns a human-readble string representation of this invocation.
+   */
+  @Override
+  public String toString() {
+    return this.getMethodName() + "(" + TypeStringUtils.inspectArgs(this) + ")";
+  }
+
   /**
    *
    * @return The exception this method invocation threw (may be null).

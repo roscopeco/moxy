@@ -1,69 +1,58 @@
 package com.roscopeco.moxy.impl.asm;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.opentest4j.AssertionFailedError;
+import org.opentest4j.MultipleFailuresError;
 
 import com.roscopeco.moxy.api.MoxyMultiVerifier;
 
 public class ASMMoxyMultiVerifier extends AbstractASMMoxyVerifier implements MoxyMultiVerifier {
-  private static final String EXPECTED_MOCK = "Expected mock ";
-  private static final String EXPECTED_MOCKS = "Expected mocks ";
-  private static final String TO_NOT_BE_CALLED_SINGLE = " to not be called, but it was.";
-  private static final String TO_NOT_BE_CALLED_MULTI = " to not be called, but they were.";
-
   public ASMMoxyMultiVerifier(final ASMMoxyEngine engine, final List<Invocation> invocations) {
     super(engine, invocations);
   }
 
-  private String shortMethodSignatures(final List<Invocation> invocations) {
-    final StringBuilder sb = new StringBuilder();
-    if (invocations.size() > 1) {
-      sb.append("[");
-    }
-
-    sb.append(invocations.stream().map(i ->
-          i.getMethodName() + TypeStringUtils.shortDescriptorSignature(i.getMethodDesc()))
-              .collect(Collectors.joining(", ")));
-
-    if (invocations.size() > 1) {
-      sb.append("]");
-    }
-
-    return sb.toString();
+  int getCallCount(final Invocation invocation, final List<Invocation> actualInvocations) {
+    return VerifierHelpers.getCallCount(this.getEngine().getMatcherEngine(),
+                                        invocation,
+                                        actualInvocations);
   }
 
   @Override
-  public MoxyMultiVerifier wereNotCalled() {
-    final List<Invocation> actualInvocations = this.getRecorder().getInvocationList();
+  public MoxyMultiVerifier inOrder() {
+    throw new UnsupportedOperationException("Not yet implemented");
+  }
 
-    final List<Invocation> matches = actualInvocations.stream()
-          .filter(actual ->
-              this.getInvocations().stream().anyMatch(invocation ->
-                  invocation.getMethodName().equals(actual.getMethodName())
-                      && invocation.getMethodDesc().equals(actual.getMethodDesc())
-                  )
-              && this.getEngine().getMatcherEngine().anyArgsMatch(actual.getArgs(),
-                                                                  this.getInvocations()))
-          .collect(Collectors.toList());
+  @Override
+  public MoxyMultiVerifier exclusivelyInOrder() {
+    throw new UnsupportedOperationException("Not yet implemented");
+  }
 
-    if (matches.size() == 1) {
-      throw new AssertionFailedError(
-          new StringBuilder()
-            .append(EXPECTED_MOCK)
-            .append(this.shortMethodSignatures(matches))
-            .append(TO_NOT_BE_CALLED_SINGLE)
-                .toString());
-    } else if (matches.size() > 1) {
-      throw new AssertionFailedError(
-          new StringBuilder()
-            .append(EXPECTED_MOCKS)
-            .append(this.shortMethodSignatures(matches))
-            .append(TO_NOT_BE_CALLED_MULTI)
-                .toString());
-    } else {
-      return this;
+  @Override
+  public void wereNotCalled() {
+    final List<Invocation> actualInvocations = new LinkedList<>(this.getRecorder().getInvocationList());
+    final List<AssertionFailedError> errors = new ArrayList<>(actualInvocations.size());
+
+    this.getMonitoredInvocations().forEach(actual -> {
+      final int callCount = this.getCallCount(actual, actualInvocations);
+
+      if (callCount > 0) {
+        errors.add(new AssertionFailedError(
+            VerifierHelpers.makeExpectedCountMismatchMessage(actual, 0, callCount, StringConsts.EXACTLY)));
+      }
+    });
+
+    if (errors.size() == 1) {
+      throw errors.get(0);
+    } else if (errors.size() > 1) {
+      throw new MultipleFailuresError("There were unexpected invocations", errors);
     }
+  }
+
+  @Override
+  public void wereAllCalled() {
+    throw new UnsupportedOperationException("Not yet implemented");
   }
 }

@@ -23,6 +23,9 @@
  */
 package com.roscopeco.moxy.api;
 
+import java.util.List;
+import java.util.function.Consumer;
+
 /**
  * <p>Special case stubber for void methods. Does not allow a return
  * value to be set.</p>
@@ -44,10 +47,8 @@ public interface MoxyVoidStubber {
    * exceptions may cause undefined behaviour in callers.</p>
    *
    * @param throwable The <code>Throwable</code> to throw for matching invocations.
-   *
-   * @return <code>this</code>
    */
-  public MoxyVoidStubber thenThrow(Throwable throwable);
+  public void thenThrow(Throwable throwable);
 
   /**
    * <p>Instead of stubbing, have the mock call the real method instead.</p>
@@ -59,8 +60,8 @@ public interface MoxyVoidStubber {
    * <p>For obvious reasons, this will only work where the mocked method
    * is not <code>abstract</code>. If it is, an
    * {@link InvalidStubbingException} will be thrown when the mock is invoked.</p>
-   *
-   * @return <code>this</code>
    */
-  public MoxyVoidStubber thenCallRealMethod();
+  public void thenCallRealMethod();
+
+  public MoxyVoidStubber thenDo(Consumer<List<? extends Object>> action);
 }

@@ -102,39 +102,21 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   }
 
   void generateSupportFields() {
-    FieldVisitor fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_ENGINE_FIELD_NAME, MOXY_ASM_ENGINE_DESCRIPTOR, null, null);
-    fv.visitEnd();
+    final FieldVisitor fv = this.cv.visitField(
+        ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC,
+        SUPPORT_ivars_FIELD_NAME,
+        MOXY_SUPPORT_ivars_DESCRIPTOR,
+        null,
+        null);
 
-    fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_RETURNMAP_FIELD_NAME, MAP_DESCRIPTOR, null, null);
-    fv.visitEnd();
-
-    fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_THROWMAP_FIELD_NAME, MAP_DESCRIPTOR, null, null);
-    fv.visitEnd();
-
-    fv = this.cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC, SUPPORT_SUPERMAP_FIELD_NAME, MAP_DESCRIPTOR, null, null);
     fv.visitEnd();
   }
 
   void generateSupportMethods() {
-    this.generateSupportGetter(SUPPORT_GETENGINE_METHOD_NAME,
-                               SUPPORT_GETENGINE_DESCRIPTOR,
-                               SUPPORT_ENGINE_FIELD_NAME,
-                               MOXY_ASM_ENGINE_DESCRIPTOR);
-
-    this.generateSupportGetter(SUPPORT_GETRETURNMAP_METHOD_NAME,
-                               SUPPORT_GETRETURNMAP_DESCRIPTOR,
-                               SUPPORT_RETURNMAP_FIELD_NAME,
-                               MAP_DESCRIPTOR);
-
-    this.generateSupportGetter(SUPPORT_GETTHROWMAP_METHOD_NAME,
-                               SUPPORT_GETTHROWMAP_DESCRIPTOR,
-                               SUPPORT_THROWMAP_FIELD_NAME,
-                               MAP_DESCRIPTOR);
-
-    this.generateSupportGetter(SUPPORT_GETSUPERMAP_METHOD_NAME,
-                               SUPPORT_GETSUPERMAP_DESCRIPTOR,
-                               SUPPORT_SUPERMAP_FIELD_NAME,
-                               MAP_DESCRIPTOR);
+    this.generateSupportGetter(SUPPORT_GET_ivars_METHOD_NAME,
+                               SUPPORT_GET_ivars_DESCRIPTOR,
+                               SUPPORT_ivars_FIELD_NAME,
+                               MOXY_SUPPORT_ivars_DESCRIPTOR);
   }
 
   private void generateSupportGetter(final String methodName,

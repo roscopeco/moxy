@@ -21,33 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.matchers;
+package com.roscopeco.moxy.api;
 
-import com.roscopeco.moxy.api.MoxyException;
+import java.util.List;
 
-class InstanceOfMatcher<T> implements MoxyMatcher<T> {
-  private final Class<T> clz;
-
-  public InstanceOfMatcher(final Class<T> clz) {
-    if (clz == null) {
-      throw new MoxyException("Null argument; see cause",
-          new IllegalArgumentException("Cannot match to null"));
-    }
-
-    this.clz = clz;
-  }
-
-  @Override
-  public boolean matches(final T arg) {
-    if (arg != null) {
-      return this.clz.isAssignableFrom(arg.getClass());
-    } else {
-      return false;
-    }
-  }
-
-  @Override
-  public String toString() {
-    return "<instanceOf: " + this.clz + ">";
-  }
+/**
+ * <p>Functional interface that provides a return value for the
+ * {@link com.roscopeco.moxy.api.MoxyStubber#thenAnswer(AnswerProvider)}
+ * method.</p>
+ *
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ * @since 1.0
+ *
+ * @param <T> The type this provider must provide.
+ */
+@FunctionalInterface
+public interface AnswerProvider<T> {
+  /**
+   * Provide an answer (return value).
+   *
+   * @param args Arguments that were passed to the method.
+   *
+   * @return The return value for the method.
+   */
+  public T provide(List<? extends Object> args);
 }

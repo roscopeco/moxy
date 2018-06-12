@@ -99,7 +99,7 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
     if (INIT_NAME.equals(name)) {
       // Generate pass-through constructors
       final String newDesc = this.prependMethodArgsDescriptorWithEngine(desc); /* this is the new descriptor */
-      return new MoxyPassThroughConstructorVisitor(this.cv.visitMethod(access & ~ACC_ABSTRACT | ACC_SYNTHETIC,
+      return new MoxyPassThroughConstructorVisitor(this.cv.visitMethod(access & ~ACC_ABSTRACT,
                                                            name, newDesc, signature, exceptions),
                                                            this.originalClassInternalName,
                                                            this.getNewClassInternalName(),

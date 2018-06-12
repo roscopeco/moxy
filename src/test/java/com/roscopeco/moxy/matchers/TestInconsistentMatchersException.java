@@ -32,9 +32,7 @@ public class TestInconsistentMatchersException {
 
     assertThat(ex.getMessage()).isEqualTo(
         "Inconsistent use of matchers: if using matchers, *all* arguments must be supplied with them.\n"
-                 + "This limitation will (hopefully) be lifted in the future.\n\n"
-                 + "Expected size: 2; actual: 1\n"
-                 + "Stack: [FAKEMATCHER]");
+                 + "This limitation will (hopefully) be lifted in the future");
 
     assertThat(ex.getCause()).isNull();
   }

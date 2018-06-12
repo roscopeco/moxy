@@ -23,6 +23,9 @@
  */
 package com.roscopeco.moxy.api;
 
+import java.util.List;
+import java.util.function.Consumer;
+
 /**
  * <p>Implementations of this interface allow mocks to be stubbed to
  * throw or return given values. They are returned by the
@@ -47,10 +50,9 @@ public interface MoxyStubber<T> {
    *
    * @param object The <code>Object</code> to return for matching invocations.
    *
-   * @return <code>this</code>
    * @since 1.0
    */
-  public MoxyStubber<T> thenReturn(T object);
+  public void thenReturn(T object);
 
   /**
    * <p>Stubs the mock invocation to throw the given <code>Throwable</code>.</p>
@@ -62,10 +64,9 @@ public interface MoxyStubber<T> {
    *
    * @param throwable The <code>Throwable</code> to throw for matching invocations.
    *
-   * @return <code>this</code>
    * @since 1.0
    */
-  public MoxyStubber<T> thenThrow(Throwable throwable);
+  public void thenThrow(Throwable throwable);
 
   /**
    * <p>Instead of stubbing, have the mock call the real method instead.</p>
@@ -78,8 +79,87 @@ public interface MoxyStubber<T> {
    * is not <code>abstract</code>. If it is, an
    * {@link InvalidStubbingException} will be thrown when the mock is invoked.</p>
    *
-   * @return <code>this</code>
    * @since 1.0
    */
-  public MoxyStubber<T> thenCallRealMethod();
+  public void thenCallRealMethod();
+
+  /**
+   * <p>Stub this method to return the value calculated by the supplied
+   * {@link AnswerProvider}.</p>
+   *
+   * <p>The provider receives the actual arguments the method was
+   * called with as an immutable <code>List</code>.</p>
+   *
+   * <p>For example:</p>
+   *
+   * <pre><code>
+   *   Moxy.when(() -&gt; mock.something("arg")).thenAnswer(args -&gt; args.get(0));
+   * </code></pre>
+   *
+   * @param provider The {@link AnswerProvider}, usually as a lambda.
+   */
+  public void thenAnswer(AnswerProvider<T> provider);
+
+  /**
+   * <p>Add a <em>doAction</em> to this method.</p>
+   *
+   * <p><em>doActions</em> are arbitrary actions that are executed, in order,
+   * during invocation of mocked methods. These actions can be applied to
+   * any mock, including those that use {@link #thenCallRealMethod()}.</p>
+   *
+   * <p>The action receives the actual arguments the method was
+   * called with as an immutable <code>List</code>.</p>
+   *
+   * <p>It is possible to chain multiple actions on a single invocation,
+   * for example:</p>
+   *
+   * <pre><code>
+   *   Moxy.when(() -&gt; mock.something("arg"))
+   *       .thenDo(args -&gt; System.out.println("mock.something called"))
+   *       .thenDo(args -&gt; customRecorder.record("something", args))
+   *       .thenCallRealMethod();
+   * </code></pre>
+   *
+   * <p><strong>Note:</strong> For a given invocation, all matching <em>doActions</em>
+   * will be invoked, even if they weren't (intentionally) applied to the
+   * given arguments. This only applies when argument matchers are used.</p>
+   *
+   * <p>As an example of this potentially-confusing behaviour, consider the
+   * following example:</p>
+   *
+   * <pre><code>
+   *   Moxy.when(() -&gt; mock.hasTwoArgs(Matchers.any(), Matchers.eqInt(5)))
+   *     .thenDo(() -&gt; System.out.println("Action 1"));
+   *     .thenDo(() -&gt; System.out.println("Action 2"));
+   *
+   *   Moxy.when(() -&gt; mock.hasTwoArgs(Matchers.eq("Bill"), Matchers.anyInt()))
+   *     .thenDo(() -&gt; System.out.println("Action 3"));
+   *
+   *   mock.hasTwoArgs("Bill", 5);
+   * </code></pre>
+   *
+   * <p>In this example, the invocation <code>mock.hasTwoArgs("Bill", 5)</code> matches
+   * <em>both</em> stubbed invocations, so all actions will run, resulting in the
+   * following output:</p>
+   *
+   * <pre><code>
+   *   Action 1
+   *   Action 2
+   *   Action 3
+   * </code></pre>
+   *
+   * <p>I.e., since the framework has no way to tell exactly which of the two
+   * potential matching preconditions you actually wanted, it calls them both.</p>
+   *
+   * <p>For this reason, you should exercise caution when using matchers with
+   * <em>doActions</em>, to ensure you only execute actions on the invocations
+   * you actually want to invoke them on. This is especially true where your
+   * actions have side effects.</p>
+   *
+   * @since 1.0
+   * @param action The action, usually as a lambda.
+   *
+   * @return <code>this</code>, for continued stubbing.
+   */
+  public MoxyStubber<T> thenDo(Consumer<List<? extends Object>> action);
 }

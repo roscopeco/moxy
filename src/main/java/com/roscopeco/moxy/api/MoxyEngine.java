@@ -29,13 +29,14 @@ import java.util.Collections;
 import java.util.Set;
 
 import com.roscopeco.moxy.matchers.Matchers;
+import com.roscopeco.moxy.matchers.MoxyMatcher;
 
 /**
  * <p>A MoxyEngine is the class that is responsible for generating mocks
  * according to whatever strategy it is designed to use.</p>
  *
  * <p>It usually also coordinates activities of mocks, as well as
- * integrating the matchers (in concert with {@link MoxyMatcherEngine}).</p>
+ * integrating the matchers.</p>
  *
  * <p>The default implementation uses the ASM library to generate mocks
  * at runtime. If you wish to replace that implementation, see
@@ -58,19 +59,6 @@ public interface MoxyEngine {
    * to be mocked.
    */
   public static final Set<Method> NO_METHODS = Collections.emptySet();
-
-  /**
-   * <p>Obtain the {@link MoxyMatcherEngine} that this <code>MoxyEngine</code>
-   * uses to service argument matchers.</p>
-   *
-   * <p>Matcher engines are closely tied to the <code>MoxyEngine</code> implementation
-   * and as such there is no way to replace the matcher engine.</p>
-   *
-   * @return The {@link MoxyMatcherEngine} in use by this <code>MoxyEngine</code>.
-   *
-   * @since 1.0
-   */
-  public MoxyMatcherEngine getMatcherEngine();
 
   /**
    * <p>Reset this engine.</p>
@@ -562,4 +550,18 @@ public interface MoxyEngine {
    * @since 1.0
    */
   public MoxyVerifier assertMock(InvocationRunnable invocation);
+
+  /**
+   * <p>Register the given matcher with this <code>MoxyEngine</code>.</p>
+   *
+   * <p>This method triggers a two-step process, whereby the matcher engine
+   * takes care of any housekeeping required by the current {@link MoxyEngine}
+   * and then calls back to the {@link MoxyMatcher#addToStack(java.util.Deque)}
+   * method, passing in the appropriate stack.</p>
+   *
+   * <p>See the documentation on {@link MoxyMatcher} for more information.</p>
+   *
+   * @param matcher The {@link MoxyMatcher} to register.
+   */
+  void registerMatcher(final MoxyMatcher<?> matcher);
 }

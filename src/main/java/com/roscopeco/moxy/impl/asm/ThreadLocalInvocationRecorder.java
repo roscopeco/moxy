@@ -24,6 +24,7 @@
 package com.roscopeco.moxy.impl.asm;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -33,14 +34,17 @@ import com.roscopeco.moxy.matchers.MoxyMatcher;
 public class ThreadLocalInvocationRecorder {
   private final ASMMoxyEngine engine;
 
-  private final ThreadLocal<LinkedHashMap<Class<?>, LinkedHashMap<String, List<Invocation>>>>
+  private final ThreadLocal<HashMap<Class<?>, LinkedHashMap<String, List<Invocation>>>>
       invocationMapThreadLocal;
+
+  private final ThreadLocal<ArrayList<Invocation>> allInvocationsOrderedList;
 
   private final ThreadLocal<Invocation> lastInvocationThreadLocal;
 
   ThreadLocalInvocationRecorder(final ASMMoxyEngine engine) {
     this.engine = engine;
     this.invocationMapThreadLocal = new ThreadLocal<>();
+    this.allInvocationsOrderedList = new ThreadLocal<>();
     this.lastInvocationThreadLocal = new ThreadLocal<>();
   }
 
@@ -49,7 +53,7 @@ public class ThreadLocalInvocationRecorder {
    * the arguments from the last invocation with them.
    */
   void replaceInvocationArgsWithMatchers() {
-    final ASMMoxyMatcherEngine mengine = this.engine.getASMMatcherEngine();
+    final ASMMoxyMatcherEngine mengine = this.engine.getMatcherEngine();
     final List<MoxyMatcher<?>> matchers = mengine.popMatchers();
     if (matchers != null) {
       final Invocation lastInvocation = this.getLastInvocation();
@@ -75,13 +79,18 @@ public class ThreadLocalInvocationRecorder {
         this.ensureInvocationMap(this.ensureLocalClassMap(), receiver.getClass()),
         methodName, methodDesc);
 
+    final List<Invocation> orderedInvocations = this.ensureAllInvocationsOrderedList();
+
     final Invocation invocation = new Invocation(receiver,
                                            methodName,
                                            methodDesc,
                                            args);
 
-    // Add to list of invocations
+    // Add to list of invocations mapped by class (for faster lookup)
     invocations.add(invocation);
+
+    // Add to ordered list (for in-order verification)
+    orderedInvocations.add(invocation);
 
     // Record last invocation on this thread
     this.lastInvocationThreadLocal.set(invocation);
@@ -92,7 +101,7 @@ public class ThreadLocalInvocationRecorder {
 
   /*
    * NOTE This does exactly what it says - deletes the invocation from the
-   * list, but not from the last invocation thread local. This means the engine
+   * lists, but not from the last invocation thread local. This means the engine
    * can still use the last invocation for the args.
    *
    * @see comments on {@link MoxyInvocationRecorder#unrecordLastInvocation}.
@@ -131,23 +140,35 @@ public class ThreadLocalInvocationRecorder {
 
   void reset() {
     this.lastInvocationThreadLocal.set(null);
+    this.allInvocationsOrderedList.set(null);
     this.invocationMapThreadLocal.set(null);
   }
 
-  private LinkedHashMap<Class<?>, LinkedHashMap<String, List<Invocation>>> ensureLocalClassMap() {
-    LinkedHashMap<Class<?>, LinkedHashMap<String, List<Invocation>>>
+  private HashMap<Class<?>, LinkedHashMap<String, List<Invocation>>> ensureLocalClassMap() {
+    HashMap<Class<?>, LinkedHashMap<String, List<Invocation>>>
         classMap = this.invocationMapThreadLocal.get();
 
     if (classMap == null) {
-      classMap = new LinkedHashMap<>();
+      classMap = new HashMap<>();
       this.invocationMapThreadLocal.set(classMap);
     }
 
     return classMap;
   }
 
+  private List<Invocation> ensureAllInvocationsOrderedList() {
+    ArrayList<Invocation> list = this.allInvocationsOrderedList.get();
+
+    if (list == null) {
+      list = new ArrayList<>();
+      this.allInvocationsOrderedList.set(list);
+    }
+
+    return list;
+  }
+
   private LinkedHashMap<String, List<Invocation>> ensureInvocationMap(
-      final LinkedHashMap<Class<?>, LinkedHashMap<String, List<Invocation>>> classMap,
+      final HashMap<Class<?>, LinkedHashMap<String, List<Invocation>>> classMap,
       final Class<?> forClz) {
     return classMap.computeIfAbsent(forClz, k -> new LinkedHashMap<>());
   }

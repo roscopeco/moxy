@@ -21,33 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.matchers;
+package com.roscopeco.moxy.model;
 
-import com.roscopeco.moxy.api.MoxyException;
+public class SimpleConstructorClass {
+  private final String str;
 
-class InstanceOfMatcher<T> implements MoxyMatcher<T> {
-  private final Class<T> clz;
-
-  public InstanceOfMatcher(final Class<T> clz) {
-    if (clz == null) {
-      throw new MoxyException("Null argument; see cause",
-          new IllegalArgumentException("Cannot match to null"));
-    }
-
-    this.clz = clz;
+  public SimpleConstructorClass() {
+    this("Hello");
   }
 
-  @Override
-  public boolean matches(final T arg) {
-    if (arg != null) {
-      return this.clz.isAssignableFrom(arg.getClass());
-    } else {
-      return false;
-    }
+  public SimpleConstructorClass(final String str) {
+    this.str = str;
   }
 
-  @Override
-  public String toString() {
-    return "<instanceOf: " + this.clz + ">";
+  public SimpleConstructorClass(final String str1, final String str2) {
+    this.str = str1 + str2;
+  }
+
+  public SimpleConstructorClass(final String str, final int i) {
+    this.str = str + i;
+  }
+
+  public String returnString() {
+    return this.str;
   }
 }

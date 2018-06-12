@@ -28,7 +28,6 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,15 +42,16 @@ import com.roscopeco.moxy.api.InvocationRunnable;
 import com.roscopeco.moxy.api.InvocationSupplier;
 import com.roscopeco.moxy.api.Mock;
 import com.roscopeco.moxy.api.MockGenerationException;
+import com.roscopeco.moxy.api.MonitoredInvocationException;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyException;
-import com.roscopeco.moxy.api.MoxyMatcherEngine;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
 import com.roscopeco.moxy.api.MoxyVoidStubber;
 import com.roscopeco.moxy.impl.asm.visitors.AbstractMoxyTypeVisitor;
 import com.roscopeco.moxy.impl.asm.visitors.MoxyMockClassVisitor;
 import com.roscopeco.moxy.impl.asm.visitors.MoxyMockInterfaceVisitor;
+import com.roscopeco.moxy.matchers.MoxyMatcher;
 import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
 
 /**
@@ -63,9 +63,20 @@ import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
  *
  */
 public class ASMMoxyEngine implements MoxyEngine {
+  /*
+   * Functional interface for monitored invocations.
+   *
+   * See #runMonitoredInvocation
+   */
+  @FunctionalInterface
+  static interface MonitoredInvocation {
+    public void invoke() throws Exception;
+  }
+
   private static final String UNRECOVERABLE_ERROR = "Unrecoverable Error";
   private static final String CANNOT_MOCK_NULL_CLASS = "Cannot mock null class";
 
+  private final ThreadLocal<Boolean> threadLocalMockBehaviourDisabled;
   private final ThreadLocalInvocationRecorder recorder;
   private final ASMMoxyMatcherEngine matcherEngine;
 
@@ -87,29 +98,40 @@ public class ASMMoxyEngine implements MoxyEngine {
     }
   }
 
+  /**
+   * Construct a new instance of the ASMMoxyEngine.
+   *
+   * @since 1.0
+   */
   public ASMMoxyEngine() {
     this.recorder = new ThreadLocalInvocationRecorder(this);
     this.matcherEngine = new ASMMoxyMatcherEngine(this);
+    this.threadLocalMockBehaviourDisabled = new ThreadLocal<>();
+    this.threadLocalMockBehaviourDisabled.set(false);
   }
 
   ASMMoxyEngine(final ThreadLocalInvocationRecorder recorder, final ASMMoxyMatcherEngine matcherEngine) {
     this.recorder = recorder;
     this.matcherEngine = matcherEngine;
+    this.threadLocalMockBehaviourDisabled = new ThreadLocal<>();
+    this.threadLocalMockBehaviourDisabled.set(false);
   }
 
-  public ThreadLocalInvocationRecorder getRecorder() {
+  /*
+   * Obtain the invocation recorder used by this engine.
+   */
+  ThreadLocalInvocationRecorder getRecorder() {
     return this.recorder;
   }
 
-  @Override
-  public MoxyMatcherEngine getMatcherEngine() {
+  ASMMoxyMatcherEngine getMatcherEngine() {
     return this.matcherEngine;
   }
 
-  ASMMoxyMatcherEngine getASMMatcherEngine() {
-    return this.matcherEngine;
-  }
-
+  /**
+   * Reset this engine. In this implementation, this discards all
+   * prior invocation data for the current thread.
+   */
   @Override
   public void reset() {
     this.getRecorder().reset();
@@ -210,16 +232,28 @@ public class ASMMoxyEngine implements MoxyEngine {
     return this.getMockClass(MoxyEngine.class.getClassLoader(), clz);
   }
 
+  /*
+   * (non-Javadoc)
+   * @see com.roscopeco.moxy.api.MoxyEngine#isMock(java.lang.Class)
+   */
   @Override
   public boolean isMock(final Class<?> clz) {
     return clz.getAnnotation(Mock.class) != null;
   }
 
+  /*
+   * (non-Javadoc)
+   * @see com.roscopeco.moxy.api.MoxyEngine#isMock(java.lang.Object)
+   */
   @Override
   public boolean isMock(final Object obj) {
     return this.isMock(obj.getClass());
   }
 
+  /*
+   * (non-Javadoc)
+   * @see com.roscopeco.moxy.api.MoxyEngine#resetMock(java.lang.Object)
+   */
   @Override
   public void resetMock(final Object mock) {
     if (!this.isMock(mock)) {
@@ -229,6 +263,9 @@ public class ASMMoxyEngine implements MoxyEngine {
     this.initializeMock(mock.getClass(), mock);
   }
 
+  /*
+   * Determine whether the supplied method is a candidate for mocking.
+   */
   boolean isMockCandidate(final Method m) {
     return ((m.getModifiers() & Opcodes.ACC_FINAL) == 0)
         && (((m.getModifiers() & Opcodes.ACC_PUBLIC) > 0)
@@ -236,6 +273,9 @@ public class ASMMoxyEngine implements MoxyEngine {
             || ((m.getModifiers() & Opcodes.ACC_PRIVATE) == 0));
   }
 
+  /*
+   * Gather all mock-candidate methods on the given class.
+   */
   HashSet<Method> gatherAllMockableMethods(final Class<?> originalClass) {
     final HashSet<Method> methods = new HashSet<>();
 
@@ -248,87 +288,183 @@ public class ASMMoxyEngine implements MoxyEngine {
     return methods;
   }
 
+  /*
+   * Ensure the engine and matcher engine are in a consistent state
+   * before running a monitored invocation.
+   *
+   * This method clears the last invocation, and ensures the matcher
+   * stack is empty. If this last condition does not hold, then
+   * an InconsistentMatchersException is thrown.
+   */
   void ensureEngineConsistencyBeforeMonitoredInvocation() {
     this.getRecorder().clearLastInvocation();
-    this.getASMMatcherEngine().validateStackConsistency();
+    this.getMatcherEngine().ensureStackConsistency();
   }
 
   /*
-   * Validates matcher stack consistency.
+   * Run a monitored invocation.
+   *
+   * Ensures engine and matcher stack consistency, and
+   * guarantees consistency at exit, whether through return or throw.
+   *
+   * During execution of this method mock behaviour is disabled
+   * (see #disableMockBehaviourOnThisThread), and is guaranteed to
+   * be re-enabled at exit.
    */
-  void naivelyInvokeAndSwallowExceptions(final InvocationRunnable doInvoke) {
+  void runMonitoredInvocation(final MonitoredInvocation invocation) {
     this.ensureEngineConsistencyBeforeMonitoredInvocation();
     try {
-      doInvoke.run();
+      this.disableMockBehaviourOnThisThread();
+      invocation.invoke();
     } catch (final MoxyException e) {
-      // Framework error - rethrow this.
-      throw e;
+      // Framework exception; don't wrap
+      // We'll never get to the code that deletes the invocation and ensures consistency,
+      // so do that now before we throw...
+      this.deleteLatestInvocationFromListAndClearStack();
+      throw(e);
     } catch (final NullPointerException e) {
+      // We'll never get to the code that deletes the invocation and ensures consistency,
+      // so do that now before we throw...
+      this.deleteLatestInvocationFromListAndClearStack();
+
       // Often an autoboxing error, give (hopefully) useful error message.
-      throw new PossibleMatcherUsageError(
-          "NPE in invocation: If you're using primitive matchers, ensure you're using the "
-        + "correct type (e.g. anyInt() rather than any()), especially when nesting.\n"
-        + "Otherwise, the causing exception may have more information.", e);
+      if (!e.getStackTrace()[0].getClassName().startsWith("com.roscopeco.moxy.impl")) {
+        // Not in our code, so almost certainly an autobox issue
+        throw new PossibleMatcherUsageError(
+            "If you're using primitive matchers, ensure you're using the "
+          + "correct type (e.g. anyInt() rather than any()), especially when nesting", e);
+      } else {
+        throw new MoxyException("[BUG] NPE in engine invocation code; Probable framework bug", e);
+      }
     } catch (final Exception e) {
-      // naively swallow everything else.
+      // We'll never get to the code that deletes the invocation and ensures consistency,
+      // so do that now before we throw...
+      this.deleteLatestInvocationFromListAndClearStack();
+
+
+      // Wrap in framework exception
+      throw new MonitoredInvocationException(e);
+    } finally {
+      this.enableMockBehaviourOnThisThread();
     }
   }
 
   /*
-   * Validates matcher stack consistency.
+   * Deletes latest invocation and clears stack, but does not validate
+   * (i.e. doesn't throw if the stack was not clear already).
+   *
+   * This is used when we're already going to throw for some other reason
+   * and just need to clear the stack.
    */
-  <T> void naivelyInvokeAndSwallowExceptions(final InvocationSupplier<T> doInvoke) {
-    this.ensureEngineConsistencyBeforeMonitoredInvocation();
-    try {
-      doInvoke.get();
-    } catch (final MoxyException e) {
-      // Framework error - rethrow this.
-      throw e;
-    } catch (final NullPointerException e) {
-      // Often an autoboxing error, give (hopefully) useful error message.
-      throw new PossibleMatcherUsageError(
-          "NPE in invocation: If you're using primitive matchers, ensure you're using the "
-        + "correct type (e.g. anyInt() rather than any()), especially when nesting.\n"
-        + "Otherwise, the causing exception may have more information.", e);
-    } catch (final Exception e) {
-      // naively swallow everything else.
-    }
-  }
-
-  /*
-   * Deletes latest invocation, and validates matcher stack consistency.
-   */
-  void deleteLatestInvocationFromList() {
+  private void deleteLatestInvocationFromListAndClearStack() {
     this.getRecorder().unrecordLastInvocation();
-    this.getASMMatcherEngine().validateStackConsistency();
+    this.getMatcherEngine().clearMatcherStack();
   }
 
+  /*
+   * Deletes latest invocation, and ensures matcher stack consistency.
+   *
+   * If stack was not empty, this throws InconsistentMatchersException.
+   */
+  void deleteLatestInvocationFromListAndValidateStack() {
+    this.getRecorder().unrecordLastInvocation();
+    this.getMatcherEngine().ensureStackConsistency();
+  }
+
+  /*
+   * Disables mock behaviour on the current thread.
+   *
+   * In the disabled state, mocks will still record their invocations,
+   * but will not execute actions or answers, return stubbed values (they
+   * will instead return default values), or callSuper.
+   *
+   * This is used at the start of #runMonitoredInvocation.
+   */
+  void disableMockBehaviourOnThisThread() {
+    this.threadLocalMockBehaviourDisabled.set(true);
+  }
+
+  /*
+   * Enables mock behaviour on the current thread.
+   *
+   * See #disableMockBehaviourOnThisThread for an explanation.
+   *
+   * This is guaranteed to be called at the end of
+   * #runMonitoredInvocation.
+   */
+  void enableMockBehaviourOnThisThread() {
+    this.threadLocalMockBehaviourDisabled.set(false);
+  }
+
+  /*
+   * Determines whether mock behaviour is disabled on the
+   * current thread.
+   */
+  boolean isMockStubbingDisabledOnThisThread() {
+    final Boolean disabled = this.threadLocalMockBehaviourDisabled.get();
+    return (disabled != null && disabled);
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.roscopeco.moxy.api.MoxyEngine#when(com.roscopeco.moxy.api.InvocationSupplier)
+   */
   @Override
   public <T> MoxyStubber<T> when(final InvocationSupplier<T> invocation) {
-    this.naivelyInvokeAndSwallowExceptions(invocation);
+    this.runMonitoredInvocation(invocation::get);
     this.getRecorder().replaceInvocationArgsWithMatchers();
-    this.deleteLatestInvocationFromList();
+    this.deleteLatestInvocationFromListAndValidateStack();
     return new ASMMoxyStubber<>(this);
   }
 
+  /*
+   * (non-Javadoc)
+   * @see com.roscopeco.moxy.api.MoxyEngine#when(com.roscopeco.moxy.api.InvocationRunnable)
+   */
   @Override
   public MoxyVoidStubber when(final InvocationRunnable invocation) {
-    this.naivelyInvokeAndSwallowExceptions(invocation);
+    this.runMonitoredInvocation(invocation::run);
     this.getRecorder().replaceInvocationArgsWithMatchers();
-    this.deleteLatestInvocationFromList();
+    this.deleteLatestInvocationFromListAndValidateStack();
     return new ASMMoxyVoidStubber(this);
   }
 
+  /*
+   * (non-Javadoc)
+   * @see com.roscopeco.moxy.api.MoxyEngine#assertMock(com.roscopeco.moxy.api.InvocationRunnable)
+   */
   @Override
   public MoxyVerifier assertMock(final InvocationRunnable invocation) {
-    this.naivelyInvokeAndSwallowExceptions(invocation);
+    this.runMonitoredInvocation(invocation::run);
     this.getRecorder().replaceInvocationArgsWithMatchers();
-    this.deleteLatestInvocationFromList();
+    this.deleteLatestInvocationFromListAndValidateStack();
     return new ASMMoxyVerifier(this);
   }
 
+  /*
+   * (non-Javadoc)
+   * @see com.roscopeco.moxy.api.MoxyEngine#registerMatcher(com.roscopeco.moxy.matchers.MoxyMatcher)
+   */
+  @Override
+  public void registerMatcher(final MoxyMatcher<?> matcher) {
+    this.getMatcherEngine().registerMatcher(matcher);
+  }
+
+  /*
+   * Instantiate a mock of the given mock class without
+   * calling a constructor.
+   *
+   * This method uses sun.misc.Unsafe.
+   *
+   * Throws IllegalArgumentException if the given class is not
+   * a mock class.
+   */
   @SuppressWarnings("restriction")
   <T> T instantiateMock(final Class<? extends T> mockClass) {
+    if (!this.isMock(mockClass)) {
+      throw new IllegalArgumentException("Cannot instantiate " + mockClass +": it is not a mock class");
+    }
+
     try {
       final Object mock = UNSAFE.allocateInstance(mockClass);
       return this.initializeMock(mockClass, mock);
@@ -340,19 +476,17 @@ public class ASMMoxyEngine implements MoxyEngine {
   }
 
   /*
-   * Instantiate a mock of the given class
+   * Initialize a mock of the given class, setting all mock-related
+   * synthetic fields to default values.
+   *
+   * When called on an existing mock, this method has the effect of
+   * resetting all stubbing on that mock.
    */
-  @SuppressWarnings({ "unchecked", "restriction", "rawtypes" })
+  @SuppressWarnings({ "unchecked", "restriction" })
   <T> T initializeMock(final Class<? extends T> mockClass, final Object mock) {
     try {
-      final Field engineField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_ENGINE_FIELD_NAME);
-      final Field returnMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_RETURNMAP_FIELD_NAME);
-      final Field throwMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_THROWMAP_FIELD_NAME);
-      final Field superMapField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_SUPERMAP_FIELD_NAME);
-      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(engineField), this);
-      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(returnMapField), new HashMap());
-      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(throwMapField), new HashMap());
-      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(superMapField), new HashMap());
+      final Field ivarsField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_ivars_FIELD_NAME);
+      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(ivarsField), new ASMMockInstanceVars(this));
       return (T)mock;
     } catch (final Exception e) {
       throw new MoxyException("Unrecoverable error: Instantiation exception; see cause", e);

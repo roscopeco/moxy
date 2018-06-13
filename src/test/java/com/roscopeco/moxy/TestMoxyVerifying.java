@@ -486,9 +486,12 @@ public class TestMoxyVerifying {
 
   @Test
   public void testMoxyMockWithMockAssertMocksAllCalledWorks() {
-    /*
+    Moxy.getMoxyEngine().reset();
     final ClassWithPrimitiveReturns mock = Moxy.mock(ClassWithPrimitiveReturns.class);
 
+    // Note - this is testing that we don't just take arguments into account
+    // when matching, but that we also take the method name/descriptor into account
+    // too.
     mock.returnBoolean();
     mock.returnDouble();
 
@@ -497,6 +500,93 @@ public class TestMoxyVerifying {
       mock.returnDouble();
     })
         .wereAllCalled();
-        */
+
+    assertThatThrownBy(() ->
+        Moxy.assertMocks(() -> {
+          mock.returnByte();
+          mock.returnBoolean();
+        })
+            .wereAllCalled()
+    )
+        .isInstanceOf(AssertionFailedError.class)
+        .hasMessage("Expected mock returnByte() to be called at least once, but it was called zero times");
+
+    assertThatThrownBy(() ->
+        Moxy.assertMocks(() -> {
+          mock.returnByte();
+          mock.returnFloat();
+        })
+            .wereAllCalled()
+    )
+        .isInstanceOf(MultipleFailuresError.class)
+        .hasMessage("There were unexpected invocations (2 failures)" + EOL
+            + "\tExpected mock returnByte() to be called at least once, but it was called zero times" + EOL
+            + "\tExpected mock returnFloat() to be called at least once, but it was called zero times");
+
+  }
+
+  @Test
+  public void testMoxyMockWithMockAssertMocksAllCalledWithArgumentsWorks() {
+    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+
+    mock.sayHelloTo("Bill");
+    mock.hasTwoArgs("one", 1);
+
+    Moxy.assertMocks(() -> {
+      mock.sayHelloTo("Bill");
+      mock.hasTwoArgs("one", 1);
+    })
+        .wereAllCalled();
+
+    assertThatThrownBy(() ->
+        Moxy.assertMocks(() -> {
+          mock.sayHelloTo("Steve");
+          mock.hasTwoArgs("two", 2);
+        })
+            .wereAllCalled()
+    )
+        .isInstanceOf(MultipleFailuresError.class)
+        .hasMessage("There were unexpected invocations (2 failures)" + EOL
+                  + "\tExpected mock sayHelloTo(\"Steve\") to be called at least once, but it was called zero times" + EOL
+                  + "\tExpected mock hasTwoArgs(\"two\", 2) to be called at least once, but it was called zero times");
+
+    assertThatThrownBy(() ->
+        Moxy.assertMocks(() -> {
+          mock.sayHelloTo("Steve");
+          mock.hasTwoArgs("one", 1);
+        })
+            .wereAllCalled()
+    )
+        .isInstanceOf(AssertionFailedError.class)
+        .hasMessage("Expected mock sayHelloTo(\"Steve\") to be called at least once, but it was called zero times");
+
+    assertThatThrownBy(() ->
+        Moxy.assertMocks(() -> {
+          mock.sayHelloTo("Bill");
+          mock.hasTwoArgs("two", 2);
+        })
+            .wereAllCalled()
+    )
+        .isInstanceOf(AssertionFailedError.class)
+        .hasMessage("Expected mock hasTwoArgs(\"two\", 2) to be called at least once, but it was called zero times");
+  }
+
+  @Test
+  public void testMoxyMockWithMockAssertMocksAllCalledWithAllPrimitiveTypes() {
+    final MethodWithPrimitiveArguments mock = Moxy.mock(MethodWithPrimitiveArguments.class);
+
+    mock.hasArgs("test", (byte)1, 'a', (short)3, 4, 5L, 6.0f, 7.0d, false);
+
+    Moxy.assertMocks(() -> {
+      mock.hasArgs("test", (byte)1, 'a', (short)3, 4, 5L, 6.0f, 7.0d, false);
+    }).wereAllCalled();
+
+    assertThatThrownBy(() ->
+      Moxy.assertMocks(() -> {
+        mock.hasArgs("TEST", (byte)2, 'b', (short)4, 5, 6L, 7.0f, 8.0d, true);
+      }).wereAllCalled()
+    )
+      .isInstanceOf(AssertionFailedError.class)
+      .hasMessage("Expected mock hasArgs(\"TEST\", (byte)2, 'b', (short)4, 5, 6L, 7.0f, 8.0d, true) to be called at least once, but it was called zero times");
   }
 }

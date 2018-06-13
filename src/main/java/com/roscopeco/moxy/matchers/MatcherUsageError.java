@@ -21,30 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.impl.asm;
+package com.roscopeco.moxy.matchers;
 
-import com.roscopeco.moxy.api.InvalidMockInvocationException;
+import com.roscopeco.moxy.api.MoxyException;
 
-class HasEngineAndInvocation {
-  protected final ASMMoxyEngine engine;
-  protected final Invocation theInvocation;
+/**
+ * <p>Thrown to indicate that Moxy has detected a definitely-incorrect
+ * use of matchers. Results from calling matcher methods out of
+ * context (i.e. outside a when or assert call).</p>
+ *
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ * @since 1.0
+ */
+public class MatcherUsageError extends MoxyException {
+  private static final long serialVersionUID = 1L;
 
-  public HasEngineAndInvocation(final ASMMoxyEngine engine) {
-    this.engine = engine;
-    this.theInvocation = engine.getRecorder().getAndClearLastInvocation();
-
-    if (this.theInvocation == null ||
-        this.theInvocation.getReceiver() == null ||
-        !engine.isMock(this.theInvocation.getReceiver().getClass())) {
-      throw new InvalidMockInvocationException("No mock invocation found");
-    }
-  }
-
-  protected ASMMoxyEngine getEngine() {
-    return this.engine;
-  }
-
-  protected Invocation getTheInvocation() {
-    return this.theInvocation;
+  public MatcherUsageError(final String message) {
+    super(message);
   }
 }

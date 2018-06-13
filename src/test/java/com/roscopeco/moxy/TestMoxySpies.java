@@ -25,6 +25,7 @@ package com.roscopeco.moxy;
 
 import static org.assertj.core.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.roscopeco.moxy.matchers.Matchers;
@@ -34,6 +35,11 @@ import com.roscopeco.moxy.model.MethodWithPrimitiveArguments;
 import com.roscopeco.moxy.model.SimpleClass;
 
 public class TestMoxySpies {
+  @BeforeEach
+  public void setUp() {
+    Moxy.getMoxyEngine().reset();
+  }
+
   @Test
   public void testMoxySpyCreatesASpyForNoArgMethods() {
     final SimpleClass spy = Moxy.spy(SimpleClass.class);

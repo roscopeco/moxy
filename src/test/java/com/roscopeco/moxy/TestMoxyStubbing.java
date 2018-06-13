@@ -25,6 +25,7 @@ package com.roscopeco.moxy;
 
 import static org.assertj.core.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
 
@@ -36,6 +37,11 @@ import com.roscopeco.moxy.model.MethodWithArguments;
 import com.roscopeco.moxy.model.SimpleClass;
 
 public class TestMoxyStubbing {
+  @BeforeEach
+  public void setUp() {
+    Moxy.getMoxyEngine().reset();
+  }
+
   @Test
   public void testMoxyWhenWithNoMockInvocationThrowsIllegalStateException() {
     assertThatThrownBy(() -> Moxy.when(() -> "Hello"))

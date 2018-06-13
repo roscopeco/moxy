@@ -24,38 +24,42 @@
 package com.roscopeco.moxy.impl.asm;
 
 import java.util.List;
-import java.util.function.Consumer;
 
-import com.roscopeco.moxy.api.MoxyVoidStubber;
+import com.roscopeco.moxy.api.InvalidMockInvocationException;
 
-class ASMMoxyVoidStubber extends AbstractASMMoxyVerifier implements MoxyVoidStubber {
-  public ASMMoxyVoidStubber(final ASMMoxyEngine engine, final List<Invocation> invocations) {
-    super(engine, invocations);
+class AbstractASMMoxyVerifier {
+  protected final ASMMoxyEngine engine;
+  protected final List<Invocation> invocations;
+
+  public AbstractASMMoxyVerifier(final ASMMoxyEngine engine,
+                                 final List<Invocation> monitoredInvocations) {
+    this.engine = engine;
+    this.invocations = monitoredInvocations;
+
+    if (this.engine == null) {
+      throw new IllegalArgumentException("Cannot construct with null engine");
+    }
+
+    if (this.invocations == null ||
+        this.invocations.isEmpty() ||
+        this.invocations.stream().anyMatch(i -> i.getReceiver() == null)) {
+      throw new InvalidMockInvocationException("No mock invocation found");
+    }
   }
 
-  @Override
-  public void thenThrow(final Throwable throwable) {
-    final Invocation invocation = this.getLastMonitoredInvocation();
-    final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
-
-    receiver.__moxy_asm_setThrowOrReturn(invocation, throwable, false);
+  protected ASMMoxyEngine getEngine() {
+    return this.engine;
   }
 
-  @Override
-  public void thenCallRealMethod() {
-    final Invocation invocation = this.getLastMonitoredInvocation();
-    final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
-
-    receiver.__moxy_asm_setShouldCallSuper(invocation, true);
+  protected ThreadLocalInvocationRecorder getRecorder() {
+    return this.engine.getRecorder();
   }
 
-  @Override
-  public MoxyVoidStubber thenDo(final Consumer<List<? extends Object>> action) {
-    final Invocation invocation = this.getLastMonitoredInvocation();
-    final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
+  protected Invocation getLastMonitoredInvocation() {
+    return this.invocations.get(this.invocations.size() - 1);
+  }
 
-    receiver.__moxy_asm_addDoAction(invocation, action);
-
-    return this;
+  protected List<Invocation> getMonitoredInvocations() {
+    return this.invocations;
   }
 }

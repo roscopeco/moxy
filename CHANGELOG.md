@@ -3,17 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
-and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
-from version 0.86 onwards.
+and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Experimental
 
 These changes are currently considered experimental and are not yet ready
 to merge to `develop`. They are in various branches and are slated to
 make it in before 1.0.0.
-
-- Ordered verification, and verification of multiple invocations at once.
-  See: https://github.com/roscopeco/moxy/tree/FEATURE/ordered-verification
   
 - Java 9 Jigsaw (module) support.
   See: https://github.com/roscopeco/moxy/tree/modular-java9
@@ -23,8 +19,14 @@ make it in before 1.0.0.
 These changes are currently in the `develop` branch, and are slated
 to make it into a release soon.
 
+**Latest release is up-to-date**
+
+## [0.86.0] - 2018-06-13
+
 ### Added
 
+- Ordered verification, and verification of multiple invocations at once
+  with the `assertMocks` method.
 - Convenience methods to construct spies directly from static methods
   on Moxy.
 - `constructMock` and `constructSpy` methods that provide a
@@ -43,9 +45,9 @@ to make it into a release soon.
 
 ### Added
 
-- Stubbing now supports answers with `thenAnswer` method.
+- Stubbing now supports answers with [thenAnswer](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenAnswer-com.roscopeco.moxy.api.AnswerProvider-) method.
 - Stubbing now supports an arbitrary number of _actions_
-  via the `thenDo` method.
+  via the [thenDo](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenDo-java.util.function.Consumer-) method.
 
 ### Changed
 
@@ -75,5 +77,6 @@ First public release, and the first version pushed to Maven Central.
 - Add project documentation
 - Setup for CI with Travis and Sonarcloud
 
-[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.84...develop
-[0.84]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.82...v0.84
+[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.86.0...develop
+[0.86.0]: https://github.com/roscopeco/moxy/compare/v0.84...v0.86.0
+[0.84]: https://github.com/roscopeco/moxy/compare/v0.82...v0.84

@@ -25,9 +25,11 @@ package com.roscopeco.moxy;
 
 import static org.assertj.core.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
 
+import com.roscopeco.moxy.api.InvalidMockInvocationException;
 import com.roscopeco.moxy.api.MoxyVerifier;
 import com.roscopeco.moxy.model.ClassWithPrimitiveReturns;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
@@ -36,6 +38,20 @@ import com.roscopeco.moxy.model.MethodWithPrimitiveArguments;
 import com.roscopeco.moxy.model.SimpleClass;
 
 public class TestMoxyVerifying {
+  @BeforeEach
+  public void setUp() {
+    Moxy.getMoxyEngine().reset();
+  }
+
+  @Test
+  public void testMoxyMockWithMockAssertMockFailsWithNoInvocation() {
+    assertThatThrownBy(() ->
+      Moxy.assertMock(() -> { /* nothing happening here... */ })
+    )
+        .isInstanceOf(InvalidMockInvocationException.class)
+        .hasMessage("No mock invocation found");
+  }
+
   @Test
   public void testMoxyAssertMockWithMockReturnsVerifier() {
     final SimpleClass mock = Moxy.mock(SimpleClass.class);
@@ -78,7 +94,7 @@ public class TestMoxyVerifying {
         Moxy.assertMock(() -> mock.hasArgs("Two", (byte)1, 'b', (short)10, 0x2badf00d, 200L, 3579.0f, 5302.0d, false))
             .wasCalled())
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock hasArgs(java.lang.String, byte, char, short, int, long, float, double, boolean) to be called with arguments (\"Two\", 1, 'b', 10, 732819469, 200, 3579.0, 5302.0, false) at least once but it wasn't called at all");
+        .hasMessage("Expected mock hasArgs(\"Two\", (byte)1, 'b', (short)10, 732819469, 200L, 3579.0f, 5302.0d, false) to be called at least once but it wasn't called at all");
   }
 
   @Test
@@ -146,7 +162,7 @@ public class TestMoxyVerifying {
         Moxy.assertMock(() -> mock.hasArgs("this was", "called")).wasNotCalled()
     )
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock hasArgs(java.lang.String, java.lang.String) to be called with arguments (\"this was\", \"called\") exactly zero times, but it was called once");
+        .hasMessage("Expected mock hasArgs(\"this was\", \"called\") to be called exactly zero times, but it was called once");
 
     Moxy.assertMock(() -> mock.hasArgs("was never", "called")).wasNotCalled();
   }
@@ -322,26 +338,26 @@ public class TestMoxyVerifying {
 
     assertThatThrownBy(() -> mock.sayHelloTo("dothrow")).isSameAs(marker);
 
-    Moxy.assertMock(() -> mock.sayHelloTo("nothrow")).neverThrewAnyException();
-    Moxy.assertMock(() -> mock.sayHelloTo("nothrow")).neverThrew(RuntimeException.class);
-    Moxy.assertMock(() -> mock.sayHelloTo("nothrow")).neverThrew(marker);
+    Moxy.assertMock(() -> mock.sayHelloTo("nothrow")).didntThrowAnyException();
+    Moxy.assertMock(() -> mock.sayHelloTo("nothrow")).didntThrow(RuntimeException.class);
+    Moxy.assertMock(() -> mock.sayHelloTo("nothrow")).didntThrow(marker);
 
     assertThatThrownBy(
-          () -> Moxy.assertMock(() -> mock.sayHelloTo("dothrow")).neverThrewAnyException())
+          () -> Moxy.assertMock(() -> mock.sayHelloTo("dothrow")).didntThrowAnyException())
       .isInstanceOf(AssertionFailedError.class)
-      .hasMessage("Expected mock sayHelloTo(java.lang.String) with arguments (\"dothrow\") "
+      .hasMessage("Expected mock sayHelloTo(\"dothrow\") "
                 + "never to throw any exception, but exceptions were thrown once");
 
     assertThatThrownBy(
-          () -> Moxy.assertMock(() -> mock.sayHelloTo("dothrow")).neverThrew(RuntimeException.class))
+          () -> Moxy.assertMock(() -> mock.sayHelloTo("dothrow")).didntThrow(RuntimeException.class))
       .isInstanceOf(AssertionFailedError.class)
-      .hasMessage("Expected mock sayHelloTo(java.lang.String) with arguments (\"dothrow\") "
+      .hasMessage("Expected mock sayHelloTo(\"dothrow\") "
                 + "never to throw exception class java.lang.RuntimeException, but it was thrown once");
 
     assertThatThrownBy(
-          () -> Moxy.assertMock(() -> mock.sayHelloTo("dothrow")).neverThrew(marker))
+          () -> Moxy.assertMock(() -> mock.sayHelloTo("dothrow")).didntThrow(marker))
       .isInstanceOf(AssertionFailedError.class)
-      .hasMessage("Expected mock sayHelloTo(java.lang.String) with arguments (\"dothrow\") "
+      .hasMessage("Expected mock sayHelloTo(\"dothrow\") "
                 + "never to throw exception java.lang.RuntimeException: MARKER, but it was thrown once");
   }
 }

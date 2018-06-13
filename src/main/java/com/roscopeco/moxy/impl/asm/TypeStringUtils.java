@@ -29,22 +29,50 @@ import java.util.stream.Collectors;
 import org.objectweb.asm.Type;
 
 final class TypeStringUtils {
+  static String readableTimes(final int times) {
+    if (times == 0) {
+      return "zero times";
+    } else if (times == 1) {
+      return "once";
+    } else if (times == 2) {
+      return "twice";
+    } else {
+      return "" + times + " times";
+    }
+  }
+
   static String inspectArg(final Object arg) {
     if (arg == null) {
       return null;
     } else if (arg instanceof String) {
       return "\"" + arg + "\"";
+    } else if (arg instanceof Byte) {
+      return "(byte)" + arg;
     } else if (arg instanceof Character) {
       return "'" + arg + "'";
+    } else if (arg instanceof Short) {
+      return "(short)" + arg;
+    } else if (arg instanceof Integer) {
+      return arg.toString();
+    } else if (arg instanceof Long) {
+      return arg + "L";
+    } else if (arg instanceof Float) {
+      return arg + "f";
+    } else if (arg instanceof Double) {
+      return arg + "d";
     } else {
       return arg.toString();
     }
   }
 
-  static String buildArgsString(final Invocation invocation) {
-    final String args = invocation.getArgs().stream()
+  static String inspectArgs(final Invocation invocation) {
+    return invocation.getArgs().stream()
         .map(TypeStringUtils::inspectArg)
         .collect(Collectors.joining(", "));
+  }
+
+  static String buildArgsString(final Invocation invocation) {
+    final String args = inspectArgs(invocation);
 
     if (args.isEmpty()) {
       return args;
@@ -53,12 +81,21 @@ final class TypeStringUtils {
     }
   }
 
-  static String ellipsisDesc(final String descriptor) {
+  private static String unqualifiedClassName(final Type type) {
+    if (type.getDescriptor().length() == 1) {
+      return type.getClassName();
+    } else {
+      final String className = type.getClassName();
+      return className.substring(className.lastIndexOf('.') + 1, className.length());
+    }
+  }
+
+  static String shortDescriptorSignature(final String descriptor) {
     if (descriptor.contains("()")) {
       return "()";
     } else {
       return "(" + Arrays.stream(Type.getArgumentTypes(descriptor))
-          .map(Type::getClassName)
+          .map(TypeStringUtils::unqualifiedClassName)
           .collect(Collectors.joining(", ")) + ")";
     }
   }
@@ -85,6 +122,6 @@ final class TypeStringUtils {
 
   private TypeStringUtils() {
     throw new UnsupportedOperationException(
-        "com.roscopeco.moxy.impl.asm.TypesAndDescriptors is not designed for instantiation");
+        "com.roscopeco.moxy.impl.asm.TypeStringUtils is not designed for instantiation");
   }
 }

@@ -117,7 +117,7 @@ public interface MoxyVerifier {
   public MoxyVerifier wasCalledAtMost(int times);
 
   /**
-   * Verify the mocked method never threw an exception of type <code>throwable</code>.
+   * Verify the mocked method didn't throw an exception of type <code>throwable</code>.
    *
    * Throws {@link AssertionFailedError} if the assertion fails.
    *
@@ -125,10 +125,10 @@ public interface MoxyVerifier {
    *
    * @return <code>this</code>
    */
-  public MoxyVerifier neverThrew(Class<? extends Throwable> throwable);
+  public MoxyVerifier didntThrow(Class<? extends Throwable> throwable);
 
   /**
-   * Verify the mocked method never threw the given <code>throwable</code> instance.
+   * Verify the mocked method didn't throw the given <code>throwable</code> instance.
    *
    * Throws {@link AssertionFailedError} if the assertion fails.
    *
@@ -136,14 +136,14 @@ public interface MoxyVerifier {
    *
    * @return <code>this</code>
    */
-  public MoxyVerifier neverThrew(Throwable throwable);
+  public MoxyVerifier didntThrow(Throwable throwable);
 
   /**
-   * Verify the mocked method never threw any exceptions.
+   * Verify the mocked method didn't throw any exceptions.
    *
    * Throws {@link AssertionFailedError} if the assertion fails.
    *
    * @return <code>this</code>
    */
-  public MoxyVerifier neverThrewAnyException();
+  public MoxyVerifier didntThrowAnyException();
 }

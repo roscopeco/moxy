@@ -114,7 +114,7 @@ public final class TypesAndDescriptors {
   public static final String SUPPORT_GETRECORDER_DESCRIPTOR = "()" + MOXY_RECORDER_DESCRIPTOR;
   public static final String SUPPORT_UPDATECURRENTRETURNED_METHOD_NAME = "__moxy_asm_updateCurrentInvocationReturnThrow";
   public static final String SUPPORT_UPDATECURRENTRETURNED_DESCRIPTOR = VOID_OBJECT_THROWABLE_DESCRIPTOR;
-  public static final String SUPPORT_MAKE_JAVA_SIGNATURE_METHOD_NAME = "__asm_moxy_makeJavaSignature";
+  public static final String SUPPORT_MAKE_JAVA_SIGNATURE_METHOD_NAME = "__moxy_asm_makeJavaSignature";
   public static final String SUPPORT_MAKE_JAVA_SIGNATURE_DESCRIPTOR =
       "(" + STRING_DESCRIPTOR + STRING_DESCRIPTOR + ")" + STRING_DESCRIPTOR;
   public static final String SUPPORT_IS_STUBBING_DISABLED_METHOD_NAME = "__moxy_asm_isMockBehaviourDisabledOnThisThread";

@@ -12,6 +12,8 @@ import org.opentest4j.MultipleFailuresError;
 import com.roscopeco.moxy.api.MoxyMultiVerifier;
 
 class ASMMoxyMultiVerifier extends AbstractASMMoxyVerifier implements MoxyMultiVerifier {
+  private boolean allCalledChecked = false;
+
   public ASMMoxyMultiVerifier(final ASMMoxyEngine engine, final List<Invocation> invocations) {
     super(engine, Collections.unmodifiableList(invocations));
   }
@@ -25,6 +27,10 @@ class ASMMoxyMultiVerifier extends AbstractASMMoxyVerifier implements MoxyMultiV
    */
   MoxyMultiVerifier wereCalled(final int expectedTimes, final StringConsts comparison,
       final Function<Integer, Boolean> passCondition) {
+
+    // This flag is used later if ordering is checked, to provide a sensible failure message...
+    this.allCalledChecked = true;
+
     final List<Invocation> actualInvocations = new LinkedList<>(this.getRecorder().getInvocationList());
     final List<AssertionFailedError> errors = new ArrayList<>(actualInvocations.size());
 
@@ -96,7 +102,8 @@ class ASMMoxyMultiVerifier extends AbstractASMMoxyVerifier implements MoxyMultiV
     VerifierHelpers.testOrderedMatch(this.getEngine().getMatcherEngine(),
                                      this.getEngine().getRecorder().getInvocationList(),
                                      this.getMonitoredInvocations(),
-                                     false);
+                                     false,
+                                     this.allCalledChecked);
   }
 
   @Override
@@ -104,7 +111,8 @@ class ASMMoxyMultiVerifier extends AbstractASMMoxyVerifier implements MoxyMultiV
     VerifierHelpers.testOrderedMatch(this.getEngine().getMatcherEngine(),
                                      this.getEngine().getRecorder().getInvocationList(),
                                      this.getMonitoredInvocations(),
-                                     true);
+                                     true,
+                                     this.allCalledChecked);
   }
 
   @Override

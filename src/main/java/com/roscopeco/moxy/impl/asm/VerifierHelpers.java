@@ -89,7 +89,8 @@ class VerifierHelpers {
   static void testOrderedMatch(final ASMMoxyMatcherEngine engine,
                                final List<Invocation> actualInvocations,
                                final List<Invocation> monitoredInvocations,
-                               final boolean exclusiveMode) {
+                               final boolean exclusiveMode,
+                               final boolean allCalledChecked) {
     int currentMatchPtr = 0;
     boolean inMatch = false;
 
@@ -131,13 +132,14 @@ class VerifierHelpers {
 
     // If we got to here, we didn't find a match. Test failed.
     throw new AssertionFailedError(
-        makeOrderMismatchMessage(monitoredInvocations, exclusiveMode));
+        makeOrderMismatchMessage(monitoredInvocations, exclusiveMode, allCalledChecked));
   }
 
   static String makeOrderMismatchMessage(final List<Invocation> expected,
-                                         final boolean exclusiveMode) {
+                                         final boolean exclusiveMode,
+                                         final boolean allCalledChecked) {
     final StringBuilder sb =  new StringBuilder()
-        .append("Expected invocations:")
+        .append(StringConsts.EXPECTED_INVOCATIONS)
         .append(StringConsts.EOL);
 
     expected.forEach(i -> {
@@ -147,10 +149,16 @@ class VerifierHelpers {
     });
 
     if (exclusiveMode) {
-      sb.append("exclusively ");
+      sb.append(StringConsts.EXCLUSIVELY);
     }
 
-    sb.append("in that order, but they were not found");
+    sb.append(StringConsts.IN_ORDER_BUT_WERE);
+
+    if (!allCalledChecked) {
+      sb.append(StringConsts.NOT_INVOKED_OR);
+    }
+
+    sb.append(StringConsts.OUT_OF_ORDER);
 
     return sb.toString();
   }

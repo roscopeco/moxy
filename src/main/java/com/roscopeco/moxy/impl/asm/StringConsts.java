@@ -2,8 +2,6 @@ package com.roscopeco.moxy.impl.asm;
 
 enum StringConsts {
   SPACE(" "),
-  TAB("\t"),
-  EOL("\n"),
   COMMA_SPACE(", "),
   LSQPAREN("["),
   RSQPAREN("]"),
@@ -17,7 +15,14 @@ enum StringConsts {
   AT_LEAST("at least"),
   AT_MOST("at most"),
   AT_LEAST_ONCE_BUT_WASNT_AT_ALL("at least once but it wasn't called at all"),
-  ;
+  TAB("\t"),
+  EOL("\n"),
+  EXPECTED_INVOCATIONS("Expected invocations:"),
+  EXCLUSIVELY("exclusively "),
+  IN_ORDER_BUT_WERE("in that order, but they were "),
+  NOT_INVOKED_OR("not invoked or were "),
+  OUT_OF_ORDER("invoked out of order"),
+;
 
   private final String value;
 

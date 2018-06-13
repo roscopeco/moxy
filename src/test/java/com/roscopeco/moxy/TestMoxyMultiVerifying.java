@@ -655,7 +655,21 @@ public class TestMoxyMultiVerifying {
       .hasMessage("Expected invocations:\n"
                 + "\tsayHelloTo(\"Steve\")\n"
                 + "\thasTwoArgs(\"Bill\", 2)\n"
-                + "in that order, but they were not found");
+                + "in that order, but they were invoked out of order");
+
+    // Check we get proper fail message if not checked all called
+    assertThatThrownBy(() ->
+      Moxy.assertMocks(() -> {
+        mock.sayHelloTo("Steve");
+        mock.hasTwoArgs("Bill", 2);
+      }).inThatOrder()
+    )
+      .isInstanceOf(AssertionFailedError.class)
+      .hasMessage("Expected invocations:\n"
+                + "\tsayHelloTo(\"Steve\")\n"
+                + "\thasTwoArgs(\"Bill\", 2)\n"
+                + "in that order, but they were not invoked or were invoked out of order");
+
   }
 
   @Test
@@ -686,6 +700,6 @@ public class TestMoxyMultiVerifying {
       .hasMessage("Expected invocations:\n"
                 + "\thasTwoArgs(\"Joe\", 5)\n"
                 + "\tsayHelloTo(\"Keith\")\n"
-                + "exclusively in that order, but they were not found");
+                + "exclusively in that order, but they were invoked out of order");
   }
 }

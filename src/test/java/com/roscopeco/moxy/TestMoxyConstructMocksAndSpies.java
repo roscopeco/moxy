@@ -25,11 +25,17 @@ package com.roscopeco.moxy;
 
 import static org.assertj.core.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.roscopeco.moxy.model.SimpleConstructorClass;
 
 public class TestMoxyConstructMocksAndSpies {
+  @BeforeEach
+  public void setUp() {
+    Moxy.getMoxyEngine().reset();
+  }
+
   @Test
   public void testMoxyConstructMockWorksWithNullConstructor() {
     final SimpleConstructorClass mock = Moxy.constructMock(SimpleConstructorClass.class);

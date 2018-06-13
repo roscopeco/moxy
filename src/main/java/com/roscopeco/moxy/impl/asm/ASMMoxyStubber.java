@@ -23,20 +23,21 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
 import com.roscopeco.moxy.api.AnswerProvider;
 import com.roscopeco.moxy.api.MoxyStubber;
 
-class ASMMoxyStubber<T> extends HasEngineAndInvocation implements MoxyStubber<T> {
-  public ASMMoxyStubber(final ASMMoxyEngine engine) {
-    super(engine);
+class ASMMoxyStubber<T> extends AbstractASMMoxyVerifier implements MoxyStubber<T> {
+  public ASMMoxyStubber(final ASMMoxyEngine engine, final List<Invocation> invocations) {
+    super(engine, Collections.unmodifiableList(invocations));
   }
 
   @Override
   public void thenReturn(final T object) {
-    final Invocation invocation = this.theInvocation;
+    final Invocation invocation = this.getLastMonitoredInvocation();
     final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
 
     receiver.__moxy_asm_setThrowOrReturn(invocation, object, true);
@@ -44,7 +45,7 @@ class ASMMoxyStubber<T> extends HasEngineAndInvocation implements MoxyStubber<T>
 
   @Override
   public void thenThrow(final Throwable throwable) {
-    final Invocation invocation = this.theInvocation;
+    final Invocation invocation = this.getLastMonitoredInvocation();
     final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
 
     receiver.__moxy_asm_setThrowOrReturn(invocation, throwable, false);
@@ -52,7 +53,7 @@ class ASMMoxyStubber<T> extends HasEngineAndInvocation implements MoxyStubber<T>
 
   @Override
   public void thenCallRealMethod() {
-    final Invocation invocation = this.theInvocation;
+    final Invocation invocation = this.getLastMonitoredInvocation();
     final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
 
     receiver.__moxy_asm_setShouldCallSuper(invocation, true);
@@ -60,7 +61,7 @@ class ASMMoxyStubber<T> extends HasEngineAndInvocation implements MoxyStubber<T>
 
   @Override
   public void thenAnswer(final AnswerProvider<T> provider) {
-    final Invocation invocation = this.theInvocation;
+    final Invocation invocation = this.getLastMonitoredInvocation();
     final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
 
     // Just stash in the return slot, support checks if it's an AnswerProvider
@@ -70,7 +71,7 @@ class ASMMoxyStubber<T> extends HasEngineAndInvocation implements MoxyStubber<T>
 
   @Override
   public MoxyStubber<T> thenDo(final Consumer<List<? extends Object>> action) {
-    final Invocation invocation = this.theInvocation;
+    final Invocation invocation = this.getLastMonitoredInvocation();
     final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
 
     receiver.__moxy_asm_addDoAction(invocation, action);

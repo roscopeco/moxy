@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.Collections;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.roscopeco.moxy.api.InvalidMockInvocationException;
@@ -36,6 +37,11 @@ import com.roscopeco.moxy.model.SimpleAbstractClass;
 import com.roscopeco.moxy.model.SimpleInterface;
 
 public class TestMoxyPartialMocks {
+  @BeforeEach
+  public void setUp() {
+    Moxy.getMoxyEngine().reset();
+  }
+
   @Test
   public void testMoxyMockWithSpecificMethodsWorks() throws Exception {
     final MethodWithArgAndReturn control = new MethodWithArgAndReturn();

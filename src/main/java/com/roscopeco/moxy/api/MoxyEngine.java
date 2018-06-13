@@ -551,6 +551,8 @@ public interface MoxyEngine {
    */
   public MoxyVerifier assertMock(InvocationRunnable invocation);
 
+  public MoxyMultiVerifier assertMocks(InvocationRunnable invocation);
+
   /**
    * <p>Register the given matcher with this <code>MoxyEngine</code>.</p>
    *

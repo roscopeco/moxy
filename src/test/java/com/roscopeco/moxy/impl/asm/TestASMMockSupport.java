@@ -132,10 +132,12 @@ public class TestASMMockSupport extends AbstractImplTest {
   public void testIsMockBehaviourDisabledOnThisThread() {
     assertThat(this.mock.__moxy_asm_isMockBehaviourDisabledOnThisThread()).isFalse();
 
-    this.engine.disableMockBehaviourOnThisThread();
+    this.engine.startMonitoredInvocation();
     assertThat(this.mock.__moxy_asm_isMockBehaviourDisabledOnThisThread()).isTrue();
 
-    this.engine.enableMockBehaviourOnThisThread();
+    this.engine.endMonitoredInvocation();
     assertThat(this.mock.__moxy_asm_isMockBehaviourDisabledOnThisThread()).isFalse();
   }
+
+  // TODO test set/run doActions
 }

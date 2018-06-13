@@ -25,6 +25,7 @@ package com.roscopeco.moxy;
 
 import static org.assertj.core.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
 
@@ -36,6 +37,11 @@ import com.roscopeco.moxy.model.SimpleAbstractClass;
 import com.roscopeco.moxy.model.SimpleInterface;
 
 public class TestMoxyCallRealMethod {
+  @BeforeEach
+  public void setUp() {
+    Moxy.getMoxyEngine().reset();
+  }
+
   @Test
   public void testMoxyMockThenCallRealMethod() {
     final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
@@ -56,7 +62,7 @@ public class TestMoxyCallRealMethod {
 
     Moxy.assertMock(() -> mock.sayHelloTo("Bill")).wasCalledOnce();
     Moxy.assertMock(() -> mock.sayHelloTo("Steve")).wasNotCalled();
-    Moxy.assertMock(() -> mock.sayHelloTo("Bill")).neverThrewAnyException();
+    Moxy.assertMock(() -> mock.sayHelloTo("Bill")).didntThrowAnyException();
   }
 
   @Test
@@ -72,10 +78,10 @@ public class TestMoxyCallRealMethod {
         .hasMessage("Hamburglar detected!");
 
     assertThatThrownBy(() ->
-        Moxy.assertMock(() -> mock.sayHelloTo("Hamburglar")).neverThrewAnyException()
+        Moxy.assertMock(() -> mock.sayHelloTo("Hamburglar")).didntThrowAnyException()
     )
         .isInstanceOf(AssertionFailedError.class)
-        .hasMessage("Expected mock sayHelloTo(java.lang.String) with arguments (\"Hamburglar\") never to throw any exception, but exceptions were thrown once");
+        .hasMessage("Expected mock sayHelloTo(\"Hamburglar\") never to throw any exception, but exceptions were thrown once");
   }
 
   @Test

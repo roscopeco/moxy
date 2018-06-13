@@ -23,6 +23,8 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -30,33 +32,14 @@ import org.opentest4j.AssertionFailedError;
 
 import com.roscopeco.moxy.api.MoxyVerifier;
 
-class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
-  private static final String SPACE = " ";
-  private static final String EXPECTED_MOCK = "Expected mock ";
-  private static final String TO_BE_CALLED = " to be called ";
-  private static final String NEVER_TO_THROW_EXCEPTION = "never to throw exception ";
-  private static final String BUT_IT_WAS_CALLED = ", but it was called ";
-  private static final String BUT_IT_WAS_THROWN = ", but it was thrown ";
-
-  public ASMMoxyVerifier(final ASMMoxyEngine engine) {
-    super(engine);
-  }
-
-  private String readableTimes(final int times) {
-    if (times == 0) {
-      return "zero times";
-    } else if (times == 1) {
-      return "once";
-    } else if (times == 2) {
-      return "twice";
-    } else {
-      return "" + times + " times";
-    }
+class ASMMoxyVerifier extends AbstractASMMoxyVerifier implements MoxyVerifier {
+  public ASMMoxyVerifier(final ASMMoxyEngine engine, final List<Invocation> invocations) {
+    super(engine, Collections.unmodifiableList(invocations));
   }
 
   @Override
   public MoxyVerifier wasCalled() {
-    final Invocation invocation = this.getTheInvocation();
+    final Invocation invocation = this.getLastMonitoredInvocation();
     final String methodName = invocation.getMethodName();
     final String methodDesc = invocation.getMethodDesc();
 
@@ -74,52 +57,38 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     } else {
       throw new AssertionFailedError(
           new StringBuilder()
-            .append(EXPECTED_MOCK)
-            .append(methodName)
-            .append(TypeStringUtils.ellipsisDesc(methodDesc))
-            .append(TO_BE_CALLED)
-            .append(TypeStringUtils.buildArgsString(invocation))
-            .append("at least once but it wasn't called at all")
+            .append(StringConsts.EXPECTED_MOCK)
+            .append(invocation.toString())
+            .append(StringConsts.TO_BE_CALLED)
+            .append(StringConsts.AT_LEAST_ONCE_BUT_WASNT_AT_ALL)
                 .toString());
     }
   }
 
-  int getCallCount(final Invocation invocation, final String methodName, final String methodDesc) {
-    return this.getEngine()
-        .getRecorder()
-        .getInvocationList(invocation.getReceiver().getClass(),
-                           methodName,
-                           methodDesc)
-    .stream()
-    .filter(e -> this.getEngine()
-                        .getMatcherEngine()
-                        .argsMatch(e.getArgs(), invocation.getArgs()) )
-    .collect(Collectors.toList())
-    .size();
+  int getCallCount(final Invocation invocation) {
+    return VerifierHelpers.getCallCount(
+        this.getEngine().getMatcherEngine(),
+        invocation,
+        this.getEngine()
+          .getRecorder()
+          .getInvocationList(invocation.getReceiver().getClass(),
+                             invocation.getMethodName(),
+                             invocation.getMethodDesc()));
   }
 
   @Override
   public MoxyVerifier wasCalled(final int times) {
-    final Invocation invocation = this.getTheInvocation();
-    final String methodName = invocation.getMethodName();
-    final String methodDesc = invocation.getMethodDesc();
-    final int actual = this.getCallCount(invocation, methodName, methodDesc);
+    final Invocation invocation = this.getLastMonitoredInvocation();
+    final int actual = this.getCallCount(invocation);
 
     if (actual == times) {
       return this;
     } else {
       throw new AssertionFailedError(
-          new StringBuilder()
-            .append(EXPECTED_MOCK)
-            .append(methodName)
-            .append(TypeStringUtils.ellipsisDesc(methodDesc))
-            .append(TO_BE_CALLED)
-            .append(TypeStringUtils.buildArgsString(invocation))
-            .append("exactly ")
-            .append(this.readableTimes(times))
-            .append(BUT_IT_WAS_CALLED)
-            .append(this.readableTimes(actual))
-                .toString());
+          VerifierHelpers.makeExpectedCountMismatchMessage(invocation,
+                                                           times,
+                                                           actual,
+                                                           StringConsts.EXACTLY));
     }
   }
 
@@ -140,51 +109,33 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
 
   @Override
   public MoxyVerifier wasCalledAtLeast(final int times) {
-    final Invocation invocation = this.getTheInvocation();
-    final String methodName = invocation.getMethodName();
-    final String methodDesc = invocation.getMethodDesc();
-    final int actual = this.getCallCount(invocation, methodName, methodDesc);
+    final Invocation invocation = this.getLastMonitoredInvocation();
+    final int actual = this.getCallCount(invocation);
 
     if (actual >= times) {
       return this;
     } else {
       throw new AssertionFailedError(
-          new StringBuilder()
-            .append(EXPECTED_MOCK)
-            .append(methodName)
-            .append(TypeStringUtils.ellipsisDesc(methodDesc))
-            .append(TO_BE_CALLED)
-            .append(TypeStringUtils.buildArgsString(invocation))
-            .append("at least ")
-            .append(this.readableTimes(times))
-            .append(BUT_IT_WAS_CALLED)
-            .append(this.readableTimes(actual))
-                .toString());
+          VerifierHelpers.makeExpectedCountMismatchMessage(invocation,
+                                                           times,
+                                                           actual,
+                                                           StringConsts.AT_LEAST));
     }
   }
 
   @Override
   public MoxyVerifier wasCalledAtMost(final int times) {
-    final Invocation invocation = this.getTheInvocation();
-    final String methodName = invocation.getMethodName();
-    final String methodDesc = invocation.getMethodDesc();
-    final int actual = this.getCallCount(invocation, methodName, methodDesc);
+    final Invocation invocation = this.getLastMonitoredInvocation();
+    final int actual = this.getCallCount(invocation);
 
     if (actual <= times) {
       return this;
     } else {
       throw new AssertionFailedError(
-          new StringBuilder()
-            .append(EXPECTED_MOCK)
-            .append(methodName)
-            .append(TypeStringUtils.ellipsisDesc(methodDesc))
-            .append(TO_BE_CALLED)
-            .append(TypeStringUtils.buildArgsString(invocation))
-            .append("at most ")
-            .append(this.readableTimes(times))
-            .append(BUT_IT_WAS_CALLED)
-            .append(this.readableTimes(actual))
-                .toString());
+          VerifierHelpers.makeExpectedCountMismatchMessage(invocation,
+              times,
+              actual,
+              StringConsts.AT_MOST));
     }
   }
 
@@ -207,10 +158,8 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
   }
 
   @Override
-  public MoxyVerifier neverThrew(final Class<? extends Throwable> throwableClass) {
-    final Invocation invocation = this.getTheInvocation();
-    final String methodName = invocation.getMethodName();
-    final String methodDesc = invocation.getMethodDesc();
+  public MoxyVerifier didntThrow(final Class<? extends Throwable> throwableClass) {
+    final Invocation invocation = this.getLastMonitoredInvocation();
 
     final int actual = (this.countExceptionsThrown(invocation,
                                         invocation.getMethodName(),
@@ -221,16 +170,14 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     if (actual > 0) {
       throw new AssertionFailedError(
           new StringBuilder()
-            .append(EXPECTED_MOCK)
-            .append(methodName)
-            .append(TypeStringUtils.ellipsisDesc(methodDesc))
-            .append(SPACE)
-            .append(TypeStringUtils.buildArgsString(invocation))
-            .append(NEVER_TO_THROW_EXCEPTION)
+            .append(StringConsts.EXPECTED_MOCK)
+            .append(invocation.toString())
+            .append(StringConsts.SPACE)
+            .append(StringConsts.NEVER_TO_THROW_EXCEPTION)
             .append("class ")
             .append(throwableClass.getName())
-            .append(BUT_IT_WAS_THROWN)
-            .append(this.readableTimes(actual))
+            .append(StringConsts.BUT_IT_WAS_THROWN)
+            .append(TypeStringUtils.readableTimes(actual))
                 .toString());
     } else {
       return this;
@@ -238,10 +185,8 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
   }
 
   @Override
-  public MoxyVerifier neverThrew(final Throwable throwable) {
-    final Invocation invocation = this.getTheInvocation();
-    final String methodName = invocation.getMethodName();
-    final String methodDesc = invocation.getMethodDesc();
+  public MoxyVerifier didntThrow(final Throwable throwable) {
+    final Invocation invocation = this.getLastMonitoredInvocation();
 
     final int actual = (this.countExceptionsThrown(invocation,
                                         invocation.getMethodName(),
@@ -252,27 +197,22 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     if (actual > 0) {
       throw new AssertionFailedError(
           new StringBuilder()
-            .append(EXPECTED_MOCK)
-            .append(methodName)
-            .append(TypeStringUtils.ellipsisDesc(methodDesc))
-            .append(SPACE)
-            .append(TypeStringUtils.buildArgsString(invocation))
-            .append(NEVER_TO_THROW_EXCEPTION)
+            .append(StringConsts.EXPECTED_MOCK)
+            .append(invocation.toString())
+            .append(StringConsts.SPACE)
+            .append(StringConsts.NEVER_TO_THROW_EXCEPTION)
             .append(throwable)
-            .append(BUT_IT_WAS_THROWN)
-            .append(this.readableTimes(actual))
+            .append(StringConsts.BUT_IT_WAS_THROWN)
+            .append(TypeStringUtils.readableTimes(actual))
                 .toString());
-
     } else {
       return this;
     }
   }
 
   @Override
-  public MoxyVerifier neverThrewAnyException() {
-    final Invocation invocation = this.getTheInvocation();
-    final String methodName = invocation.getMethodName();
-    final String methodDesc = invocation.getMethodDesc();
+  public MoxyVerifier didntThrowAnyException() {
+    final Invocation invocation = this.getLastMonitoredInvocation();
 
     final int actual = (this.countExceptionsThrown(invocation,
                                         invocation.getMethodName(),
@@ -283,13 +223,11 @@ class ASMMoxyVerifier extends HasEngineAndInvocation implements MoxyVerifier {
     if (actual > 0) {
       throw new AssertionFailedError(
           new StringBuilder()
-            .append(EXPECTED_MOCK)
-            .append(methodName)
-            .append(TypeStringUtils.ellipsisDesc(methodDesc))
-            .append(SPACE)
-            .append(TypeStringUtils.buildArgsString(invocation))
-            .append("never to throw any exception, but exceptions were thrown ")
-            .append(this.readableTimes(actual))
+            .append(StringConsts.EXPECTED_MOCK)
+            .append(invocation.toString())
+            .append(StringConsts.SPACE)
+            .append(StringConsts.NEVER_THROW_ANY_BUT_EXCEPTIONS_THROWN)
+            .append(TypeStringUtils.readableTimes(actual))
                 .toString());
     } else {
       return this;

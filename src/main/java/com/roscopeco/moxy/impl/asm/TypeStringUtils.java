@@ -66,11 +66,9 @@ final class TypeStringUtils {
   }
 
   static String inspectArgs(final Invocation invocation) {
-    final String args = invocation.getArgs().stream()
+    return invocation.getArgs().stream()
         .map(TypeStringUtils::inspectArg)
         .collect(Collectors.joining(", "));
-
-    return args;
   }
 
   static String buildArgsString(final Invocation invocation) {

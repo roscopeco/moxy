@@ -45,7 +45,7 @@ class VerifierHelpers {
     }
 
     sb.append(invocations.stream()
-        .map(i -> i.toString())
+        .map(Invocation::toString)
         .collect(Collectors.joining(StringConsts.COMMA_SPACE.value())));
 
     if (invocations.size() > 1) {

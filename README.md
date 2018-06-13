@@ -393,7 +393,7 @@ assertMocks(() -> {
 As you can see, by default Moxy doesn't care if there are extra invocations
 between the mocks you're checking order for. If you want to make sure the
 methods were called strictly in order, with no additional mock invocations
-between them, you can use the _exclusivelyInOrder()_ method instead:
+between them, you can use the _exclusivelyInThatOrder()_ method instead:
 
 ```java
 mock.hasTwoArgs("Joe", 5);

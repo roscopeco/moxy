@@ -21,6 +21,8 @@ See also [Javadoc](https://roscopeco.github.io/moxy/).
     * [Actions](#actions)
     * [Creating spies](#creating-spies)
     * [Verifying](#verifying)
+      * [Multiple verification](#multiple-verification)      
+      * [Call-order verification](#call-order-verification)
     * [Argument matchers](#argument-matchers)
       * [Passing all arguments as matchers](#passing-all-arguments-as-matchers)
       * [Primitive matchers](#primitive-matchers)
@@ -320,7 +322,7 @@ the service? The short (and in fact only) answer is, you _verify_, like so:
 assertMock(() -> mock.connectDatabase("mydatabase")).wasCalledOnce();
 ```
 
-I'm sure you get the gist - this asserts that the given method was called,
+I'm sure you get the gist - this uses the [assertMock()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html#assertMock-com.roscopeco.moxy.api.InvocationRunnable-) method to assert that the given method was called,
 with the given arguments, once. There are a variety of other assertions 
 you can make. Here are just a few:
 
@@ -340,6 +342,82 @@ assertMock(() -> /* mock method call... */)
 
 For a full list of the available asserts, take a look at the
 [MoxyVerifier](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyVerifier.html) class.
+
+##### Multiple Verification
+
+In addition to verifying with [assertMock()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html#assertMock-com.roscopeco.moxy.api.InvocationRunnable-), you can save yourself some typing and verify a bunch of mocks at the same
+time. For example:
+
+```java
+assertMocks(() -> {
+  mock.returnBoolean();
+  mock.returnDouble();
+  
+  otherMock.returnInteger(any())
+})
+  .wereAllCalled();
+```
+
+You can verify they were all called, not called, or called a given number of times.
+Additionally, if any of them fail, you'll get a `MultipleFailuresError` detailing
+exactly which ones didn't meet with your expectations.
+
+As with standard asserts, you can use matchers, and you're not limited to verifying
+a single mock instance within a given call - you can make any calls you like within
+the lambda (and of course can use regular non-mocked methods in there too if you need 
+to, although they won't count in the verification) and it will just work.
+ 
+For a full list of the available multi-asserts, take a look at the
+[MoxyMultiVerifier](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyMultiVerifier.html) class.
+
+##### Call-order Verification
+
+Using the multiple-assert feature with _assertMocks()_ (see above), you can also 
+verify that your mock methods were called in the order you specified in the assert 
+lambda. For example:
+
+```java
+mock.hasTwoArgs("Bill", 2);
+mock.hasTwoArgs("Norman", 2);     // This is fine - non-exclusive order by default
+mock.sayHelloTo("Steve");
+
+// ... later 
+
+assertMocks(() -> {
+  mock.hasTwoArgs("Bill", 2);
+  mock.sayHelloTo("Steve");
+}).wereAllCalled()
+  .inThatOrder();
+```
+
+As you can see, by default Moxy doesn't care if there are extra invocations
+between the mocks you're checking order for. If you want to make sure the
+methods were called strictly in order, with no additional mock invocations
+between them, you can use the _exclusivelyInOrder()_ method instead:
+
+```java
+mock.hasTwoArgs("Joe", 5);
+mock.hasTwoArgs("Bill", 42);
+mock.sayHelloTo("Keith");
+
+// ... later
+
+assertMocks(() -> {
+  mock.hasTwoArgs("Bill", 2);
+  mock.sayHelloTo("Steve");
+}).wereAllCalled()
+  .exclusivelyInThatOrder();
+```
+
+This test would fail, because although the methods were invoked in the given
+order, they were separated by another invocation we weren't expecting. 
+
+Obviously any non-mock methods invoked between the mocks wouldn't be picked
+up by this, but it can be a useful way to ensure behaviour and check that 
+a mock method you don't expect to be called is slipping in unnoticed. 
+
+As with the other multi-asserts described above, you can use argument matchers, and 
+verify ordering for multiple mock instances within a given _assertMock()_ call.
 
 ##### Argument matchers
 

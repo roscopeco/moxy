@@ -1,15 +1,18 @@
 package com.roscopeco.moxy.api;
 
 public interface MoxyMultiVerifier {
-  public MoxyMultiVerifier inOrder();
-  public MoxyMultiVerifier inAnyOrder();
-  public MoxyMultiVerifier exclusively();
-
   public void wereNotCalled();
-  public void wereAllCalled();
-  public void wereAllCalledExactly(int expectedTimes);
-  public void wereAllCalledOnce();
-  public void wereAllCalledTwice();
-  public void wereAllCalledAtLeast(int expectedTimes);
-  public void wereAllCalledAtMost(int expectedTimes);
+
+  public MoxyMultiVerifier wereAllCalled();
+  public MoxyMultiVerifier wereAllCalledExactly(int expectedTimes);
+  public MoxyMultiVerifier wereAllCalledOnce();
+  public MoxyMultiVerifier wereAllCalledTwice();
+  public MoxyMultiVerifier wereAllCalledAtLeast(int expectedTimes);
+  public MoxyMultiVerifier wereAllCalledAtLeastTwice();
+  public MoxyMultiVerifier wereAllCalledAtMost(int expectedTimes);
+  public MoxyMultiVerifier wereAllCalledAtMostTwice();
+
+  public void inThatOrder();
+  public void exclusivelyInThatOrder();
+  public void inAnyOrder();
 }

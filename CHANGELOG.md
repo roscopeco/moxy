@@ -3,8 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
-and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
-from version 0.86 onwards.
+and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Experimental
 
@@ -22,7 +21,7 @@ to make it into a release soon.
 
 **Latest release is up-to-date**
 
-## [0.86] - 2018-06-13
+## [0.86.0] - 2018-06-13
 
 ### Added
 
@@ -78,6 +77,6 @@ First public release, and the first version pushed to Maven Central.
 - Add project documentation
 - Setup for CI with Travis and Sonarcloud
 
-[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.86...develop
-[0.86]: https://github.com/roscopeco/moxy/compare/v0.84...v0.86
+[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.86.0...develop
+[0.86.0]: https://github.com/roscopeco/moxy/compare/v0.84...v0.86.0
 [0.84]: https://github.com/roscopeco/moxy/compare/v0.82...v0.84

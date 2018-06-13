@@ -99,7 +99,7 @@ following dependency in your POM:
 <dependency>
 	<groupId>com.roscopeco</groupId>
 	<artifactId>moxy</artifactId>
-	<version>0.86</version>
+	<version>0.86.0</version>
 </dependency>
 ```
 
@@ -121,7 +121,7 @@ repositories {
 }
 
 dependencies {
-    testCompile 'com.roscopeco:moxy:0.86'
+    testCompile 'com.roscopeco:moxy:0.86.0'
 }
 ```
 

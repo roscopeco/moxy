@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/roscopeco/moxy.svg?branch=master)](https://travis-ci.org/roscopeco/moxy) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=alert_status)](https://sonarcloud.io/dashboard/index/com.roscopeco%3Amoxy) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=bugs)](https://sonarcloud.io/component_measures?id=com.roscopeco%3Amoxy&metric=bugs) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=code_smells)](https://sonarcloud.io/component_measures?id=com.roscopeco%3Amoxy&metric=code_smells) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=coverage)](https://sonarcloud.io/component_measures?id=com.roscopeco%3Amoxy&metric=coverage) [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=ncloc)](https://sonarcloud.io/component_measures?id=com.roscopeco%3Amoxy&metric=ncloc)
+
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=sqale_rating)](https://sonarcloud.io/component_measures?id=com.roscopeco%3Amoxy&metric=sqale_rating) [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=com.roscopeco%3Amoxy&metric=reliability_rating) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=security_rating)](https://sonarcloud.io/component_measures?id=com.roscopeco%3Amoxy&metric=security_rating) [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=sqale_index)](https://sonarcloud.io/component_measures?id=com.roscopeco%3Amoxy&metric=sqale_index)
 
 # Moxy
@@ -17,9 +18,17 @@ See also [Javadoc](https://roscopeco.github.io/moxy/).
   * [Using the code](#using-the-code)
     * [Creating mocks](#creating-mocks)
     * [Stubbing](#stubbing)
+    * [Actions](#actions)
+    * [Creating spies](#creating-spies)
     * [Verifying](#verifying)
+      * [Multiple verification](#multiple-verification)      
+      * [Call-order verification](#call-order-verification)
     * [Argument matchers](#argument-matchers)
-    * [Partial Mocking and Spying](#partial-mocking-and-spying)
+      * [Passing all arguments as matchers](#passing-all-arguments-as-matchers)
+      * [Primitive matchers](#primitive-matchers)
+      * [Standard matcher types](#matcher-types)
+      * [Custom matchers](#custom-matchers)
+    * [Partial Mocking](#partial-mocking)
     
 ### What is this?
 
@@ -94,6 +103,14 @@ following dependency in your POM:
 </dependency>
 ```
 
+Development snapshots are sometimes made available in Maven via some extra
+configuration. See [this wiki page](https://github.com/roscopeco/moxy/wiki/Maven-Coordinates)
+for more information.
+
+Note that, depending on where we are in the release cycle, it is possible for the
+latest snapshot to be _behind_ the current release. Check version numbers before
+using a snapshot.
+
 ##### Gradle
 
 Something like the following should have you set up:
@@ -157,9 +174,28 @@ AmazingButSlowDatabaseService mock = mock(AmazingButSlowDatabaseService.class);
 > In this case, we said it was an interface, but it could just as easily
 be a class (abstract or concrete) - the API is exactly the same regardless.
 
+It's important to note that Moxy mocks are _complete_ - not only do they
+mock out all method behaviour, they also do not call any superclass
+constructor. 
+
+This is generally a good thing, however there are caveats if you're
+planning to utilise [thenCallRealMethod()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenCallRealMethod--)
+or convert your mocks into spies (see [the section on spies](#creating-spies), below).
+
+For those times when you want to call a constructor on your mock,
+Moxy provides the _constructMock()_ family of methods, which will select
+a best-fit constructor based on the arguments you supply:
+
+```java
+NeedsConstruction mock = constructMock(AmazingButSlowDatabaseService.class, "something", 2);
+```
+
+_constructMock()_ (and the associated _constructSpy()_ family) all support
+primitive arguments using standard Java auto boxing/unboxing.
+
 ##### Stubbing
 
-By default, this will mock all public methods of the class, and make them
+By default, Moxy will mock all public methods of the class, and make them
 all return sensible defaults (think zeroes, nulls, falseys). If you want to
 make a given method return something else, you would _stub_ it, 
 using the [thenReturn()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenReturn-T-), [thenAnswer()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenAnswer-com.roscopeco.moxy.api.AnswerProvider-) or [thenThrow()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenThrow-java.lang.Throwable-) methods like so:
@@ -190,31 +226,13 @@ a combination of (potentially different) returns and throws as you need.
 
 **Side note**
 > Incidentally, Moxy is smart enough to know if you're stubbing a void method,
-in which case you won't have the option to [thenReturn()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenReturn-T-), because stubbing
-a return value for a void method would be, well, pointless.
+in which case you won't have the option to [thenReturn()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenReturn-T-) or
+[thenAnswer()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenAnswer-com.roscopeco.moxy.api.AnswerProvider-), because stubbing a return value for a void method would be, well, pointless.
 
 Once you're done stubbing, you can go ahead and pass your mock to the class
 you're testing (or to whoever else needs it really). If you've stubbed 
 appropriately, the clients will never know they're not talking to the
 real deal and you can test with impunity.
-
-##### Spying
-
-Instead of stubbing, you can turn your mock into a spy by having it call 
-the real method, like so:
-
-```java
-when(() -> mock.connectDatabase("invalid")).thenCallRealMethod();
-```
-
-Obviously this only applies if your mock isn't based on an Interface and the 
-real method isn't `abstract`. If either of those conditions are true, you'll
-receive a helpful exception when the would-be spy is called.
-
-When using [thenCallRealMethod()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenCallRealMethod--), 
-you still get all the usual verification
-goodness that Moxy provides, so you can still use matchers, for example,
-or check how many times it was called and make sure it didn't throw exceptions.
 
 ##### Actions
 
@@ -240,6 +258,59 @@ There's one case where you'll want to be a bit careful when using actions,
 specifically when using them with matchers. For more details, check out
 the [JavaDoc](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenDo-java.util.function.Consumer-).
 
+##### Creating spies
+
+For convenience, the [Moxy](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html)
+class provides a number of _spy(...)_ and _constructSpy(...)_ methods that can be used 
+to generate spies from classes or existing mock instances. 
+
+When spying it's generally recommended that the _constructSpy()_ family of methods are used,
+since these allow an appropriate constructor to be called on the spy, initialising 
+any state that may be required by the real method implementations.
+
+If you're sure the class you're spying doesn't initialise any such state, you can
+of course call the _spy()_ methods, which do not call any constructor. This may
+also be useful where the spied class performs heavyweight initialisation in 
+its constructor, and you can initialise state in some other way (e.g. setter methods).
+
+Under the hood, spies are just mocks with all methods set to use 
+[thenCallRealMethod()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenCallRealMethod--),
+so you still have access to all the usual verification supported by mocks,
+and still use exactly the same API.
+
+**Side note** 
+>While spies don't support stubbing (i.e. [thenReturn()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenReturn-T-),
+[thenAnswer()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenAnswer-com.roscopeco.moxy.api.AnswerProvider-) or [thenThrow()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenThrow-java.lang.Throwable-))
+because their behaviour is determined by the real method, it's probably worth noting that you can
+still apply [doActions](#actions) to spies, which will be executed in the usual way,
+_prior_ to calling the real method. 
+
+##### Partial spies
+
+Instead of stubbing, you can turn your mock into a partial spy by having it call 
+the real method, like so:
+
+```java
+when(() -> mock.connectDatabase("invalid")).thenCallRealMethod();
+```
+
+Obviously this only applies if your mock isn't based on an Interface and the 
+real method isn't `abstract`. If either of those conditions are true, you'll
+receive a helpful exception when the would-be spy is called.
+
+When using [thenCallRealMethod()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenCallRealMethod--), 
+you still get all the usual verification
+goodness that Moxy provides, so you can still use matchers, for example,
+or check how many times it was called and make sure it didn't throw exceptions.
+
+**Note** that it's often required to call a constructor on the class when using 
+[thenCallRealMethod()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenCallRealMethod--)
+as real implementations may rely on state initialised in a constructor.
+
+For this reason, it's recommended to use the _Moxy.constructMock()_ family of
+methods to create such mocks, which will allow you to call an appropriate
+constructor.
+
 ##### Verifying
 
 So you passed in your mocks, and you appear to have gotten away with it -
@@ -251,7 +322,7 @@ the service? The short (and in fact only) answer is, you _verify_, like so:
 assertMock(() -> mock.connectDatabase("mydatabase")).wasCalledOnce();
 ```
 
-I'm sure you get the gist - this asserts that the given method was called,
+I'm sure you get the gist - this uses the [assertMock()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html#assertMock-com.roscopeco.moxy.api.InvocationRunnable-) method to assert that the given method was called,
 with the given arguments, once. There are a variety of other assertions 
 you can make. Here are just a few:
 
@@ -271,6 +342,82 @@ assertMock(() -> /* mock method call... */)
 
 For a full list of the available asserts, take a look at the
 [MoxyVerifier](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyVerifier.html) class.
+
+##### Multiple Verification
+
+In addition to verifying with [assertMock()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html#assertMock-com.roscopeco.moxy.api.InvocationRunnable-), you can save yourself some typing and verify a bunch of mocks at the same
+time. For example:
+
+```java
+assertMocks(() -> {
+  mock.returnBoolean();
+  mock.returnDouble();
+  
+  otherMock.returnInteger(any())
+})
+  .wereAllCalled();
+```
+
+You can verify they were all called, not called, or called a given number of times.
+Additionally, if any of them fail, you'll get a `MultipleFailuresError` detailing
+exactly which ones didn't meet with your expectations.
+
+As with standard asserts, you can use matchers, and you're not limited to verifying
+a single mock instance within a given call - you can make any calls you like within
+the lambda (and of course can use regular non-mocked methods in there too if you need 
+to, although they won't count in the verification) and it will just work.
+ 
+For a full list of the available multi-asserts, take a look at the
+[MoxyMultiVerifier](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyMultiVerifier.html) class.
+
+##### Call-order Verification
+
+Using the multiple-assert feature with _assertMocks()_ (see above), you can also 
+verify that your mock methods were called in the order you specified in the assert 
+lambda. For example:
+
+```java
+mock.hasTwoArgs("Bill", 2);
+mock.hasTwoArgs("Norman", 2);     // This is fine - non-exclusive order by default
+mock.sayHelloTo("Steve");
+
+// ... later 
+
+assertMocks(() -> {
+  mock.hasTwoArgs("Bill", 2);
+  mock.sayHelloTo("Steve");
+}).wereAllCalled()
+  .inThatOrder();
+```
+
+As you can see, by default Moxy doesn't care if there are extra invocations
+between the mocks you're checking order for. If you want to make sure the
+methods were called strictly in order, with no additional mock invocations
+between them, you can use the _exclusivelyInThatOrder()_ method instead:
+
+```java
+mock.hasTwoArgs("Joe", 5);
+mock.hasTwoArgs("Bill", 42);
+mock.sayHelloTo("Keith");
+
+// ... later
+
+assertMocks(() -> {
+  mock.hasTwoArgs("Bill", 2);
+  mock.sayHelloTo("Steve");
+}).wereAllCalled()
+  .exclusivelyInThatOrder();
+```
+
+This test would fail, because although the methods were invoked in the given
+order, they were separated by another invocation we weren't expecting. 
+
+Obviously any non-mock methods invoked between the mocks wouldn't be picked
+up by this, but it can be a useful way to ensure behaviour and check that 
+a mock method you don't expect to be called is slipping in unnoticed. 
+
+As with the other multi-asserts described above, you can use argument matchers, and 
+verify ordering for multiple mock instances within a given _assertMock()_ call.
 
 ##### Argument matchers
 
@@ -299,12 +446,6 @@ hood, and that means there are unfortunately some caveats to using them:
 * You **must not** use any of the argument matchers outside of a [when()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html#when-com.roscopeco.moxy.api.InvocationSupplier-) or [assertMock()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/Moxy.html#assertMock-com.roscopeco.moxy.api.InvocationRunnable-) call. Although there really isn't any reason you'd want to anyway.
 * You may occasionally receive an odd error message when using matchers. The aim is that this should always be in the right place (not at some indeterminate future time) though, and should always give you an error message telling you what went wrong and why. If ever that's not the case, then I consider it a potential bug and would be grateful if you'd report it on GitHub.
 
-**Side note**
-> I'm working hard to eliminate as many of these caveats as possible. Especially the one about passing all arguments as matchers, that one's got me up nights trying to figure a way around it.
-
-If you've used certain other mock frameworks, then you'll be familiar with some of these caveats.
-I'm guessing their matchers work in more or less the same way as Moxy's.
-
 ##### Passing all arguments as matchers
 
 So you've used a matcher for one of the arguments to a method, let's call it 
@@ -328,7 +469,7 @@ be asserted against. So:
 assertMock(() -> mock.method(any())).wasCalledOnce();
 ```
 
-is simply saying "Assert that mock.method was called once, with any arguments. Simples!
+is simply saying "Assert that mock.method was called once, with any arguments". Simples!
 
 ##### Primitive matchers
 
@@ -342,13 +483,11 @@ rather than plain
 [any()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#any--). 
 
 Sadly, due to the ~~stupid~~ way Java generics and autoboxing are implemented, the
-compiler won't catch you if you forget this rule, and one of two things will 
-happen at runtime:
+compiler won't catch you if you forget this rule, and get you'll get an exception
+at runtime with a helpful error message telling you that it appears you may have forgotten
+to use a primitive matcher.
 
-* _Most of the time_ Moxy will catch it, and you'll get a helpful error message telling you that it appears you may have forgotten to use a primitive matcher.
-* _But some of the time_ you'll get a no-message `NullPointerException` from some seemingly-random place in your code that is actually the result of the JVM trying to auto-unbox a null to a primitive wrapper class.
-
-So if you do get that seemingly random NPE, and you're using matchers, check carefully
+So if you do get that exception, and you're using matchers, check carefully
 that you're using primitive matchers as appropriate. A common vector for getting this 
 wrong seems to be when using primitive [and()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#and-T...-) and [or()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/matchers/Matchers.html#or-T...-) matchers - the matchers 
 that are being and'ed and or'ed _also_ need to be primitive. So, e.g., instead of:
@@ -448,15 +587,21 @@ do suggest it for inclusion into the core Moxy distribution. GitHub pull request
 preferred format for such suggestions, but if you don't have time for that feel free to submit
 a bug/feature request instead.
 
-##### Partial Mocking and Spying
+##### Partial Mocking
+
+**Side note**
+> This section has largely been superseded by the _constructMock()_ family of methods
+and the functionality provided by [thenCallRealMethod()](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenCallRealMethod--).
+It may however remain useful in some more advanced scenarios, and so has been retained
+in the documentation. 
 
 In addition to the standard behaviour of mocking all public methods, Moxy also supports
 _partial mocking_, where only _some_ of the methods in a given class are mocked, leaving
 the rest with their original implementation.
 
 Partial mocking is inherently trickier than straight-up complete mocking, mostly because
-**Moxy doesn't call constructors**. This means that, if the methods you don't mock
-require any state that is set in a constructor, they're likely to fail miserably.
+by default, **Moxy doesn't call constructors**. This means that, if the methods you don't
+mock require any state that is set in a constructor, they're likely to fail miserably.
 
 For this reason, the usual static _Moxy.mock(...)_ API doesn't support partial mocking -
 you'll have to get a little deeper into the API and call a constructor yourself.
@@ -503,13 +648,34 @@ MyClass mock = mockClass
     .newInstance(Moxy.getMoxyEngine(), "Some string", 42);
 ```
 
-Those six extra lines might seem like a bit of a pain, but think of the 
+**Side note**
+> Much of this has been superseded by the _Moxy.constructMock()_ family of
+methods, so unless you have advanced requirements you should probably
+use those instead of generating the class manually.
+
+Those few extra lines might seem like a bit of a pain, but think of the 
 extra work as a reminder that partial mocking is a little bit dangerous.
 
-Often, the behaviour you'll achieve with partial mocking can also be 
-accomplished with the `MoxyStubber.thenCallRealMethod()` method,
-or you might find you need a combination of the two. In any event, 
-you can happily use them together as the need arises.
+Alternatively, if you're looking to create a spy that needs a constructor
+call, you'd generally mock _all_ the methods, and then pass the resulting
+mock to the _Moxy.spy(Object)_ method. There is a convenient constant you
+can use to achieve that. The following example demonstrates a typical
+snippet used to generate a spy where a constructor call is needed:
+
+```java
+Class<? extends MyClass> mockClass = 
+    Moxy.getMoxyEngine().getMockClass(MyClass.class, MoxyEngine.ALL_METHODS);
+
+MyClass mock = mockClass
+    .getConstructor(MoxyEngine.class, String.class, int.class)
+    .newInstance(Moxy.getMoxyEngine(), "Some string", 42);
+
+MyClass spy = Moxy.spy(mock);
+```
+
+**Side Note**
+> This too has been superseded, and you can now use the _constructSpy()_ family
+of methods to achieve the same result, in 99% of cases, in one line of code.
 
 ### How does it work?
 

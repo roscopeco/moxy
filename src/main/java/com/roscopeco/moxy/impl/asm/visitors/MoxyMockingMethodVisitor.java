@@ -317,10 +317,15 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     this.delegate.visitInsn(ICONST_0);
     this.delegate.visitJumpInsn(IF_ICMPEQ, checkCallSuperLabel);
 
-    // All stubbing is disabled, load default
+    /////////////  IS_STUBBING_DISABLED == true
+    // All stubbing is disabled, we must be in either when() or assertMock[s]().
+    // First up, load default
     this.generateDefaultValue(this.returnType);
+
+    // Goto return (generated _much_ later).
     this.delegate.visitJumpInsn(GOTO, returnLabel);
 
+    ///////////// IS_STUBBING_DISABLED == false
     // All stubbing is enabled, so continue.
     this.delegate.visitLabel(checkCallSuperLabel);
 

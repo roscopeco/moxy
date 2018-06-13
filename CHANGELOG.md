@@ -11,9 +11,6 @@ from version 0.86 onwards.
 These changes are currently considered experimental and are not yet ready
 to merge to `develop`. They are in various branches and are slated to
 make it in before 1.0.0.
-
-- Ordered verification, and verification of multiple invocations at once.
-  See: https://github.com/roscopeco/moxy/tree/FEATURE/ordered-verification
   
 - Java 9 Jigsaw (module) support.
   See: https://github.com/roscopeco/moxy/tree/modular-java9
@@ -25,6 +22,7 @@ to make it into a release soon.
 
 ### Added
 
+- Ordered verification, and verification of multiple invocations at once.
 - Convenience methods to construct spies directly from static methods
   on Moxy.
 - `constructMock` and `constructSpy` methods that provide a

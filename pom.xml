@@ -42,6 +42,7 @@
 		<java.version>1.8</java.version>
 		<asm.version>6.2</asm.version>
 		<opentest4j.version>1.0.0</opentest4j.version>
+		<commons.lang3.version>3.7</commons.lang3.version>
 		<junit.jupiter.version>5.1.1</junit.jupiter.version>
 		<junit.platform.version>1.1.1</junit.platform.version>
 		<assertj.core.version>3.8.0</assertj.core.version>
@@ -72,6 +73,11 @@
 			<groupId>org.opentest4j</groupId>
 			<artifactId>opentest4j</artifactId>
 			<version>${opentest4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${commons.lang3.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>

@@ -35,7 +35,7 @@ import com.roscopeco.moxy.api.MoxyException;
  * usage - but it does <em>usually</em> indicate it.</p>
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
- *
+ * @since 1.0
  */
 public class PossibleMatcherUsageError extends MoxyException {
   private static final long serialVersionUID = 1L;

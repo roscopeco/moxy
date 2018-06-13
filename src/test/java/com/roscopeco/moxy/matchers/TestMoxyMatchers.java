@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
+import com.roscopeco.moxy.Moxy;
 import com.roscopeco.moxy.model.MatcherTestClass;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 
@@ -104,5 +105,31 @@ public abstract class TestMoxyMatchers {
 
     assertMock(() -> mock.testByte((byte)10)).wasCalledOnce();
     assertMock(() -> mock.testBoolean(true)).wasCalledOnce();
+  }
+
+  @Test
+  public void testThatMockMockWithMatcherUsageErrorThrowsProperly() {
+    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+
+    assertThatThrownBy(() ->
+        Moxy.when(() -> mock.hasTwoArgs(Matchers.any(), 5))
+    )
+        .isInstanceOf(InconsistentMatchersException.class)
+        .hasMessage("Inconsistent use of matchers: if using matchers, *all* arguments must be supplied with them.\n"
+            + "This limitation will (hopefully) be lifted in the future");
+
+    assertThatThrownBy(() ->
+        Moxy.when(() -> mock.hasTwoArgs("illegal bare arg", Matchers.anyInt()))
+    )
+        .isInstanceOf(InconsistentMatchersException.class)
+        .hasMessage("Inconsistent use of matchers: if using matchers, *all* arguments must be supplied with them.\n"
+            + "This limitation will (hopefully) be lifted in the future");
+
+    assertThatThrownBy(() ->
+        Moxy.when(() -> mock.hasTwoArgs(Matchers.any(), Matchers.any()))
+    )
+      .isInstanceOf(PossibleMatcherUsageError.class)
+      .hasMessage("If you're using primitive matchers, ensure you're using the "
+          + "correct type (e.g. anyInt() rather than any()), especially when nesting");
   }
 }

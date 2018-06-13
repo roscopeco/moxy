@@ -21,47 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.api;
+package com.roscopeco.moxy.model;
 
-import static org.assertj.core.api.Assertions.*;
+public class SimpleConstructorClass {
+  private final String str;
 
-import org.junit.jupiter.api.Test;
-
-public class TestMockGenerationException {
-  public static final String MARKER = "MARKER";
-  public static final Exception CAUSE = new Exception("CAUSE");
-
-  @Test
-  public void testNullConstructor() {
-    final MockGenerationException ex = new MockGenerationException();
-
-    assertThat(ex.getMessage()).isNull();
-    assertThat(ex.getCause()).isNull();
+  public SimpleConstructorClass() {
+    this("Hello");
   }
 
-  @Test
-  public void TestStringConstructor() {
-    final MockGenerationException ex = new MockGenerationException(MARKER);
-
-    assertThat(ex.getMessage()).isEqualTo(MARKER);
-    assertThat(ex.getCause()).isNull();
+  public SimpleConstructorClass(final String str) {
+    this.str = str;
   }
 
-  @Test
-  public void TestStringThrowableConstructor() {
-    final MockGenerationException ex = new MockGenerationException(MARKER, CAUSE);
-
-    assertThat(ex.getMessage()).isEqualTo(MARKER);
-    assertThat(ex.getCause()).isEqualTo(CAUSE);
+  public SimpleConstructorClass(final String str1, final String str2) {
+    this.str = str1 + str2;
   }
 
-  @Test
-  public void TestThrowableConstructor() {
-    final MockGenerationException ex = new MockGenerationException(CAUSE);
-
-    assertThat(ex.getMessage()).isEqualTo("java.lang.Exception: CAUSE");
-    assertThat(ex.getCause()).isEqualTo(CAUSE);
+  public SimpleConstructorClass(final String str, final int i) {
+    this.str = str + i;
   }
 
-
+  public String returnString() {
+    return this.str;
+  }
 }

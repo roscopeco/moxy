@@ -46,9 +46,9 @@ to make it into a release soon.
 
 ### Added
 
-- Stubbing now supports answers with `thenAnswer` method.
+- Stubbing now supports answers with [thenAnswer](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenAnswer-com.roscopeco.moxy.api.AnswerProvider-) method.
 - Stubbing now supports an arbitrary number of _actions_
-  via the `thenDo` method.
+  via the [thenDo](https://roscopeco.github.io/moxy/com/roscopeco/moxy/api/MoxyStubber.html#thenDo-java.util.function.Consumer-) method.
 
 ### Changed
 

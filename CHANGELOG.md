@@ -20,9 +20,14 @@ make it in before 1.0.0.
 These changes are currently in the `develop` branch, and are slated
 to make it into a release soon.
 
+**Latest release is up-to-date**
+
+## [0.86] - 2018-06-13
+
 ### Added
 
-- Ordered verification, and verification of multiple invocations at once.
+- Ordered verification, and verification of multiple invocations at once
+  with the `assertMocks` method.
 - Convenience methods to construct spies directly from static methods
   on Moxy.
 - `constructMock` and `constructSpy` methods that provide a
@@ -73,5 +78,6 @@ First public release, and the first version pushed to Maven Central.
 - Add project documentation
 - Setup for CI with Travis and Sonarcloud
 
-[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.84...develop
+[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.86...develop
+[0.86]: https://github.com/roscopeco/moxy/compare/v0.84...v0.86
 [0.84]: https://github.com/roscopeco/moxy/compare/v0.82...v0.84

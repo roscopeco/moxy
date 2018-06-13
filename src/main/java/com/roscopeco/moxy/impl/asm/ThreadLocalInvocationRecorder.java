@@ -163,7 +163,7 @@ public class ThreadLocalInvocationRecorder {
   /*
    * Get invocations for the given class/method/desc combo, in order.
    *
-   * Returns a copy of the original list.
+   * Part of the contract of this method is that it returns a copy of the original list.
    */
   List<Invocation> getInvocationList(final Class<?> forClz, final String methodName, final String methodDesc) {
     return new ArrayList<>(this.ensureInvocationList(this.ensureInvocationMap(this.ensureLocalClassMap(), forClz), methodName, methodDesc));
@@ -172,7 +172,7 @@ public class ThreadLocalInvocationRecorder {
   /*
    * Get _all_ invocations, in order.
    *
-   * Returns a copy of the original list.
+   * Part of the contract of this method is that it returns a copy of the original list.
    */
   List<Invocation> getInvocationList() {
     return new ArrayList<>(this.ensureAllInvocationsOrderedList());

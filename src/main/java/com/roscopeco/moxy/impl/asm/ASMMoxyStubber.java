@@ -23,6 +23,7 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -31,7 +32,7 @@ import com.roscopeco.moxy.api.MoxyStubber;
 
 class ASMMoxyStubber<T> extends AbstractASMMoxyVerifier implements MoxyStubber<T> {
   public ASMMoxyStubber(final ASMMoxyEngine engine, final List<Invocation> invocations) {
-    super(engine, invocations);
+    super(engine, Collections.unmodifiableList(invocations));
   }
 
   @Override

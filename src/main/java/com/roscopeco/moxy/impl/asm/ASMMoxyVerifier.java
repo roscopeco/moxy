@@ -23,6 +23,7 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -32,8 +33,8 @@ import org.opentest4j.AssertionFailedError;
 import com.roscopeco.moxy.api.MoxyVerifier;
 
 class ASMMoxyVerifier extends AbstractASMMoxyVerifier implements MoxyVerifier {
-  public ASMMoxyVerifier(final ASMMoxyEngine engine, final List<Invocation> theInvocations) {
-    super(engine, theInvocations);
+  public ASMMoxyVerifier(final ASMMoxyEngine engine, final List<Invocation> invocations) {
+    super(engine, Collections.unmodifiableList(invocations));
   }
 
   @Override

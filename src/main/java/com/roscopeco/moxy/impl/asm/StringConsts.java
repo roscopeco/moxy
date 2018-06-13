@@ -2,6 +2,8 @@ package com.roscopeco.moxy.impl.asm;
 
 enum StringConsts {
   SPACE(" "),
+  TAB("\t"),
+  EOL("\n"),
   COMMA_SPACE(", "),
   LSQPAREN("["),
   RSQPAREN("]"),

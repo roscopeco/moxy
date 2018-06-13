@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.roscopeco</groupId>
 	<artifactId>moxy</artifactId>
-	<version>0.86.0</version>
+	<version>0.87.0-SNAPSHOT</version>
 	<name>Moxy</name>
 	<description>Fluent API mocking/spying framework for Java.</description>
 	<inceptionYear>2018</inceptionYear>

@@ -15,7 +15,6 @@
 	
 	<properties>
 		<asm.version>6.2</asm.version>
-		<opentest4j.version>1.0.0</opentest4j.version>
 		<commons.lang3.version>3.7</commons.lang3.version>
 	</properties>
 

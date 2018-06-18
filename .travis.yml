@@ -10,8 +10,10 @@ jdk:
         - oraclejdk8
         - oraclejdk9
         - openjdk8
-        - openjdk9
-        - openjdk10
+# Testing disabled on openjdk 9/10 due to certificate issues. Oracle JDK 10 to be added ASAP.
+#       - openjdk9
+#       - openjdk10
+
 script:
         - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
 cache:

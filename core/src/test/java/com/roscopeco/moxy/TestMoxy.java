@@ -31,7 +31,7 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.roscopeco.moxy.api.Mock;
+import com.roscopeco.moxy.api.MoxyMock;
 import com.roscopeco.moxy.api.MockGenerationException;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.model.ClassWithNoNullConstructor;
@@ -99,7 +99,7 @@ public class TestMoxy {
   public void testMoxyMockHasIsMockAnnotation() {
     final SimpleClass mock = Moxy.mock(SimpleClass.class);
 
-    assertThat(mock.getClass()).hasAnnotation(Mock.class);
+    assertThat(mock.getClass()).hasAnnotation(MoxyMock.class);
   }
 
   @Test

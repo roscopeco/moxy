@@ -32,7 +32,7 @@ import java.util.Arrays;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
-import com.roscopeco.moxy.api.Mock;
+import com.roscopeco.moxy.api.MoxyMock;
 
 /**
  * Creates mocks from interfaces.
@@ -65,7 +65,7 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
                 newInterfaces.toArray(new String[newInterfaces.size()]));
 
     // Add the IsMock annotation
-    this.visitAnnotation(Type.getDescriptor(Mock.class), true).visitEnd();
+    this.visitAnnotation(Type.getDescriptor(MoxyMock.class), true).visitEnd();
   }
 
   @Override

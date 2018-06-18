@@ -41,7 +41,7 @@ import org.objectweb.asm.util.TraceClassVisitor;
 
 import com.roscopeco.moxy.api.InvocationRunnable;
 import com.roscopeco.moxy.api.InvocationSupplier;
-import com.roscopeco.moxy.api.Mock;
+import com.roscopeco.moxy.api.MoxyMock;
 import com.roscopeco.moxy.api.MockGenerationException;
 import com.roscopeco.moxy.api.MonitoredInvocationException;
 import com.roscopeco.moxy.api.MoxyEngine;
@@ -240,7 +240,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @Override
   public boolean isMock(final Class<?> clz) {
-    return clz.getAnnotation(Mock.class) != null;
+    return clz.getAnnotation(MoxyMock.class) != null;
   }
 
   /*

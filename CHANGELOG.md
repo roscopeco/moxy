@@ -22,6 +22,7 @@ to make it into a release soon.
 ### Added
 
 - JUnit 5 extension to reset mocks before each test.
+- Simple annotations support and JUnit extension to support same
 
 ### Changed
 

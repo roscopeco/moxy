@@ -1,5 +1,5 @@
 /*
- * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
+ * Spyee.java -
  *
  * Copyright 2018 Ross Bamford
  *
@@ -21,15 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package com.roscopeco.moxy.annotations.model;
 
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Mock {
+public class TesterClass {
+  public static final String PASSED = "PASSED";
 
+  public String test() {
+    return PASSED;
+  }
 }

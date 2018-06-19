@@ -21,15 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package com.roscopeco.moxy.annotations.junit5;
 
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Mock {
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
+import com.roscopeco.moxy.annotations.MoxyAnnotations;
+
+/**
+ * JUnit 5 extension to initialise mocks on a test.
+ *
+ * <pre><code>
+ *   @ExtendWith(InitMocks.class)
+ *   public class TestClass {
+ *
+ *     @Mock
+ *     public SomeClass mockSomeClass;
+ *
+ *     // ...
+ *
+ *   }
+ * </code></pre>
+ *
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ */
+public class InitMocks implements BeforeEachCallback {
+  @Override
+  public void beforeEach(final ExtensionContext context) throws Exception {
+    context.getTestInstance().ifPresent(test -> MoxyAnnotations.initMocks(test));
+  }
 }

@@ -21,15 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package com.roscopeco.moxy.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.roscopeco.moxy.api.MoxyException;
 
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Mock {
+/**
+ * TODO Document InitializationException
+ *
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ */
+public class InitializationException extends MoxyException {
+  private static final long serialVersionUID = 1L;
 
+  public InitializationException(final String message, final Throwable cause) {
+    super(message, cause);
+  }
+
+  public InitializationException(final Throwable cause) {
+    this("Error while initializing Moxy annotations; See cause", cause);
+  }
 }

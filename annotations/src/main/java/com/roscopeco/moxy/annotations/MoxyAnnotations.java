@@ -21,15 +21,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package com.roscopeco.moxy.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.reflect.Field;
 
-@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Mock {
+import com.roscopeco.moxy.Moxy;
 
+/**
+ * TODO Document MoxyAnnotations
+ *
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ */
+public class MoxyAnnotations {
+  private MoxyAnnotations() {
+    throw new UnsupportedOperationException(
+        "com.roscopeco.moxy.annotations.MoxyAnnotations is not designed for instantiation");
+  }
+
+  public static void initMocks(final Object test) {
+    for (final Field f : test.getClass().getDeclaredFields()) {
+      Object mock = null;
+
+      if (f.isAnnotationPresent(Mock.class)) {
+        mock = Moxy.mock(f.getType());
+      } else if (f.isAnnotationPresent(Spy.class)) {
+        mock = Moxy.spy(f.getType());
+      }
+
+      if (mock != null) {
+        f.setAccessible(true);
+
+        try {
+          f.set(test, mock);
+        } catch (final IllegalAccessException e) {
+          throw new InitializationException(e);
+        }
+      }
+    }
+  }
 }

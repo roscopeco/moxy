@@ -13,8 +13,53 @@ See also [Javadoc](https://roscopeco.github.io/moxy/).
 Moxy is a fairly lightweight yet surprisingly fully-featured mock/spy framework for use
 in testing Java code, with a fluent, IDE-friendly stubbing and assertion API.
 
-You can find full documentation [here](https://github.com/roscopeco/moxy/wiki), and
-Javadoc [here](https://roscopeco.github.io/moxy/overview-summary.html).
+### How do I use it?
+
+There's full documentation on [the wiki](https://github.com/roscopeco/moxy/wiki),
+which took quite a while to write, and which we try to keep as up-to-date as 
+possible.
+
+But in the spirit of getting you started, here's a [SSCCE](http://sscce.org/) we
+made earlier, paraphrased somewhat from our own tests:
+
+```java
+import org.junit.jupiter.api.Test;
+
+class TestClass {
+  public String sayHelloTo(final String who) {
+  	return "Hello, " + who;
+  }
+
+  public String hasTwoArgs(final String arg1, final int arg2) {
+    return "" + arg1 + arg2;
+  }
+}
+
+public class TestMultiVerifying {
+  @Test
+  public void testVerifying() {
+    final TestClass mock = Moxy.mock(TestClass.class);
+
+    mock.sayHelloTo("Bill");
+    mock.hasTwoArgs("one", 1);
+
+    Moxy.assertMocks(() -> {
+      mock.sayHelloTo("Steve");
+      mock.hasTwoArgs("two", 2);
+    })
+        .wereNotCalled();
+
+    Moxy.assertMocks(() -> {
+      mock.sayHelloTo("Bill");
+      mock.hasTwoArgs("one", 1);
+    })
+        .wereAllCalledOnce()
+        .inThatOrder();
+  }
+}
+```
+
+This barely scratches the surface though, so be sure to check out that [lovingly-crafted documentation](https://github.com/roscopeco/moxy/wiki).
   
 ### Requirements
 
@@ -83,54 +128,6 @@ Maven projects locally in the usual way.
 You can generate a bit of Javadoc with `mvn javadoc:javadoc`,
 which generates the docs in `target/apidocs`. The Javadoc for the current
 release can always be found at https://roscopeco.github.io/moxy/ .
-
-#### Using the code
-
-There's full documentation on [the wiki](https://github.com/roscopeco/moxy/wiki),
-which took quite a while to write, and which we try to keep as up-to-date as 
-possible.
-
-But in the spirit of getting you started, here's a [SSCCE](http://sscce.org/) we
-made earlier, paraphrased somewhat from our own tests:
-
-```java
-import org.junit.jupiter.api.Test;
-
-class TestClass {
-  public String sayHelloTo(final String who) {
-  	return "Hello, " + who;
-  }
-
-  public String hasTwoArgs(final String arg1, final int arg2) {
-    return "" + arg1 + arg2;
-  }
-}
-
-public class TestMultiVerifying {
-  @Test
-  public void testVerifying() {
-    final TestClass mock = Moxy.mock(TestClass.class);
-
-    mock.sayHelloTo("Bill");
-    mock.hasTwoArgs("one", 1);
-
-    Moxy.assertMocks(() -> {
-      mock.sayHelloTo("Steve");
-      mock.hasTwoArgs("two", 2);
-    })
-        .wereNotCalled();
-
-    Moxy.assertMocks(() -> {
-      mock.sayHelloTo("Bill");
-      mock.hasTwoArgs("one", 1);
-    })
-        .wereAllCalledOnce()
-        .inThatOrder();
-  }
-}
-```
-
-This barely scratches the surface though, so be sure to check out that [lovingly-crafted documentation](https://github.com/roscopeco/moxy/wiki).
 
 ### The legal bit
 

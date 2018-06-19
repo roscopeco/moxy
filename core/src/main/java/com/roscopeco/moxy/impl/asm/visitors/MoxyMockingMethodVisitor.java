@@ -300,9 +300,10 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
   // TODO This method is ridiculously long...
   void generateReturn() {
     final Label checkCallSuperLabel = new Label();
+    final Label checkDelegateLabel = new Label();
     final Label loadStubReturnLabel = new Label();
     final Label returnLabel = new Label();
-    final Label noCallSuperLabel = new Label();
+    final Label noCallSuperOrDelegateLabel = new Label();
 
     // Firstly, if stubbing is currently disabled, just generate a default
     // value and jump directly to return; Don't call super, don't return or throw,
@@ -346,7 +347,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
                                   SUPPORT_SHOULD_CALL_SUPER_DESCRIPTOR,
                                   true);
     this.delegate.visitInsn(ICONST_0);
-    this.delegate.visitJumpInsn(IF_ICMPEQ, noCallSuperLabel);
+    this.delegate.visitJumpInsn(IF_ICMPEQ, checkDelegateLabel);
 
     if (!this.wasAbstract) {
       // Handle super call
@@ -438,10 +439,129 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
       this.delegate.visitInsn(ATHROW);
     }
 
-    // Not calling super, so go with stubbing.
+    ////////////////////////////////////////
+    // No super call, so see if we should delegate...
+    this.delegate.visitLabel(checkDelegateLabel);
+
+    this.delegate.visitVarInsn(ALOAD, 0);
+    this.delegate.visitMethodInsn(INVOKEINTERFACE,
+                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
+                                  SUPPORT_SHOULD_DELEGATE_METHOD_NAME,
+                                  SUPPORT_SHOULD_DELEGATE_DESCRIPTOR,
+                                  true);
+
+    this.delegate.visitInsn(ICONST_0);
+    this.delegate.visitJumpInsn(IF_ICMPEQ, noCallSuperOrDelegateLabel);
+
+    // Delegating, so delegate.
+    this.delegate.visitVarInsn(ALOAD, 0);
+    this.delegate.visitMethodInsn(INVOKEINTERFACE,
+                         MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
+                         SUPPORT_RUN_DELEGATE_METHOD_NAME,
+                         SUPPORT_RUN_DELEGATE_DESCRIPTOR,
+                         true);
+
+    if (!this.isVoidMethod()) {
+      // Update the current invocation's return field to reflect the result
+      this.delegate.visitInsn(DUP);
+      this.delegate.visitVarInsn(ALOAD, 0);
+      this.delegate.visitInsn(SWAP);
+      this.delegate.visitInsn(ACONST_NULL);
+      this.delegate.visitMethodInsn(INVOKEINTERFACE,
+                                    MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
+                                    SUPPORT_UPDATECURRENTRETURNED_METHOD_NAME,
+                                    VOID_OBJECT_THROWABLE_DESCRIPTOR,
+                                    true);
+    }
+
+    // Unbox if necessary
+    switch (this.returnType.getDescriptor().charAt(0)) {
+    case BYTE_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitTypeInsn(CHECKCAST, BYTE_CLASS_INTERNAL_NAME);
+      this.delegate.visitMethodInsn(INVOKEVIRTUAL,
+                                    BYTE_CLASS_INTERNAL_NAME,
+                                    BYTEVALUE_METHOD_NAME,
+                                    BYTEVALUE_DESCRIPTOR,
+                                    false);
+      break;
+    case CHAR_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitTypeInsn(CHECKCAST, CHAR_CLASS_INTERNAL_NAME);
+      this.delegate.visitMethodInsn(INVOKEVIRTUAL,
+                                    CHAR_CLASS_INTERNAL_NAME,
+                                    CHARVALUE_METHOD_NAME,
+                                    CHARVALUE_DESCRIPTOR,
+                                    false);
+      break;
+    case SHORT_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitTypeInsn(CHECKCAST, SHORT_CLASS_INTERNAL_NAME);
+      this.delegate.visitMethodInsn(INVOKEVIRTUAL,
+                                    SHORT_CLASS_INTERNAL_NAME,
+                                    SHORTVALUE_METHOD_NAME,
+                                    SHORTVALUE_DESCRIPTOR,
+                                    false);
+      break;
+    case INT_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitTypeInsn(CHECKCAST, INT_CLASS_INTERNAL_NAME);
+      this.delegate.visitMethodInsn(INVOKEVIRTUAL,
+                                    INT_CLASS_INTERNAL_NAME,
+                                    INTVALUE_METHOD_NAME,
+                                    INTVALUE_DESCRIPTOR,
+                                    false);
+      break;
+    case BOOL_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitTypeInsn(CHECKCAST, BOOL_CLASS_INTERNAL_NAME);
+      this.delegate.visitMethodInsn(INVOKEVIRTUAL,
+                                    BOOL_CLASS_INTERNAL_NAME,
+                                    BOOLVALUE_METHOD_NAME,
+                                    BOOLVALUE_DESCRIPTOR,
+                                    false);
+      break;
+    case LONG_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitTypeInsn(CHECKCAST, LONG_CLASS_INTERNAL_NAME);
+      this.delegate.visitMethodInsn(INVOKEVIRTUAL,
+                                    LONG_CLASS_INTERNAL_NAME,
+                                    LONGVALUE_METHOD_NAME,
+                                    LONGVALUE_DESCRIPTOR,
+                                    false);
+      break;
+    case FLOAT_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitTypeInsn(CHECKCAST, FLOAT_CLASS_INTERNAL_NAME);
+      this.delegate.visitMethodInsn(INVOKEVIRTUAL,
+                                    FLOAT_CLASS_INTERNAL_NAME,
+                                    FLOATVALUE_METHOD_NAME,
+                                    FLOATVALUE_DESCRIPTOR,
+                                    false);
+      break;
+    case DOUBLE_PRIMITIVE_INTERNAL_NAME:
+      this.delegate.visitTypeInsn(CHECKCAST, DOUBLE_CLASS_INTERNAL_NAME);
+      this.delegate.visitMethodInsn(INVOKEVIRTUAL,
+                                    DOUBLE_CLASS_INTERNAL_NAME,
+                                    DOUBLEVALUE_METHOD_NAME,
+                                    DOUBLEVALUE_DESCRIPTOR,
+                                    false);
+      break;
+    case OBJECT_PRIMITIVE_INTERNAL_NAME:
+    case ARRAY_PRIMITIVE_INTERNAL_NAME:
+      // Checkcast to keep verifier happy
+      this.delegate.visitTypeInsn(CHECKCAST, this.returnType.getInternalName());
+      break;
+    case VOID_PRIMITIVE_INTERNAL_NAME:
+      // Void, pop null return from invoke.
+      this.delegate.visitInsn(POP);
+      break;
+    default:
+      throw new IllegalArgumentException(UNRECOGNISED_PRIMITIVE_TYPE + this.returnType + "'.\n"
+          + SUPER_NEW_JVM
+          + TO_FIX + "MoxyMockingMethodVisitor#generateReturn()");
+    }
+
+    this.delegate.visitJumpInsn(GOTO, returnLabel);
+
+    ///////////////////////////////////////////
+    // Not calling super or delegating, so go with stubbing.
     //
     // Firstly, we'll record the return and exception we are stubbed with, if any
-    this.delegate.visitLabel(noCallSuperLabel);
+    this.delegate.visitLabel(noCallSuperOrDelegateLabel);
 
     // Get the value this method will return (unless it also has a throw) or null if none.
     this.delegate.visitVarInsn(ALOAD, 0);

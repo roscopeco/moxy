@@ -106,6 +106,10 @@ public final class TypesAndDescriptors {
   public static final String SUPPORT_GETCURRENTRETURN_DESCRIPTOR = OBJECT_VOID_DESCRIPTOR;
   public static final String SUPPORT_SHOULD_CALL_SUPER_METHOD_NAME = "__moxy_asm_shouldCallSuperForCurrentInvocation";
   public static final String SUPPORT_SHOULD_CALL_SUPER_DESCRIPTOR = BOOLEAN_VOID_DESCRIPTOR;
+  public static final String SUPPORT_SHOULD_DELEGATE_METHOD_NAME = "__moxy_asm_shouldDelegateForCurrentInvocation";
+  public static final String SUPPORT_SHOULD_DELEGATE_DESCRIPTOR = BOOLEAN_VOID_DESCRIPTOR;
+  public static final String SUPPORT_RUN_DELEGATE_METHOD_NAME = "__moxy_asm_runCachedDelegate";
+  public static final String SUPPORT_RUN_DELEGATE_DESCRIPTOR = OBJECT_VOID_DESCRIPTOR;
   public static final String SUPPORT_RUN_DOACTIONS_METHOD_NAME = "__moxy_asm_runDoActionsForCurrentInvocation";
   public static final String SUPPORT_RUN_DOACTIONS_METHOD_DESCRIPTOR = VOID_VOID_DESCRIPTOR;
   public static final String SUPPORT_NULL_CONSTRUCTOR_THROWER_METHOD_NAME = "__moxy_asm_throwNullConstructorException";

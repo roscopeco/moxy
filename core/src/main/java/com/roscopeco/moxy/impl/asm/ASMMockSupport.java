@@ -23,6 +23,7 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
+import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,6 +68,12 @@ public interface ASMMockSupport {
 
   public default Deque<StubSuper> __moxy_asm_ensureStubSuperDeque(
       final Map<StubMethod, Deque<StubSuper>> superMap,
+      final StubMethod method) {
+    return superMap.computeIfAbsent(method, k-> new ArrayDeque<>());
+  }
+
+  public default Deque<StubDelegate> __moxy_asm_ensureStubDelegateDeque(
+      final Map<StubMethod, Deque<StubDelegate>> superMap,
       final StubMethod method) {
     return superMap.computeIfAbsent(method, k-> new ArrayDeque<>());
   }
@@ -123,6 +130,17 @@ public interface ASMMockSupport {
         superMap,
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
     deque.addFirst(new StubSuper(invocation.getArgs(), true));
+  }
+
+  public default void __moxy_asm_setDelegateTo(final Invocation invocation,
+                                               final Method method,
+                                               final Object delegate) {
+    final Map<StubMethod, Deque<StubDelegate>> delegateMap = __moxy_asm_ivars().getDelegateMap();
+    final Deque<StubDelegate> deque = __moxy_asm_ensureStubDelegateDeque(
+        delegateMap,
+        new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
+    deque.addFirst(new StubDelegate(invocation.getArgs(), method, delegate));
+
   }
 
   public default void __moxy_asm_addDoAction(final Invocation invocation,
@@ -229,6 +247,49 @@ public interface ASMMockSupport {
     return false;
   }
 
+  // ThreadLocal Cache for the stubdelegate - saves two lookups, argsmatch, etc.
+  //
+  // NOTE: This relies on generated code delegating immediately
+  // if shouldDelegateForInvocation is true!
+  //
+  // It is subsequently cleared in runDelegateForInvocation...
+  static final ThreadLocal<StubDelegate> stubDelegateCache = new ThreadLocal<>();
+
+  public default boolean __moxy_asm_shouldDelegateForInvocation(final Invocation invocation) {
+    final ASMMockInstanceVars ivars = this.__moxy_asm_ivars();
+    final Map<StubMethod, Deque<StubDelegate>> delegateMap = ivars.getDelegateMap();
+    final ASMMoxyMatcherEngine matchEngine = ivars.getEngine().getMatcherEngine();
+    final Deque<StubDelegate> deque = delegateMap.get(
+        new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
+
+    // Old-fashioned but a tad more efficient...
+    if (deque != null) {
+      for (final StubDelegate stubDelegate : deque) {
+        if (matchEngine.argsMatch(invocation.getArgs(), stubDelegate.args)) {
+          stubDelegateCache.set(stubDelegate);
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  public default Object __moxy_asm_runCachedDelegate() {
+    final StubDelegate stubDelegate = stubDelegateCache.get();
+
+    if (stubDelegate.equals(null)) {
+      throw new IllegalStateException("[BUG] Attempted to run cached delegate, but cache was empty");
+    }
+
+    try {
+      return stubDelegate.invoke();
+    } finally {
+      stubDelegateCache.set(null);
+    }
+  }
+
+
   public default void __moxy_asm_runDoActionsForInvocation(final Invocation invocation) {
     if (invocation == null) {
       throw new InvalidMockInvocationException("[BUG] Mock callback to support with no recorded invocation\n"
@@ -281,6 +342,15 @@ public interface ASMMockSupport {
    */
   public default boolean __moxy_asm_shouldCallSuperForCurrentInvocation() {
     return __moxy_asm_shouldCallSuperForInvocation(
+        __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation());
+  }
+
+  /* This MUST only ever be called from mocked methods AFTER the invocation has been
+   * recorded. It relies on the fact that getLastInvocation will always be the current
+   * invocation just prior to throw or return.
+   */
+  public default boolean __moxy_asm_shouldDelegateForCurrentInvocation() {
+    return __moxy_asm_shouldDelegateForInvocation(
         __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation());
   }
 

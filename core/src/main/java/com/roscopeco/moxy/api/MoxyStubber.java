@@ -100,6 +100,8 @@ public interface MoxyStubber<T> {
    */
   public void thenAnswer(AnswerProvider<T> provider);
 
+  public void thenDelegateTo(Object delegate);
+
   /**
    * <p>Add a <em>doAction</em> to this method.</p>
    *

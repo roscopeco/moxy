@@ -19,7 +19,14 @@ make it in before 1.0.0.
 These changes are currently in the `develop` branch, and are slated
 to make it into a release soon.
 
-**Latest release is up-to-date**
+### Added
+
+- JUnit 5 extension to reset mocks before each test.
+
+### Changed
+
+- Removed restriction on applying different behaviours or stubbing to
+  already-stubbed methods.
 
 ## [0.86.0] - 2018-06-13
 

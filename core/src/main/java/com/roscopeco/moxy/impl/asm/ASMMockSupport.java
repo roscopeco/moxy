@@ -92,39 +92,21 @@ public interface ASMMockSupport {
     }
 
     if (isReturn) {
-      if (__moxy_asm_getThrowForInvocation(invocation) != null
-          || __moxy_asm_shouldCallSuperForInvocation(invocation)) {
-        throw new IllegalStateException("Cannot set return for '"
-                                        + TypeStringUtils.javaMethodSignature(invocation)
-                                        + "' "
-                                        + TypeStringUtils.buildArgsString(invocation)
-                                        + "as it has already been stubbed to throw or call real method");
-      } else {
-        final Map<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_ivars().getReturnMap();
-        final Deque<StubReturn> deque = __moxy_asm_ensureStubReturnDeque(
-            returnMap,
-            new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
-        deque.addFirst(new StubReturn(invocation.getArgs(), object));
-      }
+      final Map<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_ivars().getReturnMap();
+      final Deque<StubReturn> deque = __moxy_asm_ensureStubReturnDeque(
+          returnMap,
+          new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
+      deque.addFirst(new StubReturn(invocation.getArgs(), object));
     } else {
-      if (__moxy_asm_getReturnForInvocation(invocation) != null
-          || __moxy_asm_shouldCallSuperForInvocation(invocation)) {
-        throw new IllegalStateException("Cannot set throw for '"
-                                        + TypeStringUtils.javaMethodSignature(invocation)
-                                        + "' "
-                                        + TypeStringUtils.buildArgsString(invocation)
-                                        + "as it has already been stubbed to return or call real method");
-      } else {
-        final Map<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_ivars().getThrowMap();
-        final Deque<StubThrow> deque = __moxy_asm_ensureStubThrowDeque(
-            throwMap,
-            new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
+      final Map<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_ivars().getThrowMap();
+      final Deque<StubThrow> deque = __moxy_asm_ensureStubThrowDeque(
+          throwMap,
+          new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
 
-        if (object instanceof Throwable) {
-          deque.addFirst(new StubThrow(invocation.getArgs(), (Throwable)object));
-        } else {
-          throw new IllegalArgumentException("Cannot throw non-Throwable class " + object.getClass().getName());
-        }
+      if (object instanceof Throwable) {
+        deque.addFirst(new StubThrow(invocation.getArgs(), (Throwable)object));
+      } else {
+        throw new IllegalArgumentException("Cannot throw non-Throwable class " + object.getClass().getName());
       }
     }
   }
@@ -136,20 +118,11 @@ public interface ASMMockSupport {
                                              + "(If you're testing the framework; may indicate an incomplete partial mock engine)");
     }
 
-    if (__moxy_asm_getThrowForInvocation(invocation) != null
-        || __moxy_asm_getReturnForInvocation(invocation) != null) {
-      throw new IllegalStateException("Cannot call real method for '"
-                                    + TypeStringUtils.javaMethodSignature(invocation)
-                                    + "' "
-                                    + TypeStringUtils.buildArgsString(invocation)
-                                    + "as it has already been stubbed");
-    } else {
-      final Map<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_ivars().getCallSuperMap();
-      final Deque<StubSuper> deque = __moxy_asm_ensureStubSuperDeque(
-          superMap,
-          new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
-      deque.addFirst(new StubSuper(invocation.getArgs(), true));
-    }
+    final Map<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_ivars().getCallSuperMap();
+    final Deque<StubSuper> deque = __moxy_asm_ensureStubSuperDeque(
+        superMap,
+        new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
+    deque.addFirst(new StubSuper(invocation.getArgs(), true));
   }
 
   public default void __moxy_asm_addDoAction(final Invocation invocation,

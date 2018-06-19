@@ -82,50 +82,11 @@ public class TestASMMockSupport extends AbstractImplTest {
   }
 
   @Test
-  public void testSetReturnAndThrowFails() {
-    this.mock.__moxy_asm_setThrowOrReturn(this.invoc, this.returnMarker, true);
-
-    assertThatThrownBy(() ->
-        this.mock.__moxy_asm_setThrowOrReturn(this.invoc, this.throwMarker, false)
-    )
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessage("Cannot set throw for 'void test(java.lang.String, java.lang.String)' with arguments (\"arg1\", \"arg2\") as it has already been stubbed to return or call real method");
-  }
-
-  @Test
-  public void testSetThrowAndReturnFails() {
-    this.mock.__moxy_asm_setThrowOrReturn(this.invoc, this.throwMarker, false);
-
-    assertThatThrownBy(() ->
-        this.mock.__moxy_asm_setThrowOrReturn(this.invoc, this.returnMarker, true)
-    )
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessage("Cannot set return for 'void test(java.lang.String, java.lang.String)' with arguments (\"arg1\", \"arg2\") as it has already been stubbed to throw or call real method");
-  }
-
-  @Test
   public void testSetCallSuper() {
     assertThat(this.mock.__moxy_asm_shouldCallSuperForInvocation(this.invoc)).isFalse();
 
     this.mock.__moxy_asm_setShouldCallSuper(this.invoc, true);
     assertThat(this.mock.__moxy_asm_shouldCallSuperForInvocation(this.invoc)).isTrue();
-  }
-
-  @Test
-  public void testSetReturnAndThrowFailFastIfSetCallSuper() {
-    this.mock.__moxy_asm_setShouldCallSuper(this.invoc, true);
-
-    assertThatThrownBy(() ->
-        this.mock.__moxy_asm_setThrowOrReturn(this.invoc, this.returnMarker, true)
-    )
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessage("Cannot set return for 'void test(java.lang.String, java.lang.String)' with arguments (\"arg1\", \"arg2\") as it has already been stubbed to throw or call real method");
-
-    assertThatThrownBy(() ->
-        this.mock.__moxy_asm_setThrowOrReturn(this.invoc, this.throwMarker, false)
-    )
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessage("Cannot set throw for 'void test(java.lang.String, java.lang.String)' with arguments (\"arg1\", \"arg2\") as it has already been stubbed to return or call real method");
   }
 
   @Test

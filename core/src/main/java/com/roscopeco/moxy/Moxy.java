@@ -689,7 +689,7 @@ public final class Moxy {
    *
    * <p>How this determination is made is engine-dependent, but may
    * rely on the fact that the class has the (mandatory)
-   * {@link com.roscopeco.moxy.api.Mock} annotation.</p>
+   * {@link com.roscopeco.moxy.api.MoxyMock} annotation.</p>
    *
    * @param clz The class to query.
    *
@@ -706,7 +706,7 @@ public final class Moxy {
    *
    * <p>How this determination is made is engine-dependent, but may
    * rely on the fact that the class has the (mandatory)
-   * {@link com.roscopeco.moxy.api.Mock} annotation.</p>
+   * {@link com.roscopeco.moxy.api.MoxyMock} annotation.</p>
    *
    * @param obj The object to query.
    *

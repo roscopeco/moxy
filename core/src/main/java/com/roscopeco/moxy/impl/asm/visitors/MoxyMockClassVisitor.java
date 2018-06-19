@@ -35,7 +35,7 @@ import java.util.Set;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
-import com.roscopeco.moxy.api.Mock;
+import com.roscopeco.moxy.api.MoxyMock;
 
 /**
  * Creates mocks from classes.
@@ -71,7 +71,7 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
                 this.originalClassInternalName,
                 newInterfaces.toArray(new String[newInterfaces.size()]));
 
-    this.visitAnnotation(Type.getDescriptor(Mock.class), true).visitEnd();
+    this.visitAnnotation(Type.getDescriptor(MoxyMock.class), true).visitEnd();
   }
 
   private boolean isToMock(final String name, final String desc) {

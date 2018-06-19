@@ -415,47 +415,76 @@ public final class Moxy {
    *
    * Used when converting a newly-created mock.
    */
-  static <T> T spy(final T mock, final boolean doReset) {
-    if (!isMock(mock)) {
-      throw new IllegalArgumentException("Cannot convert "
-                                         + mock.toString()
-                                         + " to spy - it is not a mock");
-    }
+  static <T> T spy(final T original, final boolean doReset) {
+    if (!isMock(original)) {
+      // Is real object - spying delegate
+      final Object newMock = mock(original.getClass());
 
-    if (doReset) {
-      resetMock(mock);
-    }
-
-    Arrays.stream(mock.getClass().getDeclaredMethods()).forEach(method -> {
-      if (!method.getName().startsWith("__moxy_asm")) {
-        Moxy.when(() -> method.invoke(mock,
-              Arrays.stream(method.getParameterTypes()).map(type -> {
-                switch (type.toString()) {
-                case PRIMITIVE_BYTE_TYPE:
-                  return Matchers.anyByte();
-                case PRIMITIVE_CHAR_TYPE:
-                  return Matchers.anyChar();
-                case PRIMITIVE_SHORT_TYPE:
-                  return Matchers.anyShort();
-                case PRIMITIVE_INT_TYPE:
-                  return Matchers.anyInt();
-                case PRIMITIVE_LONG_TYPE:
-                  return Matchers.anyLong();
-                case PRIMITIVE_FLOAT_TYPE:
-                  return Matchers.anyFloat();
-                case PRIMITIVE_DOUBLE_TYPE:
-                  return Matchers.anyDouble();
-                case PRIMITIVE_BOOLEAN_TYPE:
-                  return Matchers.anyBool();
-                default:
-                  return Matchers.any();
-                }
-              }).toArray())
-        ).thenCallRealMethod();
+      Arrays.stream(original.getClass().getDeclaredMethods()).forEach(method -> {
+        if (!method.getName().startsWith("__moxy_asm")) {
+          Moxy.when(() -> method.invoke(newMock,
+                Arrays.stream(method.getParameterTypes()).map(type -> {
+                  switch (type.toString()) {
+                  case PRIMITIVE_BYTE_TYPE:
+                    return Matchers.anyByte();
+                  case PRIMITIVE_CHAR_TYPE:
+                    return Matchers.anyChar();
+                  case PRIMITIVE_SHORT_TYPE:
+                    return Matchers.anyShort();
+                  case PRIMITIVE_INT_TYPE:
+                    return Matchers.anyInt();
+                  case PRIMITIVE_LONG_TYPE:
+                    return Matchers.anyLong();
+                  case PRIMITIVE_FLOAT_TYPE:
+                    return Matchers.anyFloat();
+                  case PRIMITIVE_DOUBLE_TYPE:
+                    return Matchers.anyDouble();
+                  case PRIMITIVE_BOOLEAN_TYPE:
+                    return Matchers.anyBool();
+                  default:
+                    return Matchers.any();
+                  }
+                }).toArray())
+          ).thenDelegateTo(original);
+        }
+      });
+    } else {
+      // Is mock - make spy
+      if (doReset) {
+        resetMock(original);
       }
-    });
 
-    return mock;
+      Arrays.stream(original.getClass().getDeclaredMethods()).forEach(method -> {
+        if (!method.getName().startsWith("__moxy_asm")) {
+          Moxy.when(() -> method.invoke(original,
+                Arrays.stream(method.getParameterTypes()).map(type -> {
+                  switch (type.toString()) {
+                  case PRIMITIVE_BYTE_TYPE:
+                    return Matchers.anyByte();
+                  case PRIMITIVE_CHAR_TYPE:
+                    return Matchers.anyChar();
+                  case PRIMITIVE_SHORT_TYPE:
+                    return Matchers.anyShort();
+                  case PRIMITIVE_INT_TYPE:
+                    return Matchers.anyInt();
+                  case PRIMITIVE_LONG_TYPE:
+                    return Matchers.anyLong();
+                  case PRIMITIVE_FLOAT_TYPE:
+                    return Matchers.anyFloat();
+                  case PRIMITIVE_DOUBLE_TYPE:
+                    return Matchers.anyDouble();
+                  case PRIMITIVE_BOOLEAN_TYPE:
+                    return Matchers.anyBool();
+                  default:
+                    return Matchers.any();
+                  }
+                }).toArray())
+          ).thenCallRealMethod();
+        }
+      });
+    }
+
+    return original;
   }
 
   /**

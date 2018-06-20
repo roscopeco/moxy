@@ -415,6 +415,8 @@ public final class Moxy {
    *
    * Used when converting a newly-created mock.
    */
+  // TODO DRY this
+  @SuppressWarnings("unchecked")
   static <T> T spy(final T original, final boolean doReset) {
     if (!isMock(original)) {
       // Is real object - spying delegate
@@ -448,6 +450,8 @@ public final class Moxy {
           ).thenDelegateTo(original);
         }
       });
+
+      return (T)newMock;
     } else {
       // Is mock - make spy
       if (doReset) {
@@ -482,9 +486,9 @@ public final class Moxy {
           ).thenCallRealMethod();
         }
       });
-    }
 
-    return original;
+      return original;
+    }
   }
 
   /**

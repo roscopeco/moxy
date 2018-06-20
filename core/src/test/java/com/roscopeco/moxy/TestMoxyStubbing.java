@@ -144,4 +144,17 @@ public class TestMoxyStubbing {
       throw new AssertionFailedError("Expected no exception but got " + e.getMessage());
     }
   }
+
+  @Test
+  public void testMoxyMockWithMockThenCallSuperThenReturnReplacesPriorStubbing() {
+    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+
+    Moxy.when(() -> mock.sayHelloTo("Bill")).thenCallRealMethod();
+
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hello, Bill");
+
+    Moxy.when(() -> mock.sayHelloTo("Bill")).thenReturn("Goodbye, Bill");
+
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Goodbye, Bill");
+  }
 }

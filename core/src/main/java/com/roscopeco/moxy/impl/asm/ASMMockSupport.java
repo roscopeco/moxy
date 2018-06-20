@@ -23,6 +23,7 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
+import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +31,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import com.roscopeco.moxy.api.AnswerProvider;
 import com.roscopeco.moxy.api.InvalidMockInvocationException;
@@ -53,32 +55,46 @@ public interface ASMMockSupport {
     return __moxy_asm_ivars().getEngine().getRecorder();
   }
 
-  public default Deque<StubReturn>__moxy_asm_ensureStubReturnDeque(
-      final Map<StubMethod, Deque<StubReturn>> returnMap,
-      final StubMethod method) {
-    return returnMap.computeIfAbsent(method, k -> new ArrayDeque<>());
-  }
-
-  public default Deque<StubThrow>__moxy_asm_ensureStubThrowDeque(
-      final Map<StubMethod, Deque<StubThrow>> throwMap,
-      final StubMethod method) {
-    return throwMap.computeIfAbsent(method, k -> new ArrayDeque<>());
-  }
-
-  public default Deque<StubSuper> __moxy_asm_ensureStubSuperDeque(
-      final Map<StubMethod, Deque<StubSuper>> superMap,
-      final StubMethod method) {
-    return superMap.computeIfAbsent(method, k-> new ArrayDeque<>());
-  }
-
-  public default List<StubDoActions> __moxy_asm_ensureDoActionsList(
-      final Map<StubMethod, List<StubDoActions>> doActionsMap,
-      final StubMethod method) {
-    return doActionsMap.computeIfAbsent(method, k -> new ArrayList<>());
-  }
-
   public default String __moxy_asm_makeJavaSignature(final String name, final String desc) {
     return TypeStringUtils.javaMethodSignature(name, desc);
+  }
+
+  public default <T extends AbstractStub> void __moxy_asm_removeStubbingFrom(
+                final Map<StubMethod, Deque<T>> map,
+                final StubMethod stubMethod,
+                final Invocation invocation) {
+    final Deque<T> deque = map.get(stubMethod);
+
+    if (deque != null) {
+      final ASMMoxyMatcherEngine matchEngine = __moxy_asm_ivars().getEngine().getMatcherEngine();
+
+      final Deque<T> newDeque = new ArrayDeque<>(deque.stream()
+          .filter(obj -> !matchEngine.argsMatch(invocation.getArgs(), obj.args))
+          .collect(Collectors.toList()));
+
+      map.put(stubMethod, newDeque);
+    }
+  }
+
+  // TODO move to private methods class
+  public default void __moxy_asm_removePriorStubbing(final StubMethod stubMethod, final Invocation invocation) {
+    __moxy_asm_removeStubbingFrom(__moxy_asm_ivars().getReturnMap(), stubMethod, invocation);
+    __moxy_asm_removeStubbingFrom(__moxy_asm_ivars().getThrowMap(), stubMethod, invocation);
+    __moxy_asm_removeStubbingFrom(__moxy_asm_ivars().getCallSuperMap(), stubMethod, invocation);
+    __moxy_asm_removeStubbingFrom(__moxy_asm_ivars().getDelegateMap(), stubMethod, invocation);
+  }
+
+  // TODO move to private methods class
+  public default <T extends AbstractStub> void __moxy_asm_safelySetStubbing(
+                final Map<StubMethod, Deque<T>> map,
+                final Invocation invocation,
+                final T stubbing) {
+    synchronized (__moxy_asm_ivars()) {
+      final StubMethod stubMethod = new StubMethod(invocation.getMethodName(), invocation.getMethodDesc());
+      __moxy_asm_removePriorStubbing(stubMethod, invocation);
+      final Deque<T> deque = map.computeIfAbsent(stubMethod, k -> new ArrayDeque<>());
+      deque.addFirst(stubbing);
+    }
   }
 
   public default void __moxy_asm_setThrowOrReturn(final Invocation invocation,
@@ -93,18 +109,11 @@ public interface ASMMockSupport {
 
     if (isReturn) {
       final Map<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_ivars().getReturnMap();
-      final Deque<StubReturn> deque = __moxy_asm_ensureStubReturnDeque(
-          returnMap,
-          new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
-      deque.addFirst(new StubReturn(invocation.getArgs(), object));
+      __moxy_asm_safelySetStubbing(returnMap, invocation, new StubReturn(invocation.getArgs(), object));
     } else {
       final Map<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_ivars().getThrowMap();
-      final Deque<StubThrow> deque = __moxy_asm_ensureStubThrowDeque(
-          throwMap,
-          new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
-
       if (object instanceof Throwable) {
-        deque.addFirst(new StubThrow(invocation.getArgs(), (Throwable)object));
+        __moxy_asm_safelySetStubbing(throwMap, invocation, new StubThrow(invocation.getArgs(), (Throwable)object));
       } else {
         throw new IllegalArgumentException("Cannot throw non-Throwable class " + object.getClass().getName());
       }
@@ -119,10 +128,14 @@ public interface ASMMockSupport {
     }
 
     final Map<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_ivars().getCallSuperMap();
-    final Deque<StubSuper> deque = __moxy_asm_ensureStubSuperDeque(
-        superMap,
-        new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
-    deque.addFirst(new StubSuper(invocation.getArgs(), true));
+    __moxy_asm_safelySetStubbing(superMap, invocation, new StubSuper(invocation.getArgs(), true));
+  }
+
+  public default void __moxy_asm_setDelegateTo(final Invocation invocation,
+                                               final Method method,
+                                               final Object delegate) {
+    final Map<StubMethod, Deque<StubDelegate>> delegateMap = __moxy_asm_ivars().getDelegateMap();
+    __moxy_asm_safelySetStubbing(delegateMap, invocation, new StubDelegate(invocation.getArgs(), method, delegate));
   }
 
   public default void __moxy_asm_addDoAction(final Invocation invocation,
@@ -136,9 +149,9 @@ public interface ASMMockSupport {
 
     final ASMMoxyMatcherEngine matchEngine = ivars.getEngine().getMatcherEngine();
     final Map<StubMethod, List<StubDoActions>> doActionsMap = ivars.getDoActionsMap();
-    final List<StubDoActions> list = __moxy_asm_ensureDoActionsList(
-        doActionsMap,
-        new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
+    final List<StubDoActions> list = doActionsMap.computeIfAbsent(
+        new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()),
+        k -> new ArrayList<>());
 
     StubDoActions matchingStub = null;
 
@@ -229,6 +242,49 @@ public interface ASMMockSupport {
     return false;
   }
 
+  // ThreadLocal Cache for the stubdelegate - saves two lookups, argsmatch, etc.
+  //
+  // NOTE: This relies on generated code delegating immediately
+  // if shouldDelegateForInvocation is true!
+  //
+  // It is subsequently cleared in runDelegateForInvocation...
+  static final ThreadLocal<StubDelegate> stubDelegateCache = new ThreadLocal<>();
+
+  public default boolean __moxy_asm_shouldDelegateForInvocation(final Invocation invocation) {
+    final ASMMockInstanceVars ivars = this.__moxy_asm_ivars();
+    final Map<StubMethod, Deque<StubDelegate>> delegateMap = ivars.getDelegateMap();
+    final ASMMoxyMatcherEngine matchEngine = ivars.getEngine().getMatcherEngine();
+    final Deque<StubDelegate> deque = delegateMap.get(
+        new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
+
+    // Old-fashioned but a tad more efficient...
+    if (deque != null) {
+      for (final StubDelegate stubDelegate : deque) {
+        if (matchEngine.argsMatch(invocation.getArgs(), stubDelegate.args)) {
+          stubDelegateCache.set(stubDelegate);
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  public default Object __moxy_asm_runCachedDelegate() {
+    final StubDelegate stubDelegate = stubDelegateCache.get();
+
+    if (stubDelegate.equals(null)) {
+      throw new IllegalStateException("[BUG] Attempted to run cached delegate, but cache was empty");
+    }
+
+    try {
+      return stubDelegate.invoke();
+    } finally {
+      stubDelegateCache.set(null);
+    }
+  }
+
+
   public default void __moxy_asm_runDoActionsForInvocation(final Invocation invocation) {
     if (invocation == null) {
       throw new InvalidMockInvocationException("[BUG] Mock callback to support with no recorded invocation\n"
@@ -281,6 +337,15 @@ public interface ASMMockSupport {
    */
   public default boolean __moxy_asm_shouldCallSuperForCurrentInvocation() {
     return __moxy_asm_shouldCallSuperForInvocation(
+        __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation());
+  }
+
+  /* This MUST only ever be called from mocked methods AFTER the invocation has been
+   * recorded. It relies on the fact that getLastInvocation will always be the current
+   * invocation just prior to throw or return.
+   */
+  public default boolean __moxy_asm_shouldDelegateForCurrentInvocation() {
+    return __moxy_asm_shouldDelegateForInvocation(
         __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation());
   }
 

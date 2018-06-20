@@ -32,14 +32,12 @@ import java.util.function.Consumer;
  * This is used as the value in the stubbed returnMap
  * on the mocks.
  */
-final class StubDoActions {
-  final List<Object> args;
+final class StubDoActions extends AbstractStub {
   final List<Consumer<List<?extends Object>>> actions;
 
   @SafeVarargs
   public StubDoActions(final List<Object> args, final Consumer<List<?extends Object>>... actions) {
-    super();
-    this.args = args;
+    super(args);
     this.actions = new ArrayList<>();
 
     Arrays.stream(actions).forEach(this.actions::add);

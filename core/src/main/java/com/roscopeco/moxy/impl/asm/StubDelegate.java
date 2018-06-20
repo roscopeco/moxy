@@ -23,17 +23,37 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
+import com.roscopeco.moxy.api.MoxyException;
+
 /*
- * This is used as the value in the stubbed returnMap
+ * This is used as the value in the stubbed delegateTo
  * on the mocks.
  */
-final class StubReturn extends AbstractStub {
-  final Object toReturn;
+final class StubDelegate extends AbstractStub {
+  Method method;
+  final Object delegate;
 
-  public StubReturn(final List<Object> args, final Object toReturn) {
+  public StubDelegate(final List<Object> args,
+                      final Method method,
+                      final Object delegate) {
     super(args);
-    this.toReturn = toReturn;
+    this.method = method;
+    this.delegate = delegate;
+  }
+
+  // TODO is this worth generating code for?
+  Object invoke() {
+    try {
+      this.method.setAccessible(true);
+      return this.method.invoke(this.delegate, this.args.toArray(new Object[this.args.size()]));
+    } catch (final InvocationTargetException e) {
+      throw new MoxyException("Exception invoking delegate: " + e.getCause());
+    } catch (final IllegalAccessException e) {
+      throw new MoxyException("IllegalAccessException while calling delegate", e);
+    }
   }
 }

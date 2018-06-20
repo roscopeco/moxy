@@ -29,13 +29,11 @@ import java.util.List;
  * This is used as the value in the stubbed superMap
  * on the mocks.
  */
-final class StubSuper {
-  final List<Object> args;
+final class StubSuper extends AbstractStub {
   final boolean callSuper;
 
   public StubSuper(final List<Object> args, final boolean callSuper) {
-    super();
-    this.args = args;
+    super(args);
     this.callSuper = callSuper;
   }
 }

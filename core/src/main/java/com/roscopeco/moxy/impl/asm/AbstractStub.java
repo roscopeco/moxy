@@ -21,19 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package com.roscopeco.moxy.impl.asm;
 
 import java.util.List;
 
-/*
- * This is used as the value in the stubbed returnMap
- * on the mocks.
- */
-final class StubReturn extends AbstractStub {
-  final Object toReturn;
+abstract class AbstractStub {
+  final List<Object> args;
 
-  public StubReturn(final List<Object> args, final Object toReturn) {
-    super(args);
-    this.toReturn = toReturn;
+  public AbstractStub(final List<Object> args) {
+    this.args = args;
   }
 }

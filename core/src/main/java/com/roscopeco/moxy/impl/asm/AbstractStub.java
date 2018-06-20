@@ -1,5 +1,5 @@
 /*
- * AbstractStub.java -
+ * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
  *
  * Copyright 2018 Ross Bamford
  *
@@ -26,11 +26,6 @@ package com.roscopeco.moxy.impl.asm;
 
 import java.util.List;
 
-/**
- * TODO Document AbstractStub
- *
- * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
- */
 abstract class AbstractStub {
   final List<Object> args;
 

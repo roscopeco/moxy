@@ -100,6 +100,39 @@ public interface MoxyStubber<T> {
    */
   public void thenAnswer(AnswerProvider<T> provider);
 
+  /**
+   * <p>Have this method delegate calls to the first compatible method on
+   * the given object.</p>
+   *
+   * <p>When this is applied to a mocked method, all calls will be delegated
+   * to an appropriate method on the given object. That means the method
+   * will:</p>
+   *
+   * <ul>
+   * <li>Not be static.</li>
+   * <li>Be accessible, given the current security context (if applicable).</li>
+   * <li>Have <em>exactly</em> the same return type as the mocked method.</li>
+   * <li>Have <em>exactly</em> the same number of arguments as the mocked method.</li>
+   * <li>Have <em>exactly</em> the same argument types as the mocked method.</li>
+   * </ul>
+   *
+   * <p>The name of the method is <em>not</em> taken into account.</p>
+   *
+   * <p>Note that, where several such methods exist, the first one encountered will
+   * be used (the actual ordering of the methods is, by virtue of JVM internals,
+   * undefined).</p>
+   *
+   * <p>When determining which method to call, inherited methods are <strong>not</strong>
+   * considered - only methods declared on the class of the supplied object are
+   * taken into account, regardless of their access modifiers.</p>
+   *
+   * <p>While in practice the supplied delegate will often be an object of the
+   * same class as the mock, this is not a requirement - the delegate can be
+   * of any type, and multiple methods on the same mock may each delegate to
+   * different objects, each of potentially different classes.</p>
+   *
+   * @param delegate An object with a compatible method.
+   */
   public void thenDelegateTo(Object delegate);
 
   /**

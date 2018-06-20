@@ -389,14 +389,28 @@ public final class Moxy {
   }
 
   /**
-   * <p>Convert the given mock instance into a spy.</p>
+   * <p>Convert the given object into a spy.</p>
+   *
+   * <p>This method can be used to convert any Object into a spy. It behaves
+   * differently depending on whether the passed object is a mock, or
+   * a standard object:</p>
+   *
+   * <ul>
+   * <li><p>If the given object is a standard object, then a new spy will be
+   * created that uses {@link MoxyStubber#thenDelegateTo(Object)} behind
+   * the scenes to delegate all calls to the supplied object.</p></li>
+   *
+   * <li><p>If the given object is a mock, then all existing stubbing will
+   * be <strong>replaced</strong> with {@link MoxyStubber#thenCallRealMethod()}.</p></li>
+   * </ul>
+   *
+   * <p>It is, in the latter case, important to note that this may not be exactly
+   * the behaviour you expect. You should always convert to a spy <strong>before</strong>
+   * applying any additional stubbing.</p>
    *
    * <p>Note that this will reset all prior stubbing on the given mock.</p>
    *
-   * <p>If the supplied object is not a mock, <code>IllegalArgumentException</code>
-   * will be thrown.</p>
-   *
-   * @param mock The mock to convert.
+   * @param object The object to be spied-upon.
    *
    * @return The mock, converted to a spy.
    * @since 1.0
@@ -407,8 +421,8 @@ public final class Moxy {
    * @see #spy(Class, PrintStream)
    * @see #spy(MoxyEngine, Class, PrintStream)
    */
-  public static <T> T spy(final T mock) {
-    return spy(mock, true);
+  public static <T> T spy(final T object) {
+    return spy(object, true);
   }
 
   /*
@@ -442,7 +456,8 @@ public final class Moxy {
   /*
    * Convert mock to spy, optionally without resetting.
    *
-   * Used when converting a newly-created mock.
+   * Used when converting a newly-created mock or
+   * creating a mock with a non-mock object.
    */
   // TODO DRY this
   @SuppressWarnings("unchecked")

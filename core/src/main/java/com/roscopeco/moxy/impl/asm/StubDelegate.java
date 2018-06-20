@@ -33,16 +33,14 @@ import com.roscopeco.moxy.api.MoxyException;
  * This is used as the value in the stubbed delegateTo
  * on the mocks.
  */
-final class StubDelegate {
-  final List<Object> args;
+final class StubDelegate extends AbstractStub {
   Method method;
   final Object delegate;
 
   public StubDelegate(final List<Object> args,
                       final Method method,
                       final Object delegate) {
-    super();
-    this.args = args;
+    super(args);
     this.method = method;
     this.delegate = delegate;
   }

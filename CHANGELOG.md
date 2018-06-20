@@ -19,15 +19,22 @@ make it in before 1.0.0.
 These changes are currently in the `develop` branch, and are slated
 to make it into a release soon.
 
+**Currently up-to-date**
+
+## [0.88.0] - 2018-06-20
+
 ### Added
 
+- thenDelegateTo added to MoxyStubber. This allows delegation
+  of mocked method calls to any object with a compatible method.
 - JUnit 5 extension to reset mocks before each test.
-- Simple annotations support and JUnit extension to support same
+- Simple annotations support and JUnit extension to support same.
 
 ### Changed
 
 - Removed restriction on applying different behaviours or stubbing to
   already-stubbed methods.
+- Bug-fixes around spying and static methods (was breaking tests under e.g. Jacoco)
 
 ## [0.86.0] - 2018-06-13
 
@@ -85,6 +92,7 @@ First public release, and the first version pushed to Maven Central.
 - Add project documentation
 - Setup for CI with Travis and Sonarcloud
 
-[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.86.0...develop
+[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.88.0...develop
+[0.88.0]: https://github.com/roscopeco/moxy/compare/v0.86...v0.88.0
 [0.86.0]: https://github.com/roscopeco/moxy/compare/v0.84...v0.86.0
 [0.84]: https://github.com/roscopeco/moxy/compare/v0.82...v0.84

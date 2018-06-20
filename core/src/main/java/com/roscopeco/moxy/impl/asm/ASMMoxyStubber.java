@@ -23,9 +23,13 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+
+import org.objectweb.asm.Type;
 
 import com.roscopeco.moxy.api.AnswerProvider;
 import com.roscopeco.moxy.api.MoxyStubber;
@@ -67,6 +71,43 @@ class ASMMoxyStubber<T> extends AbstractASMMoxyVerifier implements MoxyStubber<T
     // Just stash in the return slot, support checks if it's an AnswerProvider
     // and calls rather than just returning...
     receiver.__moxy_asm_setThrowOrReturn(invocation, provider, true);
+  }
+
+  Method findCompatibleMethod(final Class<?> clz, final String methodName, final String methodDesc) {
+    for (final Method m : clz.getDeclaredMethods()) {
+      final String mDesc = Type.getMethodDescriptor(Type.getReturnType(m), Type.getArgumentTypes(m));
+      if (!Modifier.isStatic(m.getModifiers()) &&
+          m.getName().equals(methodName) &&
+          mDesc.equals(methodDesc)) {
+        return m;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public void thenDelegateTo(final Object delegate) {
+    if (delegate == null) {
+      throw new IllegalArgumentException("Cannot delegate to null");
+    }
+
+    final Invocation invocation = this.getLastMonitoredInvocation();
+    final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
+    final Class<?> delegateClass = delegate.getClass();
+
+    final Method method = this.findCompatibleMethod(delegateClass,
+                                              invocation.getMethodName(),
+                                              invocation.getMethodDesc());
+    if (method != null) {
+      receiver.__moxy_asm_setDelegateTo(invocation, method, delegate);
+    } else {
+      throw new IllegalArgumentException(
+          "Cannot delegate invocation of "
+        + TypeStringUtils.javaMethodSignature(invocation)
+        + " to object of "
+        + delegate.getClass().toString()
+        + " - no compatible method found");
+    }
   }
 
   @Override

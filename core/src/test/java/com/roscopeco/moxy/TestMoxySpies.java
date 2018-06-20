@@ -128,10 +128,15 @@ public class TestMoxySpies {
   }
 
   @Test
-  public void testMoxySpyObjectFailsToConvertNonMock() {
-    assertThatThrownBy(() -> Moxy.spy(new Object()))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageMatching("Cannot convert java\\.lang\\.Object@[0-9a-f]+ to spy - it is not a mock");
+  public void testMoxySpyNonMockInstanceCreatesDelegatingSpy() {
+    final SimpleClass delegate = new SimpleClass();
+
+    final SimpleClass spy = Moxy.spy(delegate);
+
+    assertThat(delegate.returnHello()).isEqualTo("Hello");
+    assertThat(spy.returnHello()).isEqualTo("Hello");
+
+    Moxy.assertMock(() -> spy.returnHello()).wasCalledOnce();
   }
 
   @Test

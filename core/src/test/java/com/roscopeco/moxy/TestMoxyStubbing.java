@@ -111,21 +111,6 @@ public class TestMoxyStubbing {
   }
 
   @Test
-  public void testMoxyAssertMockWithMockThenThrowThenSeparateThenReturnFailsProperly() {
-    final SimpleClass mock = Moxy.mock(SimpleClass.class);
-
-    final RuntimeException theException = new RuntimeException("Oops!");
-    Moxy.when(() -> mock.returnHello()).thenThrow(theException);
-
-    assertThatThrownBy(() -> Moxy.when(() -> mock.returnHello()).thenReturn("hello"))
-        .isInstanceOf(IllegalStateException.class)
-            .hasMessage("Cannot set return for 'java.lang.String returnHello()' as it has already been stubbed to throw or call real method");
-
-    assertThatThrownBy(() -> mock.returnHello())
-        .isSameAs(theException);
-  }
-
-  @Test
   public void testMoxyMockWithMockWhenThenThrowTakesAccountOfArguments() {
     final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
 
@@ -158,5 +143,18 @@ public class TestMoxyStubbing {
     } catch (final Throwable e) {
       throw new AssertionFailedError("Expected no exception but got " + e.getMessage());
     }
+  }
+
+  @Test
+  public void testMoxyMockWithMockThenCallSuperThenReturnReplacesPriorStubbing() {
+    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+
+    Moxy.when(() -> mock.sayHelloTo("Bill")).thenCallRealMethod();
+
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hello, Bill");
+
+    Moxy.when(() -> mock.sayHelloTo("Bill")).thenReturn("Goodbye, Bill");
+
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Goodbye, Bill");
   }
 }

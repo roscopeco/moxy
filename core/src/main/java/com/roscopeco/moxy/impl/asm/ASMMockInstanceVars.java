@@ -46,6 +46,8 @@ public class ASMMockInstanceVars {
   // Present and true: call super; otherwise, use stubbing.
   private final Map<StubMethod, Deque<StubSuper>> callSuperMap;
 
+  private final Map<StubMethod, Deque<StubDelegate>> delegateMap;
+
   private final Map<StubMethod, List<StubDoActions>> doActionsMap;
 
   public ASMMockInstanceVars(final ASMMoxyEngine engine) {
@@ -54,6 +56,7 @@ public class ASMMockInstanceVars {
     this.throwMap = new HashMap<>();
     this.callSuperMap = new HashMap<>();
     this.doActionsMap = new HashMap<>();
+    this.delegateMap = new HashMap<>();
   }
 
   ASMMoxyEngine getEngine() {
@@ -70,6 +73,10 @@ public class ASMMockInstanceVars {
 
   Map<StubMethod, Deque<StubSuper>> getCallSuperMap() {
     return this.callSuperMap;
+  }
+
+  Map<StubMethod, Deque<StubDelegate>> getDelegateMap() {
+    return this.delegateMap;
   }
 
   Map<StubMethod, List<StubDoActions>> getDoActionsMap() {

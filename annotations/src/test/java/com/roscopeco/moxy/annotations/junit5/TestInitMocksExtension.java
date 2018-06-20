@@ -21,19 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.impl.asm;
 
-import java.util.List;
+package com.roscopeco.moxy.annotations.junit5;
 
-/*
- * This is used as the value in the stubbed returnMap
- * on the mocks.
- */
-final class StubReturn extends AbstractStub {
-  final Object toReturn;
+import static org.assertj.core.api.Assertions.*;
 
-  public StubReturn(final List<Object> args, final Object toReturn) {
-    super(args);
-    this.toReturn = toReturn;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import com.roscopeco.moxy.Moxy;
+import com.roscopeco.moxy.annotations.Mock;
+import com.roscopeco.moxy.annotations.Spy;
+import com.roscopeco.moxy.annotations.model.TesterClass;
+
+@ExtendWith(InitMocks.class)
+public class TestInitMocksExtension {
+  @Mock
+  public TesterClass mock;
+
+  @Spy
+  public TesterClass spy;
+
+  @Test
+  public void testSetsMocks() {
+    // Mock
+    assertThat(this.mock).isNotNull();
+    assertThat(Moxy.isMock(this.mock)).isTrue();
+
+    // Make sure it's actually a mock...
+    assertThat(this.mock.test()).isNull();
+  }
+
+  @Test
+  public void testSetsSpies() {
+    // Spy
+    assertThat(this.spy).isNotNull();
+    assertThat(Moxy.isMock(this.spy)).isTrue();
+
+    // Make sure it's actually a mock...
+    assertThat(this.spy.test()).isEqualTo(TesterClass.PASSED);
   }
 }

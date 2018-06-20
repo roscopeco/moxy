@@ -26,6 +26,7 @@ package com.roscopeco.moxy;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -388,14 +389,28 @@ public final class Moxy {
   }
 
   /**
-   * <p>Convert the given mock instance into a spy.</p>
+   * <p>Convert the given object into a spy.</p>
+   *
+   * <p>This method can be used to convert any Object into a spy. It behaves
+   * differently depending on whether the passed object is a mock, or
+   * a standard object:</p>
+   *
+   * <ul>
+   * <li><p>If the given object is a standard object, then a new spy will be
+   * created that uses {@link MoxyStubber#thenDelegateTo(Object)} behind
+   * the scenes to delegate all calls to the supplied object.</p></li>
+   *
+   * <li><p>If the given object is a mock, then all existing stubbing will
+   * be <strong>replaced</strong> with {@link MoxyStubber#thenCallRealMethod()}.</p></li>
+   * </ul>
+   *
+   * <p>It is, in the latter case, important to note that this may not be exactly
+   * the behaviour you expect. You should always convert to a spy <strong>before</strong>
+   * applying any additional stubbing.</p>
    *
    * <p>Note that this will reset all prior stubbing on the given mock.</p>
    *
-   * <p>If the supplied object is not a mock, <code>IllegalArgumentException</code>
-   * will be thrown.</p>
-   *
-   * @param mock The mock to convert.
+   * @param object The object to be spied-upon.
    *
    * @return The mock, converted to a spy.
    * @since 1.0
@@ -406,56 +421,85 @@ public final class Moxy {
    * @see #spy(Class, PrintStream)
    * @see #spy(MoxyEngine, Class, PrintStream)
    */
-  public static <T> T spy(final T mock) {
-    return spy(mock, true);
+  public static <T> T spy(final T object) {
+    return spy(object, true);
+  }
+
+  /*
+   * This is used by the spy(Object, boolean) method below.
+   * It should probably be used with caution elsewhere,
+   * e.g. it must always be used in context of when or assert...
+   */
+  private static Object pushTypeAppropriatePrimitiveMatcher(final Class<?> type) {
+    switch (type.toString()) {
+    case PRIMITIVE_BYTE_TYPE:
+      return Matchers.anyByte();
+    case PRIMITIVE_CHAR_TYPE:
+      return Matchers.anyChar();
+    case PRIMITIVE_SHORT_TYPE:
+      return Matchers.anyShort();
+    case PRIMITIVE_INT_TYPE:
+      return Matchers.anyInt();
+    case PRIMITIVE_LONG_TYPE:
+      return Matchers.anyLong();
+    case PRIMITIVE_FLOAT_TYPE:
+      return Matchers.anyFloat();
+    case PRIMITIVE_DOUBLE_TYPE:
+      return Matchers.anyDouble();
+    case PRIMITIVE_BOOLEAN_TYPE:
+      return Matchers.anyBool();
+    default:
+      return Matchers.any();
+    }
   }
 
   /*
    * Convert mock to spy, optionally without resetting.
    *
-   * Used when converting a newly-created mock.
+   * Used when converting a newly-created mock or
+   * creating a mock with a non-mock object.
    */
-  static <T> T spy(final T mock, final boolean doReset) {
-    if (!isMock(mock)) {
-      throw new IllegalArgumentException("Cannot convert "
-                                         + mock.toString()
-                                         + " to spy - it is not a mock");
-    }
+  // TODO DRY this
+  @SuppressWarnings("unchecked")
+  static <T> T spy(final T original, final boolean doReset) {
+    if (!isMock(original)) {
+      // Is real object - spying delegate
+      final Object newMock = mock(original.getClass());
 
-    if (doReset) {
-      resetMock(mock);
-    }
+      Arrays.stream(original.getClass().getDeclaredMethods()).forEach(method -> {
+        if (!Modifier.isStatic(method.getModifiers())) {
+          method.setAccessible(true);
+          if (!method.getName().startsWith("__moxy_asm")) {
+            Moxy.when(() -> method.invoke(newMock,
+                  Arrays.stream(
+                      method.getParameterTypes()).map(
+                          Moxy::pushTypeAppropriatePrimitiveMatcher)
+                  .toArray())
+            ).thenDelegateTo(original);
+          }
+        }
+      });
 
-    Arrays.stream(mock.getClass().getDeclaredMethods()).forEach(method -> {
-      if (!method.getName().startsWith("__moxy_asm")) {
-        Moxy.when(() -> method.invoke(mock,
-              Arrays.stream(method.getParameterTypes()).map(type -> {
-                switch (type.toString()) {
-                case PRIMITIVE_BYTE_TYPE:
-                  return Matchers.anyByte();
-                case PRIMITIVE_CHAR_TYPE:
-                  return Matchers.anyChar();
-                case PRIMITIVE_SHORT_TYPE:
-                  return Matchers.anyShort();
-                case PRIMITIVE_INT_TYPE:
-                  return Matchers.anyInt();
-                case PRIMITIVE_LONG_TYPE:
-                  return Matchers.anyLong();
-                case PRIMITIVE_FLOAT_TYPE:
-                  return Matchers.anyFloat();
-                case PRIMITIVE_DOUBLE_TYPE:
-                  return Matchers.anyDouble();
-                case PRIMITIVE_BOOLEAN_TYPE:
-                  return Matchers.anyBool();
-                default:
-                  return Matchers.any();
-                }
-              }).toArray())
-        ).thenCallRealMethod();
+      return (T)newMock;
+    } else {
+      // Is mock - make spy
+      if (doReset) {
+        resetMock(original);
       }
-    });
 
-    return mock;
+      Arrays.stream(original.getClass().getDeclaredMethods()).forEach(method -> {
+        if (!method.getName().startsWith("__moxy_asm")) {
+          Moxy.when(() -> method.invoke(original,
+                  Arrays.stream(
+                      method.getParameterTypes()).map(
+                          Moxy::pushTypeAppropriatePrimitiveMatcher)
+                  .toArray())
+          ).thenCallRealMethod();
+        }
+      });
+
+      return original;
+    }
   }
 
   /**
@@ -689,7 +733,7 @@ public final class Moxy {
    *
    * <p>How this determination is made is engine-dependent, but may
    * rely on the fact that the class has the (mandatory)
-   * {@link com.roscopeco.moxy.api.Mock} annotation.</p>
+   * {@link com.roscopeco.moxy.api.MoxyMock} annotation.</p>
    *
    * @param clz The class to query.
    *
@@ -706,7 +750,7 @@ public final class Moxy {
    *
    * <p>How this determination is made is engine-dependent, but may
    * rely on the fact that the class has the (mandatory)
-   * {@link com.roscopeco.moxy.api.Mock} annotation.</p>
+   * {@link com.roscopeco.moxy.api.MoxyMock} annotation.</p>
    *
    * @param obj The object to query.
    *

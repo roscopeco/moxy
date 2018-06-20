@@ -86,7 +86,29 @@ following dependency in your POM:
 <dependency>
 	<groupId>com.roscopeco</groupId>
 	<artifactId>moxy</artifactId>
-	<version>0.86.0</version>
+	<version>0.88.0</version>
+</dependency>
+```
+
+If you want to use the JUnit 5 extension to ensure your mocks are reset prior
+to each test, include the following dependency:
+
+```xml
+<dependency>
+	<groupId>com.roscopeco</groupId>
+	<artifactId>moxy-junit5</artifactId>
+	<version>0.88.0</version>
+</dependency>
+```
+
+and if you're interesting in creating your mocks with Mockito-style annotations,
+include this:
+
+```xml
+<dependency>
+	<groupId>com.roscopeco</groupId>
+	<artifactId>moxy-annotations</artifactId>
+	<version>0.88.0</version>
 </dependency>
 ```
 
@@ -108,7 +130,7 @@ repositories {
 }
 
 dependencies {
-    testCompile 'com.roscopeco:moxy:0.86.0'
+    testCompile 'com.roscopeco:moxy:0.88.0'
 }
 ```
 

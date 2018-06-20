@@ -21,19 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.impl.asm;
+package com.roscopeco.moxy.annotations;
 
-import java.util.List;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/*
- * This is used as the value in the stubbed returnMap
- * on the mocks.
+/**
+ * This annotation may be applied to fields in a test
+ * class to initialize that field with a spy automatically.
+ *
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ * @since 1.0
  */
-final class StubReturn extends AbstractStub {
-  final Object toReturn;
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Spy {
 
-  public StubReturn(final List<Object> args, final Object toReturn) {
-    super(args);
-    this.toReturn = toReturn;
-  }
 }

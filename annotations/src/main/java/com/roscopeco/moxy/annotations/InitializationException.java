@@ -21,19 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.impl.asm;
 
-import java.util.List;
+package com.roscopeco.moxy.annotations;
 
-/*
- * This is used as the value in the stubbed returnMap
- * on the mocks.
+import com.roscopeco.moxy.api.MoxyException;
+
+/**
+ * Thrown to indicate an error occured during initialization of
+ * the mock annotations.
+ *
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ * @since 1.0
  */
-final class StubReturn extends AbstractStub {
-  final Object toReturn;
+public class InitializationException extends MoxyException {
+  private static final long serialVersionUID = 1L;
 
-  public StubReturn(final List<Object> args, final Object toReturn) {
-    super(args);
-    this.toReturn = toReturn;
+  public InitializationException(final String message, final Throwable cause) {
+    super(message, cause);
+  }
+
+  public InitializationException(final Throwable cause) {
+    this("Error while initializing Moxy annotations; See cause", cause);
   }
 }

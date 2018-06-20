@@ -29,13 +29,11 @@ import java.util.List;
  * This is used as the value in the stubbed throwMap
  * on the mocks.
  */
-final class StubThrow {
-  List<Object> args;
+final class StubThrow extends AbstractStub {
   Throwable toThrow;
 
   public StubThrow(final List<Object> args, final Throwable toThrow) {
-    super();
-    this.args = args;
+    super(args);
     this.toThrow = toThrow;
   }
 }

@@ -21,19 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.impl.asm;
+package com.roscopeco.moxy.api;
 
-import java.util.List;
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.*;
 
-/*
- * This is used as the value in the stubbed returnMap
- * on the mocks.
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+/**
+ * All mocks created by a {@link MoxyEngine} implementation
+ * <strong>must</strong> have this annotation.
+ *
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ * @since 1.0
  */
-final class StubReturn extends AbstractStub {
-  final Object toReturn;
+@Retention(RUNTIME)
+@Target(TYPE)
+public @interface MoxyMock {
 
-  public StubReturn(final List<Object> args, final Object toReturn) {
-    super(args);
-    this.toReturn = toReturn;
-  }
 }

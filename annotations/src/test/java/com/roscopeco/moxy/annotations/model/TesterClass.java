@@ -1,5 +1,5 @@
 /*
- * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
+ * Spyee.java -
  *
  * Copyright 2018 Ross Bamford
  *
@@ -21,19 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.impl.asm;
 
-import java.util.List;
+package com.roscopeco.moxy.annotations.model;
 
-/*
- * This is used as the value in the stubbed returnMap
- * on the mocks.
- */
-final class StubReturn extends AbstractStub {
-  final Object toReturn;
+public class TesterClass {
+  public static final String PASSED = "PASSED";
 
-  public StubReturn(final List<Object> args, final Object toReturn) {
-    super(args);
-    this.toReturn = toReturn;
+  public String test() {
+    return PASSED;
   }
 }

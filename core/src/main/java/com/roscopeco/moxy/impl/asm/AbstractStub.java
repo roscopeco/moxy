@@ -21,23 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.api;
 
-import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.RetentionPolicy.*;
+package com.roscopeco.moxy.impl.asm;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import java.util.List;
 
-/**
- * All mocks created by a {@link MoxyEngine} implementation
- * <strong>must</strong> have this annotation.
- *
- * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
- * @since 1.0
- */
-@Retention(RUNTIME)
-@Target(TYPE)
-public @interface Mock {
+abstract class AbstractStub {
+  final List<Object> args;
 
+  public AbstractStub(final List<Object> args) {
+    this.args = args;
+  }
 }

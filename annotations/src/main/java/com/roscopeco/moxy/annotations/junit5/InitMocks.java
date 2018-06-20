@@ -21,19 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.impl.asm;
 
-import java.util.List;
+package com.roscopeco.moxy.annotations.junit5;
 
-/*
- * This is used as the value in the stubbed returnMap
- * on the mocks.
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+
+import com.roscopeco.moxy.annotations.MoxyAnnotations;
+
+/**
+ * JUnit 5 extension to initialise mocks on a test.
+ *
+ * <pre><code>
+ *   @ExtendWith(InitMocks.class)
+ *   public class TestClass {
+ *
+ *     @Mock
+ *     public SomeClass mockSomeClass;
+ *
+ *     // ...
+ *
+ *   }
+ * </code></pre>
+ *
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
-final class StubReturn extends AbstractStub {
-  final Object toReturn;
-
-  public StubReturn(final List<Object> args, final Object toReturn) {
-    super(args);
-    this.toReturn = toReturn;
+public class InitMocks implements BeforeEachCallback {
+  @Override
+  public void beforeEach(final ExtensionContext context) throws Exception {
+    context.getTestInstance().ifPresent(test -> MoxyAnnotations.initMocks(test));
   }
 }

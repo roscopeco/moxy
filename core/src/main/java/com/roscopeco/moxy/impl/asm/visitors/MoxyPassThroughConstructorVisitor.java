@@ -111,7 +111,7 @@ public class MoxyPassThroughConstructorVisitor extends MethodVisitor {
                                   false);
 
     // Store in field
-    this.delegate.visitFieldInsn(PUTFIELD, this.generatingClass, SUPPORT_IVARS_FIELD_NAME, MOXY_SUPPORT_ivars_DESCRIPTOR);
+    this.delegate.visitFieldInsn(PUTFIELD, this.generatingClass, SUPPORT_IVARS_FIELD_NAME, MOXY_SUPPORT_IVARS_DESCRIPTOR);
 
     // Done
     this.delegate.visitInsn(RETURN);

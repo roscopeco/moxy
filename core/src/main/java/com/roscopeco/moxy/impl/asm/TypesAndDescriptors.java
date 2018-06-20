@@ -77,7 +77,7 @@ public final class TypesAndDescriptors {
 
   public static final String MOXY_SUPPORT_INTERFACE_INTERNAL_NAME = Type.getInternalName(ASMMockSupport.class);
   public static final String MOXY_SUPPORT_IVARS_INTERNAL_NAME = Type.getInternalName(ASMMockInstanceVars.class);
-  public static final String MOXY_SUPPORT_ivars_DESCRIPTOR = "L" + MOXY_SUPPORT_IVARS_INTERNAL_NAME + ";";
+  public static final String MOXY_SUPPORT_IVARS_DESCRIPTOR = "L" + MOXY_SUPPORT_IVARS_INTERNAL_NAME + ";";
 
   public static final String MOXY_ENGINE_INTERNAL_NAME = Type.getInternalName(MoxyEngine.class);
 
@@ -125,7 +125,7 @@ public final class TypesAndDescriptors {
   public static final String SUPPORT_IS_STUBBING_DISABLED_DESCRIPTOR = BOOLEAN_VOID_DESCRIPTOR;
   public static final String SUPPORT_IVARS_FIELD_NAME = "__moxy_asm_ivars";
   public static final String SUPPORT_GET_IVARS_METHOD_NAME = "__moxy_asm_ivars";
-  public static final String SUPPORT_GET_IVARS_DESCRIPTOR = "()" + MOXY_SUPPORT_ivars_DESCRIPTOR;
+  public static final String SUPPORT_GET_IVARS_DESCRIPTOR = "()" + MOXY_SUPPORT_IVARS_DESCRIPTOR;
   public static final String SUPPORT_IVARS_CTOR_DESCRIPTOR = "(" + MOXY_ASM_ENGINE_DESCRIPTOR + ")V";
 
   /* primitives and their corresponding box types */

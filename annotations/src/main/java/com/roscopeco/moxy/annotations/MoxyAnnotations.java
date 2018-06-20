@@ -49,21 +49,21 @@ public class MoxyAnnotations {
    * <p>Note that no contructors will be called on the mocks.</p>
    *
    * <p>This will usually be called from a <code>{@literal}Before</code> or
-   * <code>{@literal}BeforeEach</code> method, e.g.:
+   * <code>{@literal}BeforeEach</code> method, e.g.:</p>
    *
    * <pre><code>
-   * @BeforeEach
+   * {@literal}BeforeEach
    * public void setUp() {
    *   initMocks(this);
    * }
    * </code></pre>
    *
-   * Optionally (if using JUnit5) this can be
+   * <p>Optionally (if using JUnit5) this can be
    * automated using the {@link com.roscopeco.moxy.annotations.junit5.InitMocks}
    * extension:</p>
    *
    * <pre><code>
-   * @ExtendWith(InitMocks.class)
+   * {@literal}ExtendWith(InitMocks.class)
    * public class SomeTest {
    *   // ...
    * }

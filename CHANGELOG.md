@@ -21,6 +21,13 @@ to make it into a release soon.
 
 **Currently up-to-date**
 
+## [0.88.1] - 2018-06-20
+
+### Fixed
+
+Critical bug in delegate caching/invocation that could cause undefined behaviour
+under certain (rare) circumstances.
+
 ## [0.88.0] - 2018-06-20
 
 ### Added
@@ -34,6 +41,9 @@ to make it into a release soon.
 
 - Removed restriction on applying different behaviours or stubbing to
   already-stubbed methods.
+  
+### Fixed
+
 - Bug-fixes around spying and static methods (was breaking tests under e.g. Jacoco)
 
 ## [0.86.0] - 2018-06-13
@@ -92,7 +102,8 @@ First public release, and the first version pushed to Maven Central.
 - Add project documentation
 - Setup for CI with Travis and Sonarcloud
 
-[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.88.0...develop
-[0.88.0]: https://github.com/roscopeco/moxy/compare/v0.86...v0.88.0
+[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.88.1...develop
+[0.88.1]: https://github.com/roscopeco/moxy/compare/v0.88.0...v0.88.1
+[0.88.0]: https://github.com/roscopeco/moxy/compare/v0.86.0...v0.88.0
 [0.86.0]: https://github.com/roscopeco/moxy/compare/v0.84...v0.86.0
 [0.84]: https://github.com/roscopeco/moxy/compare/v0.82...v0.84

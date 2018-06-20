@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/roscopeco/moxy.svg?branch=master)](https://travis-ci.org/roscopeco/moxy) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=alert_status)](https://sonarcloud.io/dashboard/index/com.roscopeco%3Amoxy) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=bugs)](https://sonarcloud.io/component_measures?id=com.roscopeco%3Amoxy&metric=bugs) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=code_smells)](https://sonarcloud.io/component_measures?id=com.roscopeco%3Amoxy&metric=code_smells) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=coverage)](https://sonarcloud.io/component_measures?id=com.roscopeco%3Amoxy&metric=coverage) [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=ncloc)](https://sonarcloud.io/component_measures?id=com.roscopeco%3Amoxy&metric=ncloc)
+[![Build Status](https://travis-ci.org/roscopeco/moxy.svg?branch=master)](https://travis-ci.org/roscopeco/moxy) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco.moxy%3Amoxy&metric=alert_status)](https://sonarcloud.io/dashboard/index/com.roscopeco.moxy%3Amoxy) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco.moxy%3Amoxy&metric=bugs)](https://sonarcloud.io/component_measures?id=com.roscopeco.moxy%3Amoxy&metric=bugs) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco.moxy%3Amoxy&metric=code_smells)](https://sonarcloud.io/component_measures?id=com.roscopeco.moxy%3Amoxy&metric=code_smells) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco.moxy%3Amoxy&metric=coverage)](https://sonarcloud.io/component_measures?id=com.roscopeco.moxy%3Amoxy&metric=coverage) [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco.moxy%3Amoxy&metric=ncloc)](https://sonarcloud.io/component_measures?id=com.roscopeco.moxy%3Amoxy&metric=ncloc)
 
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=sqale_rating)](https://sonarcloud.io/component_measures?id=com.roscopeco%3Amoxy&metric=sqale_rating) [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=com.roscopeco%3Amoxy&metric=reliability_rating) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=security_rating)](https://sonarcloud.io/component_measures?id=com.roscopeco%3Amoxy&metric=security_rating) [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco%3Amoxy&metric=sqale_index)](https://sonarcloud.io/component_measures?id=com.roscopeco%3Amoxy&metric=sqale_index)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco.moxy%3Amoxy&metric=sqale_rating)](https://sonarcloud.io/component_measures?id=com.roscopeco.moxy%3Amoxy&metric=sqale_rating) [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco.moxy%3Amoxy&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=com.roscopeco.moxy%3Amoxy&metric=reliability_rating) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco.moxy%3Amoxy&metric=security_rating)](https://sonarcloud.io/component_measures?id=com.roscopeco.moxy%3Amoxy&metric=security_rating) [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=com.roscopeco.moxy%3Amoxy&metric=sqale_index)](https://sonarcloud.io/component_measures?id=com.roscopeco.moxy%3Amoxy&metric=sqale_index)
 
 # Moxy
 
@@ -86,7 +86,7 @@ following dependency in your POM:
 <dependency>
 	<groupId>com.roscopeco</groupId>
 	<artifactId>moxy</artifactId>
-	<version>0.88.0</version>
+	<version>0.88.1</version>
 </dependency>
 ```
 
@@ -97,7 +97,7 @@ to each test, include the following dependency:
 <dependency>
 	<groupId>com.roscopeco</groupId>
 	<artifactId>moxy-junit5</artifactId>
-	<version>0.88.0</version>
+	<version>0.88.1</version>
 </dependency>
 ```
 
@@ -108,7 +108,7 @@ include this:
 <dependency>
 	<groupId>com.roscopeco</groupId>
 	<artifactId>moxy-annotations</artifactId>
-	<version>0.88.0</version>
+	<version>0.88.1</version>
 </dependency>
 ```
 
@@ -130,7 +130,7 @@ repositories {
 }
 
 dependencies {
-    testCompile 'com.roscopeco:moxy:0.88.0'
+    testCompile 'com.roscopeco:moxy:0.88.1'
 }
 ```
 

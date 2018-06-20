@@ -84,8 +84,8 @@ following dependency in your POM:
 
 ```xml
 <dependency>
-	<groupId>com.roscopeco</groupId>
-	<artifactId>moxy</artifactId>
+	<groupId>com.roscopeco.moxy</groupId>
+	<artifactId>moxy-core</artifactId>
 	<version>0.88.1</version>
 </dependency>
 ```
@@ -95,7 +95,7 @@ to each test, include the following dependency:
 
 ```xml
 <dependency>
-	<groupId>com.roscopeco</groupId>
+	<groupId>com.roscopeco.moxy</groupId>
 	<artifactId>moxy-junit5</artifactId>
 	<version>0.88.1</version>
 </dependency>
@@ -106,7 +106,7 @@ include this:
 
 ```xml
 <dependency>
-	<groupId>com.roscopeco</groupId>
+	<groupId>com.roscopeco.moxy</groupId>
 	<artifactId>moxy-annotations</artifactId>
 	<version>0.88.1</version>
 </dependency>
@@ -130,7 +130,7 @@ repositories {
 }
 
 dependencies {
-    testCompile 'com.roscopeco:moxy:0.88.1'
+    testCompile 'com.roscopeco.moxy:moxy-core:0.88.1'
 }
 ```
 

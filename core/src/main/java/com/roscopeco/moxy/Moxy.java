@@ -26,6 +26,7 @@ package com.roscopeco.moxy;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -411,6 +412,34 @@ public final class Moxy {
   }
 
   /*
+   * This is used by the spy(Object, boolean) method below.
+   * It should probably be used with caution elsewhere,
+   * e.g. it must always be used in context of when or assert...
+   */
+  private static Object pushTypeAppropriatePrimitiveMatcher(final Class<?> type) {
+    switch (type.toString()) {
+    case PRIMITIVE_BYTE_TYPE:
+      return Matchers.anyByte();
+    case PRIMITIVE_CHAR_TYPE:
+      return Matchers.anyChar();
+    case PRIMITIVE_SHORT_TYPE:
+      return Matchers.anyShort();
+    case PRIMITIVE_INT_TYPE:
+      return Matchers.anyInt();
+    case PRIMITIVE_LONG_TYPE:
+      return Matchers.anyLong();
+    case PRIMITIVE_FLOAT_TYPE:
+      return Matchers.anyFloat();
+    case PRIMITIVE_DOUBLE_TYPE:
+      return Matchers.anyDouble();
+    case PRIMITIVE_BOOLEAN_TYPE:
+      return Matchers.anyBool();
+    default:
+      return Matchers.any();
+    }
+  }
+
+  /*
    * Convert mock to spy, optionally without resetting.
    *
    * Used when converting a newly-created mock.
@@ -423,31 +452,16 @@ public final class Moxy {
       final Object newMock = mock(original.getClass());
 
       Arrays.stream(original.getClass().getDeclaredMethods()).forEach(method -> {
-        if (!method.getName().startsWith("__moxy_asm")) {
-          Moxy.when(() -> method.invoke(newMock,
-                Arrays.stream(method.getParameterTypes()).map(type -> {
-                  switch (type.toString()) {
-                  case PRIMITIVE_BYTE_TYPE:
-                    return Matchers.anyByte();
-                  case PRIMITIVE_CHAR_TYPE:
-                    return Matchers.anyChar();
-                  case PRIMITIVE_SHORT_TYPE:
-                    return Matchers.anyShort();
-                  case PRIMITIVE_INT_TYPE:
-                    return Matchers.anyInt();
-                  case PRIMITIVE_LONG_TYPE:
-                    return Matchers.anyLong();
-                  case PRIMITIVE_FLOAT_TYPE:
-                    return Matchers.anyFloat();
-                  case PRIMITIVE_DOUBLE_TYPE:
-                    return Matchers.anyDouble();
-                  case PRIMITIVE_BOOLEAN_TYPE:
-                    return Matchers.anyBool();
-                  default:
-                    return Matchers.any();
-                  }
-                }).toArray())
-          ).thenDelegateTo(original);
+        if (!Modifier.isStatic(method.getModifiers())) {
+          method.setAccessible(true);
+          if (!method.getName().startsWith("__moxy_asm")) {
+            Moxy.when(() -> method.invoke(newMock,
+                  Arrays.stream(
+                      method.getParameterTypes()).map(
+                          Moxy::pushTypeAppropriatePrimitiveMatcher)
+                  .toArray())
+            ).thenDelegateTo(original);
+          }
         }
       });
 
@@ -461,28 +475,10 @@ public final class Moxy {
       Arrays.stream(original.getClass().getDeclaredMethods()).forEach(method -> {
         if (!method.getName().startsWith("__moxy_asm")) {
           Moxy.when(() -> method.invoke(original,
-                Arrays.stream(method.getParameterTypes()).map(type -> {
-                  switch (type.toString()) {
-                  case PRIMITIVE_BYTE_TYPE:
-                    return Matchers.anyByte();
-                  case PRIMITIVE_CHAR_TYPE:
-                    return Matchers.anyChar();
-                  case PRIMITIVE_SHORT_TYPE:
-                    return Matchers.anyShort();
-                  case PRIMITIVE_INT_TYPE:
-                    return Matchers.anyInt();
-                  case PRIMITIVE_LONG_TYPE:
-                    return Matchers.anyLong();
-                  case PRIMITIVE_FLOAT_TYPE:
-                    return Matchers.anyFloat();
-                  case PRIMITIVE_DOUBLE_TYPE:
-                    return Matchers.anyDouble();
-                  case PRIMITIVE_BOOLEAN_TYPE:
-                    return Matchers.anyBool();
-                  default:
-                    return Matchers.any();
-                  }
-                }).toArray())
+                  Arrays.stream(
+                      method.getParameterTypes()).map(
+                          Moxy::pushTypeAppropriatePrimitiveMatcher)
+                  .toArray())
           ).thenCallRealMethod();
         }
       });

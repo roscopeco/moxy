@@ -24,6 +24,7 @@
 package com.roscopeco.moxy.impl.asm;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -75,7 +76,9 @@ class ASMMoxyStubber<T> extends AbstractASMMoxyVerifier implements MoxyStubber<T
   Method findCompatibleMethod(final Class<?> clz, final String methodName, final String methodDesc) {
     for (final Method m : clz.getDeclaredMethods()) {
       final String mDesc = Type.getMethodDescriptor(Type.getReturnType(m), Type.getArgumentTypes(m));
-      if (m.getName().equals(methodName) && mDesc.equals(methodDesc)) {
+      if (!Modifier.isStatic(m.getModifiers()) &&
+          m.getName().equals(methodName) &&
+          mDesc.equals(methodDesc)) {
         return m;
       }
     }

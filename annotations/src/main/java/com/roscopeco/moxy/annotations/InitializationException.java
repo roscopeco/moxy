@@ -27,9 +27,11 @@ package com.roscopeco.moxy.annotations;
 import com.roscopeco.moxy.api.MoxyException;
 
 /**
- * TODO Document InitializationException
+ * Thrown to indicate an error occured during initialization of
+ * the mock annotations.
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ * @since 1.0
  */
 public class InitializationException extends MoxyException {
   private static final long serialVersionUID = 1L;

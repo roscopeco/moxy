@@ -29,7 +29,7 @@ import java.lang.reflect.Field;
 import com.roscopeco.moxy.Moxy;
 
 /**
- * TODO Document MoxyAnnotations
+ * Support methods to initialize mocks using annotations.
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
@@ -39,6 +39,40 @@ public class MoxyAnnotations {
         "com.roscopeco.moxy.annotations.MoxyAnnotations is not designed for instantiation");
   }
 
+  /**
+   * <p>Initialize mock annotations on the given object.</p>
+   *
+   * <p>When called, this method will populate any fields of the
+   * given object that are annotated with the {@link Mock}
+   * annotation with appropriate mocks.</p>
+   *
+   * <p>Note that no contructors will be called on the mocks.</p>
+   *
+   * <p>This will usually be called from a <code>{@literal}Before</code> or
+   * <code>{@literal}BeforeEach</code> method, e.g.:
+   *
+   * <pre><code>
+   * @BeforeEach
+   * public void setUp() {
+   *   initMocks(this);
+   * }
+   * </code></pre>
+   *
+   * Optionally (if using JUnit5) this can be
+   * automated using the {@link com.roscopeco.moxy.annotations.junit5.InitMocks}
+   * extension:</p>
+   *
+   * <pre><code>
+   * @ExtendWith(InitMocks.class)
+   * public class SomeTest {
+   *   // ...
+   * }
+   * </code></pre>
+   *
+   * @param test The test instance to initialize.
+   *
+   * @since 1.0
+   */
   public static void initMocks(final Object test) {
     for (final Field f : test.getClass().getDeclaredFields()) {
       Object mock = null;

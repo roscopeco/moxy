@@ -104,7 +104,7 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   void generateSupportFields() {
     final FieldVisitor fv = this.cv.visitField(
         ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC,
-        SUPPORT_ivars_FIELD_NAME,
+        SUPPORT_IVARS_FIELD_NAME,
         MOXY_SUPPORT_ivars_DESCRIPTOR,
         null,
         null);
@@ -113,9 +113,9 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   }
 
   void generateSupportMethods() {
-    this.generateSupportGetter(SUPPORT_GET_ivars_METHOD_NAME,
-                               SUPPORT_GET_ivars_DESCRIPTOR,
-                               SUPPORT_ivars_FIELD_NAME,
+    this.generateSupportGetter(SUPPORT_GET_IVARS_METHOD_NAME,
+                               SUPPORT_GET_IVARS_DESCRIPTOR,
+                               SUPPORT_IVARS_FIELD_NAME,
                                MOXY_SUPPORT_ivars_DESCRIPTOR);
   }
 

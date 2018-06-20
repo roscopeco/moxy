@@ -49,6 +49,6 @@ import com.roscopeco.moxy.annotations.MoxyAnnotations;
 public class InitMocks implements BeforeEachCallback {
   @Override
   public void beforeEach(final ExtensionContext context) throws Exception {
-    context.getTestInstance().ifPresent(test -> MoxyAnnotations.initMocks(test));
+    context.getTestInstance().ifPresent(MoxyAnnotations::initMocks);
   }
 }

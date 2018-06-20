@@ -123,10 +123,10 @@ public final class TypesAndDescriptors {
       "(" + STRING_DESCRIPTOR + STRING_DESCRIPTOR + ")" + STRING_DESCRIPTOR;
   public static final String SUPPORT_IS_STUBBING_DISABLED_METHOD_NAME = "__moxy_asm_isMockBehaviourDisabledOnThisThread";
   public static final String SUPPORT_IS_STUBBING_DISABLED_DESCRIPTOR = BOOLEAN_VOID_DESCRIPTOR;
-  public static final String SUPPORT_ivars_FIELD_NAME = "__moxy_asm_ivars";
-  public static final String SUPPORT_GET_ivars_METHOD_NAME = "__moxy_asm_ivars";
-  public static final String SUPPORT_GET_ivars_DESCRIPTOR = "()" + MOXY_SUPPORT_ivars_DESCRIPTOR;
-  public static final String SUPPORT_ivars_CTOR_DESCRIPTOR = "(" + MOXY_ASM_ENGINE_DESCRIPTOR + ")V";
+  public static final String SUPPORT_IVARS_FIELD_NAME = "__moxy_asm_ivars";
+  public static final String SUPPORT_GET_IVARS_METHOD_NAME = "__moxy_asm_ivars";
+  public static final String SUPPORT_GET_IVARS_DESCRIPTOR = "()" + MOXY_SUPPORT_ivars_DESCRIPTOR;
+  public static final String SUPPORT_IVARS_CTOR_DESCRIPTOR = "(" + MOXY_ASM_ENGINE_DESCRIPTOR + ")V";
 
   /* primitives and their corresponding box types */
   public static final String VALUEOF_METHOD_NAME = "valueOf";

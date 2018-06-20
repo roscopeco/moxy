@@ -63,17 +63,13 @@ public interface ASMMockSupport {
                 final Map<StubMethod, Deque<T>> map,
                 final StubMethod stubMethod,
                 final Invocation invocation) {
-    final Deque<T> deque = map.get(stubMethod);
-
-    if (deque != null) {
+    map.computeIfPresent(stubMethod, (k, deque) -> {
       final ASMMoxyMatcherEngine matchEngine = __moxy_asm_ivars().getEngine().getMatcherEngine();
 
-      final Deque<T> newDeque = new ArrayDeque<>(deque.stream()
+      return new ArrayDeque<>(deque.stream()
           .filter(obj -> !matchEngine.argsMatch(invocation.getArgs(), obj.args))
           .collect(Collectors.toList()));
-
-      map.put(stubMethod, newDeque);
-    }
+    });
   }
 
   // TODO move to private methods class
@@ -273,7 +269,7 @@ public interface ASMMockSupport {
   public default Object __moxy_asm_runCachedDelegate() {
     final StubDelegate stubDelegate = stubDelegateCache.get();
 
-    if (stubDelegate.equals(null)) {
+    if (stubDelegate == null) {
       throw new IllegalStateException("[BUG] Attempted to run cached delegate, but cache was empty");
     }
 

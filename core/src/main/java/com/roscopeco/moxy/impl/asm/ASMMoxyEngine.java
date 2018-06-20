@@ -463,7 +463,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   @SuppressWarnings({ "unchecked", "restriction" })
   <T> T initializeMock(final Class<? extends T> mockClass, final Object mock) {
     try {
-      final Field ivarsField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_ivars_FIELD_NAME);
+      final Field ivarsField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_IVARS_FIELD_NAME);
       UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(ivarsField), new ASMMockInstanceVars(this));
       return (T)mock;
     } catch (final Exception e) {

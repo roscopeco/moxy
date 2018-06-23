@@ -19,8 +19,20 @@ make it in before 1.0.0.
 These changes are currently in the `develop` branch, and are slated
 to make it into a release soon.
 
-**Currently up-to-date**
+### Added
 
+- Multiple stubs for the same invocation are now supported by chaining
+  calls to `then[...]` methods on `ASMMoxyStubber` and `ASMMoxyVoidStubber`.
+  Mocks stubbed in this way will behave according to the applied stubbed 
+  behaviours, in order, with the final stubbed behaviour persisting until
+  explicitly reset or a new `when(...)` call is made.
+  
+### Changed
+
+- `then(Return|Throw|CallRealMethod)` are
+  no longer terminal, due to the ongoing stubbing feature being 
+  fully implemented.
+  
 ## [0.88.1] - 2018-06-20
 
 ### Fixed

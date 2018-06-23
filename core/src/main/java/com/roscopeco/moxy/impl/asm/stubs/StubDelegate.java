@@ -56,7 +56,6 @@ public final class StubDelegate implements Stub {
     return this.retain;
   }
 
-  // TODO is this worth generating code for?
   @Override
   public Object getObject(final List<Object> actualArgs) {
     try {

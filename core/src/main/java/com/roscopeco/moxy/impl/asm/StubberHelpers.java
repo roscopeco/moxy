@@ -41,4 +41,9 @@ class StubberHelpers {
     }
     return null;
   }
+
+  private StubberHelpers() {
+    throw new UnsupportedOperationException(
+        "com.roscopeco.moxy.impl.asm.StubberHelpers is not designed for instantiation");
+  }
 }

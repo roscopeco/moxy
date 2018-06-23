@@ -21,19 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.impl.asm;
+package com.roscopeco.moxy.impl.asm.stubs;
 
 import java.util.List;
 
 /*
- * This is used as the value in the stubbed throwMap
+ * This is used as the value in the stubbed superMap
  * on the mocks.
  */
-final class StubThrow extends AbstractStub {
-  Throwable toThrow;
+public final class StubSuper implements Stub {
+  final boolean retain;
 
-  public StubThrow(final List<Object> args, final Throwable toThrow) {
-    super(args);
-    this.toThrow = toThrow;
+  public StubSuper(final boolean retain) {
+    this.retain = retain;
+  }
+
+  @Override
+  public StubType getType() {
+    return StubType.CALL_SUPER;
+  }
+
+  @Override
+  public boolean isRetained() {
+    return this.retain;
+  }
+
+  @Override
+  public Object getObject(final List<Object> actualArgs) {
+    return null;
   }
 }

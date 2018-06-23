@@ -21,39 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.impl.asm;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+package com.roscopeco.moxy.impl.asm.stubs;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 
-import com.roscopeco.moxy.api.MoxyException;
+public final class StubInvocation {
+  private final List<Object> args;
+  private final Deque<Stub> stubs;
 
-/*
- * This is used as the value in the stubbed delegateTo
- * on the mocks.
- */
-final class StubDelegate extends AbstractStub {
-  Method method;
-  final Object delegate;
-
-  public StubDelegate(final List<Object> args,
-                      final Method method,
-                      final Object delegate) {
-    super(args);
-    this.method = method;
-    this.delegate = delegate;
+  public StubInvocation(final List<Object> args) {
+    this.args = args;
+    this.stubs = new ArrayDeque<>();
   }
 
-  // TODO is this worth generating code for?
-  Object invoke() {
-    try {
-      this.method.setAccessible(true);
-      return this.method.invoke(this.delegate, this.args.toArray(new Object[this.args.size()]));
-    } catch (final InvocationTargetException e) {
-      throw new MoxyException("Exception invoking delegate: " + e.getCause());
-    } catch (final IllegalAccessException e) {
-      throw new MoxyException("IllegalAccessException while calling delegate", e);
-    }
+  public List<Object> getArgs() {
+    return this.args;
+  }
+
+  public Deque<Stub> getStubs() {
+    return this.stubs;
   }
 }

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.impl.asm;
+package com.roscopeco.moxy.impl.asm.stubs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,14 +32,23 @@ import java.util.function.Consumer;
  * This is used as the value in the stubbed returnMap
  * on the mocks.
  */
-final class StubDoActions extends AbstractStub {
+public final class StubDoActions {
+  final List<Object> matchArgs;
   final List<Consumer<List<?extends Object>>> actions;
 
   @SafeVarargs
-  public StubDoActions(final List<Object> args, final Consumer<List<?extends Object>>... actions) {
-    super(args);
+  public StubDoActions(final List<Object> matchArgs, final Consumer<List<?extends Object>>... actions) {
+    this.matchArgs = matchArgs;
     this.actions = new ArrayList<>();
 
     Arrays.stream(actions).forEach(this.actions::add);
+  }
+
+  public List<Object> getMatchArgs() {
+    return this.matchArgs;
+  }
+
+  public List<Consumer<List<? extends Object>>> getActions() {
+    return this.actions;
   }
 }

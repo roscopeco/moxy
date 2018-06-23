@@ -69,6 +69,21 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     this.generateReturn();
   }
 
+
+
+  int getFirstAvailableLocalSlot() {
+    final int argsSize = Type.getArgumentsAndReturnSizes(this.methodDescriptor) >> 2;
+    return argsSize + 1;
+  }
+
+  int getMethodReturnLocalSlot() {
+    return this.getFirstAvailableLocalSlot();
+  }
+
+  int getMethodThrowLocalSlot() {
+    return this.getFirstAvailableLocalSlot() + 1;
+  }
+
   void generatePreamble() {
     final int argc = this.argTypes.length;
 
@@ -297,6 +312,11 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
 
   // NOTE this isn't super-efficient, but it's easier to grok this way...
   //
+  // NOTES:
+  //
+  //   This method reserves locals[numargs+1] for the return object.
+  //   This method reserves locals[numargs+2] for the throw object.
+  //
   // TODO This method is ridiculously long...
   void generateReturn() {
     final Label checkCallSuperLabel = new Label();
@@ -454,6 +474,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     this.delegate.visitJumpInsn(IF_ICMPEQ, noCallSuperOrDelegateLabel);
 
     // Delegating, so delegate.
+    // TODO Need to be catching and recording exceptions here, like for super, above.
     this.delegate.visitVarInsn(ALOAD, 0);
     this.delegate.visitMethodInsn(INVOKEINTERFACE,
                          MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
@@ -573,6 +594,9 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
                                   SUPPORT_GETCURRENTRETURN_DESCRIPTOR,
                                   true);
 
+    this.delegate.visitInsn(DUP);
+    this.delegate.visitVarInsn(ASTORE, this.getMethodReturnLocalSlot());
+
     // Get the exception this method will throw (or null if none)
     this.delegate.visitInsn(SWAP);
     this.delegate.visitMethodInsn(INVOKEINTERFACE,
@@ -580,6 +604,9 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
                                   SUPPORT_GETCURRENTTHROW_METHOD_NAME,
                                   SUPPORT_GETCURRENTTHROW_DESCRIPTOR,
                                   true);
+
+    this.delegate.visitInsn(DUP);
+    this.delegate.visitVarInsn(ASTORE, this.getMethodThrowLocalSlot());
 
     // Update the current invocation's returned and thrown fields.
     this.delegate.visitMethodInsn(INVOKEINTERFACE,
@@ -591,20 +618,10 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     // Always do exception first.
     // Should never have both anyway, this is/ enforced in ASMMoxyMockSupport
     // when the fields are set.
-    this.delegate.visitVarInsn(ALOAD, 0);
-    this.delegate.visitMethodInsn(INVOKEINTERFACE,
-                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
-                                  SUPPORT_GETCURRENTTHROW_METHOD_NAME,
-                                  THROWABLE_VOID_DESCRIPTOR,
-                                  true);
+    this.delegate.visitVarInsn(ALOAD, this.getMethodThrowLocalSlot());
     this.delegate.visitJumpInsn(IFNULL, loadStubReturnLabel);
 
-    this.delegate.visitVarInsn(ALOAD, 0);
-    this.delegate.visitMethodInsn(INVOKEINTERFACE,
-                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
-                                  SUPPORT_GETCURRENTTHROW_METHOD_NAME,
-                                  THROWABLE_VOID_DESCRIPTOR,
-                                  true);
+    this.delegate.visitVarInsn(ALOAD, this.getMethodThrowLocalSlot());
     this.delegate.visitInsn(ATHROW);
 
     this.delegate.visitLabel(loadStubReturnLabel);
@@ -678,12 +695,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     case ARRAY_PRIMITIVE_INTERNAL_NAME:
     case OBJECT_PRIMITIVE_INTERNAL_NAME:
       // Grab return value
-      this.delegate.visitVarInsn(ALOAD, 0);
-      this.delegate.visitMethodInsn(INVOKEINTERFACE,
-                                    MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
-                                    SUPPORT_GETCURRENTRETURN_METHOD_NAME,
-                                    OBJECT_VOID_DESCRIPTOR,
-                                    true);
+      this.delegate.visitVarInsn(ALOAD, this.getMethodReturnLocalSlot());
 
       // return it. CHECKCAST not strictly necessary, but for safety's sake...
       this.delegate.visitTypeInsn(CHECKCAST, this.returnType.getInternalName());
@@ -753,21 +765,11 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     final Label defaultValueLabel = new Label();
 
     // Do we have a return value?
-    this.delegate.visitVarInsn(ALOAD, 0);
-    this.delegate.visitMethodInsn(INVOKEINTERFACE,
-                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
-                                  SUPPORT_GETCURRENTRETURN_METHOD_NAME,
-                                  OBJECT_VOID_DESCRIPTOR,
-                                  true);
+    this.delegate.visitVarInsn(ALOAD, this.getMethodReturnLocalSlot());
     this.delegate.visitJumpInsn(IFNULL, defaultValueLabel);
 
     // Yes - load it, unbox it, return it.
-    this.delegate.visitVarInsn(ALOAD, 0);
-    this.delegate.visitMethodInsn(INVOKEINTERFACE,
-                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
-                                  SUPPORT_GETCURRENTRETURN_METHOD_NAME,
-                                  OBJECT_VOID_DESCRIPTOR,
-                                  true);
+    this.delegate.visitVarInsn(ALOAD, this.getMethodReturnLocalSlot());
     this.delegate.visitTypeInsn(CHECKCAST, boxClass);
     this.delegate.visitMethodInsn(INVOKEVIRTUAL, boxClass, valueOfMethod, valueOfDescriptor, false);
     this.delegate.visitLabel(returnLabel);

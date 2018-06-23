@@ -30,6 +30,10 @@ import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.roscopeco.moxy.impl.asm.stubs.StubDelegate;
+import com.roscopeco.moxy.impl.asm.stubs.StubReturn;
+import com.roscopeco.moxy.impl.asm.stubs.StubSuper;
+import com.roscopeco.moxy.impl.asm.stubs.StubThrow;
 import com.roscopeco.moxy.model.SimpleClass;
 
 public class TestASMMockSupport extends AbstractImplTest {
@@ -62,31 +66,30 @@ public class TestASMMockSupport extends AbstractImplTest {
 
   @Test
   public void testSetGetReturnForInvocation() {
-    this.mock.__moxy_asm_setThrowOrReturn(this.invoc, this.returnMarker, true);
-    assertThat(this.mock.__moxy_asm_getReturnForInvocation(this.invoc)).isSameAs(this.returnMarker);
+    this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker, false));
+    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc)).isSameAs(this.returnMarker);
   }
 
   @Test
   public void testSetGetThrowForInvocation() {
-    this.mock.__moxy_asm_setThrowOrReturn(this.invoc, this.throwMarker, false);
-    assertThat(this.mock.__moxy_asm_getThrowForInvocation(this.invoc)).isSameAs(this.throwMarker);
-  }
-
-  @Test
-  public void testSetThrowFailsWithNonThrowable() {
-    assertThatThrownBy(() ->
-    this.mock.__moxy_asm_setThrowOrReturn(this.invoc, this.returnMarker, false)
-)
-    .isInstanceOf(IllegalArgumentException.class)
-    .hasMessage("Cannot throw non-Throwable class java.lang.String");
+    this.mock.__moxy_asm_setStubbing(this.invoc, new StubThrow(this.throwMarker, false));
+    assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc)).isSameAs(this.throwMarker);
   }
 
   @Test
   public void testSetCallSuper() {
     assertThat(this.mock.__moxy_asm_shouldCallSuperForInvocation(this.invoc)).isFalse();
 
-    this.mock.__moxy_asm_setShouldCallSuper(this.invoc, true);
+    this.mock.__moxy_asm_setStubbing(this.invoc, new StubSuper(false));
     assertThat(this.mock.__moxy_asm_shouldCallSuperForInvocation(this.invoc)).isTrue();
+  }
+
+  @Test
+  public void testSetDelegate() throws ReflectiveOperationException {
+    assertThat(this.mock.__moxy_asm_shouldDelegateForInvocation(this.invoc)).isFalse();
+
+    this.mock.__moxy_asm_setStubbing(this.invoc, new StubDelegate(SimpleClass.class.getMethod("returnHello"), new SimpleClass(), false));
+    assertThat(this.mock.__moxy_asm_shouldDelegateForInvocation(this.invoc)).isTrue();
   }
 
   @Test

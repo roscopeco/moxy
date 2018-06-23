@@ -24,12 +24,21 @@
 
 package com.roscopeco.moxy.impl.asm;
 
-import java.util.List;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
-abstract class AbstractStub {
-  final List<Object> args;
+import org.objectweb.asm.Type;
 
-  public AbstractStub(final List<Object> args) {
-    this.args = args;
+class StubberHelpers {
+  static Method findCompatibleMethod(final Class<?> clz, final String methodName, final String methodDesc) {
+    for (final Method m : clz.getDeclaredMethods()) {
+      final String mDesc = Type.getMethodDescriptor(Type.getReturnType(m), Type.getArgumentTypes(m));
+      if (!Modifier.isStatic(m.getModifiers()) &&
+          m.getName().equals(methodName) &&
+          mDesc.equals(methodDesc)) {
+        return m;
+      }
+    }
+    return null;
   }
 }

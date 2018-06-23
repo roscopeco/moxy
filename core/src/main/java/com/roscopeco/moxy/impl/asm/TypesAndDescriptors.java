@@ -92,17 +92,9 @@ public final class TypesAndDescriptors {
   /* ASMMoxyMockSupport-related */
   public static final String SUPPORT_GETENGINE_METHOD_NAME = "__moxy_asm_getEngine";
   public static final String SUPPORT_GETENGINE_DESCRIPTOR = "()" + MOXY_ASM_ENGINE_DESCRIPTOR;
-  public static final String SUPPORT_GETRETURNMAP_METHOD_NAME = "__moxy_asm_getReturnMap";
-  public static final String SUPPORT_GETRETURNMAP_DESCRIPTOR = MAP_VOID_DESCRIPTOR;
-  public static final String SUPPORT_GETTHROWMAP_METHOD_NAME = "__moxy_asm_getThrowMap";
-  public static final String SUPPORT_GETTHROWMAP_DESCRIPTOR = MAP_VOID_DESCRIPTOR;
-  public static final String SUPPORT_GETSUPERMAP_METHOD_NAME = "__moxy_asm_getCallSuperMap";
-  public static final String SUPPORT_GETSUPERMAP_DESCRIPTOR = MAP_VOID_DESCRIPTOR;
-  public static final String SUPPORT_GETDOACTIONSMAP_METHOD_NAME = "__moxy_asm_getDoActionsMap";
-  public static final String SUPPORT_GETDOACTIONSMAP_DESCRIPTOR = MAP_VOID_DESCRIPTOR;
-  public static final String SUPPORT_GETCURRENTTHROW_METHOD_NAME = "__moxy_asm_getThrowForCurrentInvocation";
+  public static final String SUPPORT_GETCURRENTTHROW_METHOD_NAME = "__moxy_asm_getThrowableForCurrentInvocation";
   public static final String SUPPORT_GETCURRENTTHROW_DESCRIPTOR = THROWABLE_VOID_DESCRIPTOR;
-  public static final String SUPPORT_GETCURRENTRETURN_METHOD_NAME = "__moxy_asm_getReturnForCurrentInvocation";
+  public static final String SUPPORT_GETCURRENTRETURN_METHOD_NAME = "__moxy_asm_getReturnableForCurrentInvocation";
   public static final String SUPPORT_GETCURRENTRETURN_DESCRIPTOR = OBJECT_VOID_DESCRIPTOR;
   public static final String SUPPORT_SHOULD_CALL_SUPER_METHOD_NAME = "__moxy_asm_shouldCallSuperForCurrentInvocation";
   public static final String SUPPORT_SHOULD_CALL_SUPER_DESCRIPTOR = BOOLEAN_VOID_DESCRIPTOR;

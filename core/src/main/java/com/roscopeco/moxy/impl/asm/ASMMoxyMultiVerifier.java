@@ -34,7 +34,7 @@ import org.opentest4j.MultipleFailuresError;
 
 import com.roscopeco.moxy.api.MoxyMultiVerifier;
 
-class ASMMoxyMultiVerifier extends AbstractASMMoxyVerifier implements MoxyMultiVerifier {
+class ASMMoxyMultiVerifier extends AbstractASMMoxyInvocationListProcessor implements MoxyMultiVerifier {
   private boolean allCalledChecked = false;
 
   public ASMMoxyMultiVerifier(final ASMMoxyEngine engine, final List<Invocation> invocations) {

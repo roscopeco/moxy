@@ -50,6 +50,8 @@ import com.roscopeco.moxy.api.MonitoredInvocationException;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.impl.asm.ASMMoxyEngine.InvocationMonitor;
+import com.roscopeco.moxy.impl.asm.stubs.StubInvocation;
+import com.roscopeco.moxy.impl.asm.stubs.StubMethod;
 import com.roscopeco.moxy.model.ClassWithPrimitiveReturns;
 import com.roscopeco.moxy.model.DifferentAccessModifiers;
 import com.roscopeco.moxy.model.MethodWithArguments;
@@ -135,6 +137,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThatThrownBy(() -> mockEngine.mock(Object.class))
       .isInstanceOf(MoxyException.class)
       .hasMessage("MARKER");
+
   }
 
   @Test
@@ -510,27 +513,13 @@ class TestASMMoxyEngine extends AbstractImplTest {
 
     final ASMMockSupport mockSupp = (ASMMockSupport)mock;
 
-    final Map<StubMethod, Deque<StubReturn>> originalReturnMap = mockSupp.__moxy_asm_ivars().getReturnMap();
-    final Map<StubMethod, Deque<StubThrow>> originalThrowMap = mockSupp.__moxy_asm_ivars().getThrowMap();
-    final Map<StubMethod, Deque<StubSuper>> originalSuperMap = mockSupp.__moxy_asm_ivars().getCallSuperMap();
+    final Map<StubMethod, Deque<StubInvocation>> originalStubsMap = mockSupp.__moxy_asm_ivars().getStubsMap();
 
     engine.initializeMock(mock.getClass(), mock);
 
-    assertThat(mockSupp.__moxy_asm_ivars().getReturnMap())
+    assertThat(mockSupp.__moxy_asm_ivars().getStubsMap())
         .isNotNull()
-        .isNotSameAs(originalReturnMap);
-
-    assertThat(mockSupp.__moxy_asm_ivars().getThrowMap())
-        .isNotNull()
-        .isNotSameAs(originalThrowMap);
-
-    assertThat(mockSupp.__moxy_asm_ivars().getCallSuperMap())
-        .isNotNull()
-        .isNotSameAs(originalSuperMap);
-
-    assertThat(mockSupp.__moxy_asm_ivars().getEngine())
-        .isNotNull()
-        .isSameAs(engine);
+        .isNotSameAs(originalStubsMap);
   }
 
   @Test
@@ -548,12 +537,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     // Ensure fields are set up properly in instantiation
     assertThat(mockSupp.__moxy_asm_ivars().getEngine()).isSameAs(engine);
 
-    assertThat(mockSupp.__moxy_asm_ivars().getReturnMap())
-        .isNotNull()
-        .isInstanceOf(HashMap.class)
-        .isEmpty();
-
-    assertThat(mockSupp.__moxy_asm_ivars().getReturnMap())
+    assertThat(mockSupp.__moxy_asm_ivars().getStubsMap())
         .isNotNull()
         .isInstanceOf(HashMap.class)
         .isEmpty();

@@ -25,6 +25,7 @@ package com.roscopeco.moxy.api;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * <p>Implementations of this interface allow mocks to be stubbed to
@@ -50,9 +51,11 @@ public interface MoxyStubber<T> {
    *
    * @param object The <code>Object</code> to return for matching invocations.
    *
+   * @return <code>this</code> for ongoing stubbing.
+   *
    * @since 1.0
    */
-  public void thenReturn(T object);
+  public MoxyStubber<T> thenReturn(T object);
 
   /**
    * <p>Stubs the mock invocation to throw the given <code>Throwable</code>.</p>
@@ -64,9 +67,11 @@ public interface MoxyStubber<T> {
    *
    * @param throwable The <code>Throwable</code> to throw for matching invocations.
    *
+   * @return <code>this</code>, for ongoing stubbing.
+   *
    * @since 1.0
    */
-  public void thenThrow(Throwable throwable);
+  public MoxyStubber<T> thenThrow(Throwable throwable);
 
   /**
    * <p>Instead of stubbing, have the mock call the real method instead.</p>
@@ -79,9 +84,11 @@ public interface MoxyStubber<T> {
    * is not <code>abstract</code>. If it is, an
    * {@link InvalidStubbingException} will be thrown when the mock is invoked.</p>
    *
+   * @return <code>this</code>, for ongoing stubbing.
+   *
    * @since 1.0
    */
-  public void thenCallRealMethod();
+  public MoxyStubber<T> thenCallRealMethod();
 
   /**
    * <p>Stub this method to return the value calculated by the supplied
@@ -97,8 +104,10 @@ public interface MoxyStubber<T> {
    * </code></pre>
    *
    * @param provider The {@link AnswerProvider}, usually as a lambda.
+   *
+   * @return <code>this</code>, for ongoing stubbing.
    */
-  public void thenAnswer(AnswerProvider<T> provider);
+  public MoxyStubber<T> thenAnswer(Function<List<? extends Object>, T> provider);
 
   /**
    * <p>Have this method delegate calls to the first compatible method on
@@ -111,12 +120,11 @@ public interface MoxyStubber<T> {
    * <ul>
    * <li>Not be static.</li>
    * <li>Be accessible, given the current security context (if applicable).</li>
+   * <li>Have <em>exactly</em> the same name as the mocked method.</li>
    * <li>Have <em>exactly</em> the same return type as the mocked method.</li>
    * <li>Have <em>exactly</em> the same number of arguments as the mocked method.</li>
    * <li>Have <em>exactly</em> the same argument types as the mocked method.</li>
    * </ul>
-   *
-   * <p>The name of the method is <em>not</em> taken into account.</p>
    *
    * <p>Note that, where several such methods exist, the first one encountered will
    * be used (the actual ordering of the methods is, by virtue of JVM internals,
@@ -132,8 +140,10 @@ public interface MoxyStubber<T> {
    * different objects, each of potentially different classes.</p>
    *
    * @param delegate An object with a compatible method.
+   *
+   * @return <code>this</code>, for ongoing stubbing.
    */
-  public void thenDelegateTo(Object delegate);
+  public MoxyStubber<T> thenDelegateTo(Object delegate);
 
   /**
    * <p>Add a <em>doAction</em> to this method.</p>

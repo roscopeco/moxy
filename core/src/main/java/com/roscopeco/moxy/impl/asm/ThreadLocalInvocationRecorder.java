@@ -189,7 +189,6 @@ public class ThreadLocalInvocationRecorder {
     this.currentInvocationThreadLocal.set(null);
     this.standardInvocationsOrderedList.set(null);
     this.invocationMapThreadLocal.set(null);
-    this.standardInvocationsOrderedList.set(null);
   }
 
   void startMonitoredInvocation() {

@@ -21,28 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.api;
+
+package com.roscopeco.moxy.impl.asm.stubs;
 
 import java.util.List;
 
-/**
- * <p>Functional interface that provides a return value for the
- * {@link com.roscopeco.moxy.api.MoxyStubber#thenAnswer(AnswerProvider)}
- * method.</p>
+/*
+ * Interface implemented by all specific types of stubbing.
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
- * @since 1.0
- *
- * @param <T> The type this provider must provide.
  */
-@FunctionalInterface
-public interface AnswerProvider<T> {
-  /**
-   * Provide an answer (return value).
-   *
-   * @param args Arguments that were passed to the method.
-   *
-   * @return The return value for the method.
+public interface Stub {
+  /*
+   * Get the type of this stub.
    */
-  public T provide(List<? extends Object> args);
+  public StubType getType();
+
+  /*
+   * If true, this stub should be retained for future calls.
+   */
+  public boolean isRetained();
+
+  /*
+   * Get the object this stub provides, which the framework
+   * will handle according to the type of this stub.
+   *
+   * Not all stub types have an object (e.g. call super stub).
+   */
+  public Object getObject(List<Object> actualArgs);
 }

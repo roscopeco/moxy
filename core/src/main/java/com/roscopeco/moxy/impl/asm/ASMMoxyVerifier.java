@@ -32,7 +32,7 @@ import org.opentest4j.AssertionFailedError;
 
 import com.roscopeco.moxy.api.MoxyVerifier;
 
-class ASMMoxyVerifier extends AbstractASMMoxyVerifier implements MoxyVerifier {
+class ASMMoxyVerifier extends AbstractASMMoxyInvocationListProcessor implements MoxyVerifier {
   public ASMMoxyVerifier(final ASMMoxyEngine engine, final List<Invocation> invocations) {
     super(engine, Collections.unmodifiableList(invocations));
   }

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.impl.asm;
+package com.roscopeco.moxy.impl.asm.stubs;
 
 import java.util.List;
 
@@ -29,11 +29,27 @@ import java.util.List;
  * This is used as the value in the stubbed returnMap
  * on the mocks.
  */
-final class StubReturn extends AbstractStub {
+public final class StubReturn implements Stub {
   final Object toReturn;
+  final boolean retain;
 
-  public StubReturn(final List<Object> args, final Object toReturn) {
-    super(args);
+  public StubReturn(final Object toReturn, final boolean retain) {
     this.toReturn = toReturn;
+    this.retain = retain;
+  }
+
+  @Override
+  public StubType getType() {
+    return StubType.RETURN_OBJECT;
+  }
+
+  @Override
+  public boolean isRetained() {
+    return this.retain;
+  }
+
+  @Override
+  public Object getObject(final List<Object> actualArgs) {
+    return this.toReturn;
   }
 }

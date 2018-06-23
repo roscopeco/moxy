@@ -23,7 +23,6 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
-import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,8 +32,13 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import com.roscopeco.moxy.api.AnswerProvider;
 import com.roscopeco.moxy.api.InvalidMockInvocationException;
+import com.roscopeco.moxy.impl.asm.ASMMockInstanceVars.CachedDelegate;
+import com.roscopeco.moxy.impl.asm.stubs.Stub;
+import com.roscopeco.moxy.impl.asm.stubs.StubDoActions;
+import com.roscopeco.moxy.impl.asm.stubs.StubInvocation;
+import com.roscopeco.moxy.impl.asm.stubs.StubMethod;
+import com.roscopeco.moxy.impl.asm.stubs.StubType;
 
 /**
  * All mocks implement this interface. It (ab)uses default methods
@@ -59,79 +63,73 @@ public interface ASMMockSupport {
     return TypeStringUtils.javaMethodSignature(name, desc);
   }
 
-  public default <T extends AbstractStub> void __moxy_asm_removeStubbingFrom(
-                final Map<StubMethod, Deque<T>> map,
-                final StubMethod stubMethod,
-                final Invocation invocation) {
-    map.computeIfPresent(stubMethod, (k, deque) -> {
-      final ASMMoxyMatcherEngine matchEngine = __moxy_asm_ivars().getEngine().getMatcherEngine();
+  public default void __moxy_asm_removePriorStubbing(final Invocation invocation) {
+    this.__moxy_asm_removePriorStubbing(
+        new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()),
+        invocation);
+  }
 
-      return new ArrayDeque<>(deque.stream()
-          .filter(obj -> !matchEngine.argsMatch(invocation.getArgs(), obj.args))
-          .collect(Collectors.toList()));
-    });
+  public default void __moxy_asm_removePriorStubbing(final StubMethod stubMethod,
+                                                     final Invocation invocation) {
+    synchronized (__moxy_asm_ivars()) {
+      final Map<StubMethod, Deque<StubInvocation>> map = __moxy_asm_ivars().getStubsMap();
+      map.computeIfPresent(stubMethod, (k, deque) -> {
+        final ASMMoxyMatcherEngine matchEngine = __moxy_asm_ivars().getEngine().getMatcherEngine();
+
+        return new ArrayDeque<>(deque.stream()
+            .filter(stubInvocation -> !matchEngine.argsMatch(invocation.getArgs(), stubInvocation.getArgs()))
+            .collect(Collectors.toList()));
+      });
+    }
   }
 
   // TODO move to private methods class
-  public default void __moxy_asm_removePriorStubbing(final StubMethod stubMethod, final Invocation invocation) {
-    __moxy_asm_removeStubbingFrom(__moxy_asm_ivars().getReturnMap(), stubMethod, invocation);
-    __moxy_asm_removeStubbingFrom(__moxy_asm_ivars().getThrowMap(), stubMethod, invocation);
-    __moxy_asm_removeStubbingFrom(__moxy_asm_ivars().getCallSuperMap(), stubMethod, invocation);
-    __moxy_asm_removeStubbingFrom(__moxy_asm_ivars().getDelegateMap(), stubMethod, invocation);
+  //
+  // NOTE: This should be used when the arguments come from a monitored
+  // invocation (i.e. may contain matchers).
+  public default StubInvocation findStubInvocationForMonitoredArgs(final Deque<StubInvocation> deque,
+                                                                   final List<Object> args) {
+    for (final StubInvocation invocation : deque) {
+      if (args.equals(invocation.getArgs())) {
+        return invocation;
+      }
+    }
+
+    return null;
   }
 
   // TODO move to private methods class
-  public default <T extends AbstractStub> void __moxy_asm_safelySetStubbing(
-                final Map<StubMethod, Deque<T>> map,
+  public default void __moxy_asm_safelyAddStubbing(
+                final Map<StubMethod, Deque<StubInvocation>> map,
                 final Invocation invocation,
-                final T stubbing) {
+                final Stub stubbing) {
     synchronized (__moxy_asm_ivars()) {
       final StubMethod stubMethod = new StubMethod(invocation.getMethodName(), invocation.getMethodDesc());
-      __moxy_asm_removePriorStubbing(stubMethod, invocation);
-      final Deque<T> deque = map.computeIfAbsent(stubMethod, k -> new ArrayDeque<>());
-      deque.addFirst(stubbing);
-    }
-  }
+      final Deque<StubInvocation> deque = map.computeIfAbsent(stubMethod, k -> new ArrayDeque<>());
 
-  public default void __moxy_asm_setThrowOrReturn(final Invocation invocation,
-                                                  final Object object,
-                                                  final boolean isReturn) {
+      StubInvocation stubInvocation = findStubInvocationForMonitoredArgs(deque, invocation.getArgs());
 
-
-    if (invocation == null) {
-      throw new InvalidMockInvocationException("[BUG] Stubbing call to support with no recorded invocation\n"
-                                             + "(If you're testing the framework; may indicate an incomplete partial mock engine)");
-    }
-
-    if (isReturn) {
-      final Map<StubMethod, Deque<StubReturn>> returnMap = __moxy_asm_ivars().getReturnMap();
-      __moxy_asm_safelySetStubbing(returnMap, invocation, new StubReturn(invocation.getArgs(), object));
-    } else {
-      final Map<StubMethod, Deque<StubThrow>> throwMap = __moxy_asm_ivars().getThrowMap();
-      if (object instanceof Throwable) {
-        __moxy_asm_safelySetStubbing(throwMap, invocation, new StubThrow(invocation.getArgs(), (Throwable)object));
+      if (stubInvocation != null) {
+        stubInvocation.getStubs().addLast(stubbing);
       } else {
-        throw new IllegalArgumentException("Cannot throw non-Throwable class " + object.getClass().getName());
+        stubInvocation = new StubInvocation(invocation.getArgs());
+        stubInvocation.getStubs().addFirst(stubbing);
+        deque.addLast(stubInvocation);
       }
     }
   }
 
-  public default void __moxy_asm_setShouldCallSuper(final Invocation invocation,
-                                                    final boolean callSuper) {
+  public default void __moxy_asm_setStubbing(final Invocation invocation,
+                                             final Stub stub) {
+
     if (invocation == null) {
       throw new InvalidMockInvocationException("[BUG] Stubbing call to support with no recorded invocation\n"
                                              + "(If you're testing the framework; may indicate an incomplete partial mock engine)");
     }
 
-    final Map<StubMethod, Deque<StubSuper>> superMap = __moxy_asm_ivars().getCallSuperMap();
-    __moxy_asm_safelySetStubbing(superMap, invocation, new StubSuper(invocation.getArgs(), true));
-  }
+    final Map<StubMethod, Deque<StubInvocation>> stubsMap = __moxy_asm_ivars().getStubsMap();
 
-  public default void __moxy_asm_setDelegateTo(final Invocation invocation,
-                                               final Method method,
-                                               final Object delegate) {
-    final Map<StubMethod, Deque<StubDelegate>> delegateMap = __moxy_asm_ivars().getDelegateMap();
-    __moxy_asm_safelySetStubbing(delegateMap, invocation, new StubDelegate(invocation.getArgs(), method, delegate));
+    __moxy_asm_safelyAddStubbing(stubsMap, invocation, stub);
   }
 
   public default void __moxy_asm_addDoAction(final Invocation invocation,
@@ -152,7 +150,7 @@ public interface ASMMockSupport {
     StubDoActions matchingStub = null;
 
     for (final StubDoActions actions : list) {
-      if (matchEngine.argsMatch(invocation.getArgs(), actions.args)) {
+      if (matchEngine.argsMatch(invocation.getArgs(), actions.getMatchArgs())) {
         matchingStub = actions;
         break;
       }
@@ -161,122 +159,130 @@ public interface ASMMockSupport {
     if (matchingStub == null) {
       list.add(new StubDoActions(invocation.getArgs(), action));
     } else {
-      matchingStub.actions.add(action);
+      matchingStub.getActions().add(action);
     }
   }
 
-  public default Throwable __moxy_asm_getThrowForInvocation(final Invocation invocation) {
-    final ASMMockInstanceVars ivars = this.__moxy_asm_ivars();
-    final Map<StubMethod, Deque<StubThrow>> throwMap = ivars.getThrowMap();
-    final ASMMoxyMatcherEngine matchEngine = ivars.getEngine().getMatcherEngine();
-    final Deque<StubThrow> deque = throwMap.get(
-        new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
-
-    // Old-fashioned but a tad more efficient...
-    if (deque != null) {
-      for (final StubThrow stubThrow : deque) {
-        if (matchEngine.argsMatch(invocation.getArgs(), stubThrow.args)) {
-          return stubThrow.toThrow;
-        }
-      }
-    }
-
-    return null;
-  }
-
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  public default Object __moxy_asm_getReturnForInvocation(final Invocation invocation) {
-    final ASMMockInstanceVars ivars = this.__moxy_asm_ivars();
-    final Map<StubMethod, Deque<StubReturn>> returnMap = ivars.getReturnMap();
-    final ASMMoxyMatcherEngine matchEngine = ivars.getEngine().getMatcherEngine();
-    final Deque<StubReturn> deque = returnMap.get(
-        new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
-
-    // Old-fashioned but a tad more efficient...
-    if (deque != null) {
-      for (final StubReturn stubReturn : deque) {
-        if (matchEngine.argsMatch(invocation.getArgs(), stubReturn.args)) {
-          final Object toReturn = stubReturn.toReturn;
-
-          if (toReturn instanceof AnswerProvider) {
-            final List<? extends Object> immutableArgs =
-                Collections.unmodifiableList(invocation.getArgs());
-
-            return ((AnswerProvider)toReturn).provide(immutableArgs);
-          } else {
-            return stubReturn.toReturn;
-          }
-        }
-      }
-    }
-
-    return null;
-  }
-
-  public default boolean __moxy_asm_shouldCallSuperForInvocation(final Invocation invocation) {
+  // NOTE: This should NOT be used when the arguments come from a monitored
+  // invocation (i.e. may contain matchers).
+  //
+  // In that case, use #findStubInvocationForMonitoredArgs instead.
+  public default StubInvocation findStubbingForActualInvocation(final Invocation invocation) {
     if (invocation == null) {
       throw new InvalidMockInvocationException("[BUG] Mock callback to support with no recorded invocation\n"
                                              + "(If you're testing the framework; may indicate an incomplete partial mock engine)");
     }
 
     final ASMMockInstanceVars ivars = this.__moxy_asm_ivars();
-
-    final Map<StubMethod, Deque<StubSuper>> superMap = ivars.getCallSuperMap();
+    final Map<StubMethod, Deque<StubInvocation>> stubsMap = ivars.getStubsMap();
     final ASMMoxyMatcherEngine matchEngine = ivars.getEngine().getMatcherEngine();
-    final Deque<StubSuper> deque = superMap.get(
+    final Deque<StubInvocation> deque = stubsMap.get(
         new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
 
     // Old-fashioned but a tad more efficient...
     if (deque != null) {
-      for (final StubSuper stubSuper : deque) {
-        if (matchEngine.argsMatch(invocation.getArgs(), stubSuper.args)) {
-          return stubSuper.callSuper;
+      for (final StubInvocation stubInvocation : deque) {
+        if (matchEngine.argsMatch(invocation.getArgs(), stubInvocation.getArgs())) {
+          return stubInvocation;
         }
       }
     }
 
-    return false;
+    return null;
   }
 
-  // ThreadLocal Cache for the stubdelegate - saves two lookups, argsmatch, etc.
-  //
-  // NOTE: This relies on generated code delegating immediately
-  // if shouldDelegateForInvocation is true!
-  //
-  // It is subsequently cleared in runDelegateForInvocation...
-  static final ThreadLocal<StubDelegate> stubDelegateCache = new ThreadLocal<>();
+  /*
+   * Get throw for next invocation, or null if next stub isn't a throw.
+   */
+  public default Throwable __moxy_asm_getThrowableForInvocation(final Invocation invocation) {
+    final StubInvocation stubInvocation = findStubbingForActualInvocation(invocation);
+
+    if (stubInvocation != null) {
+      final Stub nextStub = stubInvocation.getStubs().peek();
+      if (nextStub != null && nextStub.getType().equals(StubType.THROW_EXCEPTION)) {
+        if (nextStub.isRetained() || stubInvocation.getStubs().size() < 2) {
+          return (Throwable)nextStub.getObject(invocation.getArgs());
+        } else {
+          return (Throwable)stubInvocation.getStubs().pop().getObject(invocation.getArgs());
+        }
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  public default Object __moxy_asm_getReturnableForInvocation(final Invocation invocation) {
+    final StubInvocation stubInvocation = findStubbingForActualInvocation(invocation);
+
+    if (stubInvocation != null) {
+      final Stub nextStub = stubInvocation.getStubs().peek();
+      if (nextStub != null && nextStub.getType().equals(StubType.RETURN_OBJECT)) {
+        if (nextStub.isRetained() || stubInvocation.getStubs().size() < 2) {
+          return nextStub.getObject(invocation.getArgs());
+        } else {
+          return stubInvocation.getStubs().pop().getObject(invocation.getArgs());
+        }
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  public default boolean __moxy_asm_shouldCallSuperForInvocation(final Invocation invocation) {
+    final StubInvocation stubInvocation = findStubbingForActualInvocation(invocation);
+
+    if (stubInvocation != null) {
+      final Stub nextStub = stubInvocation.getStubs().peek();
+      if (nextStub != null && nextStub.getType().equals(StubType.CALL_SUPER)) {
+        if (!nextStub.isRetained() && stubInvocation.getStubs().size() > 1) {
+          stubInvocation.getStubs().pop();
+        }
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
 
   public default boolean __moxy_asm_shouldDelegateForInvocation(final Invocation invocation) {
-    final ASMMockInstanceVars ivars = this.__moxy_asm_ivars();
-    final Map<StubMethod, Deque<StubDelegate>> delegateMap = ivars.getDelegateMap();
-    final ASMMoxyMatcherEngine matchEngine = ivars.getEngine().getMatcherEngine();
-    final Deque<StubDelegate> deque = delegateMap.get(
-        new StubMethod(invocation.getMethodName(), invocation.getMethodDesc()));
+    final StubInvocation stubInvocation = findStubbingForActualInvocation(invocation);
+    final ASMMockInstanceVars ivars = __moxy_asm_ivars();
 
-    // Old-fashioned but a tad more efficient...
-    if (deque != null) {
-      for (final StubDelegate stubDelegate : deque) {
-        if (matchEngine.argsMatch(invocation.getArgs(), stubDelegate.args)) {
-          stubDelegateCache.set(stubDelegate);
-          return true;
+    if (stubInvocation != null) {
+      final Stub nextStub = stubInvocation.getStubs().peek();
+      if (nextStub != null && nextStub.getType().equals(StubType.DELEGATE)) {
+        if (!nextStub.isRetained() && stubInvocation.getStubs().size() > 1) {
+          stubInvocation.getStubs().pop();
         }
-      }
-    }
 
-    return false;
+        ivars.getStubDelegateCache().set(
+            ivars.new CachedDelegate(nextStub, invocation.getArgs()));
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 
   public default Object __moxy_asm_runCachedDelegate() {
-    final StubDelegate stubDelegate = stubDelegateCache.get();
+    final CachedDelegate stubDelegate = __moxy_asm_ivars().getStubDelegateCache().get();
 
     if (stubDelegate == null) {
       throw new IllegalStateException("[BUG] Attempted to run cached delegate, but cache was empty");
     }
 
     try {
-      return stubDelegate.invoke();
+      return stubDelegate.delegate.getObject(stubDelegate.actualArgs);
     } finally {
-      stubDelegateCache.set(null);
+      __moxy_asm_ivars().getStubDelegateCache().set(null);
     }
   }
 
@@ -302,8 +308,8 @@ public interface ASMMockSupport {
 
     if (list != null) {
       for (final StubDoActions stubDoActions : list) {
-        if (matchEngine.argsMatch(invocation.getArgs(), stubDoActions.args)) {
-          stubDoActions.actions.forEach(action -> action.accept(immutableArgs));
+        if (matchEngine.argsMatch(invocation.getArgs(), stubDoActions.getMatchArgs())) {
+          stubDoActions.getActions().forEach(action -> action.accept(immutableArgs));
         }
       }
     }
@@ -313,8 +319,8 @@ public interface ASMMockSupport {
    * recorded. It relies on the fact that getLastInvocation will always be the current
    * invocation just prior to throw or return.
    */
-  public default Throwable __moxy_asm_getThrowForCurrentInvocation() {
-    return __moxy_asm_getThrowForInvocation(
+  public default Throwable __moxy_asm_getThrowableForCurrentInvocation() {
+    return __moxy_asm_getThrowableForInvocation(
         __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation());
   }
 
@@ -322,8 +328,8 @@ public interface ASMMockSupport {
    * recorded. It relies on the fact that getLastInvocation will always be the current
    * invocation just prior to throw or return.
    */
-  public default Object __moxy_asm_getReturnForCurrentInvocation() {
-    return __moxy_asm_getReturnForInvocation(
+  public default Object __moxy_asm_getReturnableForCurrentInvocation() {
+    return __moxy_asm_getReturnableForInvocation(
         __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation());
   }
 

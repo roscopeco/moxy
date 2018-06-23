@@ -31,6 +31,7 @@ import org.opentest4j.AssertionFailedError;
 
 import com.roscopeco.moxy.api.InvalidMockInvocationException;
 import com.roscopeco.moxy.api.MoxyStubber;
+import com.roscopeco.moxy.matchers.Matchers;
 import com.roscopeco.moxy.model.ClassWithPrimitiveReturns;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
@@ -156,5 +157,104 @@ public class TestMoxyStubbing {
     Moxy.when(() -> mock.sayHelloTo("Bill")).thenReturn("Goodbye, Bill");
 
     assertThat(mock.sayHelloTo("Bill")).isEqualTo("Goodbye, Bill");
+  }
+
+  class TestDelegate {
+    public String sayHelloTo(final String name) {
+      return "Whazaa, " + name;
+    }
+  }
+
+  @Test
+  public void testMoxyMockWithMockMultipleStubbingWorks() {
+    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+
+    final Exception ex = new Exception("MARKER");
+
+    Moxy.when(() -> mock.sayHelloTo("Bill"))
+        .thenReturn("Hi there, Bill")
+        .thenAnswer(args -> "Hey, " + args.get(0))
+        .thenDelegateTo(new TestDelegate())
+        .thenCallRealMethod()
+        .thenThrow(ex);
+
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hi there, Bill");
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hey, Bill");
+
+    // red herring, make sure we're still matching args ;)
+    assertThat(mock.sayHelloTo("Steve")).isNull();
+
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Whazaa, Bill");
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hello, Bill");
+
+    assertThatThrownBy(() ->
+        mock.sayHelloTo("Bill")
+    )
+        .isSameAs(ex);
+
+    // Ensure last stub remains on the mock for all time...
+    assertThatThrownBy(() ->
+        mock.sayHelloTo("Bill")
+    )
+        .isSameAs(ex);
+
+    assertThatThrownBy(() ->
+        mock.sayHelloTo("Bill")
+    )
+        .isSameAs(ex);
+  }
+
+  @Test
+  public void testMoxyMockWithMockMultipleStubbingWorksWithMatchers() {
+    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+
+    final Exception ex = new Exception("MARKER");
+
+    Moxy.when(() -> mock.sayHelloTo(Matchers.eq("Bill")))
+        .thenReturn("Hi there, Bill")
+        .thenAnswer(args -> "Hey, " + args.get(0))
+        .thenDelegateTo(new TestDelegate())
+        .thenCallRealMethod()
+        .thenThrow(ex);
+
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hi there, Bill");
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hey, Bill");
+
+    // red herring, make sure we're still matching args ;)
+    assertThat(mock.sayHelloTo("Steve")).isNull();
+
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Whazaa, Bill");
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hello, Bill");
+
+    assertThatThrownBy(() ->
+        mock.sayHelloTo("Bill")
+    )
+        .isSameAs(ex);
+
+    // Ensure last stub remains on the mock for all time...
+    assertThatThrownBy(() ->
+        mock.sayHelloTo("Bill")
+    )
+        .isSameAs(ex);
+
+    assertThatThrownBy(() ->
+        mock.sayHelloTo("Bill")
+    )
+        .isSameAs(ex);
+  }
+
+  @Test
+  public void testMoxyMockWithMockStubbingResetsInNewWhen() {
+    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+
+    Moxy.when(() -> mock.sayHelloTo("Bill")).thenReturn("Hi, Bill");
+
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hi, Bill");
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hi, Bill");
+
+    Moxy.when(() -> mock.sayHelloTo("Bill")).thenReturn("Hallo, Bill");
+
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hallo, Bill");
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hallo, Bill");
   }
 }

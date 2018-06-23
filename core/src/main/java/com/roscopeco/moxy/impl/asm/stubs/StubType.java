@@ -21,19 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.impl.asm;
 
-import java.util.List;
+package com.roscopeco.moxy.impl.asm.stubs;
 
 /*
- * This is used as the value in the stubbed superMap
- * on the mocks.
+ * Types of stubbing. Each type is treated differently in
+ * generated code.
+ *
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
-final class StubSuper extends AbstractStub {
-  final boolean callSuper;
-
-  public StubSuper(final List<Object> args, final boolean callSuper) {
-    super(args);
-    this.callSuper = callSuper;
-  }
+public enum StubType {
+  CALL_SUPER,
+  THROW_EXCEPTION,
+  RETURN_OBJECT,
+  DELEGATE,       // this is a special case of return. It's separate
+                  // to allow mock to set up exception handling etc.
 }

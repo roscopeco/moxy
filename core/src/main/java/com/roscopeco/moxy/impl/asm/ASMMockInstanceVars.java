@@ -28,6 +28,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.roscopeco.moxy.impl.asm.stubs.Stub;
+import com.roscopeco.moxy.impl.asm.stubs.StubDoActions;
+import com.roscopeco.moxy.impl.asm.stubs.StubInvocation;
+import com.roscopeco.moxy.impl.asm.stubs.StubMethod;
+
 /*
  * Holds mock objects' "instance variables".
  *
@@ -36,50 +41,51 @@ import java.util.Map;
  * as previously.
  */
 public class ASMMockInstanceVars {
+  final class CachedDelegate {
+    final Stub delegate;
+    final List<Object> actualArgs;
+
+    CachedDelegate(final Stub delegate, final List<Object> actualArgs) {
+      this.delegate = delegate;
+      this.actualArgs = actualArgs;
+    }
+  }
+
   private final ASMMoxyEngine engine;
 
   // Using Deque here for efficient add-at-front, so when
   // we stream we see the most recent stubbing...
-  private final Map<StubMethod, Deque<StubReturn>> returnMap;
-  private final Map<StubMethod, Deque<StubThrow>> throwMap;
-
-  // Present and true: call super; otherwise, use stubbing.
-  private final Map<StubMethod, Deque<StubSuper>> callSuperMap;
-
-  private final Map<StubMethod, Deque<StubDelegate>> delegateMap;
+  private final Map<StubMethod, Deque<StubInvocation>> stubsMap;
 
   private final Map<StubMethod, List<StubDoActions>> doActionsMap;
 
+  // Cache for the stubdelegate - saves two lookups, argsmatch, etc.
+  //
+  // NOTE: This relies on generated code delegating immediately
+  // if shouldDelegateForInvocation is true!
+  //
+  // It is subsequently cleared in runDelegateForInvocation...
+  private final ThreadLocal<CachedDelegate> stubDelegateCache = new ThreadLocal<>();
+
   public ASMMockInstanceVars(final ASMMoxyEngine engine) {
     this.engine = engine;
-    this.returnMap = new HashMap<>();
-    this.throwMap = new HashMap<>();
-    this.callSuperMap = new HashMap<>();
+    this.stubsMap = new HashMap<>();
     this.doActionsMap = new HashMap<>();
-    this.delegateMap = new HashMap<>();
   }
 
-  ASMMoxyEngine getEngine() {
+  public ASMMoxyEngine getEngine() {
     return this.engine;
   }
 
-  Map<StubMethod, Deque<StubReturn>> getReturnMap() {
-    return this.returnMap;
+  public Map<StubMethod, Deque<StubInvocation>> getStubsMap() {
+    return this.stubsMap;
   }
 
-  Map<StubMethod, Deque<StubThrow>> getThrowMap() {
-    return this.throwMap;
-  }
-
-  Map<StubMethod, Deque<StubSuper>> getCallSuperMap() {
-    return this.callSuperMap;
-  }
-
-  Map<StubMethod, Deque<StubDelegate>> getDelegateMap() {
-    return this.delegateMap;
-  }
-
-  Map<StubMethod, List<StubDoActions>> getDoActionsMap() {
+  public Map<StubMethod, List<StubDoActions>> getDoActionsMap() {
     return this.doActionsMap;
+  }
+
+  ThreadLocal<CachedDelegate> getStubDelegateCache() {
+    return this.stubDelegateCache;
   }
 }

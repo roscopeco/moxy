@@ -20,13 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.impl.asm;
+package com.roscopeco.moxy.impl.asm.stubs;
 
 /*
  * This is used as the key in the stubbed method maps
  * on the mocks.
  */
-final class StubMethod {
+public final class StubMethod {
   final String methodName;
   final String methodDesc;
 

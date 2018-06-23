@@ -31,9 +31,9 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.roscopeco.moxy.api.MoxyMock;
 import com.roscopeco.moxy.api.MockGenerationException;
 import com.roscopeco.moxy.api.MoxyEngine;
+import com.roscopeco.moxy.api.MoxyMock;
 import com.roscopeco.moxy.model.ClassWithNoNullConstructor;
 import com.roscopeco.moxy.model.ClassWithPrimitiveReturns;
 import com.roscopeco.moxy.model.FieldsClass;

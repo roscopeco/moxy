@@ -23,42 +23,46 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
-enum StringConsts {
-  SPACE(" "),
-  COMMA_SPACE(", "),
-  LSQPAREN("["),
-  RSQPAREN("]"),
-  EXPECTED_MOCK("Expected mock "),
-  TO_BE_CALLED(" to be called "),
-  NEVER_TO_THROW_EXCEPTION("never to throw exception "),
-  BUT_IT_WAS_CALLED(", but it was called "),
-  BUT_IT_WAS_THROWN(", but it was thrown "),
-  NEVER_THROW_ANY_BUT_EXCEPTIONS_THROWN("never to throw any exception, but exceptions were thrown "),
-  EXACTLY("exactly"),
-  AT_LEAST("at least"),
-  AT_MOST("at most"),
-  AT_LEAST_ONCE_BUT_WASNT_AT_ALL("at least once but it wasn't called at all"),
-  TAB("\t"),
-  EOL("\n"),
-  EXPECTED_INVOCATIONS("Expected invocations:"),
-  EXCLUSIVELY("exclusively "),
-  IN_ORDER_BUT_WERE("in that order, but they were "),
-  NOT_INVOKED_OR("not invoked or were "),
-  OUT_OF_ORDER("invoked out of order"),
-;
+import java.util.List;
 
-  private final String value;
+import com.roscopeco.moxy.api.InvalidMockInvocationException;
 
-  private StringConsts(final String value) {
-    this.value = value;
+/*
+ * Base-class for stubbers and verifiers.
+ */
+class AbstractASMMoxyInvocationListProcessor {
+  protected final ASMMoxyEngine engine;
+  protected final List<Invocation> invocations;
+
+  public AbstractASMMoxyInvocationListProcessor(final ASMMoxyEngine engine,
+                                 final List<Invocation> monitoredInvocations) {
+    this.engine = engine;
+    this.invocations = monitoredInvocations;
+
+    if (this.engine == null) {
+      throw new IllegalArgumentException("Cannot construct with null engine");
+    }
+
+    if (this.invocations == null ||
+        this.invocations.isEmpty() ||
+        this.invocations.stream().anyMatch(i -> i.getReceiver() == null)) {
+      throw new InvalidMockInvocationException("No mock invocation found");
+    }
   }
 
-  String value() {
-    return this.value;
+  protected ASMMoxyEngine getEngine() {
+    return this.engine;
   }
 
-  @Override
-  public String toString() {
-    return this.value();
+  protected ThreadLocalInvocationRecorder getRecorder() {
+    return this.engine.getRecorder();
+  }
+
+  protected Invocation getLastMonitoredInvocation() {
+    return this.invocations.get(this.invocations.size() - 1);
+  }
+
+  protected List<Invocation> getMonitoredInvocations() {
+    return this.invocations;
   }
 }

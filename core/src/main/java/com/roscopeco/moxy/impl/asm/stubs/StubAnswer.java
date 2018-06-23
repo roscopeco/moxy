@@ -21,45 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.impl.asm;
+package com.roscopeco.moxy.impl.asm.stubs;
 
 import java.util.List;
+import java.util.function.Function;
 
-import com.roscopeco.moxy.api.InvalidMockInvocationException;
+/*
+ * Stub that calls a Function for its value.
+ */
+public final class StubAnswer implements Stub {
+  final Function<List<? extends Object>, ? extends Object> function;
+  final boolean retain;
 
-class AbstractASMMoxyVerifier {
-  protected final ASMMoxyEngine engine;
-  protected final List<Invocation> invocations;
-
-  public AbstractASMMoxyVerifier(final ASMMoxyEngine engine,
-                                 final List<Invocation> monitoredInvocations) {
-    this.engine = engine;
-    this.invocations = monitoredInvocations;
-
-    if (this.engine == null) {
-      throw new IllegalArgumentException("Cannot construct with null engine");
-    }
-
-    if (this.invocations == null ||
-        this.invocations.isEmpty() ||
-        this.invocations.stream().anyMatch(i -> i.getReceiver() == null)) {
-      throw new InvalidMockInvocationException("No mock invocation found");
-    }
+  public StubAnswer(final Function<List<? extends Object>, ? extends Object> function, final boolean retain) {
+    this.function = function;
+    this.retain = retain;
   }
 
-  protected ASMMoxyEngine getEngine() {
-    return this.engine;
+  @Override
+  public StubType getType() {
+    return StubType.RETURN_OBJECT;
   }
 
-  protected ThreadLocalInvocationRecorder getRecorder() {
-    return this.engine.getRecorder();
+  @Override
+  public boolean isRetained() {
+    return this.retain;
   }
 
-  protected Invocation getLastMonitoredInvocation() {
-    return this.invocations.get(this.invocations.size() - 1);
-  }
-
-  protected List<Invocation> getMonitoredInvocations() {
-    return this.invocations;
+  @Override
+  public Object getObject(final List<Object> actualArgs) {
+    return this.function.apply(actualArgs);
   }
 }

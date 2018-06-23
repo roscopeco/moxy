@@ -49,6 +49,7 @@ public interface MoxyVerifier {
    * Throws {@link AssertionFailedError} if the assertion fails.
    *
    * @return <code>this</code>.
+   * @since 1.0
    */
   public MoxyVerifier wasCalled();
 
@@ -64,6 +65,7 @@ public interface MoxyVerifier {
    * @param times The number of expected invocations.
    *
    * @return <code>this</code>.
+   * @since 1.0
    */
   public MoxyVerifier wasCalled(int times);
 
@@ -73,6 +75,7 @@ public interface MoxyVerifier {
    * Throws {@link AssertionFailedError} if the assertion fails.
    *
    * @return <code>this</code>
+   * @since 1.0
    */
   public MoxyVerifier wasNotCalled();
 
@@ -82,6 +85,7 @@ public interface MoxyVerifier {
    * Throws {@link AssertionFailedError} if the assertion fails.
    *
    * @return <code>this</code>
+   * @since 1.0
    */
   public MoxyVerifier wasCalledOnce();
 
@@ -91,6 +95,7 @@ public interface MoxyVerifier {
    * Throws {@link AssertionFailedError} if the assertion fails.
    *
    * @return <code>this</code>
+   * @since 1.0
    */
   public MoxyVerifier wasCalledTwice();
 
@@ -102,6 +107,7 @@ public interface MoxyVerifier {
    * @param times The number of expected invocations.
    *
    * @return <code>this</code>
+   * @since 1.0
    */
   public MoxyVerifier wasCalledAtLeast(int times);
 
@@ -113,6 +119,7 @@ public interface MoxyVerifier {
    * @param times The number of expected invocations.
    *
    * @return <code>this</code>
+   * @since 1.0
    */
   public MoxyVerifier wasCalledAtMost(int times);
 
@@ -124,6 +131,7 @@ public interface MoxyVerifier {
    * @param throwable The exception type to check.
    *
    * @return <code>this</code>
+   * @since 1.0
    */
   public MoxyVerifier didntThrow(Class<? extends Throwable> throwable);
 
@@ -135,6 +143,7 @@ public interface MoxyVerifier {
    * @param throwable The exception instance to check.
    *
    * @return <code>this</code>
+   * @since 1.0
    */
   public MoxyVerifier didntThrow(Throwable throwable);
 
@@ -144,6 +153,7 @@ public interface MoxyVerifier {
    * Throws {@link AssertionFailedError} if the assertion fails.
    *
    * @return <code>this</code>
+   * @since 1.0
    */
   public MoxyVerifier didntThrowAnyException();
 }

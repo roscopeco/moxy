@@ -49,6 +49,8 @@ public interface MoxyEngine {
   /**
    * Constant set to be passed to mock generation methods when all methods are
    * to be mocked.
+   *
+   * @since 1.0
    */
   // Ignore this in sonar, it's final and null, hence immutable.
   @SuppressWarnings("squid:S2386")
@@ -57,6 +59,8 @@ public interface MoxyEngine {
   /**
    * Constant set to be passed to mock generation methods when no methods are
    * to be mocked.
+   *
+   * @since 1.0
    */
   public static final Set<Method> NO_METHODS = Collections.emptySet();
 
@@ -474,6 +478,10 @@ public interface MoxyEngine {
    * <p>The arguments passed to the mock within the lambda may be either
    * immediate arguments, other mocks, or argument matchers (see {@link Matchers}).</p>
    *
+   * <p>This method begins a new chain of stubbing for the given invocation -
+   * Any prior stubbing applied is discarded, to be replaced by the
+   * stubbing applied on the returned {@link MoxyStubber}.</p>
+   *
    * <p>See {@link MoxyStubber} for details on the stubbing methods
    * available.</p>
    *
@@ -509,6 +517,10 @@ public interface MoxyEngine {
    * <p>The arguments passed to the mock within the lambda may be either
    * immediate arguments, other mocks, or argument matchers (see {@link Matchers}).</p>
    *
+   * <p>This method begins a new chain of stubbing for the given invocation -
+   * Any prior stubbing applied is discarded, to be replaced by the
+   * stubbing applied on the returned {@link MoxyVoidStubber}.</p>
+   *
    * <p>See {@link MoxyStubber} for details on the stubbing methods
    * available.</p>
    *
@@ -539,7 +551,7 @@ public interface MoxyEngine {
    * <p>The arguments passed to the mock within the lambda may be either
    * immediate arguments, other mocks, or argument matchers (see {@link Matchers}).</p>
    *
-   * <p>See {@link MoxyStubber} for details on the stubbing methods
+   * <p>See {@link MoxyVerifier} for details on the verifying methods
    * available.</p>
    *
    * @param invocation A lambda that will invoke the method to be stubbed.
@@ -551,19 +563,57 @@ public interface MoxyEngine {
    */
   public MoxyVerifier assertMock(InvocationRunnable invocation);
 
+  /**
+   * <p>Starts verification of one or more mock invocations at the same
+   * time. This allows multiple invocations to be checked together
+   * to ensure ordering, for example.</p>
+   *
+   * <p>The invocation of the mock is used to determine which method
+   * and argument combination is to be verified and is not counted
+   * toward mock invocation, return or throw counters.</p>
+   *
+   * <p>Example usage:</p>
+   *
+   * <pre><code>
+   * engine.assertMocks(() -&gt; {
+   *   mock.voidMethod(engine, "one", "two")).wasCalled();
+   *   mock.anotherMethod();
+   *
+   *   anotherMock.someMethod("five");
+   *
+   *   mock.finalMethod("Bees");
+   * })
+   *     .wereAllCalledOnce()
+   *     .inThatOrder();
+   * </code></pre>
+   *
+   * <p>The arguments passed to the mocks within the lambda may be either
+   * immediate arguments, other mocks, or argument matchers (see {@link Matchers}).</p>
+   *
+   * <p>See {@link MoxyMultiVerifier} for details on the verifying methods
+   * available.</p>
+   *
+   * @param invocation A lambda that will invoke the methods to be verified.
+   * @return A {@link MoxyMultiVerifier} that will verify the invocations.
+   *
+   * @see #assertMock(InvocationRunnable)
+   * @since 1.0
+   */
   public MoxyMultiVerifier assertMocks(InvocationRunnable invocation);
 
   /**
    * <p>Register the given matcher with this <code>MoxyEngine</code>.</p>
    *
-   * <p>This method triggers a two-step process, whereby the matcher engine
-   * takes care of any housekeeping required by the current {@link MoxyEngine}
-   * and then calls back to the {@link MoxyMatcher#addToStack(java.util.Deque)}
+   * <p>This method triggers a two-step process, whereby the engine
+   * takes care of any housekeeping required and then calls back to
+   * the {@link MoxyMatcher#addToStack(java.util.Deque)}
    * method, passing in the appropriate stack.</p>
    *
    * <p>See the documentation on {@link MoxyMatcher} for more information.</p>
    *
    * @param matcher The {@link MoxyMatcher} to register.
+   *
+   * @since 1.0
    */
   void registerMatcher(final MoxyMatcher<?> matcher);
 }

@@ -48,6 +48,31 @@ public interface MoxyStubber<T> {
    * <p>Where the method being stubbed is primitive, the appropriate
    * primitive wrapper type should be returned, which will then be
    * boxed/unboxed as required by the framework.</p>
+   * <p>This method may be chained with other <code>then...</code> methods,
+   * which will cause the mocked invocation to exhibit the chained
+   * behaviours, in order, upon multiple calls to the mock.</p>
+   *
+   * <p>For example:</p>
+   *
+   * <pre><code>
+   *   Object mock = mock(Object.class);
+   *
+   *   when(mock.toString())
+   *       .thenReturn("one")
+   *       .thenAnswer(args -&gt; "two")
+   *       .thenThrow(new RuntimeException("three"));
+   *
+   *   String s = mock.toString();    // s == "one"
+   *   s = mock.toString();           // s == "two"
+   *   s = mock.toString();           // throws RuntimeException("three")
+   * </code></pre>
+   *
+   * <p>The final behaviour in the chain is retained for future calls,
+   * such that in the example above subsequent calls to <code>mock.toString()</code>
+   * will continue to throw <code>RuntimeException("three")</code>.</p>
+   *
+   * <p>This behaviour continues until the mock is reset, or new stubbing
+   * is applied with any of the <code>then...</code> methods.</p>
    *
    * @param object The <code>Object</code> to return for matching invocations.
    *
@@ -64,6 +89,12 @@ public interface MoxyStubber<T> {
    * checked or unchecked - irrespective of the method's <code>throws</code>
    * clause. This should be used with caution as undeclared checked
    * exceptions may cause undefined behaviour in callers.</p>
+   *
+   * <p>This method may be chained with other <code>then...</code> methods,
+   * which will cause the mocked invocation to exhibit the chained
+   * behaviours, in order, upon multiple calls to the mock.</p>
+   *
+   * <p>See {@link #thenReturn(Object)} for a example of chained stubbing.</p>
    *
    * @param throwable The <code>Throwable</code> to throw for matching invocations.
    *
@@ -84,6 +115,12 @@ public interface MoxyStubber<T> {
    * is not <code>abstract</code>. If it is, an
    * {@link InvalidStubbingException} will be thrown when the mock is invoked.</p>
    *
+   * <p>This method may be chained with other <code>then...</code> methods,
+   * which will cause the mocked invocation to exhibit the chained
+   * behaviours, in order, upon multiple calls to the mock.</p>
+   *
+   * <p>See {@link #thenReturn(Object)} for a example of chained stubbing.</p>
+   *
    * @return <code>this</code>, for ongoing stubbing.
    *
    * @since 1.0
@@ -92,7 +129,7 @@ public interface MoxyStubber<T> {
 
   /**
    * <p>Stub this method to return the value calculated by the supplied
-   * {@link AnswerProvider}.</p>
+   * {@link Function}.</p>
    *
    * <p>The provider receives the actual arguments the method was
    * called with as an immutable <code>List</code>.</p>
@@ -103,9 +140,17 @@ public interface MoxyStubber<T> {
    *   Moxy.when(() -&gt; mock.something("arg")).thenAnswer(args -&gt; args.get(0));
    * </code></pre>
    *
-   * @param provider The {@link AnswerProvider}, usually as a lambda.
+   * <p>This method may be chained with other <code>then...</code> methods,
+   * which will cause the mocked invocation to exhibit the chained
+   * behaviours, in order, upon multiple calls to the mock.</p>
+   *
+   * <p>See {@link #thenReturn(Object)} for a example of chained stubbing.</p>
+   *
+   * @param provider The {@link Function}, usually as a lambda.
    *
    * @return <code>this</code>, for ongoing stubbing.
+   *
+   * @since 1.0
    */
   public MoxyStubber<T> thenAnswer(Function<List<? extends Object>, T> provider);
 
@@ -139,9 +184,17 @@ public interface MoxyStubber<T> {
    * of any type, and multiple methods on the same mock may each delegate to
    * different objects, each of potentially different classes.</p>
    *
+   * <p>This method may be chained with other <code>then...</code> methods,
+   * which will cause the mocked invocation to exhibit the chained
+   * behaviours, in order, upon multiple calls to the mock.</p>
+   *
+   * <p>See {@link #thenReturn(Object)} for a example of chained stubbing.</p>
+   *
    * @param delegate An object with a compatible method.
    *
    * @return <code>this</code>, for ongoing stubbing.
+   *
+   * @since 1.0
    */
   public MoxyStubber<T> thenDelegateTo(Object delegate);
 

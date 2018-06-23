@@ -46,9 +46,17 @@ public interface MoxyVoidStubber {
    * clause. This should be used with caution as undeclared checked
    * exceptions may cause undefined behaviour in callers.</p>
    *
+   * <p>This method may be chained with other <code>then...</code> methods,
+   * which will cause the mocked invocation to exhibit the chained
+   * behaviours, in order, upon multiple calls to the mock.</p>
+   *
+   * <p>See {@link MoxyStubber#thenReturn(Object)} for a example of chained stubbing.</p>
+   *
    * @param throwable The <code>Throwable</code> to throw for matching invocations.
    *
    * @return <code>this</code>, for ongoing stubbing.
+   *
+   * @since 1.0
    */
   public MoxyVoidStubber thenThrow(Throwable throwable);
 
@@ -63,7 +71,15 @@ public interface MoxyVoidStubber {
    * is not <code>abstract</code>. If it is, an
    * {@link InvalidStubbingException} will be thrown when the mock is invoked.</p>
    *
+   * <p>This method may be chained with other <code>then...</code> methods,
+   * which will cause the mocked invocation to exhibit the chained
+   * behaviours, in order, upon multiple calls to the mock.</p>
+   *
+   * <p>See {@link MoxyStubber#thenReturn(Object)} for a example of chained stubbing.</p>
+   *
    * @return <code>this</code>, for ongoing stubbing.
+   *
+   * @since 1.0
    */
   public MoxyVoidStubber thenCallRealMethod();
 
@@ -98,9 +114,17 @@ public interface MoxyVoidStubber {
    * of any type, and multiple methods on the same mock may each delegate to
    * different objects, each of potentially different classes.</p>
    *
+   * <p>This method may be chained with other <code>then...</code> methods,
+   * which will cause the mocked invocation to exhibit the chained
+   * behaviours, in order, upon multiple calls to the mock.</p>
+   *
+   * <p>See {@link MoxyStubber#thenReturn(Object)} for a example of chained stubbing.</p>
+   *
    * @param delegate An object with a compatible method.
    *
    * @return <code>this</code>, for ongoing stubbing.
+   *
+   * @since 1.0
    */
   public MoxyVoidStubber thenDelegateTo(final Object delegate);
 

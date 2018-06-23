@@ -24,7 +24,8 @@
 package com.roscopeco.moxy.api;
 
 /**
- * Thrown to indicate an error occured during mock generation.
+ * Thrown to indicate an unrecoverable error occured during
+ * mock generation.
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  * @since 1.0

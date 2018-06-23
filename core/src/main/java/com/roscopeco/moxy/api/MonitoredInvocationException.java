@@ -23,6 +23,22 @@
  */
 package com.roscopeco.moxy.api;
 
+/**
+ * <p>Thrown to indicate an unexpected occurred during a <em>monitored
+ * invocation</em>.</p>
+ *
+ * <p>Monitored invocations are used during calls to:</p>
+ *
+ * <ul>
+ * <li>{@link MoxyEngine#when(InvocationRunnable)}</li>
+ * <li>{@link MoxyEngine#when(InvocationSupplier)}</li>
+ * <li>{@link MoxyEngine#assertMock(InvocationRunnable)}</li>
+ * <li>{@link MoxyEngine#assertMocks(InvocationRunnable)}</li>
+ * </ul>
+ *
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ * @since 1.0
+ */
 public class MonitoredInvocationException extends MoxyException {
   private static final long serialVersionUID = 1L;
 

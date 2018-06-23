@@ -850,6 +850,10 @@ public final class Moxy {
    * <p>The arguments passed to the mock within the lambda may be either
    * immediate arguments, other mocks, or argument matchers (see {@link Matchers}).</p>
    *
+   * <p>This method begins a new chain of stubbing for the given invocation -
+   * Any prior stubbing applied is discarded, to be replaced by the
+   * stubbing applied on the returned {@link MoxyStubber}.</p>
+   *
    * <p>See {@link MoxyStubber} for details on the stubbing methods
    * available.</p>
    *
@@ -887,6 +891,10 @@ public final class Moxy {
    *
    * <p>The arguments passed to the mock within the lambda may be either
    * immediate arguments, other mocks, or argument matchers (see {@link Matchers}).</p>
+   *
+   * <p>This method begins a new chain of stubbing for the given invocation -
+   * Any prior stubbing applied is discarded, to be replaced by the
+   * stubbing applied on the returned {@link MoxyVoidStubber}.</p>
    *
    * <p>See {@link MoxyStubber} for details on the stubbing methods
    * available.</p>
@@ -1042,10 +1050,87 @@ public final class Moxy {
     return engine.assertMock(invocation);
   }
 
+  /**
+   * <p>Starts verification of one or more mock invocations at the same
+   * time. This allows multiple invocations to be checked together
+   * to ensure ordering, for example.</p>
+   *
+   * <p>This method uses the current default {@link MoxyEngine}.
+   *
+   * <p>The invocation of the mock is used to determine which method
+   * and argument combination is to be verified and is not counted
+   * toward mock invocation, return or throw counters.</p>
+   *
+   * <p>Example usage:</p>
+   *
+   * <pre><code>
+   * engine.assertMocks(() -&gt; {
+   *   mock.voidMethod(engine, "one", "two")).wasCalled();
+   *   mock.anotherMethod();
+   *
+   *   anotherMock.someMethod("five");
+   *
+   *   mock.finalMethod("Bees");
+   * })
+   *     .wereAllCalledOnce()
+   *     .inThatOrder();
+   * </code></pre>
+   *
+   * <p>The arguments passed to the mocks within the lambda may be either
+   * immediate arguments, other mocks, or argument matchers (see {@link Matchers}).</p>
+   *
+   * <p>See {@link MoxyMultiVerifier} for details on the verifying methods
+   * available.</p>
+   *
+   * @param invocation A lambda that will invoke the methods to be verified.
+   * @return A {@link MoxyMultiVerifier} that will verify the invocations.
+   *
+   * @see #assertMock(InvocationRunnable)
+   * @since 1.0
+   */
   public static MoxyMultiVerifier assertMocks(final InvocationRunnable invocation) {
     return assertMocks(ensureMoxyEngine(), invocation);
   }
 
+  /**
+   * <p>Starts verification of one or more mock invocations at the same
+   * time. This allows multiple invocations to be checked together
+   * to ensure ordering, for example.</p>
+   *
+   * <p>This method uses the supplied {@link MoxyEngine}.
+   *
+   * <p>The invocation of the mock is used to determine which method
+   * and argument combination is to be verified and is not counted
+   * toward mock invocation, return or throw counters.</p>
+   *
+   * <p>Example usage:</p>
+   *
+   * <pre><code>
+   * engine.assertMocks(() -&gt; {
+   *   mock.voidMethod(engine, "one", "two")).wasCalled();
+   *   mock.anotherMethod();
+   *
+   *   anotherMock.someMethod("five");
+   *
+   *   mock.finalMethod("Bees");
+   * })
+   *     .wereAllCalledOnce()
+   *     .inThatOrder();
+   * </code></pre>
+   *
+   * <p>The arguments passed to the mocks within the lambda may be either
+   * immediate arguments, other mocks, or argument matchers (see {@link Matchers}).</p>
+   *
+   * <p>See {@link MoxyMultiVerifier} for details on the verifying methods
+   * available.</p>
+   *
+   * @param engine The {@link MoxyEngine} to use.
+   * @param invocation A lambda that will invoke the methods to be verified.
+   * @return A {@link MoxyMultiVerifier} that will verify the invocations.
+   *
+   * @see #assertMock(InvocationRunnable)
+   * @since 1.0
+   */
   public static MoxyMultiVerifier assertMocks(final MoxyEngine engine,
                                               final InvocationRunnable invocation) {
     return engine.assertMocks(invocation);

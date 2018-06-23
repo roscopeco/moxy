@@ -30,6 +30,7 @@ package com.roscopeco.moxy.api;
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  * @since 1.0
  */
+@FunctionalInterface
 public interface InvocationRunnable {
   /**
    * Run the invocation. The framework will swallow most types of exception.

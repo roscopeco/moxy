@@ -33,6 +33,7 @@ package com.roscopeco.moxy.api;
  *
  * @param <T> Return type of the method to be invoked.
  */
+@FunctionalInterface
 public interface InvocationSupplier<T> {
   /**
    * Run the invocation. The framework will swallow most types of exception.

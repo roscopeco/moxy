@@ -74,6 +74,7 @@ public interface MoxyMultiVerifier {
    * will each have a nested {@link AssertionFailedError}.</p>
    *
    * @return <code>this</code>.
+   * @since 1.0
    */
   public MoxyMultiVerifier wereAllCalled();
 

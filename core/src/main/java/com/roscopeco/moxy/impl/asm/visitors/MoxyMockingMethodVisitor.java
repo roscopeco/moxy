@@ -474,7 +474,7 @@ class MoxyMockingMethodVisitor extends MethodVisitor {
     this.delegate.visitJumpInsn(IF_ICMPEQ, noCallSuperOrDelegateLabel);
 
     // Delegating, so delegate.
-    // TODO Need to be catching and recording exceptions here, like for super, above.
+    // TODO Need to be catching and recording exceptions here, like for super, above. See #2
     this.delegate.visitVarInsn(ALOAD, 0);
     this.delegate.visitMethodInsn(INVOKEINTERFACE,
                          MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,

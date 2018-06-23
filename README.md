@@ -67,6 +67,7 @@ This barely scratches the surface though, so be sure to check out that [lovingly
 
 * Java (1.8+).
 * ASM 6.2 (base, -tree and -util)
+* Apache commons-lang3 3.7
 * opentest4j 1.0.0
 
 ##### For building/testing

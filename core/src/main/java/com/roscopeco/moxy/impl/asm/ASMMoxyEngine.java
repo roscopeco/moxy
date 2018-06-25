@@ -83,24 +83,6 @@ public class ASMMoxyEngine implements MoxyEngine {
   private final ThreadLocalInvocationRecorder recorder;
   private final ASMMoxyMatcherEngine matcherEngine;
 
-  @SuppressWarnings("restriction")
-  private static final sun.misc.Unsafe UNSAFE = getUnsafe();
-
-  @SuppressWarnings("restriction")
-  private static sun.misc.Unsafe getUnsafe() {
-    try {
-      final Field unsafeField = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
-      unsafeField.setAccessible(true);
-      return (sun.misc.Unsafe)unsafeField.get(null);
-    } catch (final NoSuchFieldException e) {
-      throw new IllegalStateException("Unrecoverable Error: NoSuchFieldException 'theUnsafe' on sun.misc.Unsafe.\n"
-          + "This is most likely an environment issue.", e);
-    } catch (final IllegalAccessException e) {
-      throw new IllegalStateException("Unrecoverable Error: IllegalAccessException when accessing 'theUnsafe' on sun.misc.Unsafe.\n"
-          + "This is most likely an environment issue.", e);
-    }
-  }
-
   /**
    * Construct a new instance of the ASMMoxyEngine.
    *
@@ -438,14 +420,13 @@ public class ASMMoxyEngine implements MoxyEngine {
    * Throws IllegalArgumentException if the given class is not
    * a mock class.
    */
-  @SuppressWarnings("restriction")
   <T> T instantiateMock(final Class<? extends T> mockClass) {
     if (!this.isMock(mockClass)) {
       throw new IllegalArgumentException("Cannot instantiate " + mockClass +": it is not a mock class");
     }
 
     try {
-      final Object mock = UNSAFE.allocateInstance(mockClass);
+      final Object mock = UnsafeUtils.allocateInstance(mockClass);
       return this.initializeMock(mockClass, mock);
     } catch (final MoxyException e) {
       throw e;
@@ -461,11 +442,11 @@ public class ASMMoxyEngine implements MoxyEngine {
    * When called on an existing mock, this method has the effect of
    * resetting all stubbing on that mock.
    */
-  @SuppressWarnings({ "unchecked", "restriction" })
+  @SuppressWarnings({ "unchecked" })
   <T> T initializeMock(final Class<? extends T> mockClass, final Object mock) {
     try {
       final Field ivarsField = mockClass.getDeclaredField(TypesAndDescriptors.SUPPORT_IVARS_FIELD_NAME);
-      UNSAFE.putObject(mock, UNSAFE.objectFieldOffset(ivarsField), new ASMMockInstanceVars(this));
+      UnsafeUtils.putObject(mock, UnsafeUtils.objectFieldOffset(ivarsField), new ASMMockInstanceVars(this));
       return (T)mock;
     } catch (final Exception e) {
       throw new MoxyException("Unrecoverable error: Instantiation exception; see cause", e);
@@ -513,7 +494,6 @@ public class ASMMoxyEngine implements MoxyEngine {
   /*
    * Define a class given a loader and an ASM ClassNode.
    */
-  @SuppressWarnings({ "restriction", "deprecation" })
   Class<?> defineClass(final ClassLoader loader, final ClassNode node) {
     if (loader == null) {
       throw new IllegalArgumentException("Implicit definition in the system classloader is unsupported.\n"
@@ -522,7 +502,7 @@ public class ASMMoxyEngine implements MoxyEngine {
     }
 
     final byte[] code = this.generateBytecode(node);
-    return UNSAFE.defineClass(node.name.replace('/',  '.'), code, 0, code.length, loader, null);
+    return UnsafeUtils.defineClass(loader, node.name.replace('/',  '.'), code);
   }
 
   /*

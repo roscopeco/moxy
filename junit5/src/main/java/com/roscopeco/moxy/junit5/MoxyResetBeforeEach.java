@@ -9,5 +9,6 @@ public class MoxyResetBeforeEach implements BeforeEachCallback {
   @Override
   public void beforeEach(final ExtensionContext context) throws Exception {
     Moxy.getMoxyEngine().reset();
+    Moxy.resetAllClassMocks();
   }
 }

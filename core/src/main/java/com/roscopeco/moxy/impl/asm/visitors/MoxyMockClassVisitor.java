@@ -93,7 +93,6 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
 
   @Override
   public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
-    // Generate field for method return value
     final boolean isAbstract = (access & ACC_ABSTRACT) != 0;
 
     if (INIT_NAME.equals(name)) {

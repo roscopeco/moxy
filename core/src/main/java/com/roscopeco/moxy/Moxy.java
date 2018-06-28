@@ -36,13 +36,13 @@ import org.apache.commons.lang3.reflect.ConstructorUtils;
 
 import com.roscopeco.moxy.api.InvocationRunnable;
 import com.roscopeco.moxy.api.InvocationSupplier;
+import com.roscopeco.moxy.api.MoxyClassMockEngine;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.api.MoxyMultiVerifier;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
 import com.roscopeco.moxy.api.MoxyVoidStubber;
-import com.roscopeco.moxy.impl.asm.ASMMoxyEngine;
 import com.roscopeco.moxy.matchers.Matchers;
 
 /**
@@ -97,18 +97,61 @@ public final class Moxy {
   private static final Logger LOG = Logger.getLogger(Moxy.class.getName());
 
   private static MoxyEngine moxyEngine;
+  private static MoxyClassMockEngine moxyClassMockEngine;
 
   private Moxy() {
     throw new UnsupportedOperationException(
         "com.roscopeco.moxy.Moxy is not designed for instantiation");
   }
 
+  private static MoxyEngine instantiateDefaultMoxyEngine() {
+    final String defaultEngineName = System.getProperty(
+        "com.roscopeco.moxy.engine.standard", "com.roscopeco.moxy.impl.asm.ASMMoxyEngine");
+
+    try {
+      final Class<?> defaultEngine = Class.forName(defaultEngineName);
+
+      if (MoxyEngine.class.isAssignableFrom(defaultEngine)) {
+          return (MoxyEngine)defaultEngine.newInstance();
+      } else {
+        throw new MoxyException("Invalid configuration: '" + defaultEngineName + " is not a MoxyEngine implementation");
+      }
+    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+      throw new MoxyException("Invalid configuration: Unable to instantiate MoxyEngine; See cause", e);
+    }
+  }
+
+  private static MoxyClassMockEngine instantiateDefaultMoxyClassMockEngine() {
+    final String defaultEngineName = System.getProperty(
+        "com.roscopeco.moxy.engine.classmock", "com.roscopeco.moxy.impl.asm.classmock.ASMClassMockEngine");
+
+    try {
+      final Class<?> defaultEngine = Class.forName(defaultEngineName);
+
+      if (MoxyClassMockEngine.class.isAssignableFrom(defaultEngine)) {
+          return (MoxyClassMockEngine)defaultEngine.newInstance();
+      } else {
+        throw new MoxyException("Invalid configuration: '" + defaultEngineName + " is not a MoxyClassMockEngine implementation");
+      }
+    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+      throw new MoxyException("Invalid configuration: Unable to instantiate MoxyClassMockEngine; See cause", e);
+    }
+  }
+
   private static MoxyEngine ensureMoxyEngine() {
     if (moxyEngine == null) {
-      moxyEngine = new ASMMoxyEngine();
+      moxyEngine = instantiateDefaultMoxyEngine();
     }
 
     return moxyEngine;
+  }
+
+  private static MoxyClassMockEngine ensureMoxyClassMockEngine() {
+    if (moxyClassMockEngine == null) {
+      moxyClassMockEngine = instantiateDefaultMoxyClassMockEngine();
+    }
+
+    return moxyClassMockEngine;
   }
 
   /**
@@ -142,6 +185,135 @@ public final class Moxy {
    */
   public static MoxyEngine getMoxyEngine() {
     return Moxy.ensureMoxyEngine();
+  }
+
+  /**
+   * <p>Set the {@link MoxyClassMockEngine} that will be used by all
+   * future calls to methods in this class.</p>
+   *
+   * <p><strong>Note:</strong> Calling this method after the current
+   * (or default) engine has been used may cause problems. If you are
+   * changing the engine, you should change it before interacting
+   * with the library in any other way (especially creating mocks).</p>
+   *
+   * @param moxyClassMockEngine The {@link MoxyClassMockEngine} implementation to use.
+   *
+   * @since 1.0
+   */
+  public static void setMoxyClassMockEngine(final MoxyClassMockEngine moxyClassMockEngine) {
+    if (Moxy.moxyClassMockEngine != null) {
+      LOG.warning(() -> "Changing an in-use class mock engine may cause unwanted side effects");
+    }
+
+    Moxy.moxyClassMockEngine = moxyClassMockEngine;
+  }
+
+  /**
+   * Get the current {@link MoxyClassMockEngine} in use by this class, or
+   * create and return a default engine if none has been set.
+   *
+   * @return The {@link MoxyClassMockEngine} currently in use.
+   *
+   * @since 1.0
+   */
+  public static MoxyClassMockEngine getMoxyClassMockEngine() {
+    return Moxy.ensureMoxyClassMockEngine();
+  }
+
+  /**
+   * <p>Convert the given classes to mock classes using the
+   * default {@link MoxyClassMockEngine}.</p>
+   *
+   * <p>when this method returns, all instances of the given classes will
+   * be converted to mocks, along with all future instances.</p>
+   *
+   * <p>This is <strong>not</strong> the normal style of mocking.
+   * See {@link MoxyClassMockEngine} for details.</p>
+   *
+   * @param classes Classes to convert.
+   *
+   * @see MoxyClassMockEngine
+   * @see MoxyClassMockEngine#mockClasses(Class...)
+   * @since 1.0
+   */
+  public static void mockClasses(final Class<?>... classes) {
+    mockClasses(ensureMoxyClassMockEngine(), classes);
+  }
+
+  /**
+   * <p>Convert the given classes to mock classes using the
+   * supplied {@link MoxyClassMockEngine}.</p>
+   *
+   * <p>when this method returns, all instances of the given classes will
+   * be converted to mocks, along with all future instances.</p>
+   *
+   * <p>This is <strong>not</strong> the normal style of mocking.
+   * See {@link MoxyClassMockEngine} for details.</p>
+   *
+   * @param engine The {@link MoxyClassMockEngine} to use.
+   * @param classes Classes to convert.
+   *
+   * @see MoxyClassMockEngine
+   * @see MoxyClassMockEngine#mockClasses(Class...)
+   * @since 1.0
+   */
+  public static void mockClasses(final MoxyClassMockEngine engine, final Class<?>... classes) {
+    engine.mockClasses(classes);
+  }
+
+  /**
+   * <p>Reset the given classes to their original, non-mock implementation,
+   * using the default {@link MoxyClassMockEngine}.</p>
+   *
+   * @param classes Classes to reset.
+   *
+   * @see #mockClasses(Class...)
+   * @see MoxyClassMockEngine
+   * @see MoxyClassMockEngine#mockClasses(Class...)
+   * @since 1.0
+   */
+  public static void resetClassMocks(final Class<?>... classes) {
+    resetClassMocks(ensureMoxyClassMockEngine(), classes);
+  }
+
+  /**
+   * <p>Reset the given classes to their original, non-mock implementation,
+   * using the supplied {@link MoxyClassMockEngine}.</p>
+   *
+   * @param engine The {@link MoxyClassMockEngine} to use.
+   * @param classes Classes to reset.
+   *
+   * @see #mockClasses(MoxyClassMockEngine, Class...)
+   * @see MoxyClassMockEngine
+   * @see MoxyClassMockEngine#mockClasses(Class...)
+   * @since 1.0
+   */
+  public static void resetClassMocks(final MoxyClassMockEngine engine, final Class<?>... classes) {
+    engine.resetClasses(classes);
+  }
+
+  /**
+   * Reset all class mocks created with the default {@link MoxyClassMockEngine}
+   * to their original, un-mocked state.
+   *
+   * @see #resetClassMocks(Class...)
+   * @since 1.0
+   */
+  public static void resetAllClassMocks() {
+    resetAllClassMocks(ensureMoxyClassMockEngine());
+  }
+
+  /**
+   * Reset all class mocks created with the supplied {@link MoxyClassMockEngine}
+   * to their original, un-mocked state.
+   *
+   * @param engine The {@link MoxyClassMockEngine} to use.
+   *
+   * @see #resetClassMocks(MoxyClassMockEngine, Class...)
+   * @since 1.0
+   */
+  public static void resetAllClassMocks(final MoxyClassMockEngine engine) {
+    engine.resetAllClasses();
   }
 
   /**

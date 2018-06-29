@@ -37,15 +37,16 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import com.roscopeco.moxy.api.InvocationRunnable;
 import com.roscopeco.moxy.api.InvocationSupplier;
-import com.roscopeco.moxy.api.MoxyMock;
 import com.roscopeco.moxy.api.MockGenerationException;
 import com.roscopeco.moxy.api.MonitoredInvocationException;
 import com.roscopeco.moxy.api.MoxyEngine;
 import com.roscopeco.moxy.api.MoxyException;
+import com.roscopeco.moxy.api.MoxyMock;
 import com.roscopeco.moxy.api.MoxyMultiVerifier;
 import com.roscopeco.moxy.api.MoxyStubber;
 import com.roscopeco.moxy.api.MoxyVerifier;
@@ -529,7 +530,8 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   byte[] generateBytecode(final ClassNode node) {
     final ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-    node.accept(writer);
+    final CheckClassAdapter check = new CheckClassAdapter(writer, false);
+    node.accept(check);
     return writer.toByteArray();
   }
 }

@@ -92,6 +92,8 @@ public final class TypesAndDescriptors {
   /* ASMMoxyMockSupport-related */
   public static final String SUPPORT_GETENGINE_METHOD_NAME = "__moxy_asm_getEngine";
   public static final String SUPPORT_GETENGINE_DESCRIPTOR = "()" + MOXY_ASM_ENGINE_DESCRIPTOR;
+  public static final String SUPPORT_SHOULDCURRENTTHROW_METHOD_NAME = "__moxy_asm_shouldThrowForCurrentInvocation";
+  public static final String SUPPORT_SHOULDCURRENTTHROW_DESCRIPTOR = BOOLEAN_VOID_DESCRIPTOR;
   public static final String SUPPORT_GETCURRENTTHROW_METHOD_NAME = "__moxy_asm_getThrowableForCurrentInvocation";
   public static final String SUPPORT_GETCURRENTTHROW_DESCRIPTOR = THROWABLE_VOID_DESCRIPTOR;
   public static final String SUPPORT_GETCURRENTRETURN_METHOD_NAME = "__moxy_asm_getReturnableForCurrentInvocation";

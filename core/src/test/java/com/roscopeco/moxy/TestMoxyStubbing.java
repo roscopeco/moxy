@@ -244,6 +244,33 @@ public class TestMoxyStubbing {
   }
 
   @Test
+  public void testMoxyMockWithMockMultipleStubbingWorksInDifferentOrder() {
+    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class, System.out);
+
+    final Exception ex = new Exception("MARKER");
+
+    Moxy.when(() -> mock.sayHelloTo(Matchers.eq("Bill")))
+        .thenReturn("Hi there, Bill")
+        .thenCallRealMethod()
+        .thenDelegateTo(new TestDelegate())
+        .thenThrow(ex)
+        .thenAnswer(args -> "Hey, " + args.get(0))
+        .thenDelegateTo(new TestDelegate());
+
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hi there, Bill");
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hello, Bill");
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Whazaa, Bill");
+
+    assertThatThrownBy(() ->
+        mock.sayHelloTo("Bill")
+    )
+        .isSameAs(ex);
+
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hey, Bill");
+    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Whazaa, Bill");
+  }
+
+  @Test
   public void testMoxyMockWithMockStubbingResetsInNewWhen() {
     final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
 

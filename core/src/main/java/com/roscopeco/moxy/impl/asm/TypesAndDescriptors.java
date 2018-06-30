@@ -62,7 +62,8 @@ public final class TypesAndDescriptors {
   public static final String BOOLEAN_VOID_DESCRIPTOR = "()Z";
   public static final String VOID_INT_DESCRIPTOR = "(I)V";
   public static final String OBJECT_VOID_DESCRIPTOR = "()" + OBJECT_DESCRIPTOR;
-  public static final String THROWABLE_VOID_DESCRIPTOR = "()" + THROWABLE_DESCRIPTOR;
+  public static final String OBJECT_BOOL_DESCRIPTOR = "(Z)" + OBJECT_DESCRIPTOR;
+  public static final String THROWABLE_BOOL_DESCRIPTOR = "(Z)" + THROWABLE_DESCRIPTOR;
   public static final String MAP_VOID_DESCRIPTOR = "()" + MAP_DESCRIPTOR;
   public static final String VOID_STRING_DESCRIPTOR = "(" + STRING_DESCRIPTOR + ")V";
   public static final String VOID_STRING_STRING_DESCRIPTOR = "(" + STRING_DESCRIPTOR + STRING_DESCRIPTOR + ")V";
@@ -95,9 +96,9 @@ public final class TypesAndDescriptors {
   public static final String SUPPORT_SHOULDCURRENTTHROW_METHOD_NAME = "__moxy_asm_shouldThrowForCurrentInvocation";
   public static final String SUPPORT_SHOULDCURRENTTHROW_DESCRIPTOR = BOOLEAN_VOID_DESCRIPTOR;
   public static final String SUPPORT_GETCURRENTTHROW_METHOD_NAME = "__moxy_asm_getThrowableForCurrentInvocation";
-  public static final String SUPPORT_GETCURRENTTHROW_DESCRIPTOR = THROWABLE_VOID_DESCRIPTOR;
+  public static final String SUPPORT_GETCURRENTTHROW_DESCRIPTOR = THROWABLE_BOOL_DESCRIPTOR;
   public static final String SUPPORT_GETCURRENTRETURN_METHOD_NAME = "__moxy_asm_getReturnableForCurrentInvocation";
-  public static final String SUPPORT_GETCURRENTRETURN_DESCRIPTOR = OBJECT_VOID_DESCRIPTOR;
+  public static final String SUPPORT_GETCURRENTRETURN_DESCRIPTOR = OBJECT_BOOL_DESCRIPTOR;
   public static final String SUPPORT_SHOULD_CALL_SUPER_METHOD_NAME = "__moxy_asm_shouldCallSuperForCurrentInvocation";
   public static final String SUPPORT_SHOULD_CALL_SUPER_DESCRIPTOR = BOOLEAN_VOID_DESCRIPTOR;
   public static final String SUPPORT_SHOULD_DELEGATE_METHOD_NAME = "__moxy_asm_shouldDelegateForCurrentInvocation";

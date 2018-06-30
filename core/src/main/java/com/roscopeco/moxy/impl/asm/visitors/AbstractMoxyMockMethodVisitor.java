@@ -730,6 +730,7 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
     this.generateLoadMockSupport();
     this.delegate.visitInsn(DUP);
     this.delegate.visitInsn(DUP);
+    this.delegate.visitInsn(ICONST_0);
     this.delegate.visitMethodInsn(INVOKEINTERFACE,
                                   MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
                                   SUPPORT_GETCURRENTRETURN_METHOD_NAME,
@@ -741,6 +742,7 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
 
     // Get the exception this method will throw (or null if none)
     this.delegate.visitInsn(SWAP);
+    this.delegate.visitInsn(ICONST_0);
     this.delegate.visitMethodInsn(INVOKEINTERFACE,
                                   MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
                                   SUPPORT_GETCURRENTTHROW_METHOD_NAME,

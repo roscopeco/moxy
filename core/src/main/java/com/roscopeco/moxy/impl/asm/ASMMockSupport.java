@@ -210,13 +210,13 @@ public interface ASMMockSupport {
   /*
    * Get throw for next invocation, or null if next stub isn't a throw.
    */
-  public default Throwable __moxy_asm_getThrowableForInvocation(final Invocation invocation) {
+  public default Throwable __moxy_asm_getThrowableForInvocation(final Invocation invocation, final boolean forceRetain) {
     final StubInvocation stubInvocation = findStubbingForActualInvocation(invocation);
 
     if (stubInvocation != null) {
       final Stub nextStub = stubInvocation.getStubs().peek();
       if (nextStub != null && nextStub.getType().equals(StubType.THROW_EXCEPTION)) {
-        if (nextStub.isRetained() || stubInvocation.getStubs().size() < 2) {
+        if (forceRetain || nextStub.isRetained() || stubInvocation.getStubs().size() < 2) {
           return (Throwable)nextStub.getObject(invocation.getArgs());
         } else {
           return (Throwable)stubInvocation.getStubs().pop().getObject(invocation.getArgs());
@@ -229,13 +229,13 @@ public interface ASMMockSupport {
     }
   }
 
-  public default Object __moxy_asm_getReturnableForInvocation(final Invocation invocation) {
+  public default Object __moxy_asm_getReturnableForInvocation(final Invocation invocation, final boolean forceRetain) {
     final StubInvocation stubInvocation = findStubbingForActualInvocation(invocation);
 
     if (stubInvocation != null) {
       final Stub nextStub = stubInvocation.getStubs().peek();
       if (nextStub != null && nextStub.getType().equals(StubType.RETURN_OBJECT)) {
-        if (nextStub.isRetained() || stubInvocation.getStubs().size() < 2) {
+        if (forceRetain || nextStub.isRetained() || stubInvocation.getStubs().size() < 2) {
           return nextStub.getObject(invocation.getArgs());
         } else {
           return stubInvocation.getStubs().pop().getObject(invocation.getArgs());
@@ -335,27 +335,18 @@ public interface ASMMockSupport {
    * recorded. It relies on the fact that getLastInvocation will always be the current
    * invocation just prior to throw or return.
    */
-  public default boolean __moxy_asm_shouldThrowForCurrentInvocation() {
-    return __moxy_asm_shouldThrowForInvocation(
-        __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation());
-  }
-
-  /* This MUST only ever be called from mocked methods AFTER the invocation has been
-   * recorded. It relies on the fact that getLastInvocation will always be the current
-   * invocation just prior to throw or return.
-   */
-  public default Throwable __moxy_asm_getThrowableForCurrentInvocation() {
+  public default Throwable __moxy_asm_getThrowableForCurrentInvocation(final boolean forceRetain) {
     return __moxy_asm_getThrowableForInvocation(
-        __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation());
+        __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation(), forceRetain);
   }
 
   /* This MUST only ever be called from mocked methods AFTER the invocation has been
    * recorded. It relies on the fact that getLastInvocation will always be the current
    * invocation just prior to throw or return.
    */
-  public default Object __moxy_asm_getReturnableForCurrentInvocation() {
+  public default Object __moxy_asm_getReturnableForCurrentInvocation(final boolean forceRetain) {
     return __moxy_asm_getReturnableForInvocation(
-        __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation());
+        __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation(), forceRetain);
   }
 
   /* This MUST only ever be called from mocked methods AFTER the invocation has been

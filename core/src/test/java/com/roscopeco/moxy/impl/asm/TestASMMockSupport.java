@@ -43,8 +43,13 @@ public class TestASMMockSupport extends AbstractImplTest {
   ASMMockSupport mock;
 
   Invocation invoc;
-  String returnMarker = "Marker";
-  Throwable throwMarker = new Throwable("Marker");
+  String returnMarker1 = "Marker1";
+  String returnMarker2 = "Marker2";
+  String returnMarker3 = "Marker3";
+
+  Throwable throwMarker1 = new Throwable("Marker1");
+  Throwable throwMarker2 = new Throwable("Marker2");
+  Throwable throwMarker3 = new Throwable("Marker3");
 
   @BeforeEach
   public void setUp() {
@@ -66,14 +71,46 @@ public class TestASMMockSupport extends AbstractImplTest {
 
   @Test
   public void testSetGetReturnForInvocation() {
-    this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker, false));
-    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc)).isSameAs(this.returnMarker);
+    this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker1, false));
+    this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker2, false));
+    this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker3, false));
+
+    // was set
+    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, true)).isSameAs(this.returnMarker1);
+
+    // was force retained
+    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, false)).isSameAs(this.returnMarker1);
+
+    // was removed
+    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, false)).isSameAs(this.returnMarker2);
+
+    // was removed
+    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, false)).isSameAs(this.returnMarker3);
+
+    // was retained (last stubbing)
+    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, false)).isSameAs(this.returnMarker3);
   }
 
   @Test
   public void testSetGetThrowForInvocation() {
-    this.mock.__moxy_asm_setStubbing(this.invoc, new StubThrow(this.throwMarker, false));
-    assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc)).isSameAs(this.throwMarker);
+    this.mock.__moxy_asm_setStubbing(this.invoc, new StubThrow(this.throwMarker1, false));
+    this.mock.__moxy_asm_setStubbing(this.invoc, new StubThrow(this.throwMarker2, false));
+    this.mock.__moxy_asm_setStubbing(this.invoc, new StubThrow(this.throwMarker3, false));
+
+    // was set
+    assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, true)).isSameAs(this.throwMarker1);
+
+    // was force retained
+    assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, false)).isSameAs(this.throwMarker1);
+
+    // was removed
+    assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, false)).isSameAs(this.throwMarker2);
+
+    // was removed
+    assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, false)).isSameAs(this.throwMarker3);
+
+    // was retained (last item)
+    assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, false)).isSameAs(this.throwMarker3);
   }
 
   @Test

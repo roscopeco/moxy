@@ -245,7 +245,7 @@ public class TestMoxyStubbing {
 
   @Test
   public void testMoxyMockWithMockMultipleStubbingWorksInDifferentOrder() {
-    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class, System.out);
+    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
 
     final Exception ex = new Exception("MARKER");
 

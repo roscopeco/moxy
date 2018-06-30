@@ -121,7 +121,9 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
   @Override
   public void resetAllClasses() {
     synchronized (this.currentlyMockedClasses) {
-      this.resetClasses(this.currentlyMockedClasses.toArray(new Class<?>[this.currentlyMockedClasses.size()]));
+      if (this.currentlyMockedClasses.size() > 0) {
+        this.resetClasses(this.currentlyMockedClasses.toArray(new Class<?>[this.currentlyMockedClasses.size()]));
+      }
     }
   }
 
@@ -176,6 +178,7 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
       final ProtectionDomain pd, final byte[] originalCode) throws IllegalClassFormatException {
     if (originalClz != null) {
       if (this.isPendingReset(originalClz)) {
+        this.currentlyMockedClasses.remove(originalClz);
         return null;
       } else if (this.isPendingMock(originalClz)) {
         try {
@@ -198,6 +201,7 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
             reader.accept(trace, 0);
           }
 
+          this.currentlyMockedClasses.add(originalClz);
           return newCode;
         } catch (final Throwable t) {
           System.err.println("Exception in transform: " + t);

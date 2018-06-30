@@ -191,19 +191,16 @@ public interface ASMMockSupport {
     return null;
   }
 
-  public default boolean __moxy_asm_shouldThrowForInvocation(final Invocation invocation) {
+  public default void __moxy_asm_popReturnOrThrowForInvocation(final Invocation invocation) {
     final StubInvocation stubInvocation = findStubbingForActualInvocation(invocation);
 
     if (stubInvocation != null) {
       final Stub nextStub = stubInvocation.getStubs().peek();
-      if (nextStub != null && nextStub.getType().equals(StubType.THROW_EXCEPTION)) {
-        // don't pop at this point - generated code needs to pick it up later.
-        return true;
-      } else {
-        return false;
+      if (nextStub != null && (nextStub.getType().equals(StubType.RETURN_OBJECT) || nextStub.getType().equals(StubType.THROW_EXCEPTION))) {
+        if (!nextStub.isRetained() && stubInvocation.getStubs().size() > 1) {
+          stubInvocation.getStubs().pop();
+        }
       }
-    } else {
-      return false;
     }
   }
 
@@ -329,6 +326,15 @@ public interface ASMMockSupport {
         }
       }
     }
+  }
+
+  /* This MUST only ever be called from mocked methods AFTER the invocation has been
+   * recorded. It relies on the fact that getLastInvocation will always be the current
+   * invocation just prior to throw or return.
+   */
+  public default void __moxy_asm_popReturnOrThrowForCurrentInvocation() {
+    __moxy_asm_popReturnOrThrowForInvocation(
+        __moxy_asm_ivars().getEngine().getRecorder().getCurrentInvocation());
   }
 
   /* This MUST only ever be called from mocked methods AFTER the invocation has been

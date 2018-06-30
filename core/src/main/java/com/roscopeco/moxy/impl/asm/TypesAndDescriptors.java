@@ -99,6 +99,8 @@ public final class TypesAndDescriptors {
   public static final String SUPPORT_GETCURRENTTHROW_DESCRIPTOR = THROWABLE_BOOL_DESCRIPTOR;
   public static final String SUPPORT_GETCURRENTRETURN_METHOD_NAME = "__moxy_asm_getReturnableForCurrentInvocation";
   public static final String SUPPORT_GETCURRENTRETURN_DESCRIPTOR = OBJECT_BOOL_DESCRIPTOR;
+  public static final String SUPPORT_POPRETURNTHROW_METHOD_NAME = "__moxy_asm_popReturnOrThrowForCurrentInvocation";
+  public static final String SUPPORT_POPRETURNTHROW_DESCRIPTOR = VOID_VOID_DESCRIPTOR;
   public static final String SUPPORT_SHOULD_CALL_SUPER_METHOD_NAME = "__moxy_asm_shouldCallSuperForCurrentInvocation";
   public static final String SUPPORT_SHOULD_CALL_SUPER_DESCRIPTOR = BOOLEAN_VOID_DESCRIPTOR;
   public static final String SUPPORT_SHOULD_DELEGATE_METHOD_NAME = "__moxy_asm_shouldDelegateForCurrentInvocation";

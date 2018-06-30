@@ -70,6 +70,32 @@ public class TestASMMockSupport extends AbstractImplTest {
   }
 
   @Test
+  public void testPopReturnOrThrowForInvocation() {
+    this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker1, false));
+    this.mock.__moxy_asm_setStubbing(this.invoc, new StubThrow(this.throwMarker1, false));
+    this.mock.__moxy_asm_setStubbing(this.invoc, new StubSuper(false));
+    this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker3, false));
+
+    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, true)).isEqualTo(this.returnMarker1);
+
+    // pops return
+    this.mock.__moxy_asm_popReturnOrThrowForInvocation(this.invoc);
+    assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, true)).isEqualTo(this.throwMarker1);
+
+    // pops throw
+    this.mock.__moxy_asm_popReturnOrThrowForInvocation(this.invoc);
+    assertThat(this.mock.__moxy_asm_shouldCallSuperForInvocation(this.invoc));
+
+    // doesn't pop (last one)
+    this.mock.__moxy_asm_popReturnOrThrowForInvocation(this.invoc);
+    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, true)).isEqualTo(this.returnMarker3);
+
+    this.mock.__moxy_asm_popReturnOrThrowForInvocation(this.invoc);
+    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, true)).isEqualTo(this.returnMarker3);
+
+  }
+
+  @Test
   public void testSetGetReturnForInvocation() {
     this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker1, false));
     this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker2, false));

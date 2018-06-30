@@ -730,7 +730,7 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
     this.generateLoadMockSupport();
     this.delegate.visitInsn(DUP);
     this.delegate.visitInsn(DUP);
-    this.delegate.visitInsn(ICONST_0);
+    this.delegate.visitInsn(ICONST_1);    // forceRetain = true
     this.delegate.visitMethodInsn(INVOKEINTERFACE,
                                   MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
                                   SUPPORT_GETCURRENTRETURN_METHOD_NAME,
@@ -742,7 +742,7 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
 
     // Get the exception this method will throw (or null if none)
     this.delegate.visitInsn(SWAP);
-    this.delegate.visitInsn(ICONST_0);
+    this.delegate.visitInsn(ICONST_1);    // forceRetain = true
     this.delegate.visitMethodInsn(INVOKEINTERFACE,
                                   MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
                                   SUPPORT_GETCURRENTTHROW_METHOD_NAME,
@@ -757,6 +757,14 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
                                   MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
                                   SUPPORT_UPDATECURRENTRETURNED_METHOD_NAME,
                                   SUPPORT_UPDATECURRENTRETURNED_DESCRIPTOR,
+                                  true);
+
+    // pop return/throw
+    this.generateLoadMockSupport();
+    this.delegate.visitMethodInsn(INVOKEINTERFACE,
+                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
+                                  SUPPORT_POPRETURNTHROW_METHOD_NAME,
+                                  SUPPORT_POPRETURNTHROW_DESCRIPTOR,
                                   true);
 
     // Always do exception first.

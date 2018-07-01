@@ -46,12 +46,13 @@ import com.roscopeco.moxy.impl.asm.visitors.classmock.MoxyClassMockDelegateAdapt
 
 import net.bytebuddy.agent.ByteBuddyAgent;
 
-/**
- * TODO Document Transformer
- *
- * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+/*
+ * MoxyClassMockEngine using ASM.
  */
 public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransformer {
+  // set to "true" to debug all, or to a class name to debug a single class
+  private static final String DEBUG_CLASSMOCK_PROPERTY = "com.roscopeco.moxy.classmock.debug";
+
   private static Instrumentation instrumentation;
 
   private static synchronized Instrumentation instrumentation() {
@@ -162,7 +163,8 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
 
     final ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 
-    if ("true".equals(System.getProperty("com.roscopeco.moxy.classmock.debug"))) {
+    if ("true".equals(System.getProperty(DEBUG_CLASSMOCK_PROPERTY)) ||
+        originalClz.getName().equals(System.getProperty(DEBUG_CLASSMOCK_PROPERTY))) {
       final CheckClassAdapter check = new CheckClassAdapter(writer, false);
       final TraceClassVisitor traceVisitor = new TraceClassVisitor(check, new PrintWriter(System.out));
       node.accept(traceVisitor);
@@ -193,7 +195,8 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
           node.accept(writer);
           final byte[] newCode = writer.toByteArray();
 
-          if ("true".equals(System.getProperty("com.roscopeco.moxy.classmock.debug"))) {
+          if ("true".equals(System.getProperty(DEBUG_CLASSMOCK_PROPERTY)) ||
+              originalClz.getName().equals(System.getProperty(DEBUG_CLASSMOCK_PROPERTY))) {
             reader = new ClassReader(newCode);
             writer = new ClassWriter(0);
             final CheckClassAdapter check = new CheckClassAdapter(writer);

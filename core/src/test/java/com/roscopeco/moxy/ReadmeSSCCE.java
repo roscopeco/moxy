@@ -25,6 +25,7 @@
 package com.roscopeco.moxy;
 
 import static com.roscopeco.moxy.Moxy.*;
+import static com.roscopeco.moxy.matchers.Matchers.*;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,10 @@ final class HardToMockClass {
   public static final String staticSayHello(final String who) {
     return "Hello, " + who;
   }
+
+  public final String finalSayHello(final String who) {
+    return "Goodbye, " + who;
+  }
 }
 
 /**
@@ -55,16 +60,20 @@ public class ReadmeSSCCE {
   public void testClassMockVerifying() {
     mockClasses(HardToMockClass.class);
 
-    assertThat(HardToMockClass.staticSayHello("Anyone")).isNull();
-
     when(() -> HardToMockClass.staticSayHello("Bill")).thenCallRealMethod();
     when(() -> HardToMockClass.staticSayHello("Steve")).thenReturn("Hi there, Steve!");
 
-    // Specific argument
     assertThat(HardToMockClass.staticSayHello("Steve")).isEqualTo("Hi there, Steve!");
-
-    // any() matcher
     assertThat(HardToMockClass.staticSayHello("Bill")).isEqualTo("Hello, Bill");
+
+    final HardToMockClass mock = new HardToMockClass();
+
+    when(() -> mock.finalSayHello("Jim")).thenAnswer(args -> "He's dead, Jim");
+
+    assertThat(mock.finalSayHello("Jim")).isEqualTo("He's dead, Jim");
+
+    assertMock(() -> HardToMockClass.staticSayHello(any())).wasCalledTwice();
+    assertMock(() -> mock.finalSayHello(any())).wasCalledOnce();
   }
 
   @Test

@@ -30,13 +30,18 @@ import org.objectweb.asm.Type;
 
 class MoxyMockingMethodVisitor extends AbstractMoxyMockMethodVisitor {
   MoxyMockingMethodVisitor(final MethodVisitor delegate,
-                           final String originalClass,
+                           final Class<?> originalClass,
                            final String methodName,
                            final String methodDescriptor,
                            final Type returnType,
                            final Type[] argTypes,
                            final boolean wasAbstract) {
     super(delegate, originalClass, methodName, methodDescriptor, returnType, argTypes, wasAbstract);
+  }
+
+  @Override
+  protected int getFirstArgumentLocalSlot() {
+    return 1;
   }
 
   @Override
@@ -53,8 +58,14 @@ class MoxyMockingMethodVisitor extends AbstractMoxyMockMethodVisitor {
     this.generateLoadMethodArguments();
 
     this.delegate.visitMethodInsn(INVOKESPECIAL,
-        this.originalClass,
+        this.originalClassInternalName,
         this.methodName,
         this.methodDescriptor, false);
+  }
+
+  @Override
+  public void visitCode() {
+    super.generatePreamble();
+    super.generateReturn();
   }
 }

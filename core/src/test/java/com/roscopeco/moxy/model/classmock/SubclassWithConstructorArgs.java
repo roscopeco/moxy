@@ -1,5 +1,5 @@
 /*
- * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
+ * SubclassWithConstructorArgs.java -
  *
  * Copyright 2018 Ross Bamford
  *
@@ -22,33 +22,21 @@
  * SOFTWARE.
  */
 
-package com.roscopeco.moxy.annotations.junit5;
-
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
-
-import com.roscopeco.moxy.annotations.MoxyAnnotations;
+package com.roscopeco.moxy.model.classmock;
 
 /**
- * JUnit 5 extension to initialise mocks on a test.
- *
- * <pre><code>
- *   {@literal @}ExtendWith(InitMocks.class)
- *   public class TestClass {
- *
- *     {@literal @}Mock
- *     public SomeClass mockSomeClass;
- *
- *     // ...
- *
- *   }
- * </code></pre>
+ * TODO Document SubclassWithConstructorArgs
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
-public class InitMocks implements BeforeEachCallback {
+public class SubclassWithConstructorArgs extends ClassWithConstructorArgs {
+  public SubclassWithConstructorArgs(final String str) {
+    super(str);
+  }
+
+  // Moxy class mocks only define declared methods...
   @Override
-  public void beforeEach(final ExtensionContext context) throws Exception {
-    context.getTestInstance().ifPresent(MoxyAnnotations::initMocks);
+  public String getStr() {
+    return super.getStr();
   }
 }

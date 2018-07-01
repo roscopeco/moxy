@@ -43,12 +43,14 @@ import com.roscopeco.moxy.api.MoxyMock;
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
+  private final Class<?> originalClass;
   private final String originalClassInternalName;
   private final Set<Method> mockMethods;
 
   public MoxyMockClassVisitor(final Class<?> originalClass, final Set<Method> methods) {
     super(AbstractMoxyTypeVisitor.makeMockName(originalClass));
 
+    this.originalClass = originalClass;
     this.originalClassInternalName = Type.getInternalName(originalClass);
     this.mockMethods = methods == null ? Collections.emptySet() : methods;
   }
@@ -93,7 +95,6 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
 
   @Override
   public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
-    // Generate field for method return value
     final boolean isAbstract = (access & ACC_ABSTRACT) != 0;
 
     if (INIT_NAME.equals(name)) {
@@ -111,7 +112,7 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
         // Do the mocking
         return new MoxyMockingMethodVisitor(this.cv.visitMethod(access & ~ACC_ABSTRACT | ACC_SYNTHETIC,
                                                            name, desc, signature, exceptions),
-                                                           this.originalClassInternalName,
+                                                           this.originalClass,
                                                            name,
                                                            desc,
                                                            Type.getReturnType(desc),

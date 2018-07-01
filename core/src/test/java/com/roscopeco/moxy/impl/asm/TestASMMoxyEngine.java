@@ -281,8 +281,8 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(engine.isMockCandidate(publicMethod)).isTrue();
     assertThat(engine.isMockCandidate(defaultMethod)).isTrue();
     assertThat(engine.isMockCandidate(protectedMethod)).isTrue();
-    assertThat(engine.isMockCandidate(privateMethod)).isFalse();
     assertThat(engine.isMockCandidate(finalMethod)).isFalse();
+    assertThat(engine.isMockCandidate(privateMethod)).isFalse();
   }
 
   @Test

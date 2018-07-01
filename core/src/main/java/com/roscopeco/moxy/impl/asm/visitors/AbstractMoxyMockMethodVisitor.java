@@ -43,14 +43,15 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
 
   protected final MethodVisitor delegate;
   protected final boolean wasAbstract;
-  protected final String originalClass;
+  protected final Class<?> originalClass;
+  protected final String originalClassInternalName;
   protected final Type returnType;
   protected final Type[] argTypes;
   protected final String methodName;
   protected final String methodDescriptor;
 
   protected AbstractMoxyMockMethodVisitor(final MethodVisitor delegate,
-                                          final String originalClass,
+                                          final Class<?> originalClass,
                                           final String methodName,
                                           final String methodDescriptor,
                                           final Type returnType,
@@ -58,20 +59,15 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
                                           final boolean wasAbstract) {
     // don't pass the delegate to the super constructor, or we'll generate
     // both old and new bytecode. Instead, use our own 'delegate' field.
-    super(ASM6);
+    super(ASM6, delegate);
     this.delegate = delegate;
     this.originalClass = originalClass;
+    this.originalClassInternalName = Type.getInternalName(originalClass);
     this.returnType = returnType;
     this.methodName = methodName;
     this.methodDescriptor = methodDescriptor;
     this.argTypes = argTypes;
     this.wasAbstract = wasAbstract;
-  }
-
-  @Override
-  public void visitCode() {
-    this.generatePreamble();
-    this.generateReturn();
   }
 
   @Override
@@ -103,6 +99,13 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
    * The return value (if any) will be handled automatically.
    */
   protected abstract void generateRealMethodCall();
+
+  /**
+   * Returns the local slot number for the first argument. For
+   * static methods, this should be zero. For instance methods,
+   * it should be 1.
+   */
+  protected abstract int getFirstArgumentLocalSlot();
 
   /**
    * @return The first available local slot, after (width-adjusted) arguments.
@@ -333,7 +336,7 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
    * is performed.
    */
   protected void generateLoadMethodArguments() {
-    int currentLocalSlot = 1;
+    int currentLocalSlot = this.getFirstArgumentLocalSlot();
     for (int i = 0; i < this.argTypes.length; i++) {
       currentLocalSlot += this.generateLoadOptionalAutoboxing(i, currentLocalSlot, false);
     }
@@ -408,6 +411,32 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
     this.delegate.visitInsn(returnOpcode);
   }
 
+  protected void generateThrowInvalidStubbing(final String postfixMessage) {
+    // Throw InvalidStubbing (can't call super to abstract)
+    this.delegate.visitTypeInsn(NEW, INVALID_STUBBING_INTERNAL_NAME);
+    this.delegate.visitInsn(DUP);
+
+    // Load format string
+    this.delegate.visitLdcInsn("Cannot call real method '%s' (" + postfixMessage + ")");
+
+    // Make Java method signature
+    this.generateLoadMockSupport();
+    this.delegate.visitLdcInsn(this.methodName);
+    this.delegate.visitLdcInsn(this.methodDescriptor);
+    this.delegate.visitMethodInsn(INVOKEINTERFACE,
+                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
+                                  SUPPORT_MAKE_JAVA_SIGNATURE_METHOD_NAME,
+                                  SUPPORT_MAKE_JAVA_SIGNATURE_DESCRIPTOR,
+                                  true);
+
+    this.delegate.visitMethodInsn(INVOKESPECIAL,
+                                  INVALID_STUBBING_INTERNAL_NAME,
+                                  INIT_NAME,
+                                  VOID_STRING_STRING_DESCRIPTOR,
+                                  false);
+    this.delegate.visitInsn(ATHROW);
+  }
+
   /**
    * Generate the mock method preamble (invocation recording).
    */
@@ -440,7 +469,7 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
     this.delegate.visitMethodInsn(INVOKESPECIAL, ARRAYLIST_INTERNAL_NAME, INIT_NAME, VOID_INT_DESCRIPTOR, false);
 
     // Go through arguments, load and autobox (if necessary).
-    int currentLocalSlot = 1;
+    int currentLocalSlot = this.getFirstArgumentLocalSlot();
     for (int argNum = 0; argNum < argc; argNum++) {
 
       this.delegate.visitInsn(DUP);
@@ -576,29 +605,7 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
 
       // end of catch
     } else {
-      // Throw InvalidStubbing (can't call super to abstract)
-      this.delegate.visitTypeInsn(NEW, INVALID_STUBBING_INTERNAL_NAME);
-      this.delegate.visitInsn(DUP);
-
-      // Load format string
-      this.delegate.visitLdcInsn("Cannot call real method '%s' (it is abstract)");
-
-      // Make Java method signature
-          this.generateLoadMockSupport();
-      this.delegate.visitLdcInsn(this.methodName);
-      this.delegate.visitLdcInsn(this.methodDescriptor);
-      this.delegate.visitMethodInsn(INVOKEINTERFACE,
-                                    MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
-                                    SUPPORT_MAKE_JAVA_SIGNATURE_METHOD_NAME,
-                                    SUPPORT_MAKE_JAVA_SIGNATURE_DESCRIPTOR,
-                                    true);
-
-      this.delegate.visitMethodInsn(INVOKESPECIAL,
-                                    INVALID_STUBBING_INTERNAL_NAME,
-                                    INIT_NAME,
-                                    VOID_STRING_STRING_DESCRIPTOR,
-                                    false);
-      this.delegate.visitInsn(ATHROW);
+      this.generateThrowInvalidStubbing("it is abstract");
     }
 
     ////////////////////////////////////////
@@ -730,6 +737,7 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
     this.generateLoadMockSupport();
     this.delegate.visitInsn(DUP);
     this.delegate.visitInsn(DUP);
+    this.delegate.visitInsn(ICONST_1);    // forceRetain = true
     this.delegate.visitMethodInsn(INVOKEINTERFACE,
                                   MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
                                   SUPPORT_GETCURRENTRETURN_METHOD_NAME,
@@ -741,6 +749,7 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
 
     // Get the exception this method will throw (or null if none)
     this.delegate.visitInsn(SWAP);
+    this.delegate.visitInsn(ICONST_1);    // forceRetain = true
     this.delegate.visitMethodInsn(INVOKEINTERFACE,
                                   MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
                                   SUPPORT_GETCURRENTTHROW_METHOD_NAME,
@@ -755,6 +764,14 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
                                   MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
                                   SUPPORT_UPDATECURRENTRETURNED_METHOD_NAME,
                                   SUPPORT_UPDATECURRENTRETURNED_DESCRIPTOR,
+                                  true);
+
+    // pop return/throw
+    this.generateLoadMockSupport();
+    this.delegate.visitMethodInsn(INVOKEINTERFACE,
+                                  MOXY_SUPPORT_INTERFACE_INTERNAL_NAME,
+                                  SUPPORT_POPRETURNTHROW_METHOD_NAME,
+                                  SUPPORT_POPRETURNTHROW_DESCRIPTOR,
                                   true);
 
     // Always do exception first.

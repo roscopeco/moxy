@@ -1,5 +1,5 @@
 /*
- * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
+ * StaticDelegate.java -
  *
  * Copyright 2018 Ross Bamford
  *
@@ -22,33 +22,26 @@
  * SOFTWARE.
  */
 
-package com.roscopeco.moxy.annotations.junit5;
+package com.roscopeco.moxy.impl.asm.classmock;
 
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
+import com.roscopeco.moxy.impl.asm.ASMMockInstanceVars;
+import com.roscopeco.moxy.impl.asm.ASMMockSupport;
+import com.roscopeco.moxy.impl.asm.ASMMoxyEngine;
 
-import com.roscopeco.moxy.annotations.MoxyAnnotations;
-
-/**
- * JUnit 5 extension to initialise mocks on a test.
- *
- * <pre><code>
- *   {@literal @}ExtendWith(InitMocks.class)
- *   public class TestClass {
- *
- *     {@literal @}Mock
- *     public SomeClass mockSomeClass;
- *
- *     // ...
- *
- *   }
- * </code></pre>
+/*
+ * Simple mock support to act as delegate for static methods.
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
-public class InitMocks implements BeforeEachCallback {
+class StaticDelegate implements ASMMockSupport {
+  private final ASMMockInstanceVars ivars;
+
+  StaticDelegate(final ASMMoxyEngine engine) {
+    this.ivars = new ASMMockInstanceVars(engine);
+  }
+
   @Override
-  public void beforeEach(final ExtensionContext context) throws Exception {
-    context.getTestInstance().ifPresent(MoxyAnnotations::initMocks);
+  public ASMMockInstanceVars __moxy_asm_ivars() {
+    return this.ivars;
   }
 }

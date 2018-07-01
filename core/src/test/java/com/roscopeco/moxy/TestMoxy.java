@@ -222,7 +222,7 @@ public class TestMoxy {
         Moxy.mock(FinalClass.class)
     )
         .isInstanceOf(MockGenerationException.class)
-        .hasMessage("Mocking of final classes is not yet supported");
+        .hasMessage("Mocking of final classes is not supported with classic mocking; Try the class mock API (Moxy.mockClasses(...))");
   }
 
   @Test

@@ -23,11 +23,15 @@ But in the spirit of getting you started, here's a [SSCCE](http://sscce.org/) we
 made earlier, paraphrased somewhat from our own tests:
 
 ```java
+import static com.roscopeco.moxy.Moxy.*;
+import static com.roscopeco.moxy.matchers.Matchers.*;
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.Test;
 
 class TestClass {
   public String sayHelloTo(final String who) {
-  	return "Hello, " + who;
+    return "Hello, " + who;
   }
 
   public String hasTwoArgs(final String arg1, final int arg2) {
@@ -35,21 +39,51 @@ class TestClass {
   }
 }
 
-public class TestMultiVerifying {
+final class HardToMockClass {
+  public static final String staticSayHello(final String who) {
+    return "Hello, " + who;
+  }
+
+  public final String finalSayHello(final String who) {
+    return "Goodbye, " + who;
+  }
+}
+
+public class ReadmeSSCCE {
   @Test
-  public void testVerifying() {
-    final TestClass mock = Moxy.mock(TestClass.class);
+  public void testClassMockVerifying() {
+    mockClasses(HardToMockClass.class);
+
+    when(() -> HardToMockClass.staticSayHello("Bill")).thenCallRealMethod();
+    when(() -> HardToMockClass.staticSayHello("Steve")).thenReturn("Hi there, Steve!");
+
+    assertThat(HardToMockClass.staticSayHello("Bill")).isEqualTo("Hello, Bill");
+    assertThat(HardToMockClass.staticSayHello("Steve")).isEqualTo("Hi there, Steve!");
+
+    final HardToMockClass mock = new HardToMockClass();
+
+    when(() -> mock.finalSayHello("Jim")).thenAnswer(args -> "He's dead, Jim");
+
+    assertThat(mock.finalSayHello("Jim")).isEqualTo("He's dead, Jim");
+
+    assertMock(() -> HardToMockClass.staticSayHello(any())).wasCalledTwice();
+    assertMock(() -> mock.finalSayHello(any())).wasCalledOnce();
+  }
+
+  @Test
+  public void testClassicMockVerifying() {
+    final TestClass mock = mock(TestClass.class);
 
     mock.sayHelloTo("Bill");
     mock.hasTwoArgs("one", 1);
 
-    Moxy.assertMocks(() -> {
+    assertMocks(() -> {
       mock.sayHelloTo("Steve");
       mock.hasTwoArgs("two", 2);
     })
         .wereNotCalled();
 
-    Moxy.assertMocks(() -> {
+    assertMocks(() -> {
       mock.sayHelloTo("Bill");
       mock.hasTwoArgs("one", 1);
     })

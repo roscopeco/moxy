@@ -130,7 +130,7 @@ public class MoxyClassMockDelegateAdapter extends ClassVisitor {
     newInterfaces.addAll(Arrays.asList(interfaces));
 
     super.visit(version,
-                access,
+                access | ACC_SYNTHETIC,
                 this.newInternalName,
                 signature,
                 superName,
@@ -173,6 +173,11 @@ public class MoxyClassMockDelegateAdapter extends ClassVisitor {
     mv.visitFieldInsn(GETFIELD, this.newInternalName, fieldName, fieldDescriptor);
     mv.visitInsn(ARETURN);
     mv.visitEnd();
+  }
+
+  @Override
+  public MethodVisitor visitMethod(final int access, final String name, final String descriptor, final String signature, final String[] exceptions) {
+    return super.visitMethod(access | ACC_SYNTHETIC, name, descriptor, signature, exceptions);
   }
 
   @Override

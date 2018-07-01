@@ -57,9 +57,10 @@ public class MoxyClassMockAdapter extends ClassVisitor {
   @Override
   public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
     final boolean isAbstract = (access & ACC_ABSTRACT) != 0;
+    final boolean isSynthetic = (access & ACC_SYNTHETIC) != 0;
     final boolean isStatic = (access & ACC_STATIC) != 0;
 
-    if (isAbstract) {
+    if (isAbstract || isSynthetic) {
       return super.visitMethod(access, name, desc, signature, exceptions);
     } else if ("<init>".equals(name)) {
       return new MoxyClassMockConstructorVisitor(super.visitMethod(access, name, desc, signature, exceptions),

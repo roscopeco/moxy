@@ -23,7 +23,8 @@
  */
 package com.roscopeco.moxy.impl.asm.visitors.classmock;
 
-import static com.roscopeco.moxy.impl.asm.visitors.classmock.TypesAndDescriptors.*;
+import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
+import static com.roscopeco.moxy.impl.asm.classmock.TypesAndDescriptors.*;
 import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
@@ -33,39 +34,58 @@ import com.roscopeco.moxy.impl.asm.visitors.AbstractMoxyMockMethodVisitor;
 
 class MoxyClassMockingMethodVisitor extends AbstractMoxyMockMethodVisitor {
   private final String delegateClass;
+  private final boolean isStatic;
 
   MoxyClassMockingMethodVisitor(final MethodVisitor delegate,
-                                final String originalClass,
+                                final Class<?> originalClass,
                                 final String delegateClass,
                                 final String methodName,
                                 final String methodDescriptor,
                                 final Type returnType,
-                                final Type[] argTypes) {
+                                final Type[] argTypes,
+                                final boolean isStatic) {
     super(delegate, originalClass, methodName, methodDescriptor, returnType, argTypes, false);
     this.delegateClass = delegateClass;
+    this.isStatic = isStatic;
   }
 
   @Override
   protected void generateLoadMockSupport() {
-    this.delegate.visitVarInsn(ALOAD, 0);
-    this.delegate.visitMethodInsn(INVOKESTATIC,
-                                  INSTANCE_REGISTRY_INTERNAL_NAME,
-                                  REGISTRY_GET_DELEGATE_METHOD_NAME,
-                                  REGISTRY_GET_DELEGATE_DESCRIPTOR,
-                                  false);
+    if (this.isStatic) {
+      this.delegate.visitLdcInsn(Type.getType(this.originalClass));
 
-    this.delegate.visitTypeInsn(CHECKCAST, this.delegateClass);
+      this.delegate.visitMethodInsn(INVOKESTATIC,
+                                    INSTANCE_REGISTRY_INTERNAL_NAME,
+                                    REGISTRY_GET_STATIC_DELEGATE_METHOD_NAME,
+                                    REGISTRY_GET_STATIC_DELEGATE_DESCRIPTOR,
+                                    false);
+
+      this.delegate.visitTypeInsn(CHECKCAST, MOXY_SUPPORT_INTERFACE_INTERNAL_NAME);
+    } else {
+      this.delegate.visitVarInsn(ALOAD, 0);
+
+      this.delegate.visitMethodInsn(INVOKESTATIC,
+                                    INSTANCE_REGISTRY_INTERNAL_NAME,
+                                    REGISTRY_GET_DELEGATE_METHOD_NAME,
+                                    REGISTRY_GET_DELEGATE_DESCRIPTOR,
+                                    false);
+
+      this.delegate.visitTypeInsn(CHECKCAST, this.delegateClass);
+    }
   }
 
   @Override
   protected void generateRealMethodCall() {
-    // load support
-    this.generateLoadMockSupport();
+    if (!this.isStatic) {
+      // load support
+      this.generateLoadMockSupport();
+    }
 
     // load arguments
     this.generateLoadMethodArguments();
 
-    this.delegate.visitMethodInsn(INVOKEVIRTUAL,
+    this.delegate.visitMethodInsn(
+        this.isStatic ? INVOKESTATIC : INVOKEVIRTUAL,
         this.delegateClass,
         this.methodName,
         this.methodDescriptor,

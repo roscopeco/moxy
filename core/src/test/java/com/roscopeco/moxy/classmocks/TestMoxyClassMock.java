@@ -26,17 +26,26 @@ package com.roscopeco.moxy.classmocks;
 
 import static org.assertj.core.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.roscopeco.moxy.Moxy;
 import com.roscopeco.moxy.model.FinalClass;
 import com.roscopeco.moxy.model.SimpleClass;
+import com.roscopeco.moxy.model.classmocks.ClassWithConstructorArgs;
+import com.roscopeco.moxy.model.classmocks.ClassWithStatic;
+import com.roscopeco.moxy.model.classmocks.SubclassWithConstructorArgs;
 
 public class TestMoxyClassMock {
   public static class Delegate {
     public String returnHello() {
       return "Delegated";
     }
+  }
+
+  @BeforeEach
+  public void resetMocks() {
+    Moxy.resetAllClassMocks();
   }
 
   @Test
@@ -152,5 +161,92 @@ public class TestMoxyClassMock {
 
     assertThatThrownBy(() -> sc.returnHello())
         .isSameAs(rte);
+  }
+
+  @Test
+  public void testMoxyClassMockCanAssertMockedClass() throws Exception {
+    Moxy.mockClasses(FinalClass.class);
+
+    final FinalClass sc = new FinalClass();
+
+    assertThat(sc.returnHello()).isNull();
+
+    Moxy.assertMock(() -> sc.returnHello()).wasCalledOnce();
+
+    Moxy.when(() -> sc.returnHello()).thenReturn("Goodbye");
+
+    assertThat(sc.returnHello()).isEqualTo("Goodbye");
+
+    Moxy.assertMock(() -> sc.returnHello()).wasCalledTwice();
+  }
+
+  @Test
+  public void testMoxyClassMockCanMockWithConstructorArguments() {
+    Moxy.mockClasses(ClassWithConstructorArgs.class);
+
+    final ClassWithConstructorArgs mock = new ClassWithConstructorArgs("Hello Constructor");
+
+    assertThat(mock.getStr()).isNull();
+
+    Moxy.when(() -> mock.getStr()).thenCallRealMethod();
+
+    assertThat(mock.getStr()).isEqualTo("Hello Constructor");
+  }
+
+  @Test
+  public void testMoxyClassMockCanMockSubclassWithConstructorArguments() {
+    Moxy.mockClasses(ClassWithConstructorArgs.class);
+
+    final SubclassWithConstructorArgs mock = new SubclassWithConstructorArgs("Hello Subclass Constructor");
+
+    assertThat(mock.getStr()).isNull();
+
+    Moxy.when(() -> mock.getStr()).thenCallRealMethod();
+
+    assertThat(mock.getStr()).isEqualTo("Hello Subclass Constructor");
+  }
+
+  @Test
+  public void testMoxyClassMockCanMockStaticMethods() {
+    Moxy.mockClasses(ClassWithStatic.class);
+
+    assertThat(ClassWithStatic.returnHello()).isNull();
+
+    Moxy.when(() -> ClassWithStatic.returnHello()).thenReturn("Goodbye");
+
+    assertThat(ClassWithStatic.returnHello()).isEqualTo("Goodbye");
+  }
+
+  @Test
+  public void testMoxyClassMockCanResetMockedClassStatics() throws Exception {
+    Moxy.mockClasses(ClassWithStatic.class);
+
+    assertThat(ClassWithStatic.returnHello()).isNull();
+
+    Moxy.assertMock(() -> ClassWithStatic.returnHello()).wasCalledOnce();
+
+    Moxy.when(() -> ClassWithStatic.returnHello()).thenReturn("Goodbye");
+
+    assertThat(ClassWithStatic.returnHello()).isEqualTo("Goodbye");
+
+    Moxy.resetClassMocks(ClassWithStatic.class);
+
+    // Static are reverted
+    assertThat(ClassWithStatic.returnHello()).isEqualTo("Hello");
+  }
+
+  @Test
+  public void testMoxyClassMockCanAssertMockedStaticMethods() {
+    Moxy.mockClasses(ClassWithStatic.class);
+
+    assertThat(ClassWithStatic.returnHello()).isNull();
+
+    Moxy.assertMock(() -> ClassWithStatic.returnHello()).wasCalledOnce();
+
+    Moxy.when(() -> ClassWithStatic.returnHello()).thenReturn("Goodbye");
+
+    assertThat(ClassWithStatic.returnHello()).isEqualTo("Goodbye");
+
+    Moxy.assertMock(() -> ClassWithStatic.returnHello()).wasCalledTwice();
   }
 }

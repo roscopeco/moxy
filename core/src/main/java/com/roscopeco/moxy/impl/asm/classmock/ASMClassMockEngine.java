@@ -180,8 +180,14 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
       final ProtectionDomain pd, final byte[] originalCode) throws IllegalClassFormatException {
     if (originalClz != null) {
       if (this.isPendingReset(originalClz)) {
+        // Remove from mocked classes
         this.currentlyMockedClasses.remove(originalClz);
-        return null;
+
+        // clear static delegate (if any)
+        DelegateRegistry.clearStaticDelegate(originalClz);
+
+        // return original code
+        return originalCode;
       } else if (this.isPendingMock(originalClz)) {
         try {
           final Class<?> copy = this.copyClass(loader, originalClz, originalCode);
@@ -213,6 +219,7 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
       }
     }
 
+    // No transform by default
     return null;
   }
 }

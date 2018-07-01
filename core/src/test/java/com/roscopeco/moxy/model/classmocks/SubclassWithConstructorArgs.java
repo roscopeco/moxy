@@ -1,5 +1,5 @@
 /*
- * InstanceRegistry.java -
+ * SubclassWithConstructorArgs.java -
  *
  * Copyright 2018 Ross Bamford
  *
@@ -22,32 +22,15 @@
  * SOFTWARE.
  */
 
-package com.roscopeco.moxy.impl.asm.classmock;
-
-import java.util.WeakHashMap;
-import java.util.logging.Logger;
-
-import com.roscopeco.moxy.impl.asm.ASMMockSupport;
+package com.roscopeco.moxy.model.classmocks;
 
 /**
- * TODO Document InstanceRegistry
+ * TODO Document SubclassWithConstructorArgs
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
-public class InstanceRegistry {
-  private static final Logger LOG = Logger.getLogger(InstanceRegistry.class.getName());
-
-  private static final WeakHashMap<Object, ASMMockSupport> registryMap = new WeakHashMap<>();
-
-  public static void registerDelegate(final Object forObj, final ASMMockSupport delegate) {
-    final Object old = registryMap.put(forObj, delegate);
-
-    if (old != null && old != delegate) {
-      LOG.warning(() -> "Delegate changed for object '" + forObj + "' (from '" + old + "' to '" + delegate + "'");
-    }
-  }
-
-  public static ASMMockSupport getDelegate(final Object forObj) {
-    return registryMap.get(forObj);
+public class SubclassWithConstructorArgs extends ClassWithConstructorArgs {
+  public SubclassWithConstructorArgs(final String str) {
+    super(str);
   }
 }

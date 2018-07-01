@@ -25,42 +25,32 @@
 package com.roscopeco.moxy.impl.asm.visitors.classmock;
 
 import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
-import static com.roscopeco.moxy.impl.asm.visitors.classmock.TypesAndDescriptors.*;
+import static com.roscopeco.moxy.impl.asm.classmock.TypesAndDescriptors.*;
 import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
+
+import com.roscopeco.moxy.impl.asm.visitors.AbstractMoxyMockMethodVisitor;
 
 /**
  * TODO Document MoxyClassMockConstructorVisitor
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
-public class MoxyClassMockConstructorVisitor extends MethodVisitor {
-  private final MethodVisitor delegate;
-  private final String thisClassInternal;
+public class MoxyClassMockConstructorVisitor extends AbstractMoxyMockMethodVisitor {
   private final String delegateClassInternal;
-  private final Type returnType;
-  private final Type[] argTypes;
-  private final String name;
-  private final String descriptor;
 
   MoxyClassMockConstructorVisitor(final MethodVisitor delegate,
-                                  final String thisClassInternal,
+                                  final Class<?> thisClass,
                                   final String delegateClassInternal,
                                   final int access,
                                   final String name,
                                   final String descriptor,
                                   final Type returnType,
                                   final Type[] argTypes) {
-    super(ASM6);
-    this.delegate = delegate;
-    this.thisClassInternal = thisClassInternal;
+    super(delegate, thisClass, name, descriptor, returnType, argTypes, false);
     this.delegateClassInternal = delegateClassInternal;
-    this.returnType = returnType;
-    this.name = name;
-    this.descriptor = descriptor;
-    this.argTypes = argTypes;
   }
 
   @Override
@@ -76,10 +66,11 @@ public class MoxyClassMockConstructorVisitor extends MethodVisitor {
     this.delegate.visitTypeInsn(NEW, this.delegateClassInternal);
     this.delegate.visitInsn(DUP);
     this.delegate.visitInsn(DUP);
+    this.generateLoadMethodArguments();
     this.delegate.visitMethodInsn(INVOKESPECIAL,
                                   this.delegateClassInternal,
                                   INIT_NAME,
-                                  VOID_VOID_DESCRIPTOR,
+                                  this.methodDescriptor,
                                   false);
 
     this.delegate.visitTypeInsn(NEW, MOXY_SUPPORT_IVARS_INTERNAL_NAME);
@@ -111,4 +102,18 @@ public class MoxyClassMockConstructorVisitor extends MethodVisitor {
 
     this.delegate.visitInsn(RETURN);
   }
+
+  @Override
+  protected void generateLoadMockSupport() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  protected void generateRealMethodCall() {
+    // TODO Auto-generated method stub
+
+  }
+
+
 }

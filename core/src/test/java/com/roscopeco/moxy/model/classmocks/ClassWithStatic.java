@@ -21,40 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.impl.asm.visitors;
 
-import static org.objectweb.asm.Opcodes.*;
+package com.roscopeco.moxy.model.classmocks;
 
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
-
-class MoxyMockingMethodVisitor extends AbstractMoxyMockMethodVisitor {
-  MoxyMockingMethodVisitor(final MethodVisitor delegate,
-                           final Class<?> originalClass,
-                           final String methodName,
-                           final String methodDescriptor,
-                           final Type returnType,
-                           final Type[] argTypes,
-                           final boolean wasAbstract) {
-    super(delegate, originalClass, methodName, methodDescriptor, returnType, argTypes, wasAbstract);
-  }
-
-  @Override
-  protected void generateLoadMockSupport() {
-    this.delegate.visitVarInsn(ALOAD, 0);
-  }
-
-  @Override
-  protected void generateRealMethodCall() {
-    // load support
-    this.generateLoadMockSupport();
-
-    // load arguments
-    this.generateLoadMethodArguments();
-
-    this.delegate.visitMethodInsn(INVOKESPECIAL,
-        this.originalClassInternalName,
-        this.methodName,
-        this.methodDescriptor, false);
+public class ClassWithStatic {
+  public static String returnHello() {
+    return "Hello";
   }
 }

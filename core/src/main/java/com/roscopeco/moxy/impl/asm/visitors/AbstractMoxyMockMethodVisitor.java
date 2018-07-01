@@ -43,14 +43,15 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
 
   protected final MethodVisitor delegate;
   protected final boolean wasAbstract;
-  protected final String originalClass;
+  protected final Class<?> originalClass;
+  protected final String originalClassInternalName;
   protected final Type returnType;
   protected final Type[] argTypes;
   protected final String methodName;
   protected final String methodDescriptor;
 
   protected AbstractMoxyMockMethodVisitor(final MethodVisitor delegate,
-                                          final String originalClass,
+                                          final Class<?> originalClass,
                                           final String methodName,
                                           final String methodDescriptor,
                                           final Type returnType,
@@ -61,6 +62,7 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
     super(ASM6);
     this.delegate = delegate;
     this.originalClass = originalClass;
+    this.originalClassInternalName = Type.getInternalName(originalClass);
     this.returnType = returnType;
     this.methodName = methodName;
     this.methodDescriptor = methodDescriptor;

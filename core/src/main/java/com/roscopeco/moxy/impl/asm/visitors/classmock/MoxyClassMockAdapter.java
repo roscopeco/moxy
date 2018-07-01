@@ -39,16 +39,12 @@ import com.roscopeco.moxy.api.MoxyMock;
  */
 public class MoxyClassMockAdapter extends ClassVisitor {
   private final Class<?> thisClz;
-  private final Class<?> delegateClz;
-  private final String thisClzInternal;
   private final String delegateClzInternal;
 
   public MoxyClassMockAdapter(final ClassVisitor delegate, final Class<?> thisClz, final Class<?> delegateClz) {
     super(ASM6, delegate);
-    this.delegateClz = delegateClz;
     this.thisClz = thisClz;
     this.delegateClzInternal = Type.getInternalName(delegateClz);
-    this.thisClzInternal = Type.getInternalName(this.thisClz);
   }
 
   @Override
@@ -61,13 +57,14 @@ public class MoxyClassMockAdapter extends ClassVisitor {
   @Override
   public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
     final boolean isAbstract = (access & ACC_ABSTRACT) != 0;
+    final boolean isStatic = (access & ACC_STATIC) != 0;
 
     if (isAbstract) {
       return super.visitMethod(access, name, desc, signature, exceptions);
     } else if ("<init>".equals(name)) {
       return new MoxyClassMockConstructorVisitor(this.cv.visitMethod(access, name, desc, signature, exceptions),
-                                                 Type.getInternalName(this.thisClz),
-                                                 Type.getInternalName(this.delegateClz),
+                                                 this.thisClz,
+                                                 this.delegateClzInternal,
                                                  access,
                                                  name,
                                                  desc,
@@ -75,12 +72,13 @@ public class MoxyClassMockAdapter extends ClassVisitor {
                                                  Type.getArgumentTypes(desc));
     } else {
       return new MoxyClassMockingMethodVisitor(this.cv.visitMethod(access, name, desc, signature, exceptions),
-                                               this.thisClzInternal,
+                                               this.thisClz,
                                                this.delegateClzInternal,
                                                name,
                                                desc,
                                                Type.getReturnType(desc),
-                                               Type.getArgumentTypes(desc));
+                                               Type.getArgumentTypes(desc),
+                                               isStatic);
     }
   }
 }

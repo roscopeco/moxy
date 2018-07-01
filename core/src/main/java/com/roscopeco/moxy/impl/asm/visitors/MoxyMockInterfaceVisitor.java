@@ -41,10 +41,12 @@ import com.roscopeco.moxy.api.MoxyMock;
  */
 public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
   private final String interfaceInternalName;
+  private final Class<?> originalIface;
 
   public MoxyMockInterfaceVisitor(final Class<?> iface) {
     super(AbstractMoxyTypeVisitor.makeMockName(iface));
 
+    this.originalIface = iface;
     this.interfaceInternalName = Type.getInternalName(iface);
   }
 
@@ -72,14 +74,14 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
   public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
     // Do the mocking
     return new MoxyMockingMethodVisitor(this.cv.visitMethod(
-        access & ~ACC_ABSTRACT | ACC_SYNTHETIC,
-        name, desc, signature, exceptions),
-    this.interfaceInternalName,
-    name,
-    desc,
-    Type.getReturnType(desc),
-    Type.getArgumentTypes(desc),
-    true);
+                                            access & ~ACC_ABSTRACT | ACC_SYNTHETIC,
+                                            name, desc, signature, exceptions),
+                                        this.originalIface,
+                                        name,
+                                        desc,
+                                        Type.getReturnType(desc),
+                                        Type.getArgumentTypes(desc),
+                                        true);
   }
 
   @Override

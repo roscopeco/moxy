@@ -25,6 +25,7 @@
 package com.roscopeco.moxy.impl.asm;
 
 import java.lang.reflect.Field;
+import java.util.logging.Logger;
 
 /**
  * TODO Document UnsafeUtils
@@ -32,6 +33,8 @@ import java.lang.reflect.Field;
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public class UnsafeUtils {
+  private static final Logger LOG = Logger.getLogger(UnsafeUtils.class.getName());
+
   @SuppressWarnings("restriction")
   private static final sun.misc.Unsafe UNSAFE = initUnsafe();
 
@@ -79,9 +82,9 @@ public class UnsafeUtils {
   @SuppressWarnings({ "restriction", "deprecation" })
   public static Class<?> defineClass(final ClassLoader loader, final String name, final byte[] code, final boolean bootLoaderCheck) {
     if (bootLoaderCheck && loader == null) {
-      throw new IllegalArgumentException("Implicit definition in the system classloader is unsupported.\n"
-                                       + "Defining mocks here will almost certainly fail with NoClassDefFoundError for framework classes.\n"
-                                       + "If you're sure this is what you want to do, pass system loader explicitly (rather than null)");
+      LOG.warning(() -> "Implicit definition in the system classloader;\n"
+                      + "Defining mocks here will almost certainly fail with NoClassDefFoundError for framework classes.\n"
+                      + "If you are using class mocking for system classes, be prepared for undefined behaviour.");
     }
 
     return UNSAFE.defineClass(name.replace('/',  '.'), code, 0, code.length, loader, null);

@@ -33,10 +33,10 @@ import com.roscopeco.moxy.annotations.MoxyAnnotations;
  * JUnit 5 extension to initialise mocks on a test.
  *
  * <pre><code>
- *   {@literal}ExtendWith(InitMocks.class)
+ *   {@literal @}ExtendWith(InitMocks.class)
  *   public class TestClass {
  *
- *     {@literal}Mock
+ *     {@literal @}Mock
  *     public SomeClass mockSomeClass;
  *
  *     // ...

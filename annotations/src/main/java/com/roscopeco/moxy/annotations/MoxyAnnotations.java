@@ -48,11 +48,11 @@ public class MoxyAnnotations {
    *
    * <p>Note that no contructors will be called on the mocks.</p>
    *
-   * <p>This will usually be called from a <code>{@literal}Before</code> or
-   * <code>{@literal}BeforeEach</code> method, e.g.:</p>
+   * <p>This will usually be called from a <code>{@literal @}Before</code> or
+   * <code>{@literal @}BeforeEach</code> method, e.g.:</p>
    *
    * <pre><code>
-   * {@literal}BeforeEach
+   * {@literal @}BeforeEach
    * public void setUp() {
    *   initMocks(this);
    * }
@@ -63,7 +63,7 @@ public class MoxyAnnotations {
    * extension:</p>
    *
    * <pre><code>
-   * {@literal}ExtendWith(InitMocks.class)
+   * {@literal @}ExtendWith(InitMocks.class)
    * public class SomeTest {
    *   // ...
    * }

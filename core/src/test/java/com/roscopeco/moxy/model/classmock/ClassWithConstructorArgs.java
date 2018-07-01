@@ -1,5 +1,5 @@
 /*
- * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
+ * ClassWithConstructorArgs.java -
  *
  * Copyright 2018 Ross Bamford
  *
@@ -21,14 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.model.classmocks;
 
-/*
- * This is separate from the com.roscopeco.moxy.model.SimpleClass
- * model to stop class mocking interfering with normal mock tests.
+package com.roscopeco.moxy.model.classmock;
+
+/**
+ * TODO Document ClassWithConstructorArgs
+ *
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
-public class SimpleClass {
-  public String returnHello() {
-    return "Hello";
+public class ClassWithConstructorArgs {
+  private final String str;
+
+  public ClassWithConstructorArgs(final String str) {
+    this.str = str;
+  }
+
+  public String getStr() {
+    return this.str;
   }
 }

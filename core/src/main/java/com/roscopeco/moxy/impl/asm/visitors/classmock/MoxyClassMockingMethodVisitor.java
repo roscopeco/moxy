@@ -96,4 +96,10 @@ class MoxyClassMockingMethodVisitor extends AbstractMoxyMockMethodVisitor {
         this.methodDescriptor,
         false);
   }
+
+  @Override
+  public void visitCode() {
+    super.generatePreamble();
+    super.generateReturn();
+  }
 }

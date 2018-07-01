@@ -1,5 +1,5 @@
 /*
- * SubclassWithConstructorArgs.java -
+ * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
  *
  * Copyright 2018 Ross Bamford
  *
@@ -22,15 +22,10 @@
  * SOFTWARE.
  */
 
-package com.roscopeco.moxy.model.classmocks;
+package com.roscopeco.moxy.model.classmock;
 
-/**
- * TODO Document SubclassWithConstructorArgs
- *
- * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
- */
-public class SubclassWithConstructorArgs extends ClassWithConstructorArgs {
-  public SubclassWithConstructorArgs(final String str) {
-    super(str);
+public class ClassWithStatic {
+  public static String returnHello() {
+    return "Hello";
   }
 }

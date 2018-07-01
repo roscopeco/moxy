@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.roscopeco.moxy.classmocks;
+package com.roscopeco.moxy.classmock;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -30,11 +30,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.roscopeco.moxy.Moxy;
+import com.roscopeco.moxy.api.InvalidStubbingException;
 import com.roscopeco.moxy.model.FinalClass;
 import com.roscopeco.moxy.model.SimpleClass;
-import com.roscopeco.moxy.model.classmocks.ClassWithConstructorArgs;
-import com.roscopeco.moxy.model.classmocks.ClassWithStatic;
-import com.roscopeco.moxy.model.classmocks.SubclassWithConstructorArgs;
+import com.roscopeco.moxy.model.classmock.ClassWithConstructorArgs;
+import com.roscopeco.moxy.model.classmock.ClassWithStatic;
+import com.roscopeco.moxy.model.classmock.SubclassWithConstructorArgs;
 
 public class TestMoxyClassMock {
   public static class Delegate {
@@ -195,7 +196,7 @@ public class TestMoxyClassMock {
 
   @Test
   public void testMoxyClassMockCanMockSubclassWithConstructorArguments() {
-    Moxy.mockClasses(ClassWithConstructorArgs.class);
+    Moxy.mockClasses(SubclassWithConstructorArgs.class);
 
     final SubclassWithConstructorArgs mock = new SubclassWithConstructorArgs("Hello Subclass Constructor");
 
@@ -248,5 +249,39 @@ public class TestMoxyClassMock {
     assertThat(ClassWithStatic.returnHello()).isEqualTo("Goodbye");
 
     Moxy.assertMock(() -> ClassWithStatic.returnHello()).wasCalledTwice();
+  }
+
+  @Test
+  public void testMoxyClassMockCanAssertConstructors() {
+    Moxy.mockClasses(FinalClass.class);
+
+    Moxy.assertMock(() -> new FinalClass()).wasNotCalled();
+
+    @SuppressWarnings("unused")
+    final FinalClass fc = new FinalClass();
+
+    Moxy.assertMock(() -> new FinalClass()).wasCalledOnce();
+  }
+
+  @Test
+  public void testMoxyClassMockCanStubConstructors() {
+    final RuntimeException rte = new RuntimeException("MARKER");
+
+    Moxy.mockClasses(FinalClass.class);
+
+    Moxy.when(() -> new FinalClass()).thenThrow(rte);
+
+    assertThatThrownBy(() -> new FinalClass()).isSameAs(rte);
+  }
+
+  @Test
+  public void testMoxyClassMockCanStubConstructorsThrowsWithInvalidStubbing() {
+    Moxy.mockClasses(FinalClass.class);
+
+    Moxy.when(() -> new FinalClass()).thenCallRealMethod();
+
+    assertThatThrownBy(() -> new FinalClass())
+        .isInstanceOf(InvalidStubbingException.class)
+        .hasMessage("Cannot call real method 'void <init>()' (constructors are not compatible with thenCallRealMethod)");
   }
 }

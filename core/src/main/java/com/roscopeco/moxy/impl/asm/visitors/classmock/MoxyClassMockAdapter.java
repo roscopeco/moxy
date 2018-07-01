@@ -62,7 +62,7 @@ public class MoxyClassMockAdapter extends ClassVisitor {
     if (isAbstract) {
       return super.visitMethod(access, name, desc, signature, exceptions);
     } else if ("<init>".equals(name)) {
-      return new MoxyClassMockConstructorVisitor(this.cv.visitMethod(access, name, desc, signature, exceptions),
+      return new MoxyClassMockConstructorVisitor(super.visitMethod(access, name, desc, signature, exceptions),
                                                  this.thisClz,
                                                  this.delegateClzInternal,
                                                  access,
@@ -71,7 +71,7 @@ public class MoxyClassMockAdapter extends ClassVisitor {
                                                  Type.getReturnType(desc),
                                                  Type.getArgumentTypes(desc));
     } else {
-      return new MoxyClassMockingMethodVisitor(this.cv.visitMethod(access, name, desc, signature, exceptions),
+      return new MoxyClassMockingMethodVisitor(super.visitMethod(access, name, desc, signature, exceptions),
                                                this.thisClz,
                                                this.delegateClzInternal,
                                                name,

@@ -21,12 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.model.classmocks;
+package com.roscopeco.moxy.model.classmock;
 
 /*
- * This is separate from the com.roscopeco.moxy.model.FinalClass
+ * This is separate from the com.roscopeco.moxy.model.SimpleClass
  * model to stop class mocking interfering with normal mock tests.
  */
-public final class FinalClass {
-  public String returnHello() { return "Hello"; }
+public class SimpleClass {
+  public String returnHello() {
+    return "Hello";
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * ClassWithConstructorArgs.java -
+ * SubclassWithConstructorArgs.java -
  *
  * Copyright 2018 Ross Bamford
  *
@@ -22,21 +22,21 @@
  * SOFTWARE.
  */
 
-package com.roscopeco.moxy.model.classmocks;
+package com.roscopeco.moxy.model.classmock;
 
 /**
- * TODO Document ClassWithConstructorArgs
+ * TODO Document SubclassWithConstructorArgs
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
-public class ClassWithConstructorArgs {
-  private final String str;
-
-  public ClassWithConstructorArgs(final String str) {
-    this.str = str;
+public class SubclassWithConstructorArgs extends ClassWithConstructorArgs {
+  public SubclassWithConstructorArgs(final String str) {
+    super(str);
   }
 
+  // Moxy class mocks only define declared methods...
+  @Override
   public String getStr() {
-    return this.str;
+    return super.getStr();
   }
 }

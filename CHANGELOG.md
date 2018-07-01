@@ -14,9 +14,6 @@ make it in before 1.0.0.
 - Java 9 Jigsaw (module) support.
   See: https://github.com/roscopeco/moxy/tree/modular-java9
   
-- Class Mocking - Supporting finals / statics and constructor mocks.
-  See: https://github.com/roscopeco/moxy/tree/FEATURE/EXPERIMENTAL/mock-finals
-
 ## [Unreleased]
 
 These changes are currently in the `develop` branch, and are slated
@@ -24,6 +21,10 @@ to make it into a release soon.
 
 ### Added
 
+- Class Mocking - a new style of mocking that co-exists with standard
+  (now 'classic') mocking, and allows mocking of finals, statics and
+  constructors.
+  
 - Multiple stubs for the same invocation are now supported by chaining
   calls to `then[...]` methods on `ASMMoxyStubber` and `ASMMoxyVoidStubber`.
   Mocks stubbed in this way will behave according to the applied stubbed 

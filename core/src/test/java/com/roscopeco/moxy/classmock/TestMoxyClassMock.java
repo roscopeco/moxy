@@ -56,9 +56,6 @@ public class TestMoxyClassMock {
     final SimpleClass sc = new SimpleClass();
 
     assertThat(sc.returnHello()).isNull();
-
-    assertThat(Moxy.isMock(FinalClass.class));
-    assertThat(Moxy.isMock(sc));
   }
 
   @Test
@@ -68,9 +65,6 @@ public class TestMoxyClassMock {
     final SimpleClass sc = new SimpleClass();
 
     assertThat(sc.returnHello()).isNull();
-
-    assertThat(Moxy.isMock(FinalClass.class));
-    assertThat(Moxy.isMock(sc));
 
     Moxy.resetClassMocks(SimpleClass.class);
 
@@ -88,9 +82,6 @@ public class TestMoxyClassMock {
     final FinalClass sc = new FinalClass();
 
     assertThat(sc.returnHello()).isNull();
-
-    assertThat(Moxy.isMock(FinalClass.class));
-    assertThat(Moxy.isMock(sc));
   }
 
   @Test

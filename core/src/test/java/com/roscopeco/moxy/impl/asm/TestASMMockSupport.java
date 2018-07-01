@@ -84,7 +84,7 @@ public class TestASMMockSupport extends AbstractImplTest {
 
     // pops throw
     this.mock.__moxy_asm_popReturnOrThrowForInvocation(this.invoc);
-    assertThat(this.mock.__moxy_asm_shouldCallSuperForInvocation(this.invoc));
+    assertThat(this.mock.__moxy_asm_shouldCallSuperForInvocation(this.invoc)).isTrue();
 
     // doesn't pop (last one)
     this.mock.__moxy_asm_popReturnOrThrowForInvocation(this.invoc);

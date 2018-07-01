@@ -40,6 +40,11 @@ class MoxyMockingMethodVisitor extends AbstractMoxyMockMethodVisitor {
   }
 
   @Override
+  protected int getFirstArgumentLocalSlot() {
+    return 1;
+  }
+
+  @Override
   protected void generateLoadMockSupport() {
     this.delegate.visitVarInsn(ALOAD, 0);
   }

@@ -115,5 +115,8 @@ public class MoxyClassMockConstructorVisitor extends AbstractMoxyMockMethodVisit
 
   }
 
-
+  @Override
+  protected int getFirstArgumentLocalSlot() {
+    return 1;
+  }
 }

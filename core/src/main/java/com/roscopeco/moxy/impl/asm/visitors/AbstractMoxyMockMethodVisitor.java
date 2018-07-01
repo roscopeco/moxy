@@ -107,6 +107,13 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
   protected abstract void generateRealMethodCall();
 
   /**
+   * Returns the local slot number for the first argument. For
+   * static methods, this will be zero. For instance methods,
+   * it will be 1.
+   */
+  protected abstract int getFirstArgumentLocalSlot();
+
+  /**
    * @return The first available local slot, after (width-adjusted) arguments.
    */
   protected int getFirstAvailableLocalSlot() {
@@ -335,7 +342,7 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
    * is performed.
    */
   protected void generateLoadMethodArguments() {
-    int currentLocalSlot = 1;
+    int currentLocalSlot = this.getFirstArgumentLocalSlot();
     for (int i = 0; i < this.argTypes.length; i++) {
       currentLocalSlot += this.generateLoadOptionalAutoboxing(i, currentLocalSlot, false);
     }
@@ -442,7 +449,7 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
     this.delegate.visitMethodInsn(INVOKESPECIAL, ARRAYLIST_INTERNAL_NAME, INIT_NAME, VOID_INT_DESCRIPTOR, false);
 
     // Go through arguments, load and autobox (if necessary).
-    int currentLocalSlot = 1;
+    int currentLocalSlot = this.getFirstArgumentLocalSlot();
     for (int argNum = 0; argNum < argc; argNum++) {
 
       this.delegate.visitInsn(DUP);
@@ -586,7 +593,7 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
       this.delegate.visitLdcInsn("Cannot call real method '%s' (it is abstract)");
 
       // Make Java method signature
-          this.generateLoadMockSupport();
+      this.generateLoadMockSupport();
       this.delegate.visitLdcInsn(this.methodName);
       this.delegate.visitLdcInsn(this.methodDescriptor);
       this.delegate.visitMethodInsn(INVOKEINTERFACE,

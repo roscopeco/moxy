@@ -50,6 +50,11 @@ class MoxyClassMockingMethodVisitor extends AbstractMoxyMockMethodVisitor {
   }
 
   @Override
+  protected int getFirstArgumentLocalSlot() {
+    return this.isStatic ? 0 : 1;
+  }
+
+  @Override
   protected void generateLoadMockSupport() {
     if (this.isStatic) {
       this.delegate.visitLdcInsn(Type.getType(this.originalClass));

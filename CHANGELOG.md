@@ -13,6 +13,9 @@ make it in before 1.0.0.
   
 - Java 9 Jigsaw (module) support.
   See: https://github.com/roscopeco/moxy/tree/modular-java9
+  
+- Class Mocking - Supporting finals / statics and constructor mocks.
+  See: https://github.com/roscopeco/moxy/tree/FEATURE/EXPERIMENTAL/mock-finals
 
 ## [Unreleased]
 

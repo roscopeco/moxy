@@ -25,6 +25,7 @@
 package com.roscopeco.moxy.impl.asm;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.logging.Logger;
 
 /**
@@ -43,22 +44,27 @@ public class UnsafeUtils {
     try {
       final Field unsafeField = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
       unsafeField.setAccessible(true);
-      return (sun.misc.Unsafe)unsafeField.get(null);
+      return (sun.misc.Unsafe) unsafeField.get(null);
     } catch (final NoSuchFieldException e) {
       throw new IllegalStateException("Unrecoverable Error: NoSuchFieldException 'theUnsafe' on sun.misc.Unsafe.\n"
           + "This is most likely an environment issue.", e);
     } catch (final IllegalAccessException e) {
-      throw new IllegalStateException("Unrecoverable Error: IllegalAccessException when accessing 'theUnsafe' on sun.misc.Unsafe.\n"
-          + "This is most likely an environment issue.", e);
+      throw new IllegalStateException(
+          "Unrecoverable Error: IllegalAccessException when accessing 'theUnsafe' on sun.misc.Unsafe.\n"
+              + "This is most likely an environment issue.",
+          e);
     }
   }
 
   /**
    * Define a class given a loader, name and a byte(code) array.
    *
-   * @param loader ClassLoader to define in.
-   * @param name Class name (must match bytecode).
-   * @param code The bytecode.
+   * @param loader
+   *          ClassLoader to define in.
+   * @param name
+   *          Class name (must match bytecode).
+   * @param code
+   *          The bytecode.
    *
    * @return The newly-defined class.
    */
@@ -69,33 +75,41 @@ public class UnsafeUtils {
   /**
    * Define a class given a loader, name and a byte(code) array.
    *
-   * If true is passed for the systemLoaderCheck parameter, an exception will
-   * be thrown if loader is null.
+   * If true is passed for the systemLoaderCheck parameter, an exception will be
+   * thrown if loader is null.
    *
-   * @param loader ClassLoader to define in.
-   * @param name Class name (must match bytecode).
-   * @param code The bytecode.
-   * @param bootLoaderCheck if <code>true</code>, an exception will be thrown if loader is null.
+   * @param loader
+   *          ClassLoader to define in.
+   * @param name
+   *          Class name (must match bytecode).
+   * @param code
+   *          The bytecode.
+   * @param bootLoaderCheck
+   *          if <code>true</code>, an exception will be thrown if loader is null.
    *
    * @return The newly-defined class.
    */
   @SuppressWarnings({ "restriction", "deprecation" })
-  public static Class<?> defineClass(final ClassLoader loader, final String name, final byte[] code, final boolean bootLoaderCheck) {
+  public static Class<?> defineClass(final ClassLoader loader, final String name, final byte[] code,
+      final boolean bootLoaderCheck) {
     if (bootLoaderCheck && loader == null) {
       LOG.warning(() -> "Implicit definition in the system classloader;\n"
-                      + "Defining mocks here will almost certainly fail with NoClassDefFoundError for framework classes.\n"
-                      + "If you are using class mocking for system classes, be prepared for undefined behaviour.");
+          + "Defining mocks here will almost certainly fail with NoClassDefFoundError for framework classes.\n"
+          + "If you are using class mocking for system classes, be prepared for undefined behaviour.");
     }
 
-    return UNSAFE.defineClass(name.replace('/',  '.'), code, 0, code.length, loader, null);
+    return UNSAFE.defineClass(name.replace('/', '.'), code, 0, code.length, loader, null);
   }
 
   /**
    * Wraps sun.misc.Unsafe.putObjectField.
    *
-   * @param receiver The object with the field to set.
-   * @param fieldOffset The field offset.
-   * @param value The value
+   * @param receiver
+   *          The object with the field to set.
+   * @param fieldOffset
+   *          The field offset.
+   * @param value
+   *          The value
    *
    * @see #objectFieldOffset(Field)
    */
@@ -107,7 +121,8 @@ public class UnsafeUtils {
   /**
    * Wraps sun.misc.Unsafe.objectFieldOffset.
    *
-   * @param field Field to get offset for.
+   * @param field
+   *          Field to get offset for.
    *
    * @return The field offset.
    */
@@ -117,17 +132,119 @@ public class UnsafeUtils {
   }
 
   /**
-   * Allocate an instance of the given class without calling
-   * a constructor.
+   * Allocate an instance of the given class without calling a constructor.
    *
-   * @param clz The class to instantiate.
+   * @param clz
+   *          The class to instantiate.
    *
    * @return A new instance.
    *
-   * @throws InstantiationException if an error occurs during allocation.
+   * @throws InstantiationException
+   *           if an error occurs during allocation.
+   */
+  @SuppressWarnings({ "restriction", "deprecation", "unchecked" })
+  public static <T> T allocateInstance(final Class<T> clz) throws InstantiationException {
+    return (T)UNSAFE.allocateInstance(clz);
+  }
+
+  static Field findDeclaredField(final Class<?> clz, final String name, final Class<?> type) {
+    try {
+      final Field f = clz.getDeclaredField(name);
+
+      if (f.getType().isAssignableFrom(type)) {
+        return f;
+      }
+    } catch (final Exception ex) {
+      /* do nothing */
+    }
+
+    if (clz.getSuperclass() == null) {
+      return null;
+    } else {
+      return findDeclaredField(clz.getSuperclass(), name, type);
+    }
+  }
+
+  static long unsigned(final int value) {
+    if (value >= 0) {
+      return value;
+    }
+    return (~0L >>> 32) & value;
+  }
+
+  /**
+   * Returns the address of the given object.
+   *
+   * @param obj The object
+   * @return the address of the object
    */
   @SuppressWarnings({ "restriction", "deprecation" })
-  public static Object allocateInstance(final Class<?> clz) throws InstantiationException {
-    return UNSAFE.allocateInstance(clz);
+  public static long toAddress(final Object obj) {
+    final Object[] array = new Object[] {obj};
+    final long baseOffset = UNSAFE.arrayBaseOffset(Object[].class);
+    return unsigned(UNSAFE.getInt(array, baseOffset));
+  }
+
+  /**
+   * <p>Copy the given object's fields to the destination object.</p>
+   *
+   * <p>If the two objects are of the same class, this will copy all
+   * fields. If not, copying will be on a 'best-effort' basis,
+   * with only fields of matching name and type being copied.</p>
+   */
+  @SuppressWarnings({ "restriction", "deprecation" })
+  public static <T> T objectCopy(final Object src, final T dest) {
+    final sun.misc.Unsafe unsafe = UnsafeUtils.UNSAFE;
+
+    Class<?> srcClz = src.getClass();
+    final Class<?> destClz = dest.getClass();
+
+    while (srcClz != Object.class) {
+      for (final Field srcField : srcClz.getDeclaredFields()) {
+        if ((srcField.getModifiers() & Modifier.STATIC) == 0) {
+          final Class<?> type = srcField.getType();
+          Field destField;
+
+          if (destClz.equals(srcClz)) {
+            // copying same type
+            destField = srcField;
+          } else {
+            // types are different
+            destField = findDeclaredField(destClz, srcField.getName(), srcField.getType());
+          }
+
+          System.out.println("Setting " + srcField);
+
+          if (destField != null) {
+            final long srcBase = toAddress(src);
+            final long srcOffset = unsafe.objectFieldOffset(srcField);
+            final long destOffset = unsafe.objectFieldOffset(destField);
+
+            if (type == byte.class) {
+              unsafe.putByte(dest, destOffset, unsafe.getByte(src, srcOffset));
+            } else if (type == char.class) {
+              unsafe.putChar(dest, destOffset, unsafe.getChar(src, srcOffset));
+            } else if (type == short.class) {
+              unsafe.putShort(dest, destOffset, unsafe.getShort(src, srcOffset));
+            } else if (type == int.class) {
+              unsafe.putInt(dest, destOffset, unsafe.getInt(src, srcOffset));
+            } else if (type == long.class) {
+              unsafe.putLong(dest, destOffset, unsafe.getLong(src, srcOffset));
+            } else if (type == float.class) {
+              unsafe.putFloat(dest, destOffset, unsafe.getFloat(src, srcOffset));
+            } else if (type == double.class) {
+              unsafe.putDouble(dest, destOffset, unsafe.getDouble(src, srcOffset));
+            } else if (type == boolean.class) {
+              unsafe.putBoolean(dest, destOffset, unsafe.getBoolean(src, srcOffset));
+            } else {
+              unsafe.putObject(dest, destOffset, unsafe.getObject(src, srcOffset));
+            }
+          }
+        }
+      }
+      srcClz = srcClz.getSuperclass();
+    }
+
+    return dest;
   }
 }

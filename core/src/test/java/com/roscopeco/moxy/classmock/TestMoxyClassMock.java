@@ -30,6 +30,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.roscopeco.moxy.Moxy;
+import com.roscopeco.moxy.api.InvalidMockInvocationException;
 import com.roscopeco.moxy.api.InvalidStubbingException;
 import com.roscopeco.moxy.model.FinalClass;
 import com.roscopeco.moxy.model.SimpleClass;
@@ -274,5 +275,24 @@ public class TestMoxyClassMock {
     assertThatThrownBy(() -> new FinalClass())
         .isInstanceOf(InvalidStubbingException.class)
         .hasMessage("Cannot call real method 'void <init>()' (constructors are not compatible with thenCallRealMethod)");
+  }
+
+  @Test
+  public void testMoxyClassMockExistingInstanceAreAutomaticallyConvertedToSpies() {
+    final FinalClass preExisting = new FinalClass();
+
+    assertThat(preExisting.returnHello()).isEqualTo("Hello");
+
+    assertThatThrownBy(() -> Moxy.when(() -> preExisting.returnHello()).thenReturn(""))
+        .isInstanceOf(InvalidMockInvocationException.class)
+        .hasMessage("No mock invocation found");
+
+    Moxy.mockClasses(FinalClass.class);
+
+    // pre-existing still behaves normally
+    assertThat(preExisting.returnHello()).isEqualTo("Hello");
+
+    // but new instances are normal mocks
+    assertThat(new FinalClass().returnHello()).isNull();
   }
 }

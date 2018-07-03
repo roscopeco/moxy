@@ -172,6 +172,7 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
       node.accept(writer);
     }
 
+    DelegateRegistry.registerDelegateClass(originalClz, delegateAdapter.getNewJavaName());
     return UnsafeUtils.defineClass(loader, delegateAdapter.getNewJavaName(), writer.toByteArray());
   }
 
@@ -182,6 +183,9 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
       if (this.isPendingReset(originalClz)) {
         // Remove from mocked classes
         this.currentlyMockedClasses.remove(originalClz);
+
+        // clear registered delegate class
+        //DelegateRegistry.removeDelegateClass(originalClz);
 
         // clear static delegate (if any)
         DelegateRegistry.clearStaticDelegate(originalClz);

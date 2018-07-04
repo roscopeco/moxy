@@ -19,7 +19,11 @@ make it in before 1.0.0.
 These changes are currently in the `develop` branch, and are slated
 to make it into a release soon.
 
-** Up to date **
+### Fixed
+
+- Static mock regression; New features introduced a bug in classic mocking
+  whereby static methods were no longer ignored. This precludes e.g.
+  Collections mocking in Java 9+ See [#4](https://github.com/roscopeco/moxy/issues/4). 
 
 ## [0.90.0] - 2018-07-04
 

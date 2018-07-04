@@ -31,6 +31,7 @@ import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 import java.util.HashSet;
+import java.util.logging.Logger;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -50,6 +51,8 @@ import net.bytebuddy.agent.ByteBuddyAgent;
  * MoxyClassMockEngine using ASM.
  */
 public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransformer {
+  Logger LOG = Logger.getLogger(ASMClassMockEngine.class.getName());
+
   // set to "true" to debug all, or to a class name to debug a single class
   private static final String DEBUG_CLASSMOCK_PROPERTY = "com.roscopeco.moxy.classmock.debug";
 
@@ -211,8 +214,7 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
           this.currentlyMockedClasses.add(originalClz);
           return newCode;
         } catch (final Throwable t) {
-          System.err.println("Exception in transform: " + t);
-          t.printStackTrace();
+          this.LOG.severe(() -> "Exception in transform: " + t);
         }
       }
     }

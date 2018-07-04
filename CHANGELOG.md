@@ -19,11 +19,15 @@ make it in before 1.0.0.
 These changes are currently in the `develop` branch, and are slated
 to make it into a release soon.
 
-### Added
+** Up to date **
 
+## [0.90.0] - 2018-07-04
+
+### Added
 - Class Mocking - a new style of mocking that co-exists with standard
-  (now 'classic') mocking, and allows mocking of finals, statics and
-  constructors.
+  (now called _classic_) mocking, and allows mocking of finals, statics and
+  constructors. This functionality is accessed via the `Moxy.mockClasses(...)`
+  API.
   
 - Multiple stubs for the same invocation are now supported by chaining
   calls to `then[...]` methods on `ASMMoxyStubber` and `ASMMoxyVoidStubber`.
@@ -33,6 +37,12 @@ to make it into a release soon.
   
 ### Changed
 
+- Multiple stubs for the same invocation are now supported by chaining
+  calls to `then[...]` methods on `ASMMoxyStubber` and `ASMMoxyVoidStubber`.
+  Mocks stubbed in this way will behave according to the applied stubbed 
+  behaviours, in order, with the final stubbed behaviour persisting until
+  explicitly reset or a new `when(...)` call is made.
+  
 - `then(Return|Throw|CallRealMethod)` are
   no longer terminal, due to the ongoing stubbing feature being 
   fully implemented.
@@ -118,7 +128,8 @@ First public release, and the first version pushed to Maven Central.
 - Add project documentation
 - Setup for CI with Travis and Sonarcloud
 
-[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.88.1...develop
+[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.90.0...develop
+[0.90.0]: https://github.com/roscopeco/moxy/compare/v0.88.0...v0.90.0
 [0.88.1]: https://github.com/roscopeco/moxy/compare/v0.88.0...v0.88.1
 [0.88.0]: https://github.com/roscopeco/moxy/compare/v0.86.0...v0.88.0
 [0.86.0]: https://github.com/roscopeco/moxy/compare/v0.84...v0.86.0

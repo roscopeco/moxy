@@ -10,17 +10,23 @@ See also [Javadoc](https://roscopeco.github.io/moxy/).
 
 ### What is this?
 
-Moxy is a fairly lightweight yet surprisingly fully-featured mock/spy framework for use
-in testing Java code, with a fluent, IDE-friendly stubbing and assertion API.
+Moxy is a fairly lightweight yet surprisingly powerful and refeshingly non-opinionated
+mock/spy framework for use in testing Java code. It has a fluent, IDE-friendly stubbing
+and verification API, runs on Java 8+, and includes out-of-the-box support for
+allegedly-evil things such as mocking finals and statics. It knows its place as 
+a _tool_ - when it's right for the job, it's just what you need, but equally it will
+let you do all the wrong things really, really well if that's your cup of tea.
+
+If it helps, think of it like a hammer. Or an elephant gun. Or something... 
 
 ### How do I use it?
 
 There's full documentation on [the wiki](https://github.com/roscopeco/moxy/wiki),
-which took quite a while to write, and which we try to keep as up-to-date as 
+which took quite a while to write, and which I try to keep as up-to-date as 
 possible.
 
 But in the spirit of getting you started, here's a [SSCCE](http://sscce.org/) we
-made earlier, paraphrased somewhat from our own tests:
+made earlier, paraphrased somewhat from Moxy's own tests:
 
 ```java
 import static com.roscopeco.moxy.Moxy.*;

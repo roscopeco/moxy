@@ -75,12 +75,6 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
     instrumentation().addTransformer(this, true);
   }
 
-  @Override
-  protected void finalize() throws Throwable {
-    instrumentation().removeTransformer(this);
-    super.finalize();
-  }
-
   /*
    * (non-Javadoc)
    * @see com.roscopeco.moxy.api.MoxyClassMockEngine#mockClasses(java.lang.Class[])
@@ -122,7 +116,7 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
   @Override
   public void resetAllClasses() {
     synchronized (this.currentlyMockedClasses) {
-      if (this.currentlyMockedClasses.size() > 0) {
+      if (!this.currentlyMockedClasses.isEmpty()) {
         this.resetClasses(this.currentlyMockedClasses.toArray(new Class<?>[this.currentlyMockedClasses.size()]));
       }
     }
@@ -185,7 +179,7 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
         this.currentlyMockedClasses.remove(originalClz);
 
         // clear registered delegate class
-        //DelegateRegistry.removeDelegateClass(originalClz);
+        DelegateRegistry.removeDelegateClass(originalClz);
 
         // clear static delegate (if any)
         DelegateRegistry.clearStaticDelegate(originalClz);

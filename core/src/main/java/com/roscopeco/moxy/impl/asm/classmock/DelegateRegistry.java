@@ -70,6 +70,11 @@ public class DelegateRegistry {
   private static final WeakHashMap<Object, ASMMockSupport> instanceRegistryMap = new WeakHashMap<>();
   private static final WeakHashMap<Class<?>, ASMMockSupport> staticRegistryMap = new WeakHashMap<>();
 
+  private DelegateRegistry() {
+    throw new UnsupportedOperationException(
+        "com.roscopeco.moxy.impl.asm.classmock.DelegateRegistry is not designed for instantiation");
+  }
+
   public static void registerDelegateClass(final Class<?> forClz, final String delegateClzName) {
     synchronized (delegateClassRegistryMap) {
       delegateClassRegistryMap.put(forClz, delegateClzName);

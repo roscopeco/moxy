@@ -34,7 +34,7 @@ import org.objectweb.asm.Type;
 import com.roscopeco.moxy.impl.asm.visitors.AbstractMoxyMockMethodVisitor;
 
 /**
- * TODO Document MoxyClassMockConstructorVisitor
+ * Method adapter that generates class-mock constructors.
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
@@ -45,7 +45,6 @@ public class MoxyClassMockConstructorVisitor extends AbstractMoxyMockMethodVisit
   MoxyClassMockConstructorVisitor(final MethodVisitor delegate,
                                   final Class<?> thisClass,
                                   final String delegateClassInternal,
-                                  final int access,
                                   final String name,
                                   final String descriptor,
                                   final Type returnType,

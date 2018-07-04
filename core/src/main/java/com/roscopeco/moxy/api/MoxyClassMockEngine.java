@@ -70,8 +70,8 @@ package com.roscopeco.moxy.api;
  *     <br>
  *     This is mitigated somewhat by the fact that any pre-existing
  *     instances are automatically set to call real methods, and have
- *     all their state copied.
- * <li>
+ *     all their state copied.</li>
+ * <li>Interfaces and abstract methods are not supported.</li>
  * <li>This style of mocking requires a Java Agent to be installed in
  *     the running JVM. Not all JVMs support this, although it should
  *     work on all those targeted by Moxy.</li>
@@ -79,8 +79,6 @@ package com.roscopeco.moxy.api;
  *     issues, and should never be used in production. But you're not
  *     running tests in production code anyway, right?
  * </ul>
- *
- * <p>This feature is highly experimental, use it at your own risk.</p>
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  * @since 1.0

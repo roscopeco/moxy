@@ -45,7 +45,7 @@ package com.roscopeco.moxy.api;
  *
  * assertTrue(Moxy.isMock(myClass));
  *
- * Moxy.when(() -> myClass.someMethod("args")).thenReturn("Mocked!");
+ * Moxy.when(() -&gt; myClass.someMethod("args")).thenReturn("Mocked!");
  *
  * assertThat(myClass.someMethod("args")).isEqualTo("Mocked!");
  * </code></pre>
@@ -55,15 +55,11 @@ package com.roscopeco.moxy.api;
  *
  * <ul>
  * <li>Final classes and methods can be mocked.</li>
- * <li>Constructors become mocks, so can be verified. &#x1f7bd;</li>
- * <li>Static methods become mocks. &#x1f7bd;</li>
+ * <li>Constructors become mocks, so can be verified.</li>
+ * <li>Static methods become mocks.</li>
  * <li>Objects allocated directly inside tested methods (with <code>new</code>)
- *     will be mocks, and so can be verified. &#x1f7bd;</li>
+ *     will be mocks, and so can be verified (assuming you can get the instance).</li>
  * </ul>
- *
- * <p><strong>Note:</strong> items marked &#x1f7bd;, above, are currently
- * unsupported by the rest of the framework. Work is in-progress to
- * implement these features.</p>
  *
  * <p>There are, however, some significant caveats to be aware of:</p>
  *
@@ -72,9 +68,9 @@ package com.roscopeco.moxy.api;
  *     mocked classes, meaning any instances in use within the running
  *     JVM will also become mocks.<br>
  *     <br>
- *     Work is currently on-going to make this less of a problem, however
- *     at present any such instances will cause an exception to be thrown
- *     when they are next invoked.</li>
+ *     This is mitigated somewhat by the fact that any pre-existing
+ *     instances are automatically set to call real methods, and have
+ *     all their state copied.
  * <li>
  * <li>This style of mocking requires a Java Agent to be installed in
  *     the running JVM. Not all JVMs support this, although it should

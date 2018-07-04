@@ -141,13 +141,12 @@ public class UnsafeUtils {
   /**
    * Allocate an instance of the given class without calling a constructor.
    *
-   * @param clz
-   *          The class to instantiate.
+   * @param clz The class to instantiate.
    *
    * @return A new instance.
    *
-   * @throws InstantiationException
-   *           if an error occurs during allocation.
+   * @throws InstantiationException if an error occurs during allocation.
+   * @param <T> The type of instance being allocated.
    */
   @SuppressWarnings({ "restriction", "deprecation", "unchecked" })
   public static <T> T allocateInstance(final Class<T> clz) throws InstantiationException {
@@ -203,6 +202,7 @@ public class UnsafeUtils {
    * @param dest The destination object
    *
    * @return The destination, for convenience.
+   * @param <T> The destination type.
    */
   @SuppressWarnings({ "restriction", "deprecation" })
   public static <T> T objectCopy(final Object src, final T dest) {

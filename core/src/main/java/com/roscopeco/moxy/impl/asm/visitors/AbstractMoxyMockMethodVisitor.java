@@ -111,6 +111,8 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
    * Returns the local slot number for the first argument. For
    * static methods, this should be zero. For instance methods,
    * it should be 1.
+   *
+   * @return the local slot number.
    */
   protected abstract int getFirstArgumentLocalSlot();
 
@@ -206,7 +208,7 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
    *
    * Expects the primitive to be boxed at top of the stack.
    *
-   * @param primType The type as an asm <code>Type</code>.
+   * @param type The type as an asm <code>Type</code>.
    */
   protected void generateAutobox(final Type type) {
     this.generateAutobox(type.getDescriptor().charAt(0));
@@ -224,6 +226,11 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
   /**
    * Load next local from slot; Always autobox.
    * Returns number of slots taken by the loaded type.
+   *
+   * @param argNum The argument number.
+   * @param currentLocalSlot the local slot to load from.
+   *
+   * @return The local slot for the next argument.
    */
   protected int generateLoadAndAutoboxing(final int argNum, final int currentLocalSlot) {
     return this.generateLoadOptionalAutoboxing(argNum, currentLocalSlot, true);
@@ -232,6 +239,12 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
   /**
    * Load from slot; Optionally autobox
    * Returns number of slots taken by the loaded type.
+   *
+   * @param argNum The argument number.
+   * @param currentLocalSlot the local slot to load from.
+   * @param autoBoxRequired <code>true</code> if autoboxing is required.
+   *
+   * @return The local slot for the next argument.
    */
   protected int generateLoadOptionalAutoboxing(final int argNum, final int currentLocalSlot, final boolean autoBoxRequired) {
     final char argType = this.argTypes[argNum].toString().charAt(0);
@@ -305,6 +318,8 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
    * where the second from top value is a cat2.
    *
    * NOTE the top MUST be a cat1 or this will go awry...
+   *
+   * @param secondFromTopType The type at second from top type on the stack.
    */
   protected void generateTypeAppropriateSwap(final Type secondFromTopType) {
     final char primType = secondFromTopType.getDescriptor().charAt(0);
@@ -391,6 +406,14 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
    * The defaultValue parameter is expected to generate the appropriate
    * default value bytecode for primitive types if there is no value
    * returned from that method (i.e. if this method has not been stubbed).
+   *
+   * @param boxClass the Box class (e.g. java/lang/Byte)
+   * @param valueOfMethod method name for the xxxValue method
+   * @param valueOfDescriptor descriptor for the xxxValue method.
+   * @param returnLabel The label that should be visited directly before the return.
+   * @param returnOpcode The opcode that should be used for the return.
+   * @param defaultValueOpcode the opcode that will generate a default value.
+   *
    */
   protected void generateUnboxingReturnFromStubbing(final String boxClass,
                                           final String valueOfMethod,

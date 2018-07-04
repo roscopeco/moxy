@@ -73,15 +73,22 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
   @Override
   public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
     // Do the mocking
-    return new MoxyMockingMethodVisitor(this.cv.visitMethod(
-                                            access & ~ACC_ABSTRACT | ACC_SYNTHETIC,
-                                            name, desc, signature, exceptions),
-                                        this.originalIface,
-                                        name,
-                                        desc,
-                                        Type.getReturnType(desc),
-                                        Type.getArgumentTypes(desc),
-                                        true);
+    final boolean isStatic = (access & ACC_STATIC) != 0;
+
+    if (!isStatic) {
+      return new MoxyMockingMethodVisitor(this.cv.visitMethod(
+                                              access & ~ACC_ABSTRACT | ACC_SYNTHETIC,
+                                              name, desc, signature, exceptions),
+                                          this.originalIface,
+                                          name,
+                                          desc,
+                                          Type.getReturnType(desc),
+                                          Type.getArgumentTypes(desc),
+                                          true);
+    } else {
+      // Don't mock
+      return null;
+    }
   }
 
   @Override

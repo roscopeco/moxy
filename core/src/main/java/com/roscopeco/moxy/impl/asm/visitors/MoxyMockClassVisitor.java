@@ -96,6 +96,7 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
   @Override
   public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
     final boolean isAbstract = (access & ACC_ABSTRACT) != 0;
+    final boolean isStatic = (access & ACC_STATIC) != 0;
 
     if (INIT_NAME.equals(name)) {
       // Generate pass-through constructors
@@ -108,7 +109,7 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
                                                            Type.getArgumentTypes(desc));
     } else {
       // Always mock abstract methods (or it won't verify), decide for concrete based on mockMethods.
-      if (isAbstract || this.isToMock(name, desc)) {
+      if (!isStatic && (isAbstract || this.isToMock(name, desc))) {
         // Do the mocking
         return new MoxyMockingMethodVisitor(this.cv.visitMethod(access & ~ACC_ABSTRACT | ACC_SYNTHETIC,
                                                            name, desc, signature, exceptions),

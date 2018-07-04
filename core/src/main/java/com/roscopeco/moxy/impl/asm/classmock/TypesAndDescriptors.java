@@ -31,11 +31,16 @@ import org.objectweb.asm.Type;
 import com.roscopeco.moxy.Moxy;
 
 /**
- * TODO Document TypesAndDescriptors
+ * Types and descriptors specific to Classmocks.
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public class TypesAndDescriptors {
+  private TypesAndDescriptors() {
+    throw new UnsupportedOperationException(
+        "com.roscopeco.moxy.impl.asm.classmock.TypesAndDescriptors is not designed for instantiation");
+  }
+
   // General Java
   public static final String CLASS_DESCRIPTOR = Type.getDescriptor(Class.class);
 

@@ -32,6 +32,9 @@ import org.objectweb.asm.Type;
 
 import com.roscopeco.moxy.impl.asm.visitors.AbstractMoxyMockMethodVisitor;
 
+/*
+ * Generates the mock methods in-place on the original class.
+ */
 class MoxyClassMockingMethodVisitor extends AbstractMoxyMockMethodVisitor {
   private final String delegateClass;
   private final boolean isStatic;

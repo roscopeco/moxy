@@ -112,11 +112,15 @@ public final class Moxy {
       final Class<?> defaultEngine = Class.forName(defaultEngineName);
 
       if (MoxyEngine.class.isAssignableFrom(defaultEngine)) {
-          return (MoxyEngine)defaultEngine.newInstance();
+          return (MoxyEngine)defaultEngine.getDeclaredConstructor().newInstance();
       } else {
         throw new MoxyException("Invalid configuration: '" + defaultEngineName + " is not a MoxyEngine implementation");
       }
-    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+    } catch (InvocationTargetException |
+             ClassNotFoundException    |
+             InstantiationException    |
+             IllegalAccessException    |
+             NoSuchMethodException e)  {
       throw new MoxyException("Invalid configuration: Unable to instantiate MoxyEngine; See cause", e);
     }
   }
@@ -129,11 +133,15 @@ public final class Moxy {
       final Class<?> defaultEngine = Class.forName(defaultEngineName);
 
       if (MoxyClassMockEngine.class.isAssignableFrom(defaultEngine)) {
-          return (MoxyClassMockEngine)defaultEngine.newInstance();
+          return (MoxyClassMockEngine)defaultEngine.getDeclaredConstructor().newInstance();
       } else {
         throw new MoxyException("Invalid configuration: '" + defaultEngineName + " is not a MoxyClassMockEngine implementation");
       }
-    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+    } catch (InvocationTargetException |
+        ClassNotFoundException    |
+        InstantiationException    |
+        IllegalAccessException    |
+        NoSuchMethodException e)  {
       throw new MoxyException("Invalid configuration: Unable to instantiate MoxyClassMockEngine; See cause", e);
     }
   }

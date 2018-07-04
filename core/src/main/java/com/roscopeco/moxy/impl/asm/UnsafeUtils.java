@@ -29,12 +29,19 @@ import java.lang.reflect.Modifier;
 import java.util.logging.Logger;
 
 /**
- * TODO Document UnsafeUtils
+ * 'Safer' wrapper around sun.misc.Unsafe.
+ *
+ * For some value of 'Safer', at least...
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public class UnsafeUtils {
   private static final Logger LOG = Logger.getLogger(UnsafeUtils.class.getName());
+
+  private UnsafeUtils() {
+    throw new UnsupportedOperationException(
+        "com.roscopeco.moxy.impl.as.UnsafeUtils is not designed for instantiation");
+  }
 
   @SuppressWarnings("restriction")
   private static final sun.misc.Unsafe UNSAFE = initUnsafe();
@@ -191,6 +198,11 @@ public class UnsafeUtils {
    * <p>If the two objects are of the same class, this will copy all
    * fields. If not, copying will be on a 'best-effort' basis,
    * with only fields of matching name and type being copied.</p>
+   *
+   * @param src The source object
+   * @param dest The destination object
+   *
+   * @return The destination, for convenience.
    */
   @SuppressWarnings({ "restriction", "deprecation" })
   public static <T> T objectCopy(final Object src, final T dest) {
@@ -213,10 +225,7 @@ public class UnsafeUtils {
             destField = findDeclaredField(destClz, srcField.getName(), srcField.getType());
           }
 
-          System.out.println("Setting " + srcField);
-
           if (destField != null) {
-            final long srcBase = toAddress(src);
             final long srcOffset = unsafe.objectFieldOffset(srcField);
             final long destOffset = unsafe.objectFieldOffset(destField);
 

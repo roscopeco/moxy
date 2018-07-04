@@ -41,7 +41,8 @@ import org.objectweb.asm.commons.Remapper;
 import com.roscopeco.moxy.api.MoxyMock;
 
 /**
- * TODO Document CopyClassVisitor
+ * Class adapter that copies the original class to a new
+ * class mock delegate class.
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
@@ -94,7 +95,7 @@ public class MoxyClassMockDelegateAdapter extends ClassVisitor {
     final String originalPackage;
 
     if (originalInternalName.contains("/")) {
-      originalPackage = originalInternalName.substring(0, originalInternalName.lastIndexOf("/") + 1);
+      originalPackage = originalInternalName.substring(0, originalInternalName.lastIndexOf('/') + 1);
     } else {
       originalPackage = "";
     }

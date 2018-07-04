@@ -32,7 +32,14 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
 /**
- * TODO Document AbstractMoxyMockMethodVisitor
+ * Base-class for method visiting adaptors.
+ *
+ * This class extracts the commonality used across the
+ * various types of mocked methods/constructors.
+ *
+ * Subclasses need only implement the abstract methods,
+ * or override the visitXXX methods to further customise
+ * (as is done by the class mock constructor visitors).
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
@@ -444,7 +451,6 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
     final int argc = this.argTypes.length;
 
     // load support to pass to recordInvocation later
-    //    this.generateLoadMockSupport();
     this.generateLoadMockSupport();
 
     // Get recorder from Support interface method as receiver
@@ -482,10 +488,6 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
 
     // Call recorder - Need to record it before we can get the return/throw
     // for it, since the support methods rely on getLastInvocation().
-    //
-    // TODO refactor this at some point to maybe create the invocation in generated
-    // code, and use getReturn/ThrowForInvocation rather than last invocation.
-    // That would save this two-step dance...
     this.delegate.visitMethodInsn(INVOKEVIRTUAL,
                                   MOXY_RECORDER_INTERNAL_NAME,
                                   MOXY_RECORDER_RECORD_METHOD_NAME,

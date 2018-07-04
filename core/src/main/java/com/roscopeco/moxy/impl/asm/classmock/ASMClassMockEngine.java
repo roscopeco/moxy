@@ -31,6 +31,7 @@ import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 import java.util.HashSet;
+import java.util.logging.Logger;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -50,6 +51,8 @@ import net.bytebuddy.agent.ByteBuddyAgent;
  * MoxyClassMockEngine using ASM.
  */
 public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransformer {
+  Logger LOG = Logger.getLogger(ASMClassMockEngine.class.getName());
+
   // set to "true" to debug all, or to a class name to debug a single class
   private static final String DEBUG_CLASSMOCK_PROPERTY = "com.roscopeco.moxy.classmock.debug";
 
@@ -73,12 +76,6 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
 
   public ASMClassMockEngine() {
     instrumentation().addTransformer(this, true);
-  }
-
-  @Override
-  protected void finalize() throws Throwable {
-    instrumentation().removeTransformer(this);
-    super.finalize();
   }
 
   /*
@@ -122,7 +119,7 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
   @Override
   public void resetAllClasses() {
     synchronized (this.currentlyMockedClasses) {
-      if (this.currentlyMockedClasses.size() > 0) {
+      if (!this.currentlyMockedClasses.isEmpty()) {
         this.resetClasses(this.currentlyMockedClasses.toArray(new Class<?>[this.currentlyMockedClasses.size()]));
       }
     }
@@ -185,7 +182,7 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
         this.currentlyMockedClasses.remove(originalClz);
 
         // clear registered delegate class
-        //DelegateRegistry.removeDelegateClass(originalClz);
+        DelegateRegistry.removeDelegateClass(originalClz);
 
         // clear static delegate (if any)
         DelegateRegistry.clearStaticDelegate(originalClz);
@@ -217,8 +214,7 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
           this.currentlyMockedClasses.add(originalClz);
           return newCode;
         } catch (final Throwable t) {
-          System.err.println("Exception in transform: " + t);
-          t.printStackTrace();
+          this.LOG.severe(() -> "Exception in transform: " + t);
         }
       }
     }

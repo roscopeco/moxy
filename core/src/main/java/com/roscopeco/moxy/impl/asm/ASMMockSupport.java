@@ -196,10 +196,12 @@ public interface ASMMockSupport {
 
     if (stubInvocation != null) {
       final Stub nextStub = stubInvocation.getStubs().peek();
-      if (nextStub != null && (nextStub.getType().equals(StubType.RETURN_OBJECT) || nextStub.getType().equals(StubType.THROW_EXCEPTION))) {
-        if (!nextStub.isRetained() && stubInvocation.getStubs().size() > 1) {
-          stubInvocation.getStubs().pop();
-        }
+      if (nextStub != null &&
+         (nextStub.getType().equals(StubType.RETURN_OBJECT) || nextStub.getType().equals(StubType.THROW_EXCEPTION)) &&
+         !nextStub.isRetained() &&
+         stubInvocation.getStubs().size() > 1) {
+
+        stubInvocation.getStubs().pop();
       }
     }
   }

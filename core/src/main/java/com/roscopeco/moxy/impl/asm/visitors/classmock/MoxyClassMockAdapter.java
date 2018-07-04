@@ -33,7 +33,8 @@ import org.objectweb.asm.Type;
 import com.roscopeco.moxy.api.MoxyMock;
 
 /**
- * TODO Document MoxyClassMockAdapter
+ * Class visitor that is used as an adapter to generate
+ * class mock classes.
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
@@ -66,7 +67,6 @@ public class MoxyClassMockAdapter extends ClassVisitor {
       return new MoxyClassMockConstructorVisitor(super.visitMethod(access, name, desc, signature, exceptions),
                                                  this.thisClz,
                                                  this.delegateClzInternal,
-                                                 access,
                                                  name,
                                                  desc,
                                                  Type.getReturnType(desc),

@@ -43,6 +43,7 @@
 		<module>core</module>
 		<module>junit5</module>
 		<module>annotations</module>
+		<module>uberjar</module>
 	</modules>
 
 	<properties>

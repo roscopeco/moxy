@@ -19,6 +19,10 @@ make it in before 1.0.0.
 These changes are currently in the `develop` branch, and are slated
 to make it into a release soon.
 
+** Up to date **
+
+## [0.90.1] - 2018-07-10
+
 ### Fixed
 
 - Static mock regression; New features introduced a bug in classic mocking
@@ -132,7 +136,8 @@ First public release, and the first version pushed to Maven Central.
 - Add project documentation
 - Setup for CI with Travis and Sonarcloud
 
-[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.90.0...develop
+[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.90.1...develop
+[0.90.0]: https://github.com/roscopeco/moxy/compare/v0.90.0...v0.90.1
 [0.90.0]: https://github.com/roscopeco/moxy/compare/v0.88.0...v0.90.0
 [0.88.1]: https://github.com/roscopeco/moxy/compare/v0.88.0...v0.88.1
 [0.88.0]: https://github.com/roscopeco/moxy/compare/v0.86.0...v0.88.0

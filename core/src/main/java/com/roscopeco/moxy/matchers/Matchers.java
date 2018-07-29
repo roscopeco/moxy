@@ -25,6 +25,7 @@ package com.roscopeco.moxy.matchers;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import com.roscopeco.moxy.Moxy;
 import com.roscopeco.moxy.api.MoxyEngine;
@@ -3258,6 +3259,298 @@ public class Matchers {
     return null;
   }
 
+  /* ************ FUNCTION ************** */
+
+  /**
+   * <p>Create a matcher that will match a primitive <code>byte</code> if the supplied
+   * function returns true for that <code>byte</code>. The matcher is created in the default
+   * {@link MoxyEngine}.</p>
+   *
+   * @param function The function that will be determine the match.
+   *
+   * @return zero (ignored).
+   * @since 1.0
+   *
+   */
+  public static byte matchesByte(final Function<Byte, Boolean> function) {
+    return matchesByte(Moxy.getMoxyEngine(), function);
+  }
+
+  /**
+   * <p>Create a matcher that will match a primitive <code>byte</code> if the supplied
+   * function returns true for that <code>byte</code>. The matcher is created in the specified
+   * {@link MoxyEngine}.</p>
+   *
+   * @param engine The {@link MoxyEngine} to which this matcher applies.
+   * @param function The function that will be determine the match.
+   *
+   * @return zero (ignored).
+   * @since 1.0
+   *
+   */
+  public static byte matchesByte(final MoxyEngine engine, final Function<Byte, Boolean> function) {
+    engine.registerMatcher(new FunctionMatcher<>(function));
+    return 0;
+  }
+
+  /**
+   * <p>Create a matcher that will match a primitive <code>char</code> if the supplied
+   * function returns true for that <code>char</code>. The matcher is created in the default
+   * {@link MoxyEngine}.</p>
+   *
+   * @param function The function that will be determine the match.
+   *
+   * @return zero (ignored).
+   * @since 1.0
+   *
+   */
+  public static char matchesChar(final Function<Character, Boolean> function) {
+    return matchesChar(Moxy.getMoxyEngine(), function);
+  }
+
+  /**
+   * <p>Create a matcher that will match a primitive <code>char</code> if the supplied
+   * function returns true for that <code>char</code>. The matcher is created in the specified
+   * {@link MoxyEngine}.</p>
+   *
+   * @param engine The {@link MoxyEngine} to which this matcher applies.
+   * @param function The function that will be determine the match.
+   *
+   * @return zero (ignored).
+   * @since 1.0
+   *
+   */
+  public static char matchesChar(final MoxyEngine engine, final Function<Character, Boolean> function) {
+    engine.registerMatcher(new FunctionMatcher<>(function));
+    return 0;
+  }
+
+  /**
+   * <p>Create a matcher that will match a primitive <code>short</code> if the supplied
+   * function returns true for that <code>short</code>. The matcher is created in the default
+   * {@link MoxyEngine}.</p>
+   *
+   * @param function The function that will be determine the match.
+   *
+   * @return zero (ignored).
+   * @since 1.0
+   *
+   */
+  public static short matchesShort(final Function<Short, Boolean> function) {
+    return matchesShort(Moxy.getMoxyEngine(), function);
+  }
+
+  /**
+   * <p>Create a matcher that will match a primitive <code>short</code> if the supplied
+   * function returns true for that <code>short</code>. The matcher is created in the specified
+   * {@link MoxyEngine}.</p>
+   *
+   * @param engine The {@link MoxyEngine} to which this matcher applies.
+   * @param function The function that will be determine the match.
+   *
+   * @return zero (ignored).
+   * @since 1.0
+   *
+   */
+  public static short matchesShort(final MoxyEngine engine, final Function<Short, Boolean> function) {
+    engine.registerMatcher(new FunctionMatcher<>(function));
+    return 0;
+  }
+
+  /**
+   * <p>Create a matcher that will match a primitive <code>int</code> if the supplied
+   * function returns true for that <code>int</code>. The matcher is created in the default
+   * {@link MoxyEngine}.</p>
+   *
+   * @param function The function that will be determine the match.
+   *
+   * @return zero (ignored).
+   * @since 1.0
+   *
+   */
+  public static int matchesInt(final Function<Integer, Boolean> function) {
+    return matchesInt(Moxy.getMoxyEngine(), function);
+  }
+
+  /**
+   * <p>Create a matcher that will match a primitive <code>int</code> if the supplied
+   * function returns true for that <code>int</code>. The matcher is created in the specified
+   * {@link MoxyEngine}.</p>
+   *
+   * @param engine The {@link MoxyEngine} to which this matcher applies.
+   * @param function The function that will be determine the match.
+   *
+   * @return zero (ignored).
+   * @since 1.0
+   *
+   */
+  public static int matchesInt(final MoxyEngine engine, final Function<Integer, Boolean> function) {
+    engine.registerMatcher(new FunctionMatcher<>(function));
+    return 0;
+  }
+
+  /**
+   * <p>Create a matcher that will match a primitive <code>long</code> if the supplied
+   * function returns true for that <code>long</code>. The matcher is created in the default
+   * {@link MoxyEngine}.</p>
+   *
+   * @param function The function that will be determine the match.
+   *
+   * @return zero (ignored).
+   * @since 1.0
+   *
+   */
+  public static long matchesLong(final Function<Long, Boolean> function) {
+    return matchesLong(Moxy.getMoxyEngine(), function);
+  }
+
+  /**
+   * <p>Create a matcher that will match a primitive <code>long</code> if the supplied
+   * function returns true for that <code>long</code>. The matcher is created in the specified
+   * {@link MoxyEngine}.</p>
+   *
+   * @param engine The {@link MoxyEngine} to which this matcher applies.
+   * @param function The function that will be determine the match.
+   *
+   * @return zero (ignored).
+   * @since 1.0
+   *
+   */
+  public static long matchesLong(final MoxyEngine engine, final Function<Long, Boolean> function) {
+    engine.registerMatcher(new FunctionMatcher<>(function));
+    return 0;
+  }
+
+  /**
+   * <p>Create a matcher that will match a primitive <code>float</code> if the supplied
+   * function returns true for that <code>float</code>. The matcher is created in the default
+   * {@link MoxyEngine}.</p>
+   *
+   * @param function The function that will be determine the match.
+   *
+   * @return zero (ignored).
+   * @since 1.0
+   *
+   */
+  public static float matchesFloat(final Function<Float, Boolean> function) {
+    return matchesFloat(Moxy.getMoxyEngine(), function);
+  }
+
+  /**
+   * <p>Create a matcher that will match a primitive <code>float</code> if the supplied
+   * function returns true for that <code>float</code>. The matcher is created in the specified
+   * {@link MoxyEngine}.</p>
+   *
+   * @param engine The {@link MoxyEngine} to which this matcher applies.
+   * @param function The function that will be determine the match.
+   *
+   * @return zero (ignored).
+   * @since 1.0
+   *
+   */
+  public static float matchesFloat(final MoxyEngine engine, final Function<Float, Boolean> function) {
+    engine.registerMatcher(new FunctionMatcher<>(function));
+    return 0;
+  }
+
+  /**
+   * <p>Create a matcher that will match a primitive <code>double</code> if the supplied
+   * function returns true for that <code>double</code>. The matcher is created in the default
+   * {@link MoxyEngine}.</p>
+   *
+   * @param function The function that will be determine the match.
+   *
+   * @return zero (ignored).
+   * @since 1.0
+   *
+   */
+  public static double matchesDouble(final Function<Double, Boolean> function) {
+    return matchesDouble(Moxy.getMoxyEngine(), function);
+  }
+
+  /**
+   * <p>Create a matcher that will match a primitive <code>double</code> if the supplied
+   * function returns true for that <code>double</code>. The matcher is created in the specified
+   * {@link MoxyEngine}.</p>
+   *
+   * @param engine The {@link MoxyEngine} to which this matcher applies.
+   * @param function The function that will be determine the match.
+   *
+   * @return zero (ignored).
+   * @since 1.0
+   *
+   */
+  public static double matchesDouble(final MoxyEngine engine, final Function<Double, Boolean> function) {
+    engine.registerMatcher(new FunctionMatcher<>(function));
+    return 0;
+  }
+
+  /**
+   * <p>Create a matcher that will match a primitive <code>boolean</code> if the supplied
+   * function returns true for that <code>boolean</code>. The matcher is created in the default
+   * {@link MoxyEngine}.</p>
+   *
+   * @param function The function that will be determine the match.
+   *
+   * @return false (ignored).
+   * @since 1.0
+   *
+   */
+  public static boolean matchesBool(final Function<Boolean, Boolean> function) {
+    return matchesBool(Moxy.getMoxyEngine(), function);
+  }
+
+  /**
+   * <p>Create a matcher that will match a primitive <code>boolean</code> if the supplied
+   * function returns true for that <code>boolean</code>. The matcher is created in the specified
+   * {@link MoxyEngine}.</p>
+   *
+   * @param engine The {@link MoxyEngine} to which this matcher applies.
+   * @param function The function that will be determine the match.
+   *
+   * @return false (ignored).
+   * @since 1.0
+   *
+   */
+  public static boolean matchesBool(final MoxyEngine engine, final Function<Boolean, Boolean> function) {
+    engine.registerMatcher(new FunctionMatcher<>(function));
+    return false;
+  }
+
+  /**
+   * <p>Create a matcher that will match an argument of type <code>T</code> if the supplied
+   * function returns true for that argument. The matcher is created in the default
+   * {@link MoxyEngine}.</p>
+   *
+   * @param function The function that will be determine the match.
+   *
+   * @return null (ignored).
+   * @since 1.0
+   *
+   * @param <T> The type this matcher will operate on
+   */
+  public static <T> T matches(final Function<T, Boolean> function) {
+    return matches(Moxy.getMoxyEngine(), function);
+  }
+
+  /**
+   * <p>Create a matcher that will match an argument of type <code>T</code> if the supplied
+   * function returns true for that argument. The matcher is created in the specified
+   * {@link MoxyEngine}.</p>
+   *
+   * @param engine The {@link MoxyEngine} to which this matcher applies.
+   * @param function The function that will be determine the match.
+   *
+   * @return null (ignored).
+   * @since 1.0
+   *
+   * @param <T> The type this matcher will operate on
+   */
+  public static <T> T matches(final MoxyEngine engine, final Function<T, Boolean> function) {
+    engine.registerMatcher(new FunctionMatcher<>(function));
+    return null;
+  }
+
   /* ************ CUSTOM ************** */
 
   /**
@@ -3769,6 +4062,39 @@ public class Matchers {
    */
   public static String startsWith(final MoxyEngine engine, final String string) {
     engine.registerMatcher(new StartsWithMatcher(string));
+    return null;
+  }
+
+  /* ************ STRING - CONTAINS ************** */
+
+  /**
+   * <p>Creates a matcher for <code>String</code> arguments that matches
+   * if the argument contains the specified <code>String</code>.
+   * The matcher is created in the default Moxy engine.</p>
+   *
+   * @param string The string that arguments must contain in order to match.
+   *
+   * @return null (ignored).
+   * @see #contains(MoxyEngine, String)
+   * @since 1.0
+   */
+  public static String contains(final String string) {
+    return contains(Moxy.getMoxyEngine(), string);
+  }
+
+  /**
+   * <p>Creates a matcher for <code>String</code> arguments that matches
+   * if the argument contains the specified <code>String</code>.
+   * The matcher is created in the specified {@link MoxyEngine}.</p>
+   *
+   * @param engine The {@link MoxyEngine} to which this matcher applies.
+   * @param string The string that arguments must contain in order to match.
+   *
+   * @return null (ignored).
+   * @since 1.0
+   */
+  public static String contains(final MoxyEngine engine, final String string) {
+    engine.registerMatcher(new ContainsMatcher(string));
     return null;
   }
 

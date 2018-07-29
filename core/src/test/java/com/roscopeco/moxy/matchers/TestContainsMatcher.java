@@ -34,7 +34,7 @@ import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
 
-public class TestEndsWithMatcher {
+public class TestContainsMatcher {
   @Test
   public void testMoxyMockVerifyWithEndsWithObjectMatcherWorks() {
     final MethodWithArguments mock = mock(MethodWithArguments.class);
@@ -43,33 +43,30 @@ public class TestEndsWithMatcher {
     mock.hasArgs("three", "four");
     mock.hasArgs("five", "six");
 
-    assertMock(() -> mock.hasArgs(endsWith("ne"), endsWith("wo"))).wasCalledOnce();
-    assertMock(() -> mock.hasArgs(endsWith("e"), endsWith("wo"))).wasCalledOnce();
-    assertMock(() -> mock.hasArgs(endsWith("ne"), endsWith("ur"))).wasNotCalled();
+    assertMock(() -> mock.hasArgs(contains("ne"), contains("tw"))).wasCalledOnce();
+    assertMock(() -> mock.hasArgs(contains("n"), contains("w"))).wasCalledOnce();
+    assertMock(() -> mock.hasArgs(contains("hre"), contains("ou"))).wasCalledOnce();
+    assertMock(() -> mock.hasArgs(contains("iv"), contains("w"))).wasNotCalled();
     assertThatThrownBy(() ->
-
-    assertMock(
-        () -> mock.hasArgs(endsWith(null), endsWith(null))).wasNotCalled()
-    )
-        .isInstanceOf(MoxyException.class)
-        .hasMessage("Null argument; see cause")
-        .hasCauseInstanceOf(IllegalArgumentException.class);
+        assertMock(() -> mock.hasArgs(contains(null), contains(null))).wasNotCalled())
+            .isInstanceOf(MoxyException.class)
+            .hasMessage("Null argument; see cause")
+            .hasCauseInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   public void testMoxyMockWhenWithEndsWithObjectMatcherWorks() {
     final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
 
-    when(() -> mock.sayHelloTo(endsWith("ve"))).thenReturn(PASSED);
+    when(() -> mock.sayHelloTo(contains("tev"))).thenReturn(PASSED);
 
     assertThat(mock.sayHelloTo("Steve")).isEqualTo(PASSED);
     assertThat(mock.sayHelloTo("Bill")).isEqualTo(null);
 
     assertThatThrownBy(() ->
-        when(() -> mock.sayHelloTo(endsWith(null))).thenReturn(PASSED)
-    )
-        .isInstanceOf(MoxyException.class)
-        .hasMessage("Null argument; see cause")
-        .hasCauseInstanceOf(IllegalArgumentException.class);
+        when(() -> mock.sayHelloTo(contains(null))).thenReturn(PASSED))
+            .isInstanceOf(MoxyException.class)
+            .hasMessage("Null argument; see cause")
+            .hasCauseInstanceOf(IllegalArgumentException.class);
   }
 }

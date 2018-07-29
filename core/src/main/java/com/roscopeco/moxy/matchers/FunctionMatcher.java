@@ -43,4 +43,9 @@ class FunctionMatcher<T> implements MoxyMatcher<T> {
   public boolean matches(final T arg) {
     return this.function.apply(arg);
   }
+
+  @Override
+  public String toString() {
+    return "<function: arg -> ...>";
+  }
 }

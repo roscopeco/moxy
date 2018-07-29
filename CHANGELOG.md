@@ -19,7 +19,11 @@ make it in before 1.0.0.
 These changes are currently in the `develop` branch, and are slated
 to make it into a release soon.
 
-** Up to date **
+### Added
+
+- New `matches(Function<T, Boolean>)` (and primitive variants) added to
+  `Matchers`. Allows a function to be passed, without the extra functionality
+  provided by `custom(MoxyMatcher)` (i.e. custom matcher stack manipulation).
 
 ## [0.90.1] - 2018-07-10
 

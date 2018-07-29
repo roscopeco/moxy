@@ -94,16 +94,11 @@ public interface MoxyVoidStubber {
    * <ul>
    * <li>Not be static.</li>
    * <li>Be accessible, given the current security context (if applicable).</li>
+   * <li>Have <em>exactly</em> the same name as the mocked method.</li>
    * <li>Have <em>exactly</em> the same return type as the mocked method.</li>
    * <li>Have <em>exactly</em> the same number of arguments as the mocked method.</li>
    * <li>Have <em>exactly</em> the same argument types as the mocked method.</li>
    * </ul>
-   *
-   * <p>The name of the method is <em>not</em> taken into account.</p>
-   *
-   * <p>Note that, where several such methods exist, the first one encountered will
-   * be used (the actual ordering of the methods is, by virtue of JVM internals,
-   * undefined).</p>
    *
    * <p>When determining which method to call, inherited methods are <strong>not</strong>
    * considered - only methods declared on the class of the supplied object are

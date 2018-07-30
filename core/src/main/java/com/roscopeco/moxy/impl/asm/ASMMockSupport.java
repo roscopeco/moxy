@@ -40,6 +40,8 @@ import com.roscopeco.moxy.impl.asm.stubs.StubInvocation;
 import com.roscopeco.moxy.impl.asm.stubs.StubMethod;
 import com.roscopeco.moxy.impl.asm.stubs.StubType;
 
+import nl.jqno.equalsverifier.internal.lib.asm.Type;
+
 /**
  * All mocks implement this interface. It (ab)uses default methods
  * to allow us to do less bytecode generation.
@@ -228,6 +230,10 @@ public interface ASMMockSupport {
     }
   }
 
+  public default Object __moxy_asm_getConfiguredDefaultReturnForType(final String className) {
+    return this.__moxy_asm_ivars().getEngine().getDefaultReturn(className);
+  }
+
   public default Object __moxy_asm_getReturnableForInvocation(final Invocation invocation, final boolean forceRetain) {
     final StubInvocation stubInvocation = findStubbingForActualInvocation(invocation);
 
@@ -243,7 +249,7 @@ public interface ASMMockSupport {
         return null;
       }
     } else {
-      return null;
+      return __moxy_asm_getConfiguredDefaultReturnForType(Type.getReturnType(invocation.getMethodDesc()).getClassName());
     }
   }
 

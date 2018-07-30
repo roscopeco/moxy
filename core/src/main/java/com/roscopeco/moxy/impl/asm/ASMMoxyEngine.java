@@ -28,8 +28,12 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.objectweb.asm.ClassReader;
@@ -82,6 +86,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   private final ThreadLocal<Boolean> threadLocalMockBehaviourDisabled;
   private final ThreadLocalInvocationRecorder recorder;
   private final ASMMoxyMatcherEngine matcherEngine;
+  private final Map<String, DefaultReturnGenerator> returnGeneratorMap;
 
   /**
    * Construct a new instance of the ASMMoxyEngine.
@@ -93,6 +98,9 @@ public class ASMMoxyEngine implements MoxyEngine {
     this.matcherEngine = new ASMMoxyMatcherEngine(this);
     this.threadLocalMockBehaviourDisabled = new ThreadLocal<>();
     this.threadLocalMockBehaviourDisabled.set(false);
+    this.returnGeneratorMap = new HashMap<>();
+
+    this.registerDefaultReturnGenerators();
   }
 
   ASMMoxyEngine(final ThreadLocalInvocationRecorder recorder, final ASMMoxyMatcherEngine matcherEngine) {
@@ -100,6 +108,9 @@ public class ASMMoxyEngine implements MoxyEngine {
     this.matcherEngine = matcherEngine;
     this.threadLocalMockBehaviourDisabled = new ThreadLocal<>();
     this.threadLocalMockBehaviourDisabled.set(false);
+    this.returnGeneratorMap = new HashMap<>();
+
+    this.registerDefaultReturnGenerators();
   }
 
   /*
@@ -111,6 +122,39 @@ public class ASMMoxyEngine implements MoxyEngine {
 
   ASMMoxyMatcherEngine getMatcherEngine() {
     return this.matcherEngine;
+  }
+
+  Object getDefaultReturn(final String className) {
+    final DefaultReturnGenerator gen = this.returnGeneratorMap.get(className);
+
+    if (gen != null) {
+      return this.returnGeneratorMap.get(className).generateDefaultReturnValue();
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public void registerDefaultReturnForType(final String type, final DefaultReturnGenerator generator) {
+    this.returnGeneratorMap.put(type, generator);
+  }
+
+  @Override
+  public void removeDefaultReturnForType(final String type) {
+    this.returnGeneratorMap.remove(type);
+  }
+
+  @Override
+  public void resetDefaultReturnTypes() {
+    this.returnGeneratorMap.clear();
+    this.registerDefaultReturnGenerators();
+  }
+
+  private void registerDefaultReturnGenerators() {
+    this.registerDefaultReturnForType(Optional.class.getName(), () -> Optional.empty());
+    this.registerDefaultReturnForType(Map.class.getName(), () -> Collections.emptyMap());
+    this.registerDefaultReturnForType(List.class.getName(), () -> Collections.emptyList());
+    this.registerDefaultReturnForType(Set.class.getName(), () -> Collections.emptySet());
   }
 
   /**

@@ -28,6 +28,7 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Set;
 
+import com.roscopeco.moxy.impl.asm.DefaultReturnGenerator;
 import com.roscopeco.moxy.matchers.Matchers;
 import com.roscopeco.moxy.matchers.MoxyMatcher;
 
@@ -63,6 +64,30 @@ public interface MoxyEngine {
    * @since 1.0
    */
   public static final Set<Method> NO_METHODS = Collections.emptySet();
+
+  /**
+   * Register a default return value generator for the specified type.
+   *
+   * @param className The type this generator will create return objects for.
+   * @param generator The generator that will generate return values.
+   *
+   * @since 1.0
+   */
+  public void registerDefaultReturnForType(String className, DefaultReturnGenerator generator);
+
+  /**
+   * Remove a configured default return value generator for the specified type.
+   *
+   * @param className The type of for which the return value generator should be removed.
+   *
+   * @since 1.0
+   */
+  public void removeDefaultReturnForType(String className);
+
+  /**
+   * Reset default return type generators to the defaults.
+   */
+  public void resetDefaultReturnTypes();
 
   /**
    * <p>Reset this engine.</p>

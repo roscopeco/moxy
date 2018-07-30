@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.objectweb.asm.Type;
+
 import com.roscopeco.moxy.api.InvalidMockInvocationException;
 import com.roscopeco.moxy.impl.asm.ASMMockInstanceVars.CachedDelegate;
 import com.roscopeco.moxy.impl.asm.stubs.Stub;
@@ -39,8 +41,6 @@ import com.roscopeco.moxy.impl.asm.stubs.StubDoActions;
 import com.roscopeco.moxy.impl.asm.stubs.StubInvocation;
 import com.roscopeco.moxy.impl.asm.stubs.StubMethod;
 import com.roscopeco.moxy.impl.asm.stubs.StubType;
-
-import nl.jqno.equalsverifier.internal.lib.asm.Type;
 
 /**
  * All mocks implement this interface. It (ab)uses default methods

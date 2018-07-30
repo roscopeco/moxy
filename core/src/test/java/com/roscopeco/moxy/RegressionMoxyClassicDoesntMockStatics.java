@@ -39,7 +39,7 @@ public class RegressionMoxyClassicDoesntMockStatics {
   // This fails on Java9+ if classic mocking isn't excluding statics...
   @Test
   public void testMoxyCanMockMap() {
-    final Map map = Moxy.mock(Map.class, System.out);
+    final Map<?,?> map = Moxy.mock(Map.class, System.out);
 
     assertThat(map.get("Anything")).isNull();
   }

@@ -49,12 +49,12 @@ final class Invocation {
   /**
    * Create a new Invocation with the specified receiver, method and arguments.
    *
-   * @param receiver
-   * @param methodName
-   * @param methodDesc
-   * @param args
+   * @param receiver The receiver.
+   * @param methodName The method name.
+   * @param methodDesc The method descriptor.
+   * @param args The arguments.
    */
-  public Invocation(final Object receiver,
+  Invocation(final Object receiver,
                     final String methodName,
                     final String methodDesc,
                     final List<Object> args) {

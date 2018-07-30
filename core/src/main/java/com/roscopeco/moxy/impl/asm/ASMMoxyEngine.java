@@ -44,6 +44,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
+import com.roscopeco.moxy.api.DefaultReturnGenerator;
 import com.roscopeco.moxy.api.InvocationRunnable;
 import com.roscopeco.moxy.api.InvocationSupplier;
 import com.roscopeco.moxy.api.MockGenerationException;

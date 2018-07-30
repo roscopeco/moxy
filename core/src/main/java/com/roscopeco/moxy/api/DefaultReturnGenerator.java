@@ -22,9 +22,7 @@
  * SOFTWARE.
  */
 
-package com.roscopeco.moxy.impl.asm;
-
-import com.roscopeco.moxy.api.MoxyEngine;
+package com.roscopeco.moxy.api;
 
 /**
  * Generates default return values for methods.

@@ -28,7 +28,6 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Set;
 
-import com.roscopeco.moxy.impl.asm.DefaultReturnGenerator;
 import com.roscopeco.moxy.matchers.Matchers;
 import com.roscopeco.moxy.matchers.MoxyMatcher;
 

@@ -65,7 +65,7 @@ public class TestMoxyConfiguredDefaultReturns {
   public void testMoxyMockDefaultConfiguredReturnTypeList() {
     final ClassWithDefaultConfiguredReturnTypes mock = Moxy.mock(ClassWithDefaultConfiguredReturnTypes.class);
 
-    // returns empty optional by default
+    // returns empty list by default
     assertThat(mock.returnListOfString())
         .isNotNull()
         .isEmpty();
@@ -91,7 +91,7 @@ public class TestMoxyConfiguredDefaultReturns {
   public void testMoxyMockDefaultConfiguredReturnTypeMap() {
     final ClassWithDefaultConfiguredReturnTypes mock = Moxy.mock(ClassWithDefaultConfiguredReturnTypes.class);
 
-    // returns empty optional by default
+    // returns empty map by default
     assertThat(mock.returnMapStringToString())
         .isNotNull()
         .isEmpty();
@@ -119,7 +119,7 @@ public class TestMoxyConfiguredDefaultReturns {
   public void testMoxyMockDefaultConfiguredReturnTypeSet() {
     final ClassWithDefaultConfiguredReturnTypes mock = Moxy.mock(ClassWithDefaultConfiguredReturnTypes.class);
 
-    // returns empty optional by default
+    // returns empty set by default
     assertThat(mock.returnSetOfString())
         .isNotNull()
         .isEmpty();

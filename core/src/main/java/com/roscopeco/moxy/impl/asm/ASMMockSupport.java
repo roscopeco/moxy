@@ -57,7 +57,7 @@ public interface ASMMockSupport {
   public ASMMockInstanceVars __moxy_asm_ivars();
 
   /* Implemented by default */
-  public default ThreadLocalInvocationRecorder __moxy_asm_getRecorder() {
+  public default InvocationRecorder __moxy_asm_getRecorder() {
     return __moxy_asm_ivars().getEngine().getRecorder();
   }
 

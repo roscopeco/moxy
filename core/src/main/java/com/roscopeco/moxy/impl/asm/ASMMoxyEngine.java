@@ -84,7 +84,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   private static final String CANNOT_MOCK_NULL_CLASS = "Cannot mock null class";
 
   private final ThreadLocal<Boolean> threadLocalMockBehaviourDisabled;
-  private final ThreadLocalInvocationRecorder recorder;
+  private final InvocationRecorder recorder;
   private final ASMMoxyMatcherEngine matcherEngine;
   private final Map<String, DefaultReturnGenerator> returnGeneratorMap;
 
@@ -94,7 +94,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    * @since 1.0
    */
   public ASMMoxyEngine() {
-    this.recorder = new ThreadLocalInvocationRecorder(this);
+    this.recorder = new InvocationRecorder(this);
     this.matcherEngine = new ASMMoxyMatcherEngine(this);
     this.threadLocalMockBehaviourDisabled = new ThreadLocal<>();
     this.threadLocalMockBehaviourDisabled.set(false);
@@ -103,7 +103,7 @@ public class ASMMoxyEngine implements MoxyEngine {
     this.registerDefaultReturnGenerators();
   }
 
-  ASMMoxyEngine(final ThreadLocalInvocationRecorder recorder, final ASMMoxyMatcherEngine matcherEngine) {
+  ASMMoxyEngine(final InvocationRecorder recorder, final ASMMoxyMatcherEngine matcherEngine) {
     this.recorder = recorder;
     this.matcherEngine = matcherEngine;
     this.threadLocalMockBehaviourDisabled = new ThreadLocal<>();
@@ -116,7 +116,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   /*
    * Obtain the invocation recorder used by this engine.
    */
-  ThreadLocalInvocationRecorder getRecorder() {
+  InvocationRecorder getRecorder() {
     return this.recorder;
   }
 

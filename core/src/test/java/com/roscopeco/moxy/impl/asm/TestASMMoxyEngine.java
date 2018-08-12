@@ -69,7 +69,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
 
     assertThat(engine.getRecorder())
         .isNotNull()
-        .isInstanceOf(ThreadLocalInvocationRecorder.class);
+        .isInstanceOf(InvocationRecorder.class);
 
     assertThat(engine.getMatcherEngine())
         .isNotNull()
@@ -84,7 +84,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
   @Test
   public void testReset() {
     final ASMMoxyMatcherEngine matcherEngine = mock(ASMMoxyMatcherEngine.class);
-    final ThreadLocalInvocationRecorder recorder = mock(ThreadLocalInvocationRecorder.class);
+    final InvocationRecorder recorder = mock(InvocationRecorder.class);
 
     final ASMMoxyEngine engine = new ASMMoxyEngine(recorder, matcherEngine);
 
@@ -304,7 +304,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
   public void testEnsureEngineStartMonitoredInvocation() throws Exception {
     final ASMMoxyEngine engine = this.makePartialMock(true, MoxyEngine.NO_METHODS);
 
-    final ThreadLocalInvocationRecorder mockRecorder = engine.getRecorder();
+    final InvocationRecorder mockRecorder = engine.getRecorder();
     final ASMMoxyMatcherEngine mockMatcherEngine = engine.getMatcherEngine();
 
     engine.startMonitoredInvocation();
@@ -317,7 +317,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
   public void testEnsureEngineEndMonitoredInvocation() throws Exception {
     final ASMMoxyEngine engine = this.makePartialMock(true, MoxyEngine.NO_METHODS);
 
-    final ThreadLocalInvocationRecorder mockRecorder = engine.getRecorder();
+    final InvocationRecorder mockRecorder = engine.getRecorder();
     final ASMMoxyMatcherEngine mockMatcherEngine = engine.getMatcherEngine();
 
     assertThatThrownBy(() -> engine.endMonitoredInvocation())
@@ -391,7 +391,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
 
     final Invocation testInvocation = new Invocation(simpleMock, "test", "test", Collections.emptyList());
 
-    final ThreadLocalInvocationRecorder recorder = mockEngine.getRecorder();
+    final InvocationRecorder recorder = mockEngine.getRecorder();
 
     when(() -> mockEngine.runMonitoredInvocation(any())).thenCallRealMethod();
     when(() -> mockEngine.startMonitoredInvocation()).thenCallRealMethod();
@@ -433,7 +433,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
 
     final Invocation testInvocation = new Invocation(voidReturnMock, "test", "test", Collections.emptyList());
 
-    final ThreadLocalInvocationRecorder recorder = mockEngine.getRecorder();
+    final InvocationRecorder recorder = mockEngine.getRecorder();
 
     when(() -> mockEngine.runMonitoredInvocation(any())).thenCallRealMethod();
     when(() -> mockEngine.startMonitoredInvocation()).thenCallRealMethod();
@@ -475,7 +475,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
 
     final Invocation testInvocation = new Invocation(voidReturnMock, "test", "test", Collections.emptyList());
 
-    final ThreadLocalInvocationRecorder recorder = mockEngine.getRecorder();
+    final InvocationRecorder recorder = mockEngine.getRecorder();
 
     when(() -> mockEngine.runMonitoredInvocation(any())).thenCallRealMethod();
     when(() -> mockEngine.startMonitoredInvocation()).thenCallRealMethod();

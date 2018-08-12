@@ -38,7 +38,7 @@ import com.roscopeco.moxy.model.SimpleClass;
 
 public class TestASMMockSupport extends AbstractImplTest {
   ASMMoxyEngine engine;
-  ThreadLocalInvocationRecorder recorder;
+  InvocationRecorder recorder;
   ASMMoxyMatcherEngine matcherEngine;
   ASMMockSupport mock;
 

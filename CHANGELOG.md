@@ -19,7 +19,28 @@ make it in before 1.0.0.
 These changes are currently in the `develop` branch, and are slated
 to make it into a release soon.
 
-** Up to date **
+### Added
+
+- New `matches(Function<T, Boolean>)` (and primitive variants) added to
+  `Matchers`. Allows a function to be passed, without the extra functionality
+  provided by `custom(MoxyMatcher)` (i.e. custom matcher stack manipulation).
+  
+- Ability to set default return values for mocked methods. The new 
+  `registerDefaultReturnForType(String className, DefaultReturnGenerator generator)`
+  method on `MoxyEngine` allows default return generators to be registered for 
+  specific return-types.
+  
+### Changed 
+
+- **BREAKING CHANGE** - Mock methods that return `java.util.Optional` now
+  return `Optional.empty()` instead of `null`. This change is in keeping with
+  the notion that `Optional` methods should never return `null`, and is considered
+  of low-impact in terms of API incompatibility.
+  
+- **BREAKING CHANGE** - Invocations are no-longer recorded on a thread-local basis.
+  Instead, mocks now record their invocations globally in a thread-safe manner.
+  This change is only considered breaking for cases where mocks were previously
+  stubbed or verified in a way that took into account the old behaviour.
 
 ## [0.90.1] - 2018-07-10
 

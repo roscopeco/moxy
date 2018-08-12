@@ -34,6 +34,11 @@ to make it into a release soon.
   return `Optional.empty()` instead of `null`. This change is in keeping with
   the notion that `Optional` methods should never return `null`, and is considered
   of low-impact in terms of API incompatibility.
+  
+- **BREAKING CHANGE** - Invocations are no-longer recorded on a thread-local basis.
+  Instead, mocks now record their invocations globally in a thread-safe manner.
+  This change is only considered breaking for cases where mocks were previously
+  stubbed or verified in a way that took into account the old behaviour.
 
 ## [0.90.1] - 2018-07-10
 

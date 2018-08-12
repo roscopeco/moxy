@@ -30,6 +30,12 @@ to make it into a release soon.
   method on `MoxyEngine` allows default return generators to be registered for 
   specific return-types.
   
+- New `uberjar` module that now builds a fat Jar with Moxy and its runtime dependencies.
+  This is intended to ease adding Moxy to the boot classpath when using class mocking
+  with Java system classes.
+  
+### Changed 
+
 - **BREAKING CHANGE** - Mock methods that return `java.util.Optional` now
   return `Optional.empty()` instead of `null`. This change is in keeping with
   the notion that `Optional` methods should never return `null`, and is considered

@@ -106,10 +106,10 @@ public interface MoxyEngine {
    * <p>Reset this engine.</p>
    *
    * <p>Implementations may choose to globally reset the mocking framework,
-   * or to reset only for  the current thread. This must be documented
+   * or to reset only for the current thread. This must be documented
    * with the engine implementation.</p>
    *
-   * <p>The default engine <code>reset()</code>s on a per-thread basis.</p>
+   * <p>The default engine <code>reset()</code>s on a global basis.</p>
    *
    * @since 1.0
    */
@@ -487,10 +487,6 @@ public interface MoxyEngine {
 
   /**
    * <p>Reset the supplied mock, removing all stubbing that was previously applied.</p>
-   *
-   * <p>Note that this <strong>does not</strong> operate on a thread-local basis,
-   * (since stubbing is not thread-local) and that it does not reset previous
-   * invocation data for the mock. If you wish to reset that, see {@link MoxyEngine#reset()}.</p>
    *
    * @param mock The mock to reset
    *

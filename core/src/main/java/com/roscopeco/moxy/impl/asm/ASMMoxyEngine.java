@@ -155,8 +155,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   }
 
   /**
-   * Reset this engine. In this implementation, this discards all
-   * prior invocation data for the current thread.
+   * Reset this engine. Discards all prior invocation data.
    */
   @Override
   public void reset() {
@@ -360,6 +359,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    * * Pushes a new frame to the monitored invocation stack.
    *
    * In the disabled state, mocks will still record their invocations,
+   * (although the recorder will record their invocations separately)
    * but will not execute actions or answers, return stubbed values (they
    * will instead return default values), or callSuper.
    *

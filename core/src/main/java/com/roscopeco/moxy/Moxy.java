@@ -945,8 +945,7 @@ public final class Moxy {
   /**
    * <p>Reset the supplied mock, removing all stubbing that was previously applied.</p>
    *
-   * <p>Note that this <strong>does not</strong> operate on a thread-local basis,
-   * (since stubbing is not thread-local) and that it does not reset previous
+   * <p>Note that this <strong>does not</strong> reset previous
    * invocation data for the mock. If you wish to reset that, see {@link MoxyEngine#reset()}.</p>
    *
    * @param mock The mock to reset.
@@ -964,8 +963,7 @@ public final class Moxy {
    * <p>Reset the supplied mock using the supplied engine, removing all stubbing
    * that was previously applied.</p>
    *
-   * <p>Note that this <strong>does not</strong> operate on a thread-local basis,
-   * (since stubbing is not thread-local) and that it does not reset previous
+   * <p>Note that this <strong>does not</strong> not reset previous
    * invocation data for the mock. If you wish to reset that, see {@link MoxyEngine#reset()}.</p>
    *
    * @param engine The {@link MoxyEngine} to use.

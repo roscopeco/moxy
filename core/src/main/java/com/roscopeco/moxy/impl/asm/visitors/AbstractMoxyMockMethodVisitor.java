@@ -367,6 +367,8 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
   /**
    * Generate an appropriate default value for the given type.
    * This is used when stubbing is disabled (i.e. in a when or assertMock).
+   *
+   * @param returnType The return type for this method.
    */
   protected void generateDefaultValue(final Type returnType) {
     final char primitiveReturnType = returnType.toString().charAt(0);

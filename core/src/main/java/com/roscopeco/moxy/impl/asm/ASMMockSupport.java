@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.objectweb.asm.Type;
+
 import com.roscopeco.moxy.api.InvalidMockInvocationException;
 import com.roscopeco.moxy.impl.asm.ASMMockInstanceVars.CachedDelegate;
 import com.roscopeco.moxy.impl.asm.stubs.Stub;
@@ -228,6 +230,10 @@ public interface ASMMockSupport {
     }
   }
 
+  public default Object __moxy_asm_getConfiguredDefaultReturnForType(final String className) {
+    return this.__moxy_asm_ivars().getEngine().getDefaultReturn(className);
+  }
+
   public default Object __moxy_asm_getReturnableForInvocation(final Invocation invocation, final boolean forceRetain) {
     final StubInvocation stubInvocation = findStubbingForActualInvocation(invocation);
 
@@ -243,7 +249,7 @@ public interface ASMMockSupport {
         return null;
       }
     } else {
-      return null;
+      return __moxy_asm_getConfiguredDefaultReturnForType(Type.getReturnType(invocation.getMethodDesc()).getClassName());
     }
   }
 

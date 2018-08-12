@@ -28,7 +28,6 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -153,9 +152,6 @@ public class ASMMoxyEngine implements MoxyEngine {
 
   private void registerDefaultReturnGenerators() {
     this.registerDefaultReturnForType(Optional.class.getName(), () -> Optional.empty());
-    this.registerDefaultReturnForType(Map.class.getName(), () -> Collections.emptyMap());
-    this.registerDefaultReturnForType(List.class.getName(), () -> Collections.emptyList());
-    this.registerDefaultReturnForType(Set.class.getName(), () -> Collections.emptySet());
   }
 
   /**

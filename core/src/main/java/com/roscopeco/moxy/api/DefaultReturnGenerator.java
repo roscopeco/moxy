@@ -25,7 +25,7 @@
 package com.roscopeco.moxy.api;
 
 /**
- * Generates default return values for methods.
+ * Generates default return values for mocked methods.
  *
  * @see MoxyEngine#registerDefaultReturnForType(String, DefaultReturnGenerator)
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;

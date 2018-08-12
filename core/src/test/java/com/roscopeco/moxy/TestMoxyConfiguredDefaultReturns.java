@@ -26,7 +26,6 @@ package com.roscopeco.moxy;
 
 import static org.assertj.core.api.Assertions.*;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -58,86 +57,6 @@ public class TestMoxyConfiguredDefaultReturns {
     assertThat(mock.returnOptionalString())
         .isNotNull()
         .isPresent()
-        .contains("Hello, World");
-  }
-
-  @Test
-  public void testMoxyMockDefaultConfiguredReturnTypeList() {
-    final ClassWithDefaultConfiguredReturnTypes mock = Moxy.mock(ClassWithDefaultConfiguredReturnTypes.class);
-
-    // returns empty list by default
-    assertThat(mock.returnListOfString())
-        .isNotNull()
-        .isEmpty();
-
-    // and can still be stubbed
-    Moxy.when(() -> mock.returnListOfString()).thenReturn(Collections.singletonList("Hello there!"));
-
-    assertThat(mock.returnListOfString())
-        .isNotNull()
-        .isNotEmpty()
-        .contains("Hello there!");
-
-    // etc.
-    Moxy.when(() -> mock.returnListOfString()).thenCallRealMethod();
-
-    assertThat(mock.returnListOfString())
-        .isNotNull()
-        .isNotEmpty()
-        .contains("Hello, World");
-  }
-
-  @Test
-  public void testMoxyMockDefaultConfiguredReturnTypeMap() {
-    final ClassWithDefaultConfiguredReturnTypes mock = Moxy.mock(ClassWithDefaultConfiguredReturnTypes.class);
-
-    // returns empty map by default
-    assertThat(mock.returnMapStringToString())
-        .isNotNull()
-        .isEmpty();
-
-    // and can still be stubbed
-    Moxy.when(() -> mock.returnMapStringToString()).thenReturn(Collections.singletonMap("Hello", "There!"));
-
-    assertThat(mock.returnMapStringToString())
-        .isNotNull()
-        .isNotEmpty()
-        .containsOnlyKeys("Hello")
-        .containsValue("There!");
-
-    // etc.
-    Moxy.when(() -> mock.returnMapStringToString()).thenCallRealMethod();
-
-    assertThat(mock.returnMapStringToString())
-        .isNotNull()
-        .isNotEmpty()
-        .containsOnlyKeys("Hello")
-        .containsValue("World");
-  }
-
-  @Test
-  public void testMoxyMockDefaultConfiguredReturnTypeSet() {
-    final ClassWithDefaultConfiguredReturnTypes mock = Moxy.mock(ClassWithDefaultConfiguredReturnTypes.class);
-
-    // returns empty set by default
-    assertThat(mock.returnSetOfString())
-        .isNotNull()
-        .isEmpty();
-
-    // and can still be stubbed
-    Moxy.when(() -> mock.returnSetOfString()).thenReturn(Collections.singleton("Hello There!"));
-
-    assertThat(mock.returnSetOfString())
-        .isNotNull()
-        .isNotEmpty()
-        .contains("Hello There!");
-
-    // etc.
-    Moxy.when(() -> mock.returnSetOfString()).thenCallRealMethod();
-
-    assertThat(mock.returnSetOfString())
-        .isNotNull()
-        .isNotEmpty()
         .contains("Hello, World");
   }
 

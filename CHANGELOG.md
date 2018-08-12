@@ -24,6 +24,16 @@ to make it into a release soon.
 - New `matches(Function<T, Boolean>)` (and primitive variants) added to
   `Matchers`. Allows a function to be passed, without the extra functionality
   provided by `custom(MoxyMatcher)` (i.e. custom matcher stack manipulation).
+  
+- Ability to set default return values for mocked methods. The new 
+  `registerDefaultReturnForType(String className, DefaultReturnGenerator generator)`
+  method on `MoxyEngine` allows default return generators to be registered for 
+  specific return-types.
+  
+- **BREAKING CHANGE** - Mock methods that return `java.util.Optional` now
+  return `Optional.empty()` instead of `null`. This change is in keeping with
+  the notion that `Optional` methods should never return `null`, and is considered
+  of low-impact in terms of API incompatibility.
 
 ## [0.90.1] - 2018-07-10
 

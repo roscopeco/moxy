@@ -1,5 +1,5 @@
 /*
- * TestMoxyNestedAndInnerClasses.java -
+ * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
  *
  * Copyright 2018 Ross Bamford
  *
@@ -26,21 +26,37 @@ package com.roscopeco.moxy;
 
 import static org.assertj.core.api.Assertions.*;
 
-import java.util.Map;
-
 import org.junit.jupiter.api.Test;
 
-/**
- * TODO Document TestMoxyNestedAndInnerClasses
- *
- * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
- */
-public class RegressionMoxyClassicDoesntMockStatics {
-  // This fails on Java9+ if classic mocking isn't excluding statics...
-  @Test
-  public void testMoxyCanMockMap() {
-    final Map<?,?> map = Moxy.mock(Map.class);
+import com.roscopeco.moxy.model.classmock.SimpleClass;
 
-    assertThat(map.get("Anything")).isNull();
+public class TestMoxyMultithreaded {
+  @Test
+  public void testMoxyMockWhenThenReturnDifferentThreads() throws InterruptedException {
+    final SimpleClass mock = Moxy.mock(SimpleClass.class);
+    Moxy.when(() -> mock.returnHello()).thenReturn("MARKER");
+
+    final String[] r = new String[] { "NOTSET" };
+    final Thread t = new Thread(() -> r[0] = mock.returnHello());
+    t.start();
+    t.join();
+
+    assertThat(r[0]).isEqualTo("MARKER");
+  }
+
+  @Test
+  public void testMoxyMockWhenThenVerifyDifferentThreads() throws InterruptedException {
+    final SimpleClass mock = Moxy.mock(SimpleClass.class);
+
+    final Thread t1 = new Thread(() -> mock.returnHello());
+    final Thread t2 = new Thread(() -> mock.returnHello());
+
+    t1.start();
+    t2.start();
+
+    t1.join();
+    t2.join();
+
+    Moxy.assertMock(() -> mock.returnHello()).wasCalledTwice();
   }
 }

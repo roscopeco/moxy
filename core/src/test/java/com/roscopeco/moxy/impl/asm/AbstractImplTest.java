@@ -67,11 +67,11 @@ public abstract class AbstractImplTest {
     if (injectMocks) {
       final Constructor<? extends ASMMoxyEngine> ctor =
           mockClass.getDeclaredConstructor(MoxyEngine.class,
-                                           ThreadLocalInvocationRecorder.class,
+                                           InvocationRecorder.class,
                                            ASMMoxyMatcherEngine.class);
 
       return ctor.newInstance(realEngine,
-                              mock(ThreadLocalInvocationRecorder.class),
+                              mock(InvocationRecorder.class),
                               mock(ASMMoxyMatcherEngine.class));
     } else {
       final Constructor<? extends ASMMoxyEngine> ctor =

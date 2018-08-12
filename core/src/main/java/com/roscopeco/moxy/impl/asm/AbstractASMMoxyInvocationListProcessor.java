@@ -54,7 +54,7 @@ class AbstractASMMoxyInvocationListProcessor {
     return this.engine;
   }
 
-  protected ThreadLocalInvocationRecorder getRecorder() {
+  protected InvocationRecorder getRecorder() {
     return this.engine.getRecorder();
   }
 

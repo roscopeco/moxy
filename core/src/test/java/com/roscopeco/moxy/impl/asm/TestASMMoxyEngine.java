@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.roscopeco.moxy.api.InvocationSupplier;
 import com.roscopeco.moxy.model.*;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
@@ -110,13 +111,20 @@ class TestASMMoxyEngine extends AbstractImplTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testMockClassPrintStreamHandlesErrors() throws Exception {
     final ASMMoxyEngine mockEngine = this.makePartialMock(true,
         ASMMoxyEngine.class.getDeclaredMethod("getMockClass", Class.class, Set.class, PrintStream.class));
 
     // Wraps non-moxy exceptions...
     final Exception marker = new Exception("MARKER");
-    when(() -> mockEngine.getMockClass(Object.class, Collections.emptySet(), null))
+
+    // Working around https://youtrack.jetbrains.com/issue/IDEA-194713
+    //
+    // Doesn't actually need to be assigned to a local, but gives a spurious IDE error otherwise.
+    final InvocationSupplier<Class<?>> classInvocationSupplier = () -> mockEngine.getMockClass(Object.class, Collections.emptySet(), null);
+
+    when(classInvocationSupplier)
         .thenThrow(marker);
 
     assertThatThrownBy(() -> mockEngine.mock(Object.class))
@@ -128,7 +136,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
 
     // But passes moxy exceptions straight through.
     final MoxyException moxyMarker = new MoxyException("MARKER");
-    when(() -> mockEngine.getMockClass(Object.class, Collections.emptySet(), null))
+    when(classInvocationSupplier)
         .thenThrow(moxyMarker);
 
     assertThatThrownBy(() -> mockEngine.mock(Object.class))

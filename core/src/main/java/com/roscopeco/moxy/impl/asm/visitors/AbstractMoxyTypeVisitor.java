@@ -57,13 +57,17 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
    * (e.g. java.lang).
    */
   private static String makeMockPackageInternalName(final Package originalPackage) {
-    final String originalName = originalPackage.getName();
-
-    if (PROHIBITED_PACKAGES.stream().anyMatch(regex -> regex.matcher(originalName).find())) {
-      // default package
+    if (originalPackage == null) {
       return "";
     } else {
-      return originalName.replace('.', '/') + "/";
+      final String originalName = originalPackage.getName();
+
+      if (PROHIBITED_PACKAGES.stream().anyMatch(regex -> regex.matcher(originalName).find())) {
+        // default package
+        return "";
+      } else {
+        return originalName.replace('.', '/') + "/";
+      }
     }
   }
 

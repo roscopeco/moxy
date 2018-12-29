@@ -50,6 +50,7 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
 
   protected final MethodVisitor delegate;
   protected final boolean wasAbstract;
+  protected final boolean wasNative;
   protected final Class<?> originalClass;
   protected final String originalClassInternalName;
   protected final Type returnType;
@@ -63,7 +64,8 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
                                           final String methodDescriptor,
                                           final Type returnType,
                                           final Type[] argTypes,
-                                          final boolean wasAbstract) {
+                                          final boolean wasAbstract,
+                                          final boolean wasNative) {
     // don't pass the delegate to the super constructor, or we'll generate
     // both old and new bytecode. Instead, use our own 'delegate' field.
     super(ASM6, delegate);
@@ -75,14 +77,15 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
     this.methodDescriptor = methodDescriptor;
     this.argTypes = argTypes;
     this.wasAbstract = wasAbstract;
+    this.wasNative = wasNative;
   }
 
   @Override
   public void visitEnd() {
-    // If the method was abstract, we'll need to manually force
+    // If the method was abstract or native, we'll need to manually force
     // code generation (since there's no original code attribute
     // to visit).
-    if (this.wasAbstract) {
+    if (this.wasAbstract || this.wasNative) {
       this.visitCode();
       super.visitEnd();
     }

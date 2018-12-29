@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.roscopeco.moxy.model.*;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,10 +53,6 @@ import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.impl.asm.ASMMoxyEngine.InvocationMonitor;
 import com.roscopeco.moxy.impl.asm.stubs.StubInvocation;
 import com.roscopeco.moxy.impl.asm.stubs.StubMethod;
-import com.roscopeco.moxy.model.ClassWithPrimitiveReturns;
-import com.roscopeco.moxy.model.DifferentAccessModifiers;
-import com.roscopeco.moxy.model.MethodWithArguments;
-import com.roscopeco.moxy.model.SimpleClass;
 
 class TestASMMoxyEngine extends AbstractImplTest {
   @BeforeEach
@@ -286,18 +283,39 @@ class TestASMMoxyEngine extends AbstractImplTest {
   }
 
   @Test
+  public void testIsMockCandidate_excludesObjectEqualsAndHashcode_butIncludesOverriden() throws Exception {
+    final ASMMoxyEngine engine = new ASMMoxyEngine();
+
+    final Method objectEquals = Object.class.getDeclaredMethod("equals", Object.class);
+    final Method objectHashCode = Object.class.getDeclaredMethod("hashCode");
+    final Method overridenEquals = ClassWithOverridenEqualsHashcode.class.getDeclaredMethod("equals", Object.class);
+    final Method overridenHashCode = ClassWithOverridenEqualsHashcode.class.getDeclaredMethod("hashCode");
+
+    assertThat(engine.isMockCandidate(overridenEquals)).isTrue();
+    assertThat(engine.isMockCandidate(overridenHashCode)).isTrue();
+    assertThat(engine.isMockCandidate(objectEquals)).isFalse();
+    assertThat(engine.isMockCandidate(objectHashCode)).isFalse();
+  }
+
+  @Test
   public void testGatherAllMockableMethods() throws Exception {
     final ASMMoxyEngine engine = new ASMMoxyEngine();
 
     assertThat(engine.gatherAllMockableMethods(DifferentAccessModifiers.class))
-        .hasSize(3)
-        .containsAll(Lists.newArrayList(
-            DifferentAccessModifiers.class.getDeclaredMethod("publicMethod"),
-            DifferentAccessModifiers.class.getDeclaredMethod("defaultMethod"),
-            DifferentAccessModifiers.class.getDeclaredMethod("protectedMethod")))
-        .doesNotContainAnyElementsOf(Lists.newArrayList(
-            DifferentAccessModifiers.class.getDeclaredMethod("privateMethod"),
-            DifferentAccessModifiers.class.getDeclaredMethod("finalMethod")));
+        .hasSize(6)
+        .containsKeys(
+            "clone()Ljava/lang/Object;",
+            "finalize()V",
+            "toString()Ljava/lang/String;",
+            "publicMethod()V",
+            "defaultMethod()V",
+            "protectedMethod()V"
+        )
+        .doesNotContainKeys(
+            "privateMethod()V",
+            "finalMethod()V"
+
+        );
   }
 
   @Test
@@ -577,7 +595,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(node.superName).isEqualTo("com/roscopeco/moxy/model/ClassWithPrimitiveReturns");
 
     assertThat(node.methods)
-      .hasSize(11)
+      .hasSize(14)
       .hasOnlyElementsOfType(MethodNode.class)
       .extracting("name", "desc")
           .containsOnly(tuple("<init>",                       "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
@@ -590,7 +608,10 @@ class TestASMMoxyEngine extends AbstractImplTest {
                         tuple("returnFloat",                  "()F"),
                         tuple("returnDouble",                 "()D"),
                         tuple("returnBoolean",                "()Z"),
-                        tuple("returnVoid",                   "()V"));
+                        tuple("returnVoid",                   "()V"),
+                        tuple("clone",                        "()Ljava/lang/Object;"),
+                        tuple("finalize",                     "()V"),
+                        tuple("toString",                     "()Ljava/lang/String;"));
   }
 
   @Test

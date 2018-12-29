@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -295,19 +297,29 @@ public class ASMMoxyEngine implements MoxyEngine {
     return ((m.getModifiers() & Opcodes.ACC_FINAL) == 0)
         && (((m.getModifiers() & Opcodes.ACC_PUBLIC) > 0)
             || ((m.getModifiers() & Opcodes.ACC_PROTECTED) > 0)
-            || ((m.getModifiers() & Opcodes.ACC_PRIVATE) == 0));
+            || ((m.getModifiers() & Opcodes.ACC_PRIVATE) == 0))
+        && (!(Object.class.equals(m.getDeclaringClass()) && "equals".equals(m.getName())))
+        && (!(Object.class.equals(m.getDeclaringClass()) && "hashCode".equals(m.getName())));
   }
 
   /*
    * Gather all mock-candidate methods on the given class.
+   *
+   * Used by both classic and class mock engines.
    */
-  HashSet<Method> gatherAllMockableMethods(final Class<?> originalClass) {
-    final HashSet<Method> methods = new HashSet<>();
+  Map<String, Method> gatherAllMockableMethods(final Class<?> originalClass) {
+    final HashMap<String, Method> methods = new HashMap<>();
 
-    for (final Method m : originalClass.getDeclaredMethods()) {
-      if (this.isMockCandidate(m)) {
-        methods.add(m);
+    Class<?> current = originalClass;
+
+    while (current != null) {
+      for (final Method m : current.getDeclaredMethods()) {
+        String sig = m.getName() + Type.getMethodDescriptor(m);
+        if (this.isMockCandidate(m) && !methods.containsKey(sig)) {
+          methods.put(sig, m);
+        }
       }
+      current = current.getSuperclass();
     }
 
     return methods;
@@ -511,11 +523,11 @@ public class ASMMoxyEngine implements MoxyEngine {
 
     // Find the annotated methods (and their interfaces)
 
-    Set<Method> mockableMethods;
+    Map<String, Method> mockableMethods;
     if (methods == MoxyEngine.ALL_METHODS) {
       mockableMethods = this.gatherAllMockableMethods(clz);
     } else {
-      mockableMethods = methods;
+      mockableMethods = methods.stream().collect(Collectors.toMap(m -> m.getName() + Type.getMethodDescriptor(m), Function.identity()));
     }
 
     final AbstractMoxyTypeVisitor visitor =

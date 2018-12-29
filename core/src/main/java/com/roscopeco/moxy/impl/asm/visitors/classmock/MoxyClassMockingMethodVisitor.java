@@ -47,7 +47,7 @@ class MoxyClassMockingMethodVisitor extends AbstractMoxyMockMethodVisitor {
                                 final Type returnType,
                                 final Type[] argTypes,
                                 final boolean isStatic) {
-    super(delegate, originalClass, methodName, methodDescriptor, returnType, argTypes, false);
+    super(delegate, originalClass, methodName, methodDescriptor, returnType, argTypes, false, false);
     this.delegateClass = delegateClass;
     this.isStatic = isStatic;
   }

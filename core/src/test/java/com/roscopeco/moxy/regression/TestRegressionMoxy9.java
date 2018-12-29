@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import com.roscopeco.moxy.Moxy;
 
 class TestRegressionMoxy9 {
-  private static class Super {
+  public static class Super {
     String notOverriden() {
       return "ORIGINAL";
     }
@@ -17,7 +17,7 @@ class TestRegressionMoxy9 {
     }
   }
 
-  private static class Sub extends Super {
+  public static class Sub extends Super {
     @Override
     public String overridden() {
       return "OVERRIDEN";
@@ -30,6 +30,16 @@ class TestRegressionMoxy9 {
     Sub sub = Moxy.mock(Sub.class);
 
     assertThat(sub.overridden()).isNull();
-    assertThat(sub.notOverriden()).isNull();     /* failure here */
+    assertThat(sub.notOverriden()).isNull();     /* failure was here */
+  }
+
+  @Test
+  void testCallRealMethodStillWorks() {
+    Sub sub = Moxy.mock(Sub.class);
+
+    Moxy.when(sub::notOverriden).thenCallRealMethod();
+
+    assertThat(sub.overridden()).isNull();
+    assertThat(sub.notOverriden()).isEqualTo("ORIGINAL");
   }
 }

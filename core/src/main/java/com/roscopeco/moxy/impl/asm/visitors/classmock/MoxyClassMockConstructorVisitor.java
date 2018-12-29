@@ -49,7 +49,7 @@ public class MoxyClassMockConstructorVisitor extends AbstractMoxyMockMethodVisit
                                   final String descriptor,
                                   final Type returnType,
                                   final Type[] argTypes) {
-    super(delegate, thisClass, name, descriptor, returnType, argTypes, false);
+    super(delegate, thisClass, name, descriptor, returnType, argTypes, false, false);
     this.delegateClassInternalName = delegateClassInternal;
     this.superClassInternalName = Type.getInternalName(thisClass.getSuperclass());
   }

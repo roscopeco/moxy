@@ -35,8 +35,9 @@ class MoxyMockingMethodVisitor extends AbstractMoxyMockMethodVisitor {
                            final String methodDescriptor,
                            final Type returnType,
                            final Type[] argTypes,
-                           final boolean wasAbstract) {
-    super(delegate, originalClass, methodName, methodDescriptor, returnType, argTypes, wasAbstract);
+                           final boolean wasAbstract,
+                           final boolean wasNative) {
+    super(delegate, originalClass, methodName, methodDescriptor, returnType, argTypes, wasAbstract, wasNative);
   }
 
   @Override

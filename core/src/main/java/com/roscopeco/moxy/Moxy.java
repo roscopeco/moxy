@@ -668,6 +668,7 @@ public final class Moxy {
       }
 
       Arrays.stream(original.getClass().getDeclaredMethods()).forEach(method -> {
+        method.setAccessible(true);
         if (!method.getName().startsWith("__moxy_asm")) {
           Moxy.when(() -> method.invoke(original,
                   Arrays.stream(

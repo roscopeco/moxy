@@ -84,7 +84,8 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
                                           desc,
                                           Type.getReturnType(desc),
                                           Type.getArgumentTypes(desc),
-                                          true);
+                                          true,
+                                          false);
     } else {
       // Don't mock
       return null;

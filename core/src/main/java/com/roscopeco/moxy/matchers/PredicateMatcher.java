@@ -23,29 +23,29 @@
  */
 package com.roscopeco.moxy.matchers;
 
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
- * Matcher that passes the argument to a function to determine whether
+ * Matcher that passes the argument to a predicate to determine whether
  * or not it matches.
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  * @since 1.0
  */
-class FunctionMatcher<T> implements MoxyMatcher<T> {
-  private final Function<T, Boolean> function;
+class PredicateMatcher<T> implements MoxyMatcher<T> {
+  private final Predicate<T> predicate;
 
-  FunctionMatcher(final Function<T, Boolean> function) {
-    this.function = function;
+  PredicateMatcher(final Predicate<T> predicate) {
+    this.predicate = predicate;
   }
 
   @Override
   public boolean matches(final T arg) {
-    return this.function.apply(arg);
+    return this.predicate.test(arg);
   }
 
   @Override
   public String toString() {
-    return "<function: arg -> ...>";
+    return "<predicate: arg -> ...>";
   }
 }

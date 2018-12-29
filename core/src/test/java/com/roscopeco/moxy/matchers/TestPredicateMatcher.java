@@ -35,7 +35,7 @@ import com.roscopeco.moxy.model.MatcherTestClass;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
 
-public class TestFunctionMatcher {
+public class TestPredicateMatcher {
   @Test
   public void testMoxyMockVerifyWithFunctionByteMatcherWorks() {
     final MatcherTestClass mock = mock(MatcherTestClass.class);

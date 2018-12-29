@@ -29,7 +29,6 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -78,8 +77,8 @@ public class ASMMoxyEngine implements MoxyEngine {
    * See #runMonitoredInvocation
    */
   @FunctionalInterface
-  static interface InvocationMonitor {
-    public void invoke() throws Exception;
+  interface InvocationMonitor {
+    void invoke() throws Exception;
   }
 
   private static final String UNRECOVERABLE_ERROR = "Unrecoverable Error";
@@ -153,7 +152,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   }
 
   private void registerDefaultReturnGenerators() {
-    this.registerDefaultReturnForType(Optional.class.getName(), () -> Optional.empty());
+    this.registerDefaultReturnForType(Optional.class.getName(), Optional::empty);
   }
 
   /**
@@ -547,7 +546,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   /*
    * Define a class given a loader and an ASM ClassNode.
    */
-  Class<?> defineClass(final ClassLoader loader, final ClassNode node) {
+  private Class<?> defineClass(final ClassLoader loader, final ClassNode node) {
     if (loader == null) {
       throw new IllegalArgumentException("Implicit definition in the system classloader is unsupported.\n"
                                        + "Defining mocks here will almost certainly fail with NoClassDefFoundError for framework classes.\n"
@@ -561,7 +560,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   /*
    * Transform a ClassNode into bytecode.
    */
-  byte[] generateBytecode(final ClassNode node) {
+  private byte[] generateBytecode(final ClassNode node) {
     final ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     final CheckClassAdapter check = new CheckClassAdapter(writer, false);
     node.accept(check);

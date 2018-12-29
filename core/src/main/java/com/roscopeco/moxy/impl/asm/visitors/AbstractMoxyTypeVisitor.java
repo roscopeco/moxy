@@ -57,7 +57,7 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
    * (e.g. java.lang).
    */
   private static String makeMockPackageInternalName(final Package originalPackage) {
-    if (originalPackage == null) {
+    if (originalPackage == null || originalPackage.getName().isEmpty()) {
       return "";
     } else {
       final String originalName = originalPackage.getName();

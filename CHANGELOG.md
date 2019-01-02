@@ -38,6 +38,8 @@ to make it into a release soon.
   This is intended to ease adding Moxy to the boot classpath when using class mocking
   with Java system classes.
   
+  Note that the uberjar is not deployed to Maven, you will need to build it locally if you want to use it.
+  
 ### Changed 
 
 - **BREAKING CHANGE** - Mock methods that return `java.util.Optional` now
@@ -50,6 +52,10 @@ to make it into a release soon.
   This change is only considered breaking for cases where mocks were previously
   stubbed or verified in a way that took into account the old behaviour.
 
+- **Potential breaking change** - All declared methods are now mocked, including those inherited from Object, except:
+  - equals and hashCode are NOT mocked **if they are inherited from Object**.
+    - They **are** mocked if the subclass overrides them.
+      
 ## [0.90.1] - 2018-07-10
 
 ### Fixed

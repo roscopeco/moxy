@@ -39,6 +39,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.roscopeco.moxy.api.InvocationSupplier;
+import com.roscopeco.moxy.model.*;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,10 +54,6 @@ import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.impl.asm.ASMMoxyEngine.InvocationMonitor;
 import com.roscopeco.moxy.impl.asm.stubs.StubInvocation;
 import com.roscopeco.moxy.impl.asm.stubs.StubMethod;
-import com.roscopeco.moxy.model.ClassWithPrimitiveReturns;
-import com.roscopeco.moxy.model.DifferentAccessModifiers;
-import com.roscopeco.moxy.model.MethodWithArguments;
-import com.roscopeco.moxy.model.SimpleClass;
 
 class TestASMMoxyEngine extends AbstractImplTest {
   @BeforeEach
@@ -69,7 +67,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
 
     assertThat(engine.getRecorder())
         .isNotNull()
-        .isInstanceOf(ThreadLocalInvocationRecorder.class);
+        .isInstanceOf(InvocationRecorder.class);
 
     assertThat(engine.getMatcherEngine())
         .isNotNull()
@@ -84,7 +82,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
   @Test
   public void testReset() {
     final ASMMoxyMatcherEngine matcherEngine = mock(ASMMoxyMatcherEngine.class);
-    final ThreadLocalInvocationRecorder recorder = mock(ThreadLocalInvocationRecorder.class);
+    final InvocationRecorder recorder = mock(InvocationRecorder.class);
 
     final ASMMoxyEngine engine = new ASMMoxyEngine(recorder, matcherEngine);
 
@@ -113,13 +111,20 @@ class TestASMMoxyEngine extends AbstractImplTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testMockClassPrintStreamHandlesErrors() throws Exception {
     final ASMMoxyEngine mockEngine = this.makePartialMock(true,
         ASMMoxyEngine.class.getDeclaredMethod("getMockClass", Class.class, Set.class, PrintStream.class));
 
     // Wraps non-moxy exceptions...
     final Exception marker = new Exception("MARKER");
-    when(() -> mockEngine.getMockClass(Object.class, Collections.emptySet(), null))
+
+    // Working around https://youtrack.jetbrains.com/issue/IDEA-194713
+    //
+    // Doesn't actually need to be assigned to a local, but gives a spurious IDE error otherwise.
+    final InvocationSupplier<Class<?>> classInvocationSupplier = () -> mockEngine.getMockClass(Object.class, Collections.emptySet(), null);
+
+    when(classInvocationSupplier)
         .thenThrow(marker);
 
     assertThatThrownBy(() -> mockEngine.mock(Object.class))
@@ -131,7 +136,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
 
     // But passes moxy exceptions straight through.
     final MoxyException moxyMarker = new MoxyException("MARKER");
-    when(() -> mockEngine.getMockClass(Object.class, Collections.emptySet(), null))
+    when(classInvocationSupplier)
         .thenThrow(moxyMarker);
 
     assertThatThrownBy(() -> mockEngine.mock(Object.class))
@@ -286,25 +291,46 @@ class TestASMMoxyEngine extends AbstractImplTest {
   }
 
   @Test
+  public void testIsMockCandidate_excludesObjectEqualsAndHashcode_butIncludesOverriden() throws Exception {
+    final ASMMoxyEngine engine = new ASMMoxyEngine();
+
+    final Method objectEquals = Object.class.getDeclaredMethod("equals", Object.class);
+    final Method objectHashCode = Object.class.getDeclaredMethod("hashCode");
+    final Method overridenEquals = ClassWithOverridenEqualsHashcode.class.getDeclaredMethod("equals", Object.class);
+    final Method overridenHashCode = ClassWithOverridenEqualsHashcode.class.getDeclaredMethod("hashCode");
+
+    assertThat(engine.isMockCandidate(overridenEquals)).isTrue();
+    assertThat(engine.isMockCandidate(overridenHashCode)).isTrue();
+    assertThat(engine.isMockCandidate(objectEquals)).isFalse();
+    assertThat(engine.isMockCandidate(objectHashCode)).isFalse();
+  }
+
+  @Test
   public void testGatherAllMockableMethods() throws Exception {
     final ASMMoxyEngine engine = new ASMMoxyEngine();
 
     assertThat(engine.gatherAllMockableMethods(DifferentAccessModifiers.class))
-        .hasSize(3)
-        .containsAll(Lists.newArrayList(
-            DifferentAccessModifiers.class.getDeclaredMethod("publicMethod"),
-            DifferentAccessModifiers.class.getDeclaredMethod("defaultMethod"),
-            DifferentAccessModifiers.class.getDeclaredMethod("protectedMethod")))
-        .doesNotContainAnyElementsOf(Lists.newArrayList(
-            DifferentAccessModifiers.class.getDeclaredMethod("privateMethod"),
-            DifferentAccessModifiers.class.getDeclaredMethod("finalMethod")));
+        .hasSize(6)
+        .containsKeys(
+            "clone()Ljava/lang/Object;",
+            "finalize()V",
+            "toString()Ljava/lang/String;",
+            "publicMethod()V",
+            "defaultMethod()V",
+            "protectedMethod()V"
+        )
+        .doesNotContainKeys(
+            "privateMethod()V",
+            "finalMethod()V"
+
+        );
   }
 
   @Test
   public void testEnsureEngineStartMonitoredInvocation() throws Exception {
     final ASMMoxyEngine engine = this.makePartialMock(true, MoxyEngine.NO_METHODS);
 
-    final ThreadLocalInvocationRecorder mockRecorder = engine.getRecorder();
+    final InvocationRecorder mockRecorder = engine.getRecorder();
     final ASMMoxyMatcherEngine mockMatcherEngine = engine.getMatcherEngine();
 
     engine.startMonitoredInvocation();
@@ -317,7 +343,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
   public void testEnsureEngineEndMonitoredInvocation() throws Exception {
     final ASMMoxyEngine engine = this.makePartialMock(true, MoxyEngine.NO_METHODS);
 
-    final ThreadLocalInvocationRecorder mockRecorder = engine.getRecorder();
+    final InvocationRecorder mockRecorder = engine.getRecorder();
     final ASMMoxyMatcherEngine mockMatcherEngine = engine.getMatcherEngine();
 
     assertThatThrownBy(() -> engine.endMonitoredInvocation())
@@ -391,7 +417,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
 
     final Invocation testInvocation = new Invocation(simpleMock, "test", "test", Collections.emptyList());
 
-    final ThreadLocalInvocationRecorder recorder = mockEngine.getRecorder();
+    final InvocationRecorder recorder = mockEngine.getRecorder();
 
     when(() -> mockEngine.runMonitoredInvocation(any())).thenCallRealMethod();
     when(() -> mockEngine.startMonitoredInvocation()).thenCallRealMethod();
@@ -433,7 +459,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
 
     final Invocation testInvocation = new Invocation(voidReturnMock, "test", "test", Collections.emptyList());
 
-    final ThreadLocalInvocationRecorder recorder = mockEngine.getRecorder();
+    final InvocationRecorder recorder = mockEngine.getRecorder();
 
     when(() -> mockEngine.runMonitoredInvocation(any())).thenCallRealMethod();
     when(() -> mockEngine.startMonitoredInvocation()).thenCallRealMethod();
@@ -475,7 +501,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
 
     final Invocation testInvocation = new Invocation(voidReturnMock, "test", "test", Collections.emptyList());
 
-    final ThreadLocalInvocationRecorder recorder = mockEngine.getRecorder();
+    final InvocationRecorder recorder = mockEngine.getRecorder();
 
     when(() -> mockEngine.runMonitoredInvocation(any())).thenCallRealMethod();
     when(() -> mockEngine.startMonitoredInvocation()).thenCallRealMethod();
@@ -577,7 +603,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(node.superName).isEqualTo("com/roscopeco/moxy/model/ClassWithPrimitiveReturns");
 
     assertThat(node.methods)
-      .hasSize(11)
+      .hasSize(14)
       .hasOnlyElementsOfType(MethodNode.class)
       .extracting("name", "desc")
           .containsOnly(tuple("<init>",                       "(Lcom/roscopeco/moxy/api/MoxyEngine;)V"),
@@ -590,7 +616,10 @@ class TestASMMoxyEngine extends AbstractImplTest {
                         tuple("returnFloat",                  "()F"),
                         tuple("returnDouble",                 "()D"),
                         tuple("returnBoolean",                "()Z"),
-                        tuple("returnVoid",                   "()V"));
+                        tuple("returnVoid",                   "()V"),
+                        tuple("clone",                        "()Ljava/lang/Object;"),
+                        tuple("finalize",                     "()V"),
+                        tuple("toString",                     "()Ljava/lang/String;"));
   }
 
   @Test

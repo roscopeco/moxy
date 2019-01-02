@@ -19,9 +19,13 @@ make it in before 1.0.0.
 These changes are currently in the `develop` branch, and are slated
 to make it into a release soon.
 
+- Nothing to show
+
+## [0.92] - 2019-02-01
+
 ### Added
 
-- New `matches(Function<T, Boolean>)` (and primitive variants) added to
+- New `matches(Predicate<T>)` (and primitive variants) added to
   `Matchers`. Allows a function to be passed, without the extra functionality
   provided by `custom(MoxyMatcher)` (i.e. custom matcher stack manipulation).
   
@@ -29,6 +33,10 @@ to make it into a release soon.
   `registerDefaultReturnForType(String className, DefaultReturnGenerator generator)`
   method on `MoxyEngine` allows default return generators to be registered for 
   specific return-types.
+  
+- New `uberjar` module that now builds a fat Jar with Moxy and its runtime dependencies.
+  This is intended to ease adding Moxy to the boot classpath when using class mocking
+  with Java system classes.
   
 ### Changed 
 

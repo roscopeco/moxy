@@ -1,5 +1,5 @@
 /*
- * TestMoxyNestedAndInnerClasses.java -
+ * ClassWithDefaultConfiguredReturnTypes.java -
  *
  * Copyright 2018 Ross Bamford
  *
@@ -22,25 +22,33 @@
  * SOFTWARE.
  */
 
-package com.roscopeco.moxy;
+package com.roscopeco.moxy.model;
 
-import static org.assertj.core.api.Assertions.*;
-
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
-
-import org.junit.jupiter.api.Test;
+import java.util.Optional;
+import java.util.Set;
 
 /**
- * TODO Document TestMoxyNestedAndInnerClasses
+ * TODO Document ClassWithDefaultConfiguredReturnTypes
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
-public class RegressionMoxyClassicDoesntMockStatics {
-  // This fails on Java9+ if classic mocking isn't excluding statics...
-  @Test
-  public void testMoxyCanMockMap() {
-    final Map<?,?> map = Moxy.mock(Map.class);
+public class ClassWithDefaultConfiguredReturnTypes {
+  public Optional<String> returnOptionalString() {
+    return Optional.of("Hello, World");
+  }
 
-    assertThat(map.get("Anything")).isNull();
+  public List<String> returnListOfString() {
+    return Collections.singletonList("Hello, World");
+  }
+
+  public Map<String, String> returnMapStringToString() {
+    return Collections.singletonMap("Hello", "World");
+  }
+
+  public Set<String> returnSetOfString() {
+    return Collections.singleton("Hello, World");
   }
 }

@@ -1,5 +1,5 @@
 /*
- * TestMoxyNestedAndInnerClasses.java -
+ * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
  *
  * Copyright 2018 Ross Bamford
  *
@@ -22,25 +22,16 @@
  * SOFTWARE.
  */
 
-package com.roscopeco.moxy;
-
-import static org.assertj.core.api.Assertions.*;
-
-import java.util.Map;
-
-import org.junit.jupiter.api.Test;
+package com.roscopeco.moxy.api;
 
 /**
- * TODO Document TestMoxyNestedAndInnerClasses
+ * Generates default return values for mocked methods.
  *
+ * @see MoxyEngine#registerDefaultReturnForType(String, DefaultReturnGenerator)
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ * @since 1.0
  */
-public class RegressionMoxyClassicDoesntMockStatics {
-  // This fails on Java9+ if classic mocking isn't excluding statics...
-  @Test
-  public void testMoxyCanMockMap() {
-    final Map<?,?> map = Moxy.mock(Map.class);
-
-    assertThat(map.get("Anything")).isNull();
-  }
+@FunctionalInterface
+public interface DefaultReturnGenerator {
+  public Object generateDefaultReturnValue();
 }

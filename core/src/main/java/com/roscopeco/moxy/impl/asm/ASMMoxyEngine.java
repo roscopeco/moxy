@@ -28,9 +28,13 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -40,6 +44,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
+import com.roscopeco.moxy.api.DefaultReturnGenerator;
 import com.roscopeco.moxy.api.InvocationRunnable;
 import com.roscopeco.moxy.api.InvocationSupplier;
 import com.roscopeco.moxy.api.MockGenerationException;
@@ -72,16 +77,17 @@ public class ASMMoxyEngine implements MoxyEngine {
    * See #runMonitoredInvocation
    */
   @FunctionalInterface
-  static interface InvocationMonitor {
-    public void invoke() throws Exception;
+  interface InvocationMonitor {
+    void invoke() throws Exception;
   }
 
   private static final String UNRECOVERABLE_ERROR = "Unrecoverable Error";
   private static final String CANNOT_MOCK_NULL_CLASS = "Cannot mock null class";
 
   private final ThreadLocal<Boolean> threadLocalMockBehaviourDisabled;
-  private final ThreadLocalInvocationRecorder recorder;
+  private final InvocationRecorder recorder;
   private final ASMMoxyMatcherEngine matcherEngine;
+  private final Map<String, DefaultReturnGenerator> returnGeneratorMap;
 
   /**
    * Construct a new instance of the ASMMoxyEngine.
@@ -89,23 +95,29 @@ public class ASMMoxyEngine implements MoxyEngine {
    * @since 1.0
    */
   public ASMMoxyEngine() {
-    this.recorder = new ThreadLocalInvocationRecorder(this);
+    this.recorder = new InvocationRecorder(this);
     this.matcherEngine = new ASMMoxyMatcherEngine(this);
     this.threadLocalMockBehaviourDisabled = new ThreadLocal<>();
     this.threadLocalMockBehaviourDisabled.set(false);
+    this.returnGeneratorMap = new HashMap<>();
+
+    this.registerDefaultReturnGenerators();
   }
 
-  ASMMoxyEngine(final ThreadLocalInvocationRecorder recorder, final ASMMoxyMatcherEngine matcherEngine) {
+  ASMMoxyEngine(final InvocationRecorder recorder, final ASMMoxyMatcherEngine matcherEngine) {
     this.recorder = recorder;
     this.matcherEngine = matcherEngine;
     this.threadLocalMockBehaviourDisabled = new ThreadLocal<>();
     this.threadLocalMockBehaviourDisabled.set(false);
+    this.returnGeneratorMap = new HashMap<>();
+
+    this.registerDefaultReturnGenerators();
   }
 
   /*
    * Obtain the invocation recorder used by this engine.
    */
-  ThreadLocalInvocationRecorder getRecorder() {
+  InvocationRecorder getRecorder() {
     return this.recorder;
   }
 
@@ -113,9 +125,38 @@ public class ASMMoxyEngine implements MoxyEngine {
     return this.matcherEngine;
   }
 
+  Object getDefaultReturn(final String className) {
+    final DefaultReturnGenerator gen = this.returnGeneratorMap.get(className);
+
+    if (gen != null) {
+      return this.returnGeneratorMap.get(className).generateDefaultReturnValue();
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public void registerDefaultReturnForType(final String type, final DefaultReturnGenerator generator) {
+    this.returnGeneratorMap.put(type, generator);
+  }
+
+  @Override
+  public void removeDefaultReturnForType(final String type) {
+    this.returnGeneratorMap.remove(type);
+  }
+
+  @Override
+  public void resetDefaultReturnTypes() {
+    this.returnGeneratorMap.clear();
+    this.registerDefaultReturnGenerators();
+  }
+
+  private void registerDefaultReturnGenerators() {
+    this.registerDefaultReturnForType(Optional.class.getName(), Optional::empty);
+  }
+
   /**
-   * Reset this engine. In this implementation, this discards all
-   * prior invocation data for the current thread.
+   * Reset this engine. Discards all prior invocation data.
    */
   @Override
   public void reset() {
@@ -255,19 +296,29 @@ public class ASMMoxyEngine implements MoxyEngine {
     return ((m.getModifiers() & Opcodes.ACC_FINAL) == 0)
         && (((m.getModifiers() & Opcodes.ACC_PUBLIC) > 0)
             || ((m.getModifiers() & Opcodes.ACC_PROTECTED) > 0)
-            || ((m.getModifiers() & Opcodes.ACC_PRIVATE) == 0));
+            || ((m.getModifiers() & Opcodes.ACC_PRIVATE) == 0))
+        && (!(Object.class.equals(m.getDeclaringClass()) && "equals".equals(m.getName())))
+        && (!(Object.class.equals(m.getDeclaringClass()) && "hashCode".equals(m.getName())));
   }
 
   /*
    * Gather all mock-candidate methods on the given class.
+   *
+   * Used by both classic and class mock engines.
    */
-  HashSet<Method> gatherAllMockableMethods(final Class<?> originalClass) {
-    final HashSet<Method> methods = new HashSet<>();
+  Map<String, Method> gatherAllMockableMethods(final Class<?> originalClass) {
+    final HashMap<String, Method> methods = new HashMap<>();
 
-    for (final Method m : originalClass.getDeclaredMethods()) {
-      if (this.isMockCandidate(m)) {
-        methods.add(m);
+    Class<?> current = originalClass;
+
+    while (current != null) {
+      for (final Method m : current.getDeclaredMethods()) {
+        String sig = m.getName() + Type.getMethodDescriptor(m);
+        if (this.isMockCandidate(m) && !methods.containsKey(sig)) {
+          methods.put(sig, m);
+        }
       }
+      current = current.getSuperclass();
     }
 
     return methods;
@@ -319,6 +370,7 @@ public class ASMMoxyEngine implements MoxyEngine {
    * * Pushes a new frame to the monitored invocation stack.
    *
    * In the disabled state, mocks will still record their invocations,
+   * (although the recorder will record their invocations separately)
    * but will not execute actions or answers, return stubbed values (they
    * will instead return default values), or callSuper.
    *
@@ -470,11 +522,11 @@ public class ASMMoxyEngine implements MoxyEngine {
 
     // Find the annotated methods (and their interfaces)
 
-    Set<Method> mockableMethods;
+    Map<String, Method> mockableMethods;
     if (methods == MoxyEngine.ALL_METHODS) {
       mockableMethods = this.gatherAllMockableMethods(clz);
     } else {
-      mockableMethods = methods;
+      mockableMethods = methods.stream().collect(Collectors.toMap(m -> m.getName() + Type.getMethodDescriptor(m), Function.identity()));
     }
 
     final AbstractMoxyTypeVisitor visitor =
@@ -494,7 +546,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   /*
    * Define a class given a loader and an ASM ClassNode.
    */
-  Class<?> defineClass(final ClassLoader loader, final ClassNode node) {
+  private Class<?> defineClass(final ClassLoader loader, final ClassNode node) {
     if (loader == null) {
       throw new IllegalArgumentException("Implicit definition in the system classloader is unsupported.\n"
                                        + "Defining mocks here will almost certainly fail with NoClassDefFoundError for framework classes.\n"
@@ -508,7 +560,7 @@ public class ASMMoxyEngine implements MoxyEngine {
   /*
    * Transform a ClassNode into bytecode.
    */
-  byte[] generateBytecode(final ClassNode node) {
+  private byte[] generateBytecode(final ClassNode node) {
     final ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     final CheckClassAdapter check = new CheckClassAdapter(writer, false);
     node.accept(check);

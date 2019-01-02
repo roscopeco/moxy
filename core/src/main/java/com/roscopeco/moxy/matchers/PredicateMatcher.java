@@ -1,5 +1,5 @@
 /*
- * TestMoxyNestedAndInnerClasses.java -
+ * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
  *
  * Copyright 2018 Ross Bamford
  *
@@ -21,26 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package com.roscopeco.moxy.matchers;
 
-package com.roscopeco.moxy;
-
-import static org.assertj.core.api.Assertions.*;
-
-import java.util.Map;
-
-import org.junit.jupiter.api.Test;
+import java.util.function.Predicate;
 
 /**
- * TODO Document TestMoxyNestedAndInnerClasses
+ * Matcher that passes the argument to a predicate to determine whether
+ * or not it matches.
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ * @since 1.0
  */
-public class RegressionMoxyClassicDoesntMockStatics {
-  // This fails on Java9+ if classic mocking isn't excluding statics...
-  @Test
-  public void testMoxyCanMockMap() {
-    final Map<?,?> map = Moxy.mock(Map.class);
+class PredicateMatcher<T> implements MoxyMatcher<T> {
+  private final Predicate<T> predicate;
 
-    assertThat(map.get("Anything")).isNull();
+  PredicateMatcher(final Predicate<T> predicate) {
+    this.predicate = predicate;
+  }
+
+  @Override
+  public boolean matches(final T arg) {
+    return this.predicate.test(arg);
+  }
+
+  @Override
+  public String toString() {
+    return "<predicate: arg -> ...>";
   }
 }

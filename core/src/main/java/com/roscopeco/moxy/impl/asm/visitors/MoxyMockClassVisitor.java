@@ -27,10 +27,7 @@ import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
 import static org.objectweb.asm.Opcodes.*;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -45,14 +42,14 @@ import com.roscopeco.moxy.api.MoxyMock;
 public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
   private final Class<?> originalClass;
   private final String originalClassInternalName;
-  private final Set<Method> mockMethods;
+  private final Map<String, Method> mockMethods;
 
-  public MoxyMockClassVisitor(final Class<?> originalClass, final Set<Method> methods) {
+  public MoxyMockClassVisitor(final Class<?> originalClass, final Map<String, Method> methods) {
     super(AbstractMoxyTypeVisitor.makeMockName(originalClass));
 
     this.originalClass = originalClass;
     this.originalClassInternalName = Type.getInternalName(originalClass);
-    this.mockMethods = methods == null ? Collections.emptySet() : methods;
+    this.mockMethods = methods == null ? Collections.emptyMap() : new HashMap<>(methods);
   }
 
   @Override
@@ -77,8 +74,7 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
   }
 
   private boolean isToMock(final String name, final String desc) {
-    return this.mockMethods.stream()
-      .anyMatch(m -> m.getName().equals(name) && Type.getMethodDescriptor(m).equals(desc));
+    return this.mockMethods.containsKey(name + desc);
   }
 
   /*
@@ -96,12 +92,13 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
   @Override
   public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
     final boolean isAbstract = (access & ACC_ABSTRACT) != 0;
+    final boolean isNative = (access & ACC_NATIVE) != 0;
     final boolean isStatic = (access & ACC_STATIC) != 0;
 
     if (INIT_NAME.equals(name)) {
       // Generate pass-through constructors
       final String newDesc = this.prependMethodArgsDescriptorWithEngine(desc); /* this is the new descriptor */
-      return new MoxyPassThroughConstructorVisitor(this.cv.visitMethod(access & ~ACC_ABSTRACT,
+      return new MoxyPassThroughConstructorVisitor(this.cv.visitMethod(access & ~ACC_ABSTRACT & ~ACC_NATIVE,
                                                            name, newDesc, signature, exceptions),
                                                            this.originalClassInternalName,
                                                            this.getNewClassInternalName(),
@@ -110,19 +107,36 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
     } else {
       // Always mock abstract methods (or it won't verify), decide for concrete based on mockMethods.
       if (!isStatic && (isAbstract || this.isToMock(name, desc))) {
+        // mark as mocked
+        this.mockMethods.remove(name + desc);
+
         // Do the mocking
-        return new MoxyMockingMethodVisitor(this.cv.visitMethod(access & ~ACC_ABSTRACT | ACC_SYNTHETIC,
+        return new MoxyMockingMethodVisitor(this.cv.visitMethod(access & ~ACC_ABSTRACT & ~ACC_NATIVE | ACC_SYNTHETIC,
                                                            name, desc, signature, exceptions),
                                                            this.originalClass,
                                                            name,
                                                            desc,
                                                            Type.getReturnType(desc),
                                                            Type.getArgumentTypes(desc),
-                                                           isAbstract);
+                                                           isAbstract,
+                                                           isNative);
       } else {
         // Don't mock, just super.
         return null;
       }
+    }
+  }
+
+  @Override
+  public void visitEnd() {
+    super.visitEnd();
+
+    // Need to manually generate any methods that remain in the methods hash.
+    for (String key : new HashSet<>(this.mockMethods.keySet())) {
+      Method m = this.mockMethods.get(key);
+      MethodVisitor mv = visitMethod(m.getModifiers() & ~ACC_ABSTRACT, m.getName(), Type.getMethodDescriptor(m), null, null);
+      mv.visitCode();
+      mv.visitEnd();
     }
   }
 }

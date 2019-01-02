@@ -85,7 +85,7 @@ public final class TypesAndDescriptors {
   public static final String INVALID_STUBBING_INTERNAL_NAME = Type.getInternalName(InvalidStubbingException.class);
 
   /* Recorder */
-  public static final String MOXY_RECORDER_INTERNAL_NAME = Type.getInternalName(ThreadLocalInvocationRecorder.class);
+  public static final String MOXY_RECORDER_INTERNAL_NAME = Type.getInternalName(InvocationRecorder.class);
   public static final String MOXY_RECORDER_DESCRIPTOR = "L" + MOXY_RECORDER_INTERNAL_NAME + ";";
   public static final String MOXY_RECORDER_RECORD_METHOD_NAME = "recordInvocation";
   public static final String MOXY_RECORDER_RECORD_DESCRIPTOR = "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;)V";

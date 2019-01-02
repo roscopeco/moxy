@@ -1,5 +1,5 @@
 /*
- * TestMoxyNestedAndInnerClasses.java -
+ * Moxy - Lean-and-mean mocking framework for Java with a fluent API.
  *
  * Copyright 2018 Ross Bamford
  *
@@ -21,26 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package com.roscopeco.moxy.matchers;
 
-package com.roscopeco.moxy;
+class ContainsMatcher extends SimpleObjectMatcher<String> {
+  public ContainsMatcher(final String string) {
+    super(string, false);
+  }
 
-import static org.assertj.core.api.Assertions.*;
+  @Override
+  public boolean matches(final String arg) {
+    if (arg == null) {
+      return false;
+    } else {
+      return arg.contains(this.getObject());
+    }
+  }
 
-import java.util.Map;
-
-import org.junit.jupiter.api.Test;
-
-/**
- * TODO Document TestMoxyNestedAndInnerClasses
- *
- * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
- */
-public class RegressionMoxyClassicDoesntMockStatics {
-  // This fails on Java9+ if classic mocking isn't excluding statics...
-  @Test
-  public void testMoxyCanMockMap() {
-    final Map<?,?> map = Moxy.mock(Map.class);
-
-    assertThat(map.get("Anything")).isNull();
+  @Override
+  public String toString() {
+    return "<contains" + super.toString();
   }
 }

@@ -65,13 +65,51 @@ public interface MoxyEngine {
   public static final Set<Method> NO_METHODS = Collections.emptySet();
 
   /**
+   * <p>Register a default return value generator for the specified type.</p>
+   *
+   * <p>The return generator will be used to generate default return values for the
+   * specified types as required by mocks. In practice, this means whenever a
+   * mock hasn't been stubbed with another return type or other behaviour.</p>
+   *
+   * <p>By default, the framework will provide zero, null or false returns for
+   * all types except <code>java.util.Optional</code>. For the latter, the
+   * default return is <code>Optional.empty()</code>.</p>
+   *
+   * <p><strong>Note:</strong> The default value generator will <strong>not</strong>
+   * be called during <em>monitored invocations</em>. The framework will always
+   * generate the same return values during those invocations - however this
+   * is a detail that should concern only those involved in developing or extending
+   * the framework itself.</p>
+   *
+   * @param className The type this generator will create return objects for.
+   * @param generator The generator that will generate return values.
+   *
+   * @since 1.0
+   */
+  public void registerDefaultReturnForType(String className, DefaultReturnGenerator generator);
+
+  /**
+   * Remove a configured default return value generator for the specified type.
+   *
+   * @param className The type of for which the return value generator should be removed.
+   *
+   * @since 1.0
+   */
+  public void removeDefaultReturnForType(String className);
+
+  /**
+   * Reset default return type generators to the defaults.
+   */
+  public void resetDefaultReturnTypes();
+
+  /**
    * <p>Reset this engine.</p>
    *
    * <p>Implementations may choose to globally reset the mocking framework,
-   * or to reset only for  the current thread. This must be documented
+   * or to reset only for the current thread. This must be documented
    * with the engine implementation.</p>
    *
-   * <p>The default engine <code>reset()</code>s on a per-thread basis.</p>
+   * <p>The default engine <code>reset()</code>s on a global basis.</p>
    *
    * @since 1.0
    */
@@ -449,10 +487,6 @@ public interface MoxyEngine {
 
   /**
    * <p>Reset the supplied mock, removing all stubbing that was previously applied.</p>
-   *
-   * <p>Note that this <strong>does not</strong> operate on a thread-local basis,
-   * (since stubbing is not thread-local) and that it does not reset previous
-   * invocation data for the mock. If you wish to reset that, see {@link MoxyEngine#reset()}.</p>
    *
    * @param mock The mock to reset
    *

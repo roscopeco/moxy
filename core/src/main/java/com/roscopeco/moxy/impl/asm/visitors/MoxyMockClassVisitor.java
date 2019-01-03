@@ -68,7 +68,7 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
                 super.getNewClassInternalName(),
                 signature,
                 this.originalClassInternalName,
-                newInterfaces.toArray(new String[newInterfaces.size()]));
+                newInterfaces.toArray(new String[0]));
 
     this.visitAnnotation(Type.getDescriptor(MoxyMock.class), true).visitEnd();
   }
@@ -94,6 +94,7 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
     final boolean isAbstract = (access & ACC_ABSTRACT) != 0;
     final boolean isNative = (access & ACC_NATIVE) != 0;
     final boolean isStatic = (access & ACC_STATIC) != 0;
+    final boolean isSynthetic = (access & ACC_SYNTHETIC) != 0 || (access & ACC_BRIDGE) != 0;
 
     if (INIT_NAME.equals(name)) {
       // Generate pass-through constructors
@@ -106,7 +107,7 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
                                                            Type.getArgumentTypes(desc));
     } else {
       // Always mock abstract methods (or it won't verify), decide for concrete based on mockMethods.
-      if (!isStatic && (isAbstract || this.isToMock(name, desc))) {
+      if (!isStatic && !isSynthetic && (isAbstract || this.isToMock(name, desc))) {
         // mark as mocked
         this.mockMethods.remove(name + desc);
 
@@ -135,8 +136,12 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
     for (String key : new HashSet<>(this.mockMethods.keySet())) {
       Method m = this.mockMethods.get(key);
       MethodVisitor mv = visitMethod(m.getModifiers() & ~ACC_ABSTRACT, m.getName(), Type.getMethodDescriptor(m), null, null);
-      mv.visitCode();
-      mv.visitEnd();
+
+      // mv may be null if method is static, synthetic, bridge, etc.
+      if (mv != null) {
+        mv.visitCode();
+        mv.visitEnd();
+      }
     }
   }
 }

@@ -21,6 +21,12 @@ to make it into a release soon.
 
 - Nothing to show
 
+## [0.92.1] - 2019-07-01
+
+### Fixed
+
+- [MOXY-11](https://github.com/roscopeco/moxy/issues/11) (Bug with synthetic methods)
+
 ## [0.92] - 2019-02-01
 
 ### Added
@@ -171,8 +177,10 @@ First public release, and the first version pushed to Maven Central.
 - Add project documentation
 - Setup for CI with Travis and Sonarcloud
 
-[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.90.1...develop
-[0.90.0]: https://github.com/roscopeco/moxy/compare/v0.90.0...v0.90.1
+[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.92.1...develop
+[0.92.1]:  https://github.com/roscopeco/moxy/compare/v0.92...v0.92.1
+[0.92.0]:  https://github.com/roscopeco/moxy/compare/v0.90.1...v0.92
+[0.90.1]: https://github.com/roscopeco/moxy/compare/v0.90.0...v0.90.1
 [0.90.0]: https://github.com/roscopeco/moxy/compare/v0.88.0...v0.90.0
 [0.88.1]: https://github.com/roscopeco/moxy/compare/v0.88.0...v0.88.1
 [0.88.0]: https://github.com/roscopeco/moxy/compare/v0.86.0...v0.88.0

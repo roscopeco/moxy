@@ -27,7 +27,7 @@ to make it into a release soon.
 
 - [MOXY-11](https://github.com/roscopeco/moxy/issues/11) (Bug with synthetic methods)
 
-## [0.92] - 2019-02-01
+## [0.92.0] - 2019-02-01
 
 ### Added
 

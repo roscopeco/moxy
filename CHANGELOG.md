@@ -19,6 +19,10 @@ make it in before 1.0.0.
 These changes are currently in the `develop` branch, and are slated
 to make it into a release soon.
 
+- Nothing to show
+
+## [0.92.2] - 2019-06-02
+
 ### Fixed
 
 - [MOXY-13](https://github.com/roscopeco/moxy/issues/13) (Bug with super interfaces)
@@ -179,7 +183,8 @@ First public release, and the first version pushed to Maven Central.
 - Add project documentation
 - Setup for CI with Travis and Sonarcloud
 
-[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.92.1...develop
+[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.92.2...develop
+[0.92.2]:  https://github.com/roscopeco/moxy/compare/v0.92.1...v0.92.2
 [0.92.1]:  https://github.com/roscopeco/moxy/compare/v0.92...v0.92.1
 [0.92.0]:  https://github.com/roscopeco/moxy/compare/v0.90.1...v0.92
 [0.90.1]: https://github.com/roscopeco/moxy/compare/v0.90.0...v0.90.1

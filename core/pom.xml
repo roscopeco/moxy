@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.roscopeco.moxy</groupId>
         <artifactId>moxy</artifactId>
-        <version>0.92.1</version>
+        <version>0.92.2</version>
     </parent>
 
     <artifactId>moxy-core</artifactId>

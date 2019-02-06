@@ -19,7 +19,9 @@ make it in before 1.0.0.
 These changes are currently in the `develop` branch, and are slated
 to make it into a release soon.
 
-- Nothing to show
+### Fixed
+
+- [MOXY-13](https://github.com/roscopeco/moxy/issues/13) (Bug with super interfaces)
 
 ## [0.92.1] - 2019-07-01
 
@@ -27,7 +29,7 @@ to make it into a release soon.
 
 - [MOXY-11](https://github.com/roscopeco/moxy/issues/11) (Bug with synthetic methods)
 
-## [0.92] - 2019-02-01
+## [0.92.0] - 2019-02-01
 
 ### Added
 

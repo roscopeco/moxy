@@ -26,8 +26,8 @@ package com.roscopeco.moxy.impl.asm.visitors;
 import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
 import static org.objectweb.asm.Opcodes.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.lang.reflect.Method;
+import java.util.*;
 
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -43,8 +43,8 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
   private final String interfaceInternalName;
   private final Class<?> originalIface;
 
-  public MoxyMockInterfaceVisitor(final Class<?> iface) {
-    super(AbstractMoxyTypeVisitor.makeMockName(iface));
+  public MoxyMockInterfaceVisitor(final Class<?> iface, final Map<String, Method> methods) {
+    super(AbstractMoxyTypeVisitor.makeMockName(iface), methods);
 
     this.originalIface = iface;
     this.interfaceInternalName = Type.getInternalName(iface);
@@ -64,7 +64,7 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
                 this.getNewClassInternalName(),
                 signature,
                 OBJECT_INTERNAL_NAME,
-                newInterfaces.toArray(new String[newInterfaces.size()]));
+                newInterfaces.toArray(new String[0]));
 
     // Add the IsMock annotation
     this.visitAnnotation(Type.getDescriptor(MoxyMock.class), true).visitEnd();
@@ -76,6 +76,10 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
     final boolean isStatic = (access & ACC_STATIC) != 0;
 
     if (!isStatic) {
+      // mark as mocked
+      this.markMethodAsMocked(name, desc);
+
+      // Do mocking
       return new MoxyMockingMethodVisitor(this.cv.visitMethod(
                                               access & ~ACC_ABSTRACT | ACC_SYNTHETIC,
                                               name, desc, signature, exceptions),
@@ -92,16 +96,13 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
     }
   }
 
-  @Override
-  public void visitEnd() {
-    // Manually generate a constructor in case user wants to manually instantiate,
-    // like they do for partial mocks...
+  private void generateConstructor() {
     final MoxyPassThroughConstructorVisitor mv =
         new MoxyPassThroughConstructorVisitor(this.cv.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC,
-                            INIT_NAME,
-                            MOCK_CONSTRUCTOR_DESCRIPTOR,
-                            null,
-                            null),
+            INIT_NAME,
+            MOCK_CONSTRUCTOR_DESCRIPTOR,
+            null,
+            null),
             OBJECT_INTERNAL_NAME,
             this.getNewClassInternalName(),
             VOID_VOID_DESCRIPTOR,
@@ -109,6 +110,14 @@ public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
 
     mv.visitCode();
     mv.visitEnd();
+  }
+
+  @Override
+  public void visitEnd() {
+    // Manually generate a constructor in case user wants to manually instantiate,
+    // like they do for partial mocks...
+    generateConstructor();
+
 
     super.visitEnd();
   }

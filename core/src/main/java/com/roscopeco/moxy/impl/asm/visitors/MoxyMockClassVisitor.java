@@ -42,14 +42,12 @@ import com.roscopeco.moxy.api.MoxyMock;
 public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
   private final Class<?> originalClass;
   private final String originalClassInternalName;
-  private final Map<String, Method> mockMethods;
 
-  public MoxyMockClassVisitor(final Class<?> originalClass, final Map<String, Method> methods) {
-    super(AbstractMoxyTypeVisitor.makeMockName(originalClass));
+  public MoxyMockClassVisitor(final Class<?> originalClass, final Map<String, Method> mockableMethods) {
+    super(AbstractMoxyTypeVisitor.makeMockName(originalClass), mockableMethods);
 
     this.originalClass = originalClass;
     this.originalClassInternalName = Type.getInternalName(originalClass);
-    this.mockMethods = methods == null ? Collections.emptyMap() : new HashMap<>(methods);
   }
 
   @Override
@@ -71,10 +69,6 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
                 newInterfaces.toArray(new String[0]));
 
     this.visitAnnotation(Type.getDescriptor(MoxyMock.class), true).visitEnd();
-  }
-
-  private boolean isToMock(final String name, final String desc) {
-    return this.mockMethods.containsKey(name + desc);
   }
 
   /*
@@ -109,7 +103,7 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
       // Always mock abstract methods (or it won't verify), decide for concrete based on mockMethods.
       if (!isStatic && !isSynthetic && (isAbstract || this.isToMock(name, desc))) {
         // mark as mocked
-        this.mockMethods.remove(name + desc);
+        this.markMethodAsMocked(name, desc);
 
         // Do the mocking
         return new MoxyMockingMethodVisitor(this.cv.visitMethod(access & ~ACC_ABSTRACT & ~ACC_NATIVE | ACC_SYNTHETIC,
@@ -124,23 +118,6 @@ public class MoxyMockClassVisitor extends AbstractMoxyTypeVisitor {
       } else {
         // Don't mock, just super.
         return null;
-      }
-    }
-  }
-
-  @Override
-  public void visitEnd() {
-    super.visitEnd();
-
-    // Need to manually generate any methods that remain in the methods hash.
-    for (String key : new HashSet<>(this.mockMethods.keySet())) {
-      Method m = this.mockMethods.get(key);
-      MethodVisitor mv = visitMethod(m.getModifiers() & ~ACC_ABSTRACT, m.getName(), Type.getMethodDescriptor(m), null, null);
-
-      // mv may be null if method is static, synthetic, bridge, etc.
-      if (mv != null) {
-        mv.visitCode();
-        mv.visitEnd();
       }
     }
   }

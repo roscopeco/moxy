@@ -15,7 +15,7 @@ class TestRegressionMoxy13 {
 
   @Test
   void testMoxyBug() {
-    final Sub sub = Moxy.mock(Sub.class, System.out);
+    final Sub sub = Moxy.mock(Sub.class);
 
     sub.subMethod();        // Works fine
     sub.superMethod();      // AbstractMethodError is thrown; Output shows superMethod was *not* generated

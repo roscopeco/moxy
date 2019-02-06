@@ -28,11 +28,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -309,16 +305,29 @@ public class ASMMoxyEngine implements MoxyEngine {
   Map<String, Method> gatherAllMockableMethods(final Class<?> originalClass) {
     final HashMap<String, Method> methods = new HashMap<>();
 
-    Class<?> current = originalClass;
+    Deque<Class<?>> queue = new ArrayDeque<>();
+    Set<Method> seen = new HashSet<>();
 
-    while (current != null) {
+    queue.add(originalClass);
+
+    while (!queue.isEmpty()) {
+      Class<?> current = queue.removeFirst();
+
       for (final Method m : current.getDeclaredMethods()) {
         String sig = m.getName() + Type.getMethodDescriptor(m);
-        if (this.isMockCandidate(m) && !methods.containsKey(sig)) {
+        if (!seen.contains(m) && this.isMockCandidate(m) && !methods.containsKey(sig)) {
+          seen.add(m);
           methods.put(sig, m);
         }
       }
-      current = current.getSuperclass();
+
+      for (Class<?> iface : current.getInterfaces()) {
+        queue.push(iface);
+      }
+
+      if ((current = current.getSuperclass()) != null) {
+        queue.push(current);
+      }
     }
 
     return methods;
@@ -531,8 +540,8 @@ public class ASMMoxyEngine implements MoxyEngine {
 
     final AbstractMoxyTypeVisitor visitor =
         clz.isInterface() ?
-            new MoxyMockInterfaceVisitor(clz)               :
-            new MoxyMockClassVisitor(clz, mockableMethods)  ;
+            new MoxyMockInterfaceVisitor(clz, mockableMethods)  :
+            new MoxyMockClassVisitor(clz, mockableMethods)      ;
 
     reader.accept(visitor, ClassReader.SKIP_DEBUG);
 

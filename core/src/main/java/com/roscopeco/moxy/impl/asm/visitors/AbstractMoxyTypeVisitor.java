@@ -26,14 +26,18 @@ package com.roscopeco.moxy.impl.asm.visitors;
 import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
 import static org.objectweb.asm.Opcodes.*;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 
 /**
@@ -42,7 +46,7 @@ import org.objectweb.asm.tree.ClassNode;
  * Generates a ClassNode.
  */
 public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
-  protected static final AtomicInteger mockNumber = new AtomicInteger();
+  private static final AtomicInteger mockNumber = new AtomicInteger();
   private static final List<Pattern> PROHIBITED_PACKAGES = Arrays.asList(
       Pattern.compile("java\\..*"),
       Pattern.compile("javax\\..*"),
@@ -71,7 +75,7 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
     }
   }
 
-  protected static String makeMockName(final Class<?> originalClass) {
+  static String makeMockName(final Class<?> originalClass) {
     return makeMockPackageInternalName(originalClass.getPackage()) + "Mock "
            + originalClass.getSimpleName()
            + " {"
@@ -81,15 +85,25 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
 
   private final ClassNode node = new ClassNode();
   private final String newClassInternalName;
+  private final Map<String, Method> mockableMethods;
 
-  protected AbstractMoxyTypeVisitor(final String newClassInternalName) {
+  AbstractMoxyTypeVisitor(final String newClassInternalName, final Map<String, Method> mockableMethods) {
     super(ASM6);
     this.cv = this.node;
     this.newClassInternalName = newClassInternalName;
+    this.mockableMethods = mockableMethods;
   }
 
-  protected String getNewClassInternalName() {
+  String getNewClassInternalName() {
     return this.newClassInternalName;
+  }
+
+  boolean isToMock(final String name, final String desc) {
+    return this.mockableMethods.containsKey(name + desc);
+  }
+
+  void markMethodAsMocked(String name, String descriptor) {
+    this.mockableMethods.remove(name + descriptor);
   }
 
   @Override
@@ -100,12 +114,13 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
 
   @Override
   public void visitEnd() {
+    this.generateRemainingMockedMethods();
     this.generateSupportFields();
     this.generateSupportMethods();
     super.visitEnd();
   }
 
-  void generateSupportFields() {
+  private void generateSupportFields() {
     final FieldVisitor fv = this.cv.visitField(
         ACC_PRIVATE | ACC_FINAL | ACC_SYNTHETIC,
         SUPPORT_IVARS_FIELD_NAME,
@@ -116,25 +131,33 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
     fv.visitEnd();
   }
 
-  void generateSupportMethods() {
-    this.generateSupportGetter(SUPPORT_GET_IVARS_METHOD_NAME,
-                               SUPPORT_GET_IVARS_DESCRIPTOR,
-                               SUPPORT_IVARS_FIELD_NAME,
-                               MOXY_SUPPORT_IVARS_DESCRIPTOR);
+  private void generateRemainingMockedMethods() {
+    // Need to manually generate any methods that remain in the methods hash.
+    for (String key : new HashSet<>(this.mockableMethods.keySet())) {
+      Method m = this.mockableMethods.get(key);
+      MethodVisitor mv = visitMethod(m.getModifiers() & ~ACC_ABSTRACT, m.getName(), Type.getMethodDescriptor(m), null, null);
+
+      // mv may be null if method is static, synthetic, bridge, etc.
+      if (mv != null) {
+        mv.visitCode();
+        mv.visitEnd();
+      }
+    }
   }
 
-  private void generateSupportGetter(final String methodName,
-                             final String methodDescriptor,
-                             final String fieldName,
-                             final String fieldDescriptor) {
+  private void generateSupportMethods() {
+    this.generateSupportGetter();
+  }
+
+  private void generateSupportGetter() {
     final MethodVisitor mv = this.cv.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC,
-                                           methodName,
-                                           methodDescriptor,
-                                           null,
-                                           EMPTY_STRING_ARRAY);
+                                                  SUPPORT_GET_IVARS_METHOD_NAME,
+                                                  SUPPORT_GET_IVARS_DESCRIPTOR,
+                                         null,
+                                                  EMPTY_STRING_ARRAY);
     mv.visitCode();
     mv.visitVarInsn(ALOAD, 0);
-    mv.visitFieldInsn(GETFIELD, this.newClassInternalName, fieldName, fieldDescriptor);
+    mv.visitFieldInsn(GETFIELD, this.newClassInternalName, SUPPORT_IVARS_FIELD_NAME, MOXY_SUPPORT_IVARS_DESCRIPTOR);
     mv.visitInsn(ARETURN);
     mv.visitEnd();
   }

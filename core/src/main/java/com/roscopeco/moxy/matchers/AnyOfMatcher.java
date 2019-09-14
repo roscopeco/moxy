@@ -26,6 +26,8 @@ package com.roscopeco.moxy.matchers;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.roscopeco.moxy.api.MoxyMatcher;
+
 class AnyOfMatcher<T> implements MoxyMatcher<T> {
   private final List<? extends T> objects;
 

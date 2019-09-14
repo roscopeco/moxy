@@ -25,6 +25,8 @@ package com.roscopeco.moxy.matchers;
 
 import java.util.function.Predicate;
 
+import com.roscopeco.moxy.api.MoxyMatcher;
+
 /**
  * Matcher that passes the argument to a predicate to determine whether
  * or not it matches.

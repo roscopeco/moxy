@@ -12,7 +12,7 @@ See also [Javadoc](https://roscopeco.github.io/moxy/).
 
 Moxy is a fairly lightweight yet surprisingly powerful and refeshingly non-opinionated
 mock/spy framework for use in testing Java code. It has a fluent, IDE-friendly stubbing
-and verification API, runs on Java 8+, and includes out-of-the-box support for
+and verification API, runs on Java 11+, and includes out-of-the-box support for
 allegedly-evil things such as mocking finals and statics. It knows its place as 
 a _tool_ - when it's right for the job, it's just what you need, but equally it will
 let you do all the wrong things really, really well if that's your cup of tea.
@@ -105,8 +105,8 @@ This barely scratches the surface though, so be sure to check out that [lovingly
 
 ##### Compile/runtime:
 
-* Java (1.8+).
-* ASM 6.2 (base, -tree and -util)
+* Java (11+).
+* ASM 7.0 (base, -tree, -commons and -util)
 * Apache commons-lang3 3.7
 * opentest4j 1.0.0
 
@@ -127,7 +127,7 @@ following dependency in your POM:
 <dependency>
 	<groupId>com.roscopeco.moxy</groupId>
 	<artifactId>moxy-core</artifactId>
-	<version>0.92.2</version>
+	<version>0.93</version>
 </dependency>
 ```
 
@@ -138,7 +138,7 @@ to each test, include the following dependency:
 <dependency>
 	<groupId>com.roscopeco.moxy</groupId>
 	<artifactId>moxy-junit5</artifactId>
-	<version>0.92.2</version>
+	<version>0.93</version>
 </dependency>
 ```
 
@@ -149,7 +149,7 @@ include this:
 <dependency>
 	<groupId>com.roscopeco.moxy</groupId>
 	<artifactId>moxy-annotations</artifactId>
-	<version>0.92.2</version>
+	<version>0.93</version>
 </dependency>
 ```
 
@@ -171,7 +171,7 @@ repositories {
 }
 
 dependencies {
-    testCompile 'com.roscopeco.moxy:moxy-core:0.92.2'
+    testCompile 'com.roscopeco.moxy:moxy-core:0.93'
 }
 ```
 
@@ -194,6 +194,6 @@ release can always be found at https://roscopeco.github.io/moxy/ .
 
 ### The legal bit
 
-Moxy is copyright (c)2018 Ross Bamford (and contributors)
+Moxy is copyright (c)2018-2019 Ross Bamford (and contributors)
 
 This is open-source software under the MIT license. See LICENSE for details.

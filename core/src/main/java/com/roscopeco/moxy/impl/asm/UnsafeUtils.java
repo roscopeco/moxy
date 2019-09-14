@@ -26,7 +26,6 @@ package com.roscopeco.moxy.impl.asm;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.logging.Logger;
 
 /**
  * 'Safer' wrapper around sun.misc.Unsafe.
@@ -36,8 +35,6 @@ import java.util.logging.Logger;
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public class UnsafeUtils {
-  private static final Logger LOG = Logger.getLogger(UnsafeUtils.class.getName());
-
   private UnsafeUtils() {
     throw new UnsupportedOperationException(
         "com.roscopeco.moxy.impl.as.UnsafeUtils is not designed for instantiation");
@@ -63,50 +60,6 @@ public class UnsafeUtils {
     }
   }
 
-  /**
-   * Define a class given a loader, name and a byte(code) array.
-   *
-   * @param loader
-   *          ClassLoader to define in.
-   * @param name
-   *          Class name (must match bytecode).
-   * @param code
-   *          The bytecode.
-   *
-   * @return The newly-defined class.
-   */
-  public static Class<?> defineClass(final ClassLoader loader, final String name, final byte[] code) {
-    return defineClass(loader, name, code, true);
-  }
-
-  /**
-   * Define a class given a loader, name and a byte(code) array.
-   *
-   * If true is passed for the systemLoaderCheck parameter, an exception will be
-   * thrown if loader is null.
-   *
-   * @param loader
-   *          ClassLoader to define in.
-   * @param name
-   *          Class name (must match bytecode).
-   * @param code
-   *          The bytecode.
-   * @param bootLoaderCheck
-   *          if <code>true</code>, an exception will be thrown if loader is null.
-   *
-   * @return The newly-defined class.
-   */
-  @SuppressWarnings({ "restriction", "deprecation" })
-  public static Class<?> defineClass(final ClassLoader loader, final String name, final byte[] code,
-      final boolean bootLoaderCheck) {
-    if (bootLoaderCheck && loader == null) {
-      LOG.warning(() -> "Implicit definition in the system classloader;\n"
-          + "Defining mocks here will almost certainly fail with NoClassDefFoundError for framework classes.\n"
-          + "If you are using class mocking for system classes, be prepared for undefined behaviour.");
-    }
-
-    return UNSAFE.defineClass(name.replace('/', '.'), code, 0, code.length, loader, null);
-  }
 
   /**
    * Wraps sun.misc.Unsafe.putObjectField.
@@ -120,7 +73,7 @@ public class UnsafeUtils {
    *
    * @see #objectFieldOffset(Field)
    */
-  @SuppressWarnings({ "restriction", "deprecation" })
+  @SuppressWarnings({ "restriction" })
   public static void putObject(final Object receiver, final long fieldOffset, final Object value) {
     UNSAFE.putObject(receiver, fieldOffset, value);
   }
@@ -133,7 +86,7 @@ public class UnsafeUtils {
    *
    * @return The field offset.
    */
-  @SuppressWarnings({ "restriction", "deprecation" })
+  @SuppressWarnings({ "restriction" })
   public static long objectFieldOffset(final Field field) {
     return UNSAFE.objectFieldOffset(field);
   }
@@ -148,7 +101,7 @@ public class UnsafeUtils {
    * @throws InstantiationException if an error occurs during allocation.
    * @param <T> The type of instance being allocated.
    */
-  @SuppressWarnings({ "restriction", "deprecation", "unchecked" })
+  @SuppressWarnings({ "restriction", "unchecked" })
   public static <T> T allocateInstance(final Class<T> clz) throws InstantiationException {
     return (T)UNSAFE.allocateInstance(clz);
   }
@@ -184,7 +137,7 @@ public class UnsafeUtils {
    * @param obj The object
    * @return the address of the object
    */
-  @SuppressWarnings({ "restriction", "deprecation" })
+  @SuppressWarnings({ "restriction" })
   public static long toAddress(final Object obj) {
     final Object[] array = new Object[] {obj};
     final long baseOffset = UNSAFE.arrayBaseOffset(Object[].class);
@@ -204,7 +157,7 @@ public class UnsafeUtils {
    * @return The destination, for convenience.
    * @param <T> The destination type.
    */
-  @SuppressWarnings({ "restriction", "deprecation" })
+  @SuppressWarnings({ "restriction" })
   public static <T> T objectCopy(final Object src, final T dest) {
     final sun.misc.Unsafe unsafe = UnsafeUtils.UNSAFE;
 

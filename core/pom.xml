@@ -15,7 +15,7 @@
 
     <properties>
         <byte.buddy.agent.version>1.8.12</byte.buddy.agent.version>
-        <asm.version>6.2</asm.version>
+        <asm.version>7.1</asm.version>
         <commons.lang3.version>3.7</commons.lang3.version>
     </properties>
 

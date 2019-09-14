@@ -24,6 +24,7 @@
 package com.roscopeco.moxy.matchers;
 
 import com.roscopeco.moxy.api.MoxyException;
+import com.roscopeco.moxy.api.MoxyMatcher;
 
 class InstanceOfMatcher<T> implements MoxyMatcher<T> {
   private final Class<T> clz;

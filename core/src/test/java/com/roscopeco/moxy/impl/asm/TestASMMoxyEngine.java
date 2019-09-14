@@ -30,6 +30,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,7 +40,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.roscopeco.moxy.api.ClassDefinitionStrategy;
 import com.roscopeco.moxy.api.InvocationSupplier;
+import com.roscopeco.moxy.api.LookupClassDefinitionStrategy;
+import com.roscopeco.moxy.api.MoxyMock;
 import com.roscopeco.moxy.model.*;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,13 +60,17 @@ import com.roscopeco.moxy.impl.asm.stubs.StubInvocation;
 import com.roscopeco.moxy.impl.asm.stubs.StubMethod;
 
 class TestASMMoxyEngine extends AbstractImplTest {
+  private ByteArrayOutputStream baos = new ByteArrayOutputStream();
+  private PrintStream fakeOut = new PrintStream(baos);
+
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     Moxy.getMoxyEngine().reset();
+    this.baos.reset();
   }
 
   @Test
-  public void testConstruction() {
+  void testConstruction() {
     final ASMMoxyEngine engine = new ASMMoxyEngine();
 
     assertThat(engine.getRecorder())
@@ -80,7 +88,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
   }
 
   @Test
-  public void testReset() {
+  void testReset() {
     final ASMMoxyMatcherEngine matcherEngine = mock(ASMMoxyMatcherEngine.class);
     final InvocationRecorder recorder = mock(InvocationRecorder.class);
 
@@ -88,11 +96,11 @@ class TestASMMoxyEngine extends AbstractImplTest {
 
     engine.reset();
 
-    assertMock(() -> recorder.reset()).wasCalledOnce();
+    assertMock(recorder::reset).wasCalledOnce();
   }
 
   @Test
-  public void testMockClassPassesThrough() throws Exception {
+  void testMockClassPassesThrough() throws Exception {
     final ASMMoxyEngine mockEngine = this.makePartialMock(true,
         ASMMoxyEngine.class.getDeclaredMethod("mock", Class.class, PrintStream.class));
 
@@ -102,7 +110,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
   }
 
   @Test
-  public void testMockClassWithNull() throws Exception {
+  void testMockClassWithNull() {
     final ASMMoxyEngine engine = new ASMMoxyEngine();
 
     assertThatThrownBy(() -> engine.mock(null))
@@ -112,9 +120,9 @@ class TestASMMoxyEngine extends AbstractImplTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void testMockClassPrintStreamHandlesErrors() throws Exception {
+  void testMockClassPrintStreamHandlesErrors() throws Exception {
     final ASMMoxyEngine mockEngine = this.makePartialMock(true,
-        ASMMoxyEngine.class.getDeclaredMethod("getMockClass", Class.class, Set.class, PrintStream.class));
+        ASMMoxyEngine.class.getDeclaredMethod("getMockClass", Class.class, ClassDefinitionStrategy.class, Set.class, PrintStream.class));
 
     // Wraps non-moxy exceptions...
     final Exception marker = new Exception("MARKER");
@@ -122,7 +130,8 @@ class TestASMMoxyEngine extends AbstractImplTest {
     // Working around https://youtrack.jetbrains.com/issue/IDEA-194713
     //
     // Doesn't actually need to be assigned to a local, but gives a spurious IDE error otherwise.
-    final InvocationSupplier<Class<?>> classInvocationSupplier = () -> mockEngine.getMockClass(Object.class, Collections.emptySet(), null);
+    final InvocationSupplier<Class<?>> classInvocationSupplier =
+        () -> mockEngine.getMockClass(Object.class, mockEngine.getDefaultClassDefinitionStrategy(), Collections.emptySet(), null);
 
     when(classInvocationSupplier)
         .thenThrow(marker);
@@ -130,7 +139,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThatThrownBy(() -> mockEngine.mock(Object.class))
       .isInstanceOf(MoxyException.class)
       .hasMessage("Unrecoverable error: exception during mock generation")
-      .extracting(e -> e.getCause())
+      .extracting(Throwable::getCause)
         .hasSize(1)
         .allMatch(e -> e == marker);
 
@@ -146,7 +155,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
   }
 
   @Test
-  public void testGetMockClassLoaderClassSetPrintStreamNullArgs() throws Exception {
+  public void testGetMockClassLoaderClassSetPrintStreamNullArgs() {
     final ASMMoxyEngine engine = new ASMMoxyEngine();
 
     // Throws on null classloader
@@ -167,9 +176,10 @@ class TestASMMoxyEngine extends AbstractImplTest {
         .hasMessage("Cannot mock null class");
 
     // Null set is same as all methods
-    final Class<? extends Object> mockClass = engine.getMockClass(this.getClass().getClassLoader(),
+    @SuppressWarnings("unchecked")
+    final Class<Object> mockClass = engine.getMockClass(this.getClass().getClassLoader(),
                                                             ClassWithPrimitiveReturns.class,
-                                                            null,
+                                                            (Set)null,
                                                             null);
 
     try {
@@ -217,7 +227,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     )
         .isInstanceOf(MoxyException.class)
         .hasMessage("Unrecoverable Error")
-          .extracting(e -> e.getCause())
+          .extracting(Throwable::getCause)
           .hasSize(1)
           .hasSameElementsAs(Lists.newArrayList(ioException));
   }
@@ -439,7 +449,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(stubber.getLastMonitoredInvocation().getArgs()).isEqualTo(Collections.emptyList());
 
     // Ensure engine state consistency was maintained behind the scenes
-    assertMock(() -> mockEngine.runMonitoredInvocation((InvocationMonitor)any())).wasCalledOnce();
+    assertMock(() -> mockEngine.runMonitoredInvocation(any())).wasCalledOnce();
     assertMock(() -> mockEngine.startMonitoredInvocation()).wasCalledOnce();
     assertMock(() -> mockEngine.endMonitoredInvocation()).wasCalledOnce();
     assertMock(() -> recorder.startMonitoredInvocation()).wasCalledOnce();
@@ -481,7 +491,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(stubber.getLastMonitoredInvocation().getArgs()).isEqualTo(Collections.emptyList());
 
     // Ensure engine state consistency was maintained behind the scenes
-    assertMock(() -> mockEngine.runMonitoredInvocation((InvocationMonitor)any())).wasCalledOnce();
+    assertMock(() -> mockEngine.runMonitoredInvocation(any())).wasCalledOnce();
     assertMock(() -> mockEngine.startMonitoredInvocation()).wasCalledOnce();
     assertMock(() -> mockEngine.endMonitoredInvocation()).wasCalledOnce();
     assertMock(() -> recorder.startMonitoredInvocation()).wasCalledOnce();
@@ -523,7 +533,7 @@ class TestASMMoxyEngine extends AbstractImplTest {
     assertThat(verifier.getLastMonitoredInvocation().getArgs()).isEqualTo(Collections.emptyList());
 
     // Ensure engine state consistency was maintained behind the scenes
-    assertMock(() -> mockEngine.runMonitoredInvocation((InvocationMonitor)any())).wasCalledOnce();
+    assertMock(() -> mockEngine.runMonitoredInvocation(any())).wasCalledOnce();
     assertMock(() -> mockEngine.startMonitoredInvocation()).wasCalledOnce();
     assertMock(() -> mockEngine.endMonitoredInvocation()).wasCalledOnce();
     assertMock(() -> recorder.startMonitoredInvocation()).wasCalledOnce();
@@ -685,4 +695,147 @@ class TestASMMoxyEngine extends AbstractImplTest {
     engine.endMonitoredInvocation();
     assertThat(engine.isMockStubbingDisabledOnThisThread()).isFalse();
   }
+
+  /* Individual mock method tests */
+
+  @Test
+  void testMock_Class() {
+    MethodWithArguments mwa = Moxy.mock(MethodWithArguments.class);
+
+    assertThat(Moxy.isMock(mwa)).isTrue();
+  }
+
+  @Test
+  void testMock_Class_PrintStream() {
+    final ASMMoxyEngine engine = new ASMMoxyEngine();
+
+    MethodWithArguments mwa = engine.mock(MethodWithArguments.class, this.fakeOut);
+
+    assertThat(engine.isMock(mwa)).isTrue();
+  }
+
+  @Test
+  void testMock_Class_Strategy() {
+    final ASMMoxyEngine engine = new ASMMoxyEngine();
+
+    MethodWithArguments mwa = engine.mock(MethodWithArguments.class, new LookupClassDefinitionStrategy(MethodHandles.lookup()));
+
+    assertThat(engine.isMock(mwa)).isTrue();
+  }
+
+  @Test
+  void testMock_Class_Strategy_PrintStream() {
+    final ASMMoxyEngine engine = new ASMMoxyEngine();
+
+    MethodWithArguments mwa = engine.mock(MethodWithArguments.class, new LookupClassDefinitionStrategy(MethodHandles.lookup()), this.fakeOut);
+
+    assertThat(engine.isMock(mwa)).isTrue();
+  }
+
+  @Test
+  void testGetMockClass_Class() {
+    final ASMMoxyEngine engine = new ASMMoxyEngine();
+
+    Class<? extends MethodWithArguments> mwac = engine.getMockClass(MethodWithArguments.class);
+
+    assertThat(mwac.getAnnotation(MoxyMock.class)).isNotNull();
+  }
+
+  @Test
+  void testGetMockClass_Class_PrintStream() {
+    final ASMMoxyEngine engine = new ASMMoxyEngine();
+
+    Class<? extends MethodWithArguments> mwac = engine.getMockClass(MethodWithArguments.class, this.fakeOut);
+
+    assertThat(mwac.getAnnotation(MoxyMock.class)).isNotNull();
+  }
+
+  @Test
+  void testGetMockClass_Class_Methods() throws NoSuchMethodException {
+    final ASMMoxyEngine engine = new ASMMoxyEngine();
+
+    Class<? extends MethodWithArgAndReturn> mwac = engine.getMockClass(MethodWithArgAndReturn.class, Collections.singleton(
+        MethodWithArgAndReturn.class.getDeclaredMethod("sayHelloTo", String.class)
+    ));
+
+    assertThat(mwac.getAnnotation(MoxyMock.class)).isNotNull();
+
+    // We only mocked a subset, check that...
+    assertThat(MethodWithArgAndReturn.class.getDeclaredMethods().length).isGreaterThan(1);
+    assertThat(mwac.getDeclaredMethods()).hasSize(2); /* one mocked, one for __moxy_asm_ivars... */
+  }
+
+  @Test
+  void testGetMockClass_Class_Strategy() throws NoSuchMethodException {
+    final ASMMoxyEngine engine = new ASMMoxyEngine();
+
+    Class<? extends MethodWithArgAndReturn> mwac =
+        engine.getMockClass(MethodWithArgAndReturn.class, new LookupClassDefinitionStrategy(MethodHandles.lookup()));
+
+    assertThat(mwac.getAnnotation(MoxyMock.class)).isNotNull();
+  }
+
+  @Test
+  void testGetMockClass_Class_Strategy_PrintStream() throws NoSuchMethodException {
+    final ASMMoxyEngine engine = new ASMMoxyEngine();
+
+    Class<? extends MethodWithArgAndReturn> mwac =
+        engine.getMockClass(MethodWithArgAndReturn.class, new LookupClassDefinitionStrategy(MethodHandles.lookup()), this.fakeOut);
+
+    assertThat(mwac.getAnnotation(MoxyMock.class)).isNotNull();
+  }
+
+  @Test
+  void testGetMockClass_Class_Methods_PrintStream() throws NoSuchMethodException {
+    final ASMMoxyEngine engine = new ASMMoxyEngine();
+
+    Class<? extends MethodWithArgAndReturn> mwac = engine.getMockClass(MethodWithArgAndReturn.class, Collections.singleton(
+        MethodWithArgAndReturn.class.getDeclaredMethod("sayHelloTo", String.class)
+    ), this.fakeOut);
+
+    assertThat(mwac.getAnnotation(MoxyMock.class)).isNotNull();
+
+    // We only mocked a subset, check that...
+    assertThat(MethodWithArgAndReturn.class.getDeclaredMethods().length).isGreaterThan(1);
+    assertThat(mwac.getDeclaredMethods()).hasSize(2); /* one mocked, one for __moxy_asm_ivars... */
+  }
+
+  @Test
+  void testGetMockClass_Strategy_Methods() throws NoSuchMethodException {
+    final ASMMoxyEngine engine = new ASMMoxyEngine();
+
+    Class<? extends MethodWithArgAndReturn> mwac = engine.getMockClass(MethodWithArgAndReturn.class,
+        new LookupClassDefinitionStrategy(MethodHandles.lookup()),
+        Collections.singleton(
+            MethodWithArgAndReturn.class.getDeclaredMethod("sayHelloTo", String.class)
+        )
+    );
+
+    assertThat(mwac.getAnnotation(MoxyMock.class)).isNotNull();
+
+    // We only mocked a subset, check that...
+    assertThat(MethodWithArgAndReturn.class.getDeclaredMethods().length).isGreaterThan(1);
+    assertThat(mwac.getDeclaredMethods()).hasSize(2); /* one mocked, one for __moxy_asm_ivars... */
+  }
+
+  @Test
+  void testGetMockClass_Strategy_Methods_PrintStream() throws NoSuchMethodException {
+    final ASMMoxyEngine engine = new ASMMoxyEngine();
+
+    Class<? extends MethodWithArgAndReturn> mwac = engine.getMockClass(MethodWithArgAndReturn.class,
+        new LookupClassDefinitionStrategy(MethodHandles.lookup()),
+        Collections.singleton(
+            MethodWithArgAndReturn.class.getDeclaredMethod("sayHelloTo", String.class)
+        ),
+        this.fakeOut
+    );
+
+    assertThat(mwac.getAnnotation(MoxyMock.class)).isNotNull();
+
+    // We only mocked a subset, check that...
+    assertThat(MethodWithArgAndReturn.class.getDeclaredMethods().length).isGreaterThan(1);
+    assertThat(mwac.getDeclaredMethods()).hasSize(2); /* one mocked, one for __moxy_asm_ivars... */
+  }
+
+
 }

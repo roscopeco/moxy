@@ -40,6 +40,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
+import com.roscopeco.moxy.api.ClassDefinitionStrategy;
 import com.roscopeco.moxy.api.DefaultReturnGenerator;
 import com.roscopeco.moxy.api.InvocationRunnable;
 import com.roscopeco.moxy.api.InvocationSupplier;
@@ -55,7 +56,7 @@ import com.roscopeco.moxy.api.MoxyVoidStubber;
 import com.roscopeco.moxy.impl.asm.visitors.AbstractMoxyTypeVisitor;
 import com.roscopeco.moxy.impl.asm.visitors.MoxyMockClassVisitor;
 import com.roscopeco.moxy.impl.asm.visitors.MoxyMockInterfaceVisitor;
-import com.roscopeco.moxy.matchers.MoxyMatcher;
+import com.roscopeco.moxy.api.MoxyMatcher;
 import com.roscopeco.moxy.matchers.PossibleMatcherUsageError;
 
 /**
@@ -74,12 +75,14 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @FunctionalInterface
   interface InvocationMonitor {
+    @SuppressWarnings("squid:S00112" /* This is a wrapper for client code */)
     void invoke() throws Exception;
   }
 
   private static final String UNRECOVERABLE_ERROR = "Unrecoverable Error";
   private static final String CANNOT_MOCK_NULL_CLASS = "Cannot mock null class";
 
+  @SuppressWarnings("squid:S5164" /* Tests hopefully aren't using pools... */)
   private final ThreadLocal<Boolean> threadLocalMockBehaviourDisabled;
   private final InvocationRecorder recorder;
   private final ASMMoxyMatcherEngine matcherEngine;
@@ -159,25 +162,19 @@ public class ASMMoxyEngine implements MoxyEngine {
     this.getRecorder().reset();
   }
 
-  /* (non-Javadoc)
-   * @see com.roscopeco.moxy.internal.MoxyEngine#mock(java.lang.Class)
-   */
   @Override
   public <T> T mock(final Class<T> clz) {
-    return this.mock(clz, null);
+    return this.mock(clz, (PrintStream)null);
   }
 
-  /* (non-Javadoc)
-   * @see com.roscopeco.moxy.internal.MoxyEngine#mock(java.lang.Class, java.io.PrintStream)
-   */
   @Override
-  public <T> T mock(final Class<T> clz, final PrintStream trace) {
+  public <T> T mock(final Class<T> clz, ClassDefinitionStrategy definitionStrategy, final PrintStream trace) {
     if (clz == null) {
       throw new IllegalArgumentException(CANNOT_MOCK_NULL_CLASS);
     }
 
     try {
-      final Class<? extends T> mockClass = this.getMockClass(clz, MoxyEngine.ALL_METHODS, trace);
+      final Class<? extends T> mockClass = this.getMockClass(clz, definitionStrategy, MoxyEngine.ALL_METHODS, trace);
       return this.instantiateMock(mockClass);
     } catch (final MoxyException e) {
       throw e;
@@ -186,96 +183,107 @@ public class ASMMoxyEngine implements MoxyEngine {
     }
   }
 
-  /* (non-Javadoc)
-   * @see com.roscopeco.moxy.internal.MoxyEngine#getMockClass(java.lang.ClassLoader, java.lang.Class, java.util.Set, java.io.PrintStream)
-   */
   @Override
-  @SuppressWarnings("unchecked")
-  public <I> Class<? extends I> getMockClass(final ClassLoader loader,
-                                             final Class<I> clz,
-                                             final Set<Method> methods,
-                                             final PrintStream trace) {
+  public <T> T mock(Class<T> clz, ClassDefinitionStrategy definitionStrategy) {
+    return this.mock(clz, definitionStrategy, null);
+  }
+
+  @Override
+  public <T> T mock(Class<T> clz, PrintStream trace) {
+    return this.mock(clz, getDefaultClassDefinitionStrategy(), null);
+  }
+
+  @Override
+  public <I> Class<? extends I> getMockClass(ClassLoader loader, Class<I> clz, ClassDefinitionStrategy definitionStrategy, Set<Method> methods, PrintStream trace) {
     try {
-      return (Class<I>)this.defineClass(loader, this.createMockClassNode(clz, methods, trace));
+      return definitionStrategy.defineClass(
+          loader, clz, generateBytecode(this.createMockClassNode(clz, methods, trace)));
     } catch (final IOException e) {
       throw new MoxyException(UNRECOVERABLE_ERROR, e);
     }
   }
 
-  /* (non-Javadoc)
-   * @see com.roscopeco.moxy.internal.MoxyEngine#getMockClass(java.lang.ClassLoader, java.lang.Class, java.util.Set)
-   */
+  @Override
+  public <I> Class<? extends I> getMockClass(final ClassLoader loader,
+                                             final Class<I> clz,
+                                             final Set<Method> methods,
+                                             final PrintStream trace) {
+    return getMockClass(loader, clz, getDefaultClassDefinitionStrategy(), methods, trace);
+  }
+
+  @Override
+  public <I> Class<? extends I> getMockClass(ClassLoader loader, Class<I> clz, ClassDefinitionStrategy definitionStrategy, Set<Method> methods) {
+    return getMockClass(loader, clz, definitionStrategy, methods, null);
+  }
+
   @Override
   public <I> Class<? extends I> getMockClass(final ClassLoader loader,
                                              final Class<I> clz,
                                              final Set<Method> methods) {
-    return this.getMockClass(loader, clz, methods, null);
+    return getMockClass(loader, clz, methods, null);
   }
 
-  /* (non-Javadoc)
-   * @see com.roscopeco.moxy.internal.MoxyEngine#getMockClass(java.lang.Class, java.util.Set)
-   */
+  @Override
+  public <I> Class<? extends I> getMockClass(Class<I> clz, ClassDefinitionStrategy definitionStrategy, Set<Method> methods) {
+    return this.getMockClass(MoxyEngine.class.getClassLoader(), clz, definitionStrategy, methods, null);
+  }
+
   @Override
   public <I> Class<? extends I> getMockClass(final Class<I> clz,
                                              final Set<Method> methods) {
     return this.getMockClass(MoxyEngine.class.getClassLoader(), clz, methods, null);
   }
 
-  /* (non-Javadoc)
-   * @see com.roscopeco.moxy.internal.MoxyEngine#getMockClass(java.lang.ClassLoader, java.lang.Class)
-   */
+  @Override
+  public <I> Class<? extends I> getMockClass(ClassLoader loader, Class<I> clz, ClassDefinitionStrategy definitionStrategy) {
+    return this.getMockClass(loader, clz, definitionStrategy, MoxyEngine.ALL_METHODS, null);
+  }
+
   @Override
   public <I> Class<? extends I> getMockClass(final ClassLoader loader, final Class<I> clz) {
     return this.getMockClass(loader, clz, MoxyEngine.ALL_METHODS, null);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.roscopeco.moxy.api.MoxyEngine#getMockClass(java.lang.Class, java.util.Set, java.io.PrintStream)
-   */
+  @Override
+  public <I> Class<? extends I> getMockClass(Class<I> clz, ClassDefinitionStrategy definitionStrategy, PrintStream trace) {
+    return this.getMockClass(MoxyEngine.class.getClassLoader(), clz, definitionStrategy, MoxyEngine.ALL_METHODS, trace);
+  }
+
   @Override
   public <I> Class<? extends I> getMockClass(final Class<I> clz, final Set<Method> methods, final PrintStream trace) {
     return this.getMockClass(MoxyEngine.class.getClassLoader(), clz, methods, trace);
   }
 
-  /* (non-Javadoc)
-   * @see com.roscopeco.moxy.internal.MoxyEngine#getMockClass(java.lang.Class, java.io.PrintStream)
-   */
+  @Override
+  public <I> Class<? extends I> getMockClass(Class<I> clz, ClassDefinitionStrategy definitionStrategy) {
+    return this.getMockClass(MoxyEngine.class.getClassLoader(), clz, definitionStrategy, MoxyEngine.ALL_METHODS, null);
+  }
+
   @Override
   public <I> Class<? extends I> getMockClass(final Class<I> clz, final PrintStream trace) {
     return this.getMockClass(MoxyEngine.class.getClassLoader(), clz, MoxyEngine.ALL_METHODS, trace);
   }
 
-  /* (non-Javadoc)
-   * @see com.roscopeco.moxy.internal.MoxyEngine#getMockClass(java.lang.Class)
-   */
+  @Override
+  public <I> Class<? extends I> getMockClass(Class<I> clz, ClassDefinitionStrategy definitionStrategy, Set<Method> methods, PrintStream trace) {
+    return this.getMockClass(MoxyEngine.class.getClassLoader(), clz, definitionStrategy, methods, trace);
+  }
+
   @Override
   public <I> Class<? extends I> getMockClass(final Class<I> clz) {
     return this.getMockClass(MoxyEngine.class.getClassLoader(), clz);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.roscopeco.moxy.api.MoxyEngine#isMock(java.lang.Class)
-   */
   @Override
   public boolean isMock(final Class<?> clz) {
     return clz.getAnnotation(MoxyMock.class) != null;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.roscopeco.moxy.api.MoxyEngine#isMock(java.lang.Object)
-   */
   @Override
   public boolean isMock(final Object obj) {
     return this.isMock(obj.getClass());
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.roscopeco.moxy.api.MoxyEngine#resetMock(java.lang.Object)
-   */
   @Override
   public void resetMock(final Object mock) {
     if (!this.isMock(mock)) {
@@ -423,50 +431,30 @@ public class ASMMoxyEngine implements MoxyEngine {
     return (disabled != null && disabled);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.roscopeco.moxy.api.MoxyEngine#when(com.roscopeco.moxy.api.InvocationSupplier)
-   */
   @Override
   public <T> MoxyStubber<T> when(final InvocationSupplier<T> invocation) {
     final List<Invocation> invocations = this.runMonitoredInvocation(invocation::get);
     return new ASMMoxyStubber<>(this, invocations);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.roscopeco.moxy.api.MoxyEngine#when(com.roscopeco.moxy.api.InvocationRunnable)
-   */
   @Override
   public MoxyVoidStubber when(final InvocationRunnable invocation) {
     final List<Invocation> invocations = this.runMonitoredInvocation(invocation::run);
     return new ASMMoxyVoidStubber(this, invocations);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.roscopeco.moxy.api.MoxyEngine#assertMock(com.roscopeco.moxy.api.InvocationRunnable)
-   */
   @Override
   public MoxyVerifier assertMock(final InvocationRunnable invocation) {
     final List<Invocation> invocations = this.runMonitoredInvocation(invocation::run);
     return new ASMMoxyVerifier(this, invocations);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.roscopeco.moxy.api.MoxyEngine#assertMocks(com.roscopeco.moxy.api.InvocationRunnable)
-   */
   @Override
   public MoxyMultiVerifier assertMocks(final InvocationRunnable invocation) {
     final List<Invocation> invocations = this.runMonitoredInvocation(invocation::run);
     return new ASMMoxyMultiVerifier(this, invocations);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.roscopeco.moxy.api.MoxyEngine#registerMatcher(com.roscopeco.moxy.matchers.MoxyMatcher)
-   */
   @Override
   public void registerMatcher(final MoxyMatcher<?> matcher) {
     this.getMatcherEngine().registerMatcher(matcher);
@@ -553,20 +541,6 @@ public class ASMMoxyEngine implements MoxyEngine {
   }
 
   /*
-   * Define a class given a loader and an ASM ClassNode.
-   */
-  private Class<?> defineClass(final ClassLoader loader, final ClassNode node) {
-    if (loader == null) {
-      throw new IllegalArgumentException("Implicit definition in the system classloader is unsupported.\n"
-                                       + "Defining mocks here will almost certainly fail with NoClassDefFoundError for framework classes.\n"
-                                       + "If you're sure this is what you want to do, pass system loader explicitly (rather than null)");
-    }
-
-    final byte[] code = this.generateBytecode(node);
-    return UnsafeUtils.defineClass(loader, node.name.replace('/',  '.'), code);
-  }
-
-  /*
    * Transform a ClassNode into bytecode.
    */
   private byte[] generateBytecode(final ClassNode node) {
@@ -574,5 +548,16 @@ public class ASMMoxyEngine implements MoxyEngine {
     final CheckClassAdapter check = new CheckClassAdapter(writer, false);
     node.accept(check);
     return writer.toByteArray();
+  }
+
+  private DefaultClassDefinitionStrategy cachedDefaultClassDefinitionStrategy;
+
+  @Override
+  public synchronized ClassDefinitionStrategy getDefaultClassDefinitionStrategy() {
+    if (this.cachedDefaultClassDefinitionStrategy == null) {
+      this.cachedDefaultClassDefinitionStrategy = new DefaultClassDefinitionStrategy();
+    }
+
+    return this.cachedDefaultClassDefinitionStrategy;
   }
 }

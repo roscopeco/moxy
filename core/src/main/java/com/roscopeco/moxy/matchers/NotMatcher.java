@@ -25,6 +25,8 @@ package com.roscopeco.moxy.matchers;
 
 import java.util.Deque;
 
+import com.roscopeco.moxy.api.MoxyMatcher;
+
 class NotMatcher<T> implements MoxyMatcher<T> {
   private MoxyMatcher<? super T> matcher;
 

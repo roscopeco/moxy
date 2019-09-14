@@ -30,7 +30,7 @@ import java.util.List;
 import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.matchers.InconsistentMatchersException;
 import com.roscopeco.moxy.matchers.MatcherUsageError;
-import com.roscopeco.moxy.matchers.MoxyMatcher;
+import com.roscopeco.moxy.api.MoxyMatcher;
 
 class ASMMoxyMatcherEngine {
   final ASMMoxyEngine engine;

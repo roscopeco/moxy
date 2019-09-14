@@ -30,7 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.roscopeco.moxy.matchers.InconsistentMatchersException;
-import com.roscopeco.moxy.matchers.MoxyMatcher;
+import com.roscopeco.moxy.api.MoxyMatcher;
 
 /**
  * <p>Handles recording of invocations.</p>

@@ -27,6 +27,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 import com.roscopeco.moxy.api.MoxyException;
+import com.roscopeco.moxy.api.MoxyMatcher;
 
 /**
  * <p>Thrown to indicate that the matcher stack was found to be

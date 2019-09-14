@@ -29,6 +29,8 @@ import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.roscopeco.moxy.api.MoxyMatcher;
+
 class AndMatcher<T> implements MoxyMatcher<T> {
   // This is only used to determine how many matchers we should be popping
   final Object[] passedArgs;

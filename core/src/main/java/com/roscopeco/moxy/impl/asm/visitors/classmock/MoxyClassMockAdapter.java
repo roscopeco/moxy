@@ -43,7 +43,7 @@ public class MoxyClassMockAdapter extends ClassVisitor {
   private final String delegateClzInternal;
 
   public MoxyClassMockAdapter(final ClassVisitor delegate, final Class<?> thisClz, final Class<?> delegateClz) {
-    super(ASM6, delegate);
+    super(ASM7, delegate);
     this.thisClz = thisClz;
     this.delegateClzInternal = Type.getInternalName(delegateClz);
   }

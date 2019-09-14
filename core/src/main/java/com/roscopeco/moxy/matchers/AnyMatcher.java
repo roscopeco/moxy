@@ -23,6 +23,8 @@
  */
 package com.roscopeco.moxy.matchers;
 
+import com.roscopeco.moxy.api.MoxyMatcher;
+
 class AnyMatcher<T> implements MoxyMatcher<T> {
   AnyMatcher() { }
 

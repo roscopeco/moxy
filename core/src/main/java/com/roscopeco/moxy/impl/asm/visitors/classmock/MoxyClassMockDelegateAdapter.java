@@ -80,7 +80,7 @@ public class MoxyClassMockDelegateAdapter extends ClassVisitor {
    *
    */
   public MoxyClassMockDelegateAdapter(final ClassVisitor delegate, final Class<?> source) {
-    super(ASM6);
+    super(ASM7);
 
     this.originalInternalName = Type.getInternalName(source);
     this.newInternalName = this.generateNewInternalName(this.originalInternalName);

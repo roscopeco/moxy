@@ -68,7 +68,7 @@ public abstract class AbstractMoxyMockMethodVisitor extends MethodVisitor {
                                           final boolean wasNative) {
     // don't pass the delegate to the super constructor, or we'll generate
     // both old and new bytecode. Instead, use our own 'delegate' field.
-    super(ASM6, delegate);
+    super(ASM7, delegate);
     this.delegate = delegate;
     this.originalClass = originalClass;
     this.originalClassInternalName = Type.getInternalName(originalClass);

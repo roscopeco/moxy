@@ -88,7 +88,7 @@ public abstract class AbstractMoxyTypeVisitor extends ClassVisitor {
   private final Map<String, Method> mockableMethods;
 
   AbstractMoxyTypeVisitor(final String newClassInternalName, final Map<String, Method> mockableMethods) {
-    super(ASM6);
+    super(ASM7);
     this.cv = this.node;
     this.newClassInternalName = newClassInternalName;
     this.mockableMethods = mockableMethods;

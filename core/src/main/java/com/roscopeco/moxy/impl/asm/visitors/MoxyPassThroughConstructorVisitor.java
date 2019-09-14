@@ -44,7 +44,7 @@ public class MoxyPassThroughConstructorVisitor extends MethodVisitor {
     // don't pass the delegate to the super constructor, or we'll generate
     // both old and new bytecode. Instead, just use local mv field and
     // stash the delegate directly.
-    super(ASM6);
+    super(ASM7);
     this.delegate = delegate;
     this.originalClass = originalClass;
     this.generatingClass = generatingClass;

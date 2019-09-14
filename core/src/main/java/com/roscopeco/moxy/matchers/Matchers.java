@@ -29,6 +29,7 @@ import java.util.function.Predicate;
 
 import com.roscopeco.moxy.Moxy;
 import com.roscopeco.moxy.api.MoxyEngine;
+import com.roscopeco.moxy.api.MoxyMatcher;
 
 /**
  * <p>Provides static access to the standard Moxy argument matchers.</p>

@@ -8,6 +8,8 @@ import java.util.Deque;
 
 import org.junit.jupiter.api.Test;
 
+import com.roscopeco.moxy.api.MoxyMatcher;
+
 public class TestInconsistentMatchersException {
   static class FakeMatcher<T> implements MoxyMatcher<T> {
     @Override

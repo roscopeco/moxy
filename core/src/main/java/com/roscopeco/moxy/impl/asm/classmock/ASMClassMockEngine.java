@@ -39,12 +39,12 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
+import com.roscopeco.moxy.api.ClassDefinitionStrategy;
 import com.roscopeco.moxy.api.MoxyClassMockEngine;
 import com.roscopeco.moxy.api.MoxyException;
-import com.roscopeco.moxy.impl.asm.UnsafeUtils;
+import com.roscopeco.moxy.impl.asm.DefaultClassDefinitionStrategy;
 import com.roscopeco.moxy.impl.asm.visitors.classmock.MoxyClassMockAdapter;
 import com.roscopeco.moxy.impl.asm.visitors.classmock.MoxyClassMockDelegateAdapter;
-
 import net.bytebuddy.agent.ByteBuddyAgent;
 
 /*
@@ -73,15 +73,12 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
   private final HashSet<Class<?>> pendingMock = new HashSet<>();
   private final HashSet<Class<?>> pendingReset = new HashSet<>();
   private final HashSet<Class<?>> currentlyMockedClasses = new HashSet<>();
+  private final ClassDefinitionStrategy classDefinitionStrategy = new DefaultClassDefinitionStrategy();
 
   public ASMClassMockEngine() {
     instrumentation().addTransformer(this, true);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.roscopeco.moxy.api.MoxyClassMockEngine#mockClasses(java.lang.Class[])
-   */
   @Override
   public void mockClasses(final Class<?>... classes) {
     for (final Class<?> clz : classes) {
@@ -95,10 +92,6 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.roscopeco.moxy.api.MoxyClassMockEngine#resetClasses(java.lang.Class[])
-   */
   @Override
   public void resetClasses(final Class<?>... classes) {
     for (final Class<?> clz : classes) {
@@ -112,10 +105,6 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
     }
   }
 
-  /*
-   * (non-Javadoc)
-   * @see com.roscopeco.moxy.api.MoxyClassMockEngine#resetAllClasses()
-   */
   @Override
   public void resetAllClasses() {
     synchronized (this.currentlyMockedClasses) {
@@ -149,7 +138,7 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
     }
   }
 
-  Class<?> copyClass(final ClassLoader loader, final Class<?> originalClz, final byte[] original) {
+  Class<?> copyClass(ClassDefinitionStrategy definitionStrategy, final Class<?> originalClz, final byte[] original) {
     final ClassReader reader = new ClassReader(original);
 
     final ClassNode node = new ClassNode();
@@ -170,12 +159,12 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
     }
 
     DelegateRegistry.registerDelegateClass(originalClz, delegateAdapter.getNewJavaName());
-    return UnsafeUtils.defineClass(loader, delegateAdapter.getNewJavaName(), writer.toByteArray());
+    return definitionStrategy.defineClass(originalClz.getClassLoader(), originalClz, writer.toByteArray());
   }
 
   @Override
-  public byte[] transform(final ClassLoader loader, final String name, final Class<?> originalClz,
-      final ProtectionDomain pd, final byte[] originalCode) throws IllegalClassFormatException {
+  public byte[] transform(ClassLoader loader, final String name, final Class<?> originalClz,
+      final ProtectionDomain pd, final byte[] originalCode) {
     if (originalClz != null) {
       if (this.isPendingReset(originalClz)) {
         // Remove from mocked classes
@@ -191,7 +180,7 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
         return originalCode;
       } else if (this.isPendingMock(originalClz)) {
         try {
-          final Class<?> copy = this.copyClass(loader, originalClz, originalCode);
+          final Class<?> copy = this.copyClass(this.getClassDefinitionStrategy(), originalClz, originalCode);
 
           ClassReader reader = new ClassReader(originalCode);
           final ClassNode node = new ClassNode();
@@ -221,5 +210,9 @@ public class ASMClassMockEngine implements MoxyClassMockEngine, ClassFileTransfo
 
     // No transform by default
     return null;
+  }
+
+  public ClassDefinitionStrategy getClassDefinitionStrategy() {
+    return classDefinitionStrategy;
   }
 }

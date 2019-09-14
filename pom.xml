@@ -131,6 +131,9 @@
                             <version>${junit.jupiter.version}</version>
                         </dependency>
                     </dependencies>
+                    <configuration>
+                        <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.sonatype.plugins</groupId>

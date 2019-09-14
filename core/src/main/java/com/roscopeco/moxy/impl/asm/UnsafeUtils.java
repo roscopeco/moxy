@@ -24,16 +24,8 @@
 
 package com.roscopeco.moxy.impl.asm;
 
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.security.ProtectionDomain;
-import java.util.logging.Logger;
-
-import com.roscopeco.moxy.api.MockGenerationException;
-import com.roscopeco.moxy.api.MoxyException;
 
 /**
  * 'Safer' wrapper around sun.misc.Unsafe.

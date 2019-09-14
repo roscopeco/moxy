@@ -27,7 +27,6 @@ package com.roscopeco.moxy.impl.asm.classmock;
 
 import java.io.PrintWriter;
 import java.lang.instrument.ClassFileTransformer;
-import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 import java.util.HashSet;

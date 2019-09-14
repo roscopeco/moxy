@@ -76,14 +76,14 @@ public class ASMMoxyEngine implements MoxyEngine {
    */
   @FunctionalInterface
   interface InvocationMonitor {
+    @SuppressWarnings("squid:S00112" /* This is a wrapper for client code */)
     void invoke() throws Exception;
   }
-
-  private static final Logger LOG = Logger.getLogger(ASMMoxyEngine.class.getName());
 
   private static final String UNRECOVERABLE_ERROR = "Unrecoverable Error";
   private static final String CANNOT_MOCK_NULL_CLASS = "Cannot mock null class";
 
+  @SuppressWarnings("squid:S5164" /* Tests hopefully aren't using pools... */)
   private final ThreadLocal<Boolean> threadLocalMockBehaviourDisabled;
   private final InvocationRecorder recorder;
   private final ASMMoxyMatcherEngine matcherEngine;

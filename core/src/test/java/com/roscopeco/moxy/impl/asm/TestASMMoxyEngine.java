@@ -27,7 +27,6 @@ import static com.roscopeco.moxy.Moxy.*;
 import static com.roscopeco.moxy.matchers.Matchers.*;
 import static org.assertj.core.api.Assertions.*;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;

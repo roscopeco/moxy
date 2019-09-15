@@ -30,20 +30,20 @@ package com.roscopeco.moxy.api;
  * @since 1.0
  */
 public class MoxyException extends RuntimeException {
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public MoxyException() {
-  }
+    public MoxyException() {
+    }
 
-  public MoxyException(final String message) {
-    super(message);
-  }
+    public MoxyException(final String message) {
+        super(message);
+    }
 
-  public MoxyException(final Throwable cause) {
-    super(cause);
-  }
+    public MoxyException(final Throwable cause) {
+        super(cause);
+    }
 
-  public MoxyException(final String message, final Throwable cause) {
-    super(message, cause);
-  }
+    public MoxyException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 }

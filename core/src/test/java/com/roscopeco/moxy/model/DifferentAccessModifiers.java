@@ -24,15 +24,19 @@
 package com.roscopeco.moxy.model;
 
 public class DifferentAccessModifiers {
-  public void publicMethod() { }
+    public void publicMethod() {
+    }
 
-  void defaultMethod() { }
+    void defaultMethod() {
+    }
 
-  protected void protectedMethod() { }
+    protected void protectedMethod() {
+    }
 
-  @SuppressWarnings("unused")
-  private void privateMethod() { }
+    @SuppressWarnings("unused")
+    private void privateMethod() {
+    }
 
-  final public void finalMethod() { }
-
+    final public void finalMethod() {
+    }
 }

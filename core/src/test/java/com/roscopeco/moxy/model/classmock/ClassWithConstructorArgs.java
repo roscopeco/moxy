@@ -30,13 +30,13 @@ package com.roscopeco.moxy.model.classmock;
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public class ClassWithConstructorArgs {
-  private final String str;
+    private final String str;
 
-  public ClassWithConstructorArgs(final String str) {
-    this.str = str;
-  }
+    public ClassWithConstructorArgs(final String str) {
+        this.str = str;
+    }
 
-  public String getStr() {
-    return this.str;
-  }
+    public String getStr() {
+        return this.str;
+    }
 }

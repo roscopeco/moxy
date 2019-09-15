@@ -27,11 +27,11 @@ package com.roscopeco.moxy.api;
 /**
  * Generates default return values for mocked methods.
  *
- * @see MoxyEngine#registerDefaultReturnForType(String, DefaultReturnGenerator)
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ * @see MoxyEngine#registerDefaultReturnForType(String, DefaultReturnGenerator)
  * @since 1.0
  */
 @FunctionalInterface
 public interface DefaultReturnGenerator {
-  public Object generateDefaultReturnValue();
+    Object generateDefaultReturnValue();
 }

@@ -32,21 +32,21 @@ package com.roscopeco.moxy.api;
  * @since 1.0
  */
 public class InvalidMockInvocationException extends MoxyException {
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public InvalidMockInvocationException() {
-    super();
-  }
+    public InvalidMockInvocationException() {
+        super();
+    }
 
-  public InvalidMockInvocationException(final String message, final Throwable cause) {
-    super(message, cause);
-  }
+    InvalidMockInvocationException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 
-  public InvalidMockInvocationException(final String message) {
-    super(message);
-  }
+    public InvalidMockInvocationException(final String message) {
+        super(message);
+    }
 
-  public InvalidMockInvocationException(final Throwable cause) {
-    super(cause);
-  }
+    InvalidMockInvocationException(final Throwable cause) {
+        super(cause);
+    }
 }

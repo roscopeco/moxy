@@ -24,26 +24,26 @@
 
 package com.roscopeco.moxy.impl.asm;
 
+import org.objectweb.asm.Type;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import org.objectweb.asm.Type;
-
 class StubberHelpers {
-  static Method findCompatibleMethod(final Class<?> clz, final String methodName, final String methodDesc) {
-    for (final Method m : clz.getDeclaredMethods()) {
-      final String mDesc = Type.getMethodDescriptor(Type.getReturnType(m), Type.getArgumentTypes(m));
-      if (!Modifier.isStatic(m.getModifiers()) &&
-          m.getName().equals(methodName) &&
-          mDesc.equals(methodDesc)) {
-        return m;
-      }
+    static Method findCompatibleMethod(final Class<?> clz, final String methodName, final String methodDesc) {
+        for (final Method m : clz.getDeclaredMethods()) {
+            final String mDesc = Type.getMethodDescriptor(Type.getReturnType(m), Type.getArgumentTypes(m));
+            if (!Modifier.isStatic(m.getModifiers()) &&
+                    m.getName().equals(methodName) &&
+                    mDesc.equals(methodDesc)) {
+                return m;
+            }
+        }
+        return null;
     }
-    return null;
-  }
 
-  private StubberHelpers() {
-    throw new UnsupportedOperationException(
-        "com.roscopeco.moxy.impl.asm.StubberHelpers is not designed for instantiation");
-  }
+    private StubberHelpers() {
+        throw new UnsupportedOperationException(
+                "com.roscopeco.moxy.impl.asm.StubberHelpers is not designed for instantiation");
+    }
 }

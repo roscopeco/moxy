@@ -85,33 +85,32 @@ package com.roscopeco.moxy.api;
  */
 public interface MoxyClassMockEngine {
 
-  /**
-   * <p>Convert the given classes to mock classes.</p>
-   *
-   * <p>when this method returns, all instances of the given classes will
-   * be converted to mocks, along with all future instances.</p>
-   *
-   * @param classes Classes to convert.
-   * @since 1.0
-   */
-  public void mockClasses(Class<?>... classes);
+    /**
+     * <p>Convert the given classes to mock classes.</p>
+     *
+     * <p>when this method returns, all instances of the given classes will
+     * be converted to mocks, along with all future instances.</p>
+     *
+     * @param classes Classes to convert.
+     * @since 1.0
+     */
+    void mockClasses(Class<?>... classes);
 
-  /**
-   * <p>Reset the given classes to their original, non-mock implementation.</p>
-   *
-   * @param classes Classes to convert.
-   *
-   * @see #mockClasses(Class...)
-   * @since 1.0
-   */
-  public void resetClasses(Class<?>... classes);
+    /**
+     * <p>Reset the given classes to their original, non-mock implementation.</p>
+     *
+     * @param classes Classes to convert.
+     * @see #mockClasses(Class...)
+     * @since 1.0
+     */
+    void resetClasses(Class<?>... classes);
 
-  /**
-   * <p>Reset the given classes to their original, non-mock implementation.</p>
-   *
-   * @see #mockClasses(Class...)
-   * @see #resetClasses(Class...)
-   * @since 1.0
-   */
-  public void resetAllClasses();
+    /**
+     * <p>Reset the given classes to their original, non-mock implementation.</p>
+     *
+     * @see #mockClasses(Class...)
+     * @see #resetClasses(Class...)
+     * @since 1.0
+     */
+    void resetAllClasses();
 }

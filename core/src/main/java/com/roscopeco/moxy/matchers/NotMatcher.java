@@ -23,36 +23,38 @@
  */
 package com.roscopeco.moxy.matchers;
 
+import com.roscopeco.moxy.api.MoxyMatcher;
+
 import java.util.Deque;
 
 class NotMatcher<T> implements MoxyMatcher<T> {
-  private MoxyMatcher<? super T> matcher;
+    private MoxyMatcher<? super T> matcher;
 
-  public MoxyMatcher<? super T> getMatcher() {
-    return this.matcher;
-  }
-
-  @Override
-  public boolean matches(final T arg) {
-    return !this.matcher.matches(arg);
-  }
-
-  // NOTE not strictly type-safe, but only used internally so it'll be fine...
-  ///         ... as long as long as the stack stays consistent (!)
-  @SuppressWarnings("unchecked")
-  @Override
-  public void addToStack(final Deque<MoxyMatcher<?>> stack) {
-    if (stack.isEmpty()) {
-      throw new IllegalMatcherStateException("Not enough matchers for not(...) (Expected 1)\n"
-                                           + "Ensure you're passing another matcher to not(...)");
-    } else {
-      this.matcher = (MoxyMatcher<? super T>)stack.pop();
-      stack.push(this);
+    public MoxyMatcher<? super T> getMatcher() {
+        return this.matcher;
     }
-  }
 
-  @Override
-  public String toString() {
-    return "<not: " + this.matcher.toString() + ">";
-  }
+    @Override
+    public boolean matches(final T arg) {
+        return !this.matcher.matches(arg);
+    }
+
+    // NOTE not strictly type-safe, but only used internally so it'll be fine...
+    ///         ... as long as long as the stack stays consistent (!)
+    @SuppressWarnings("unchecked")
+    @Override
+    public void addToStack(final Deque<MoxyMatcher<?>> stack) {
+        if (stack.isEmpty()) {
+            throw new IllegalMatcherStateException("Not enough matchers for not(...) (Expected 1)\n"
+                    + "Ensure you're passing another matcher to not(...)");
+        } else {
+            this.matcher = (MoxyMatcher<? super T>) stack.pop();
+            stack.push(this);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "<not: " + this.matcher.toString() + ">";
+    }
 }

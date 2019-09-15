@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.roscopeco.moxy</groupId>
     <artifactId>moxy</artifactId>
-    <version>0.92.2</version>
+    <version>0.93-SNAPSHOT</version>
     <name>Moxy</name>
     <description>Fluent API mocking/spying framework for Java.</description>
     <inceptionYear>2018</inceptionYear>
@@ -46,13 +46,13 @@
     </modules>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <opentest4j.version>1.0.0</opentest4j.version>
         <junit.jupiter.version>5.1.1</junit.jupiter.version>
         <junit.platform.version>1.1.1</junit.platform.version>
         <opentest4j.version>1.0.0</opentest4j.version>
         <assertj.core.version>3.10.0</assertj.core.version>
-        <equalsverifier.version>2.4.6</equalsverifier.version>
+        <equalsverifier.version>3.1.9</equalsverifier.version>
 
         <surefire.plugin.version>2.19.1</surefire.plugin.version>
         <nexus.staging.plugin.version>1.6.7</nexus.staging.plugin.version>
@@ -108,7 +108,9 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.0</version>
                     <configuration>
+                        <release>${java.version}</release>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
                     </configuration>

@@ -29,19 +29,19 @@ import java.util.Deque;
 import java.util.List;
 
 public final class StubInvocation {
-  private final List<Object> args;
-  private final Deque<Stub> stubs;
+    private final List<Object> args;
+    private final Deque<Stub> stubs;
 
-  public StubInvocation(final List<Object> args) {
-    this.args = args;
-    this.stubs = new ArrayDeque<>();
-  }
+    public StubInvocation(final List<Object> args) {
+        this.args = args;
+        this.stubs = new ArrayDeque<>();
+    }
 
-  public List<Object> getArgs() {
-    return this.args;
-  }
+    public List<Object> getArgs() {
+        return this.args;
+    }
 
-  public Deque<Stub> getStubs() {
-    return this.stubs;
-  }
+    public Deque<Stub> getStubs() {
+        return this.stubs;
+    }
 }

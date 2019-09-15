@@ -23,27 +23,19 @@
  */
 package com.roscopeco.moxy;
 
-import static org.assertj.core.api.Assertions.*;
-
-import java.util.Collections;
-
+import com.roscopeco.moxy.api.MockGenerationException;
+import com.roscopeco.moxy.api.MoxyEngine;
+import com.roscopeco.moxy.api.MoxyMock;
+import com.roscopeco.moxy.model.*;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.roscopeco.moxy.api.MockGenerationException;
-import com.roscopeco.moxy.api.MoxyEngine;
-import com.roscopeco.moxy.api.MoxyMock;
-import com.roscopeco.moxy.model.ClassWithNoNullConstructor;
-import com.roscopeco.moxy.model.ClassWithPrimitiveReturns;
-import com.roscopeco.moxy.model.FieldsClass;
-import com.roscopeco.moxy.model.FinalClass;
-import com.roscopeco.moxy.model.MethodWithArgAndReturn;
-import com.roscopeco.moxy.model.MethodWithArguments;
-import com.roscopeco.moxy.model.MethodWithPrimitiveArguments;
-import com.roscopeco.moxy.model.SimpleAbstractClass;
-import com.roscopeco.moxy.model.SimpleClass;
-import com.roscopeco.moxy.model.SimpleInterface;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /*
  * This is basically integration/e2e tests. It's actually the tests used
@@ -53,214 +45,216 @@ import com.roscopeco.moxy.model.SimpleInterface;
  *
  * If it gets much bigger it may need to be split up though.
  */
-public class TestMoxy {
-  private static final String PASSED = "passed";
-  @BeforeEach
-  public void setUp() {
-    Moxy.getMoxyEngine().reset();
-  }
+class TestMoxy {
+    private static final String PASSED = "passed";
 
-  @Test
-  public void testMoxyMockWithNullThrowsIllegalArgumentException() {
-    assertThatThrownBy(() -> Moxy.mock(null))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessage("Cannot mock null");
-  }
+    @BeforeEach
+    void setUp() {
+        Moxy.getMoxyEngine().reset();
+    }
 
-  @Test
-  public void testMoxyMockWithSimpleClassReturnsInstance() {
-    final SimpleClass mock = Moxy.mock(SimpleClass.class);
+    @Test
+    void testMoxyMockWithNullThrowsIllegalArgumentException() {
+        assertThatThrownBy(() -> Moxy.mock(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Cannot mock null");
+    }
 
-    assertThat(mock)
-        .isNotNull()
-        .isInstanceOf(SimpleClass.class);
-  }
+    @Test
+    void testMoxyMockWithSimpleClassReturnsInstance() {
+        final SimpleClass mock = Moxy.mock(SimpleClass.class);
 
-  @Test
-  public void testMoxyMockWithSimpleClassReturnsActualMock() {
-    final SimpleClass mock = Moxy.mock(SimpleClass.class);
+        assertThat(mock)
+                .isNotNull()
+                .isInstanceOf(SimpleClass.class);
+    }
 
-    assertThat(mock.returnHello())
-        .isNull();
-  }
+    @Test
+    void testMoxyMockWithSimpleClassReturnsActualMock() {
+        final SimpleClass mock = Moxy.mock(SimpleClass.class);
 
-  @Test
-  public void testMoxyMockWithNullEngineUsesDefaultEngine() {
-    Moxy.setMoxyEngine(null);
+        assertThat(mock.returnHello())
+                .isNull();
+    }
 
-    final SimpleClass mock = Moxy.mock(SimpleClass.class);
+    @Test
+    void testMoxyMockWithNullEngineUsesDefaultEngine() {
+        Moxy.setMoxyEngine(null);
 
-    assertThat(mock)
-        .isNotNull()
-        .isInstanceOf(SimpleClass.class);
-  }
+        final SimpleClass mock = Moxy.mock(SimpleClass.class);
 
-  @Test
-  public void testMoxyMockHasIsMockAnnotation() {
-    final SimpleClass mock = Moxy.mock(SimpleClass.class);
+        assertThat(mock)
+                .isNotNull()
+                .isInstanceOf(SimpleClass.class);
+    }
 
-    assertThat(mock.getClass()).hasAnnotation(MoxyMock.class);
-  }
+    @Test
+    void testMoxyMockHasIsMockAnnotation() {
+        final SimpleClass mock = Moxy.mock(SimpleClass.class);
 
-  @Test
-  public void testMoxyIsMockWorks() {
-    final SimpleClass mock = Moxy.mock(SimpleClass.class);
+        assertThat(mock.getClass()).hasAnnotation(MoxyMock.class);
+    }
 
-    assertThat(Moxy.isMock(mock.getClass())).isTrue();
-    assertThat(Moxy.isMock(mock)).isTrue();
-  }
+    @Test
+    void testMoxyIsMockWorks() {
+        final SimpleClass mock = Moxy.mock(SimpleClass.class);
 
-  @Test
-  public void testMoxyMockWithSimpleInterfaceReturnsInstance() {
-    final SimpleInterface mock = Moxy.mock(SimpleInterface.class);
+        assertThat(Moxy.isMock(mock.getClass())).isTrue();
+        assertThat(Moxy.isMock(mock)).isTrue();
+    }
 
-    assertThat(mock)
-        .isNotNull()
-        .isInstanceOf(SimpleInterface.class);
-  }
+    @Test
+    void testMoxyMockWithSimpleInterfaceReturnsInstance() {
+        final SimpleInterface mock = Moxy.mock(SimpleInterface.class);
 
-  @Test
-  public void testMoxyMockWithSimpleAbstractClassReturnsInstance() {
-    final SimpleAbstractClass mock = Moxy.mock(SimpleAbstractClass.class);
+        assertThat(mock)
+                .isNotNull()
+                .isInstanceOf(SimpleInterface.class);
+    }
 
-    assertThat(mock)
-        .isNotNull()
-        .isInstanceOf(SimpleAbstractClass.class);
-  }
+    @Test
+    void testMoxyMockWithSimpleAbstractClassReturnsInstance() {
+        final SimpleAbstractClass mock = Moxy.mock(SimpleAbstractClass.class);
 
-  @Test
-  public void testMoxyMockWithClassWithPrimitiveReturnsWorks() {
-    final ClassWithPrimitiveReturns mock = Moxy.mock(ClassWithPrimitiveReturns.class);
+        assertThat(mock)
+                .isNotNull()
+                .isInstanceOf(SimpleAbstractClass.class);
+    }
 
-    assertThat(mock)
-        .isNotNull()
-        .isInstanceOf(ClassWithPrimitiveReturns.class);
-  }
+    @Test
+    void testMoxyMockWithClassWithPrimitiveReturnsWorks() {
+        final ClassWithPrimitiveReturns mock = Moxy.mock(ClassWithPrimitiveReturns.class);
 
-  @Test
-  public void testMoxyMockWithMethodArgumentsWorks() {
-    final MethodWithArguments mock = Moxy.mock(MethodWithArguments.class);
+        assertThat(mock)
+                .isNotNull()
+                .isInstanceOf(ClassWithPrimitiveReturns.class);
+    }
 
-    assertThat(mock)
-        .isNotNull()
-        .isInstanceOf(MethodWithArguments.class);
-  }
+    @Test
+    void testMoxyMockWithMethodArgumentsWorks() {
+        final MethodWithArguments mock = Moxy.mock(MethodWithArguments.class);
 
-  @Test
-  public void testMoxyMockWithPrimitiveMethodArgumentsWorks() {
-    final MethodWithPrimitiveArguments mock = Moxy.mock(MethodWithPrimitiveArguments.class);
+        assertThat(mock)
+                .isNotNull()
+                .isInstanceOf(MethodWithArguments.class);
+    }
 
-    assertThat(mock)
-        .isNotNull()
-        .isInstanceOf(MethodWithPrimitiveArguments.class);
+    @Test
+    void testMoxyMockWithPrimitiveMethodArgumentsWorks() {
+        final MethodWithPrimitiveArguments mock = Moxy.mock(MethodWithPrimitiveArguments.class);
 
-    assertThat(mock.hasArgs("", (byte)1, '2', (short)3, 4, 5L, 6.0f, 7.0d, true))
-        .isEqualTo(0);
-  }
+        assertThat(mock)
+                .isNotNull()
+                .isInstanceOf(MethodWithPrimitiveArguments.class);
 
-  @Test
-  public void testThatCanMockClassWithNoNullConstructor() {
-    final ClassWithNoNullConstructor mock = Moxy.mock(ClassWithNoNullConstructor.class);
+        assertThat(mock.hasArgs("", (byte) 1, '2', (short) 3, 4, 5L, 6.0f, 7.0d, true))
+                .isEqualTo(0);
+    }
 
-    Moxy.when(() -> mock.returnSomething()).thenReturn(PASSED);
+    @Test
+    void testThatCanMockClassWithNoNullConstructor() {
+        final ClassWithNoNullConstructor mock = Moxy.mock(ClassWithNoNullConstructor.class);
 
-    assertThat(mock.returnSomething()).isEqualTo(PASSED);
-  }
+        Moxy.when(mock::returnSomething).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockGeneratesPassthroughConstructors() throws Exception {
-    Class<? extends ClassWithNoNullConstructor> mockClass =
-        Moxy.getMoxyEngine().getMockClass(
-            ClassWithNoNullConstructor.class,
-            Collections.singleton(ClassWithNoNullConstructor.class.getMethod("getAnyInt")));
+        assertThat(mock.returnSomething()).isEqualTo(PASSED);
+    }
 
-    ClassWithNoNullConstructor mock =
-        mockClass.getConstructor(MoxyEngine.class, String.class)
-            .newInstance(Moxy.getMoxyEngine(), PASSED);
+    @Test
+    void testMoxyMockGeneratesPassthroughConstructors()
+    throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException {
+        Class<? extends ClassWithNoNullConstructor> mockClass =
+                Moxy.getMoxyEngine().getMockClass(
+                        ClassWithNoNullConstructor.class,
+                        Collections.singleton(ClassWithNoNullConstructor.class.getMethod("getAnyInt")));
 
-    assertThat(mock.returnSomething()).isEqualTo(PASSED);
+        ClassWithNoNullConstructor mock =
+                mockClass.getConstructor(MoxyEngine.class, String.class)
+                        .newInstance(Moxy.getMoxyEngine(), PASSED);
 
-    mockClass =
-        Moxy.getMoxyEngine().getMockClass(
-            ClassWithNoNullConstructor.class,
-            Collections.singleton(ClassWithNoNullConstructor.class.getMethod("returnSomething")));
+        assertThat(mock.returnSomething()).isEqualTo(PASSED);
 
-    mock = mockClass.getConstructor(MoxyEngine.class, int.class)
-        .newInstance(Moxy.getMoxyEngine(), 37);
+        mockClass =
+                Moxy.getMoxyEngine().getMockClass(
+                        ClassWithNoNullConstructor.class,
+                        Collections.singleton(ClassWithNoNullConstructor.class.getMethod("returnSomething")));
 
-    assertThat(mock.getAnyInt()).isEqualTo(37);
-  }
+        mock = mockClass.getConstructor(MoxyEngine.class, int.class)
+                .newInstance(Moxy.getMoxyEngine(), 37);
 
-  @Test
-  public void testMoxyMockDoesntCopyFields() throws Exception {
-    final FieldsClass mock = Moxy.mock(FieldsClass.class);
+        assertThat(mock.getAnyInt()).isEqualTo(37);
+    }
 
-    // Ensure we've only got the support fields, and haven't copied any...
-    assertThat(mock.getClass().getDeclaredFields())
-        .hasSize(1)
-        .doesNotContainAnyElementsOf(
-            Lists.newArrayList(
-                FieldsClass.class.getDeclaredField("intField"),
-                FieldsClass.class.getDeclaredField("byteField"),
-                FieldsClass.class.getDeclaredField("boolField"),
-                FieldsClass.class.getDeclaredField("longField")
-            ));
-  }
+    @Test
+    void testMoxyMockDoesntCopyFields() throws NoSuchFieldException {
+        final FieldsClass mock = Moxy.mock(FieldsClass.class);
 
-  @Test
-  public void testMoxyMockCanMockJavaLangClasses() {
-    final Object objectMock = Moxy.mock(Object.class);
+        // Ensure we've only got the support fields, and haven't copied any...
+        assertThat(mock.getClass().getDeclaredFields())
+                .hasSize(1)
+                .doesNotContainAnyElementsOf(
+                        Lists.newArrayList(
+                                FieldsClass.class.getDeclaredField("intField"),
+                                FieldsClass.class.getDeclaredField("byteField"),
+                                FieldsClass.class.getDeclaredField("boolField"),
+                                FieldsClass.class.getDeclaredField("longField")
+                        ));
+    }
 
-    assertThat(objectMock)
-        .isNotNull()
-        .isInstanceOf(Object.class);
-  }
+    @Test
+    void testMoxyMockCanMockJavaLangClasses() {
+        final Object objectMock = Moxy.mock(Object.class);
 
-  @Test
-  public void testMoxyMockWithFinalClassFailsFast() {
-    assertThatThrownBy(() ->
-        Moxy.mock(FinalClass.class)
-    )
-        .isInstanceOf(MockGenerationException.class)
-        .hasMessage("Mocking of final classes is not supported with classic mocking; Try the class mock API (Moxy.mockClasses(...))");
-  }
+        assertThat(objectMock)
+                .isNotNull()
+                .isInstanceOf(Object.class);
+    }
 
-  @Test
-  public void testMoxyMockThenStubThenResetWorksProperly() {
-    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+    @Test
+    void testMoxyMockWithFinalClassFailsFast() {
+        assertThatThrownBy(() ->
+                Moxy.mock(FinalClass.class)
+        )
+                .isInstanceOf(MockGenerationException.class)
+                .hasMessage("Mocking of final classes is not supported with classic mocking; Try the class mock API (Moxy.mockClasses(...))");
+    }
 
-    final Exception ex = new Exception("No-one to say hello to");
+    @Test
+    void testMoxyMockThenStubThenResetWorksProperly() {
+        final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
 
-    // Given I've stubbed some mocks...
-    Moxy.when(() -> mock.sayHelloTo("Bill")).thenCallRealMethod();
-    Moxy.when(() -> mock.sayHelloTo("Steve")).thenReturn("Oh hi, Steve");
-    Moxy.when(() -> mock.sayHelloTo(null)).thenThrow(ex);
+        final Exception ex = new Exception("No-one to say hello to");
 
-    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hello, Bill");
-    assertThat(mock.sayHelloTo("Steve")).isEqualTo("Oh hi, Steve");
-    assertThatThrownBy(() ->
-        mock.sayHelloTo(null)
-    )
-        .isSameAs(ex);
+        // Given I've stubbed some mocks...
+        Moxy.when(() -> mock.sayHelloTo("Bill")).thenCallRealMethod();
+        Moxy.when(() -> mock.sayHelloTo("Steve")).thenReturn("Oh hi, Steve");
+        Moxy.when(() -> mock.sayHelloTo(null)).thenThrow(ex);
 
-    // When I reset,
-    Moxy.resetMock(mock);
+        assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hello, Bill");
+        assertThat(mock.sayHelloTo("Steve")).isEqualTo("Oh hi, Steve");
+        assertThatThrownBy(() ->
+                mock.sayHelloTo(null)
+        )
+                .isSameAs(ex);
 
-    // Then the stubs are gone.
-    assertThat(mock.sayHelloTo("Bill")).isNull();
-    assertThat(mock.sayHelloTo("Steve")).isNull();
-    assertThat(mock.sayHelloTo(null)).isNull();
+        // When I reset,
+        Moxy.resetMock(mock);
 
-    // And I can stub again.
-    Moxy.when(() -> mock.sayHelloTo("Steve")).thenCallRealMethod();
-    Moxy.when(() -> mock.sayHelloTo(null)).thenReturn("Oh hi, null");
-    Moxy.when(() -> mock.sayHelloTo("Bill")).thenThrow(ex);
+        // Then the stubs are gone.
+        assertThat(mock.sayHelloTo("Bill")).isNull();
+        assertThat(mock.sayHelloTo("Steve")).isNull();
+        assertThat(mock.sayHelloTo(null)).isNull();
 
-    assertThat(mock.sayHelloTo("Steve")).isEqualTo("Hello, Steve");
-    assertThat(mock.sayHelloTo(null)).isEqualTo("Oh hi, null");
-    assertThatThrownBy(() ->
-        mock.sayHelloTo("Bill")
-    )
-        .isSameAs(ex);
-  }
+        // And I can stub again.
+        Moxy.when(() -> mock.sayHelloTo("Steve")).thenCallRealMethod();
+        Moxy.when(() -> mock.sayHelloTo(null)).thenReturn("Oh hi, null");
+        Moxy.when(() -> mock.sayHelloTo("Bill")).thenThrow(ex);
+
+        assertThat(mock.sayHelloTo("Steve")).isEqualTo("Hello, Steve");
+        assertThat(mock.sayHelloTo(null)).isEqualTo("Oh hi, null");
+        assertThatThrownBy(() ->
+                mock.sayHelloTo("Bill")
+        )
+                .isSameAs(ex);
+    }
 }

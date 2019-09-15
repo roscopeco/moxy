@@ -24,15 +24,15 @@
 package com.roscopeco.moxy.model;
 
 public class MethodWithPrimitiveArguments {
-  public int hasArgs(final String arg1,
-                     final byte arg2,
-                     final char arg3,
-                     final short arg4,
-                     final int arg5,
-                     final long arg6,
-                     final float arg7,
-                     final double arg8,
-                     final boolean arg9) {
-    return 42;
-  }
+    public int hasArgs(final String arg1,
+                       final byte arg2,
+                       final char arg3,
+                       final short arg4,
+                       final int arg5,
+                       final long arg6,
+                       final float arg7,
+                       final double arg8,
+                       final boolean arg9) {
+        return 42;
+    }
 }

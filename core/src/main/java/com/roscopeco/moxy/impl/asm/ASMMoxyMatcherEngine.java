@@ -23,126 +23,129 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.roscopeco.moxy.api.MoxyException;
+import com.roscopeco.moxy.api.MoxyMatcher;
 import com.roscopeco.moxy.matchers.InconsistentMatchersException;
 import com.roscopeco.moxy.matchers.MatcherUsageError;
-import com.roscopeco.moxy.matchers.MoxyMatcher;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 class ASMMoxyMatcherEngine {
-  final ASMMoxyEngine engine;
+    private final ASMMoxyEngine engine;
 
-  ASMMoxyMatcherEngine(final ASMMoxyEngine engine) {
-    this.engine = engine;
-  }
-
-  ThreadLocal<ArrayDeque<MoxyMatcher<?>>> matcherStack = new ThreadLocal<>();
-
-  ASMMoxyEngine getASMMoxyEngine() {
-    return this.engine;
-  }
-
-  private ArrayDeque<MoxyMatcher<?>> ensureMatcherStack() {
-    ArrayDeque<MoxyMatcher<?>> stack = this.matcherStack.get();
-
-    if (stack == null) {
-      stack = new ArrayDeque<>();
-      this.matcherStack.set(stack);
+    ASMMoxyMatcherEngine(final ASMMoxyEngine engine) {
+        this.engine = engine;
     }
 
-    return stack;
-  }
+    @SuppressWarnings("squid:S5164" /* Tests hopefully aren't using pools... */)
+    private ThreadLocal<ArrayDeque<MoxyMatcher<?>>> matcherStack = new ThreadLocal<>();
 
-  ArrayDeque<MoxyMatcher<?>> getMatcherStack() {
-    return this.ensureMatcherStack();
-  }
-
-  void verifyMatcherNotNull(final MoxyMatcher<?> matcher) {
-    if (matcher == null) {
-      throw new MoxyException("Null argument; see cause",
-          new IllegalArgumentException("Cannot match to null"));
-    }
-  }
-
-  void registerMatcher(final MoxyMatcher<?> matcher) {
-    if (this.getASMMoxyEngine().isMockStubbingDisabledOnThisThread()) {
-      this.verifyMatcherNotNull(matcher);
-      matcher.addToStack(this.ensureMatcherStack());
-    } else {
-      throw new MatcherUsageError("Attempt to register matcher '"
-                                  + matcher.toString()
-                                  + "' outside when() or assertMock[s]() call");
-    }
-  }
-
-  List<MoxyMatcher<?>> popMatchers() {
-    final ArrayDeque<MoxyMatcher<?>> stack = this.ensureMatcherStack();
-    if (stack.isEmpty()) {
-      return null;
-    } else {
-      final ArrayList<MoxyMatcher<?>> result = new ArrayList<>();
-      while (!stack.isEmpty()) {
-        result.add(stack.removeLast());
-      }
-      return result;
-    }
-  }
-
-  // suppress because we check manually
-  @SuppressWarnings("unchecked")
-  boolean argsMatch(final List<Object> actualArgs, final List<Object> storedArgs) {
-    if (storedArgs.size() != actualArgs.size()) {
-      return false;
+    private ASMMoxyEngine getASMMoxyEngine() {
+        return this.engine;
     }
 
-    boolean result = true;
+    private ArrayDeque<MoxyMatcher<?>> ensureMatcherStack() {
+        ArrayDeque<MoxyMatcher<?>> stack = this.matcherStack.get();
 
-    for (int i = 0; i < storedArgs.size(); i++) {
-      final Object stored = storedArgs.get(i);
-      final Object actual = actualArgs.get(i);
-
-      if (stored instanceof MoxyMatcher) {
-        final MoxyMatcher<Object> matcher = (MoxyMatcher<Object>)stored;
-        if (!matcher.matches(actual)) {
-          result = false;
+        if (stack == null) {
+            stack = new ArrayDeque<>();
+            this.matcherStack.set(stack);
         }
-      } else {
-        if (stored == null) {
-          result = actual == null;
+
+        return stack;
+    }
+
+    ArrayDeque<MoxyMatcher<?>> getMatcherStack() {
+        return this.ensureMatcherStack();
+    }
+
+    private void verifyMatcherNotNull(final MoxyMatcher<?> matcher) {
+        if (matcher == null) {
+            throw new MoxyException("Null argument; see cause",
+                    new IllegalArgumentException("Cannot match to null"));
+        }
+    }
+
+    void registerMatcher(final MoxyMatcher<?> matcher) {
+        if (this.getASMMoxyEngine().isMockStubbingDisabledOnThisThread()) {
+            this.verifyMatcherNotNull(matcher);
+            matcher.addToStack(this.ensureMatcherStack());
         } else {
-          if (!stored.equals(actual)) {
-            result = false;
-          }
+            throw new MatcherUsageError("Attempt to register matcher '"
+                    + matcher.toString()
+                    + "' outside when() or assertMock[s]() call");
         }
-      }
     }
 
-    return result;
-  }
-
-  boolean clearMatcherStack() {
-    final ArrayDeque<MoxyMatcher<?>> stack = this.matcherStack.get();
-    if (stack != null && !stack.isEmpty()) {
-      // clear stack as per contract of InconsistentMatchersException
-      stack.clear();
-      return true;
+    List<MoxyMatcher<?>> popMatchers() {
+        final ArrayDeque<MoxyMatcher<?>> stack = this.ensureMatcherStack();
+        if (stack.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            final ArrayList<MoxyMatcher<?>> result = new ArrayList<>();
+            while (!stack.isEmpty()) {
+                result.add(stack.removeLast());
+            }
+            return result;
+        }
     }
-    return false;
 
-  }
+    // suppress because we check manually
+    @SuppressWarnings("unchecked")
+    boolean argsMatch(final List<Object> actualArgs, final List<Object> storedArgs) {
+        if (storedArgs.size() != actualArgs.size()) {
+            return false;
+        }
 
-  /*
-   * Verifies the stack is empty. Called at entry and exit to the
-   * framework (i.e. start and end of when() and assert() calls).
-   *
-   * If non-empty, throws InconsistentMatchersException.
-   */
-  void ensureStackConsistency() {
-    if (this.clearMatcherStack()) {
-      throw new InconsistentMatchersException(0, this.matcherStack.get());
+        boolean result = true;
+
+        for (int i = 0; i < storedArgs.size(); i++) {
+            final Object stored = storedArgs.get(i);
+            final Object actual = actualArgs.get(i);
+
+            if (stored instanceof MoxyMatcher) {
+                final MoxyMatcher<Object> matcher = (MoxyMatcher<Object>) stored;
+                if (!matcher.matches(actual)) {
+                    result = false;
+                }
+            } else {
+                if (stored == null) {
+                    result = actual == null;
+                } else {
+                    if (!stored.equals(actual)) {
+                        result = false;
+                    }
+                }
+            }
+        }
+
+        return result;
     }
-  }
+
+    private boolean clearMatcherStack() {
+        final ArrayDeque<MoxyMatcher<?>> stack = this.matcherStack.get();
+        if (stack != null && !stack.isEmpty()) {
+            // clear stack as per contract of InconsistentMatchersException
+            stack.clear();
+            return true;
+        }
+        return false;
+    }
+
+    /*
+     * Verifies the stack is empty. Called at entry and exit to the
+     * framework (i.e. start and end of when() and assert() calls).
+     *
+     * If non-empty, throws InconsistentMatchersException.
+     */
+    void ensureStackConsistency(boolean noThrow) {
+        final boolean inconsistentStack = this.clearMatcherStack();
+
+        if (inconsistentStack && !noThrow) {
+            throw new InconsistentMatchersException(0, this.matcherStack.get());
+        }
+    }
 }

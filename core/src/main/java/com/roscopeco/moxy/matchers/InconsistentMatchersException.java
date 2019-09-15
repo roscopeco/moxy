@@ -23,10 +23,11 @@
  */
 package com.roscopeco.moxy.matchers;
 
+import com.roscopeco.moxy.api.MoxyException;
+import com.roscopeco.moxy.api.MoxyMatcher;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
-
-import com.roscopeco.moxy.api.MoxyException;
 
 /**
  * <p>Thrown to indicate that the matcher stack was found to be
@@ -44,29 +45,29 @@ import com.roscopeco.moxy.api.MoxyException;
  * @since 1.0
  */
 public class InconsistentMatchersException extends MoxyException {
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private final int expectedSize;
-  private final ArrayDeque<MoxyMatcher<?>> stack;
+    private final int expectedSize;
+    private final transient ArrayDeque<MoxyMatcher<?>> stack;
 
-  public InconsistentMatchersException(final int expectedSize,
-                                       final Deque<MoxyMatcher<?>> stack) {
-    super("Inconsistent use of matchers: if using matchers, *all* arguments must be supplied with them.\n"
-        + "This limitation will (hopefully) be lifted in the future");
+    public InconsistentMatchersException(final int expectedSize,
+                                         final Deque<MoxyMatcher<?>> stack) {
+        super("Inconsistent use of matchers: if using matchers, *all* arguments must be supplied with them.\n"
+                + "This limitation will (hopefully) be lifted in the future.");
 
-    this.expectedSize = expectedSize;
-    this.stack = new ArrayDeque<>(stack);
-  }
+        this.expectedSize = expectedSize;
+        this.stack = new ArrayDeque<>(stack);
+    }
 
-  int getExpectedSize() {
-    return this.expectedSize;
-  }
+    int getExpectedSize() {
+        return this.expectedSize;
+    }
 
-  int getActualSize() {
-    return this.stack.size();
-  }
+    int getActualSize() {
+        return this.stack.size();
+    }
 
-  Deque<MoxyMatcher<?>> getStack() {
-    return this.stack;
-  }
+    Deque<MoxyMatcher<?>> getStack() {
+        return this.stack;
+    }
 }

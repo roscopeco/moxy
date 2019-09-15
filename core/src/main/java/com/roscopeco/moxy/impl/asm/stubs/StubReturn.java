@@ -30,26 +30,26 @@ import java.util.List;
  * on the mocks.
  */
 public final class StubReturn implements Stub {
-  final Object toReturn;
-  final boolean retain;
+    private final Object toReturn;
+    private final boolean retain;
 
-  public StubReturn(final Object toReturn, final boolean retain) {
-    this.toReturn = toReturn;
-    this.retain = retain;
-  }
+    public StubReturn(final Object toReturn, final boolean retain) {
+        this.toReturn = toReturn;
+        this.retain = retain;
+    }
 
-  @Override
-  public StubType getType() {
-    return StubType.RETURN_OBJECT;
-  }
+    @Override
+    public StubType getType() {
+        return StubType.RETURN_OBJECT;
+    }
 
-  @Override
-  public boolean isRetained() {
-    return this.retain;
-  }
+    @Override
+    public boolean isRetained() {
+        return this.retain;
+    }
 
-  @Override
-  public Object getObject(final List<Object> actualArgs) {
-    return this.toReturn;
-  }
+    @Override
+    public Object getObject(final List<Object> actualArgs) {
+        return this.toReturn;
+    }
 }

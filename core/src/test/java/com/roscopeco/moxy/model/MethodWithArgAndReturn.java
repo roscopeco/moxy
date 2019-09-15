@@ -24,19 +24,19 @@
 package com.roscopeco.moxy.model;
 
 public class MethodWithArgAndReturn {
-  public String sayHelloTo(final String who) {
-    if ("Hamburglar".equals(who)) {
-      throw new RuntimeException("Hamburglar detected!");
-    } else {
-      return "Hello, " + who;
+    public String sayHelloTo(final String who) {
+        if ("Hamburglar".equals(who)) {
+            throw new RuntimeException("Hamburglar detected!");
+        } else {
+            return "Hello, " + who;
+        }
     }
-  }
 
-  public String hasTwoArgs(final String arg1, final int arg2) {
-    return "" + arg1 + arg2;
-  }
+    public String hasTwoArgs(final String arg1, final int arg2) {
+        return "" + arg1 + arg2;
+    }
 
-  public String objectMethod(final Object o) {
-    return o.toString();
-  }
+    public String objectMethod(final Object o) {
+        return o.toString();
+    }
 }

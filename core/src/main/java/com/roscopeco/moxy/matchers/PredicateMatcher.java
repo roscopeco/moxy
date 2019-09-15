@@ -23,6 +23,8 @@
  */
 package com.roscopeco.moxy.matchers;
 
+import com.roscopeco.moxy.api.MoxyMatcher;
+
 import java.util.function.Predicate;
 
 /**
@@ -33,19 +35,19 @@ import java.util.function.Predicate;
  * @since 1.0
  */
 class PredicateMatcher<T> implements MoxyMatcher<T> {
-  private final Predicate<T> predicate;
+    private final Predicate<T> predicate;
 
-  PredicateMatcher(final Predicate<T> predicate) {
-    this.predicate = predicate;
-  }
+    PredicateMatcher(final Predicate<T> predicate) {
+        this.predicate = predicate;
+    }
 
-  @Override
-  public boolean matches(final T arg) {
-    return this.predicate.test(arg);
-  }
+    @Override
+    public boolean matches(final T arg) {
+        return this.predicate.test(arg);
+    }
 
-  @Override
-  public String toString() {
-    return "<predicate: arg -> ...>";
-  }
+    @Override
+    public String toString() {
+        return "<predicate: arg -> ...>";
+    }
 }

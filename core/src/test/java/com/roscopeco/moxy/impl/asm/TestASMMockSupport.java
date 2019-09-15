@@ -23,148 +23,144 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
-import static org.assertj.core.api.Assertions.*;
-
-import java.util.Arrays;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import com.roscopeco.moxy.impl.asm.stubs.StubDelegate;
 import com.roscopeco.moxy.impl.asm.stubs.StubReturn;
 import com.roscopeco.moxy.impl.asm.stubs.StubSuper;
 import com.roscopeco.moxy.impl.asm.stubs.StubThrow;
 import com.roscopeco.moxy.model.SimpleClass;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class TestASMMockSupport extends AbstractImplTest {
-  ASMMoxyEngine engine;
-  InvocationRecorder recorder;
-  ASMMoxyMatcherEngine matcherEngine;
-  ASMMockSupport mock;
+import java.util.Arrays;
 
-  Invocation invoc;
-  String returnMarker1 = "Marker1";
-  String returnMarker2 = "Marker2";
-  String returnMarker3 = "Marker3";
+import static org.assertj.core.api.Assertions.assertThat;
 
-  Throwable throwMarker1 = new Throwable("Marker1");
-  Throwable throwMarker2 = new Throwable("Marker2");
-  Throwable throwMarker3 = new Throwable("Marker3");
+class TestASMMockSupport extends AbstractImplTest {
+    private ASMMoxyEngine engine;
+    private InvocationRecorder recorder;
+    private ASMMockSupport mock;
 
-  @BeforeEach
-  public void setUp() {
-    this.engine = new ASMMoxyEngine();
-    this.mock = (ASMMockSupport)this.engine.mock(SimpleClass.class);
-    this.invoc = new Invocation(this.mock,
-                                "test",
-                                "(Ljava/lang/String;Ljava/lang/String;)V",
-                                Arrays.asList("arg1", "arg2"));
+    private Invocation invoc;
+    private String returnMarker1 = "Marker1";
+    private String returnMarker3 = "Marker3";
 
-    this.recorder = this.engine.getRecorder();
-    this.matcherEngine = this.engine.getMatcherEngine();
-  }
+    private Throwable throwMarker1 = new Throwable("Marker1");
+    private Throwable throwMarker2 = new Throwable("Marker2");
+    private Throwable throwMarker3 = new Throwable("Marker3");
 
-  @Test
-  public void testGetRecorder() {
-    assertThat(this.mock.__moxy_asm_getRecorder()).isEqualTo(this.recorder);
-  }
+    @BeforeEach
+    void setUp() {
+        this.engine = new ASMMoxyEngine();
+        this.mock = (ASMMockSupport) this.engine.mock(SimpleClass.class);
+        this.invoc = new Invocation(this.mock,
+                "test",
+                "(Ljava/lang/String;Ljava/lang/String;)V",
+                Arrays.asList("arg1", "arg2"));
 
-  @Test
-  public void testPopReturnOrThrowForInvocation() {
-    this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker1, false));
-    this.mock.__moxy_asm_setStubbing(this.invoc, new StubThrow(this.throwMarker1, false));
-    this.mock.__moxy_asm_setStubbing(this.invoc, new StubSuper(false));
-    this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker3, false));
+        this.recorder = this.engine.getRecorder();
+    }
 
-    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, true)).isEqualTo(this.returnMarker1);
+    @Test
+    void testGetRecorder() {
+        assertThat(this.mock.__moxy_asm_getRecorder()).isEqualTo(this.recorder);
+    }
 
-    // pops return
-    this.mock.__moxy_asm_popReturnOrThrowForInvocation(this.invoc);
-    assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, true)).isEqualTo(this.throwMarker1);
+    @Test
+    void testPopReturnOrThrowForInvocation() {
+        this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker1, false));
+        this.mock.__moxy_asm_setStubbing(this.invoc, new StubThrow(this.throwMarker1, false));
+        this.mock.__moxy_asm_setStubbing(this.invoc, new StubSuper(false));
+        this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker3, false));
 
-    // pops throw
-    this.mock.__moxy_asm_popReturnOrThrowForInvocation(this.invoc);
-    assertThat(this.mock.__moxy_asm_shouldCallSuperForInvocation(this.invoc)).isTrue();
+        assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, true)).isEqualTo(this.returnMarker1);
 
-    // doesn't pop (last one)
-    this.mock.__moxy_asm_popReturnOrThrowForInvocation(this.invoc);
-    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, true)).isEqualTo(this.returnMarker3);
+        // pops return
+        this.mock.__moxy_asm_popReturnOrThrowForInvocation(this.invoc);
+        assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, true)).isEqualTo(this.throwMarker1);
 
-    this.mock.__moxy_asm_popReturnOrThrowForInvocation(this.invoc);
-    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, true)).isEqualTo(this.returnMarker3);
+        // pops throw
+        this.mock.__moxy_asm_popReturnOrThrowForInvocation(this.invoc);
+        assertThat(this.mock.__moxy_asm_shouldCallSuperForInvocation(this.invoc)).isTrue();
 
-  }
+        // doesn't pop (last one)
+        this.mock.__moxy_asm_popReturnOrThrowForInvocation(this.invoc);
+        assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, true)).isEqualTo(this.returnMarker3);
 
-  @Test
-  public void testSetGetReturnForInvocation() {
-    this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker1, false));
-    this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker2, false));
-    this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker3, false));
+        this.mock.__moxy_asm_popReturnOrThrowForInvocation(this.invoc);
+        assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, true)).isEqualTo(this.returnMarker3);
+    }
 
-    // was set
-    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, true)).isSameAs(this.returnMarker1);
+    @Test
+    void testSetGetReturnForInvocation() {
+        this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker1, false));
+        String returnMarker2 = "Marker2";
+        this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(returnMarker2, false));
+        this.mock.__moxy_asm_setStubbing(this.invoc, new StubReturn(this.returnMarker3, false));
 
-    // was force retained
-    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, false)).isSameAs(this.returnMarker1);
+        // was set
+        assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, true)).isSameAs(this.returnMarker1);
 
-    // was removed
-    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, false)).isSameAs(this.returnMarker2);
+        // was force retained
+        assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, false)).isSameAs(this.returnMarker1);
 
-    // was removed
-    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, false)).isSameAs(this.returnMarker3);
+        // was removed
+        assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, false)).isSameAs(returnMarker2);
 
-    // was retained (last stubbing)
-    assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, false)).isSameAs(this.returnMarker3);
-  }
+        // was removed
+        assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, false)).isSameAs(this.returnMarker3);
 
-  @Test
-  public void testSetGetThrowForInvocation() {
-    this.mock.__moxy_asm_setStubbing(this.invoc, new StubThrow(this.throwMarker1, false));
-    this.mock.__moxy_asm_setStubbing(this.invoc, new StubThrow(this.throwMarker2, false));
-    this.mock.__moxy_asm_setStubbing(this.invoc, new StubThrow(this.throwMarker3, false));
+        // was retained (last stubbing)
+        assertThat(this.mock.__moxy_asm_getReturnableForInvocation(this.invoc, false)).isSameAs(this.returnMarker3);
+    }
 
-    // was set
-    assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, true)).isSameAs(this.throwMarker1);
+    @Test
+    void testSetGetThrowForInvocation() {
+        this.mock.__moxy_asm_setStubbing(this.invoc, new StubThrow(this.throwMarker1, false));
+        this.mock.__moxy_asm_setStubbing(this.invoc, new StubThrow(this.throwMarker2, false));
+        this.mock.__moxy_asm_setStubbing(this.invoc, new StubThrow(this.throwMarker3, false));
 
-    // was force retained
-    assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, false)).isSameAs(this.throwMarker1);
+        // was set
+        assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, true)).isSameAs(this.throwMarker1);
 
-    // was removed
-    assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, false)).isSameAs(this.throwMarker2);
+        // was force retained
+        assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, false)).isSameAs(this.throwMarker1);
 
-    // was removed
-    assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, false)).isSameAs(this.throwMarker3);
+        // was removed
+        assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, false)).isSameAs(this.throwMarker2);
 
-    // was retained (last item)
-    assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, false)).isSameAs(this.throwMarker3);
-  }
+        // was removed
+        assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, false)).isSameAs(this.throwMarker3);
 
-  @Test
-  public void testSetCallSuper() {
-    assertThat(this.mock.__moxy_asm_shouldCallSuperForInvocation(this.invoc)).isFalse();
+        // was retained (last item)
+        assertThat(this.mock.__moxy_asm_getThrowableForInvocation(this.invoc, false)).isSameAs(this.throwMarker3);
+    }
 
-    this.mock.__moxy_asm_setStubbing(this.invoc, new StubSuper(false));
-    assertThat(this.mock.__moxy_asm_shouldCallSuperForInvocation(this.invoc)).isTrue();
-  }
+    @Test
+    void testSetCallSuper() {
+        assertThat(this.mock.__moxy_asm_shouldCallSuperForInvocation(this.invoc)).isFalse();
 
-  @Test
-  public void testSetDelegate() throws ReflectiveOperationException {
-    assertThat(this.mock.__moxy_asm_shouldDelegateForInvocation(this.invoc)).isFalse();
+        this.mock.__moxy_asm_setStubbing(this.invoc, new StubSuper(false));
+        assertThat(this.mock.__moxy_asm_shouldCallSuperForInvocation(this.invoc)).isTrue();
+    }
 
-    this.mock.__moxy_asm_setStubbing(this.invoc, new StubDelegate(SimpleClass.class.getMethod("returnHello"), new SimpleClass(), false));
-    assertThat(this.mock.__moxy_asm_shouldDelegateForInvocation(this.invoc)).isTrue();
-  }
+    @Test
+    void testSetDelegate() throws ReflectiveOperationException {
+        assertThat(this.mock.__moxy_asm_shouldDelegateForInvocation(this.invoc)).isFalse();
 
-  @Test
-  public void testIsMockBehaviourDisabledOnThisThread() {
-    assertThat(this.mock.__moxy_asm_isMockBehaviourDisabledOnThisThread()).isFalse();
+        this.mock.__moxy_asm_setStubbing(this.invoc, new StubDelegate(SimpleClass.class.getMethod("returnHello"), new SimpleClass(), false));
+        assertThat(this.mock.__moxy_asm_shouldDelegateForInvocation(this.invoc)).isTrue();
+    }
 
-    this.engine.startMonitoredInvocation();
-    assertThat(this.mock.__moxy_asm_isMockBehaviourDisabledOnThisThread()).isTrue();
+    @Test
+    void testIsMockBehaviourDisabledOnThisThread() {
+        assertThat(this.mock.__moxy_asm_isMockBehaviourDisabledOnThisThread()).isFalse();
 
-    this.engine.endMonitoredInvocation();
-    assertThat(this.mock.__moxy_asm_isMockBehaviourDisabledOnThisThread()).isFalse();
-  }
+        this.engine.startMonitoredInvocation();
+        assertThat(this.mock.__moxy_asm_isMockBehaviourDisabledOnThisThread()).isTrue();
 
-  // TODO test set/run doActions
+        this.engine.endMonitoredInvocation(false);
+        assertThat(this.mock.__moxy_asm_isMockBehaviourDisabledOnThisThread()).isFalse();
+    }
+
+    // TODO test set/run doActions
 }

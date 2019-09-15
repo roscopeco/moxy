@@ -1,19 +1,18 @@
 package com.roscopeco.moxy.matchers;
 
-import static org.assertj.core.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
 
-public class TestPossibleMatcherUsageError {
-  public static final String MARKER = "MARKER";
-  public static final Exception CAUSE = new Exception("CAUSE");
+import static org.assertj.core.api.Assertions.assertThat;
 
-  @Test
-  public void TestStringThrowableConstructor() {
-    final PossibleMatcherUsageError ex = new PossibleMatcherUsageError(MARKER, CAUSE);
+class TestPossibleMatcherUsageError {
+    public static final String MARKER = "MARKER";
+    private static final Exception CAUSE = new Exception("CAUSE");
 
-    assertThat(ex.getMessage()).isEqualTo(MARKER);
-    assertThat(ex.getCause()).isEqualTo(CAUSE);
-  }
+    @Test
+    void testStringThrowableConstructor() {
+        final PossibleMatcherUsageError ex = new PossibleMatcherUsageError(MARKER, CAUSE);
 
+        assertThat(ex.getMessage()).isEqualTo(MARKER);
+        assertThat(ex.getCause()).isEqualTo(CAUSE);
+    }
 }

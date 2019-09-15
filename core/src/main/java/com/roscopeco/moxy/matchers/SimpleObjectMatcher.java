@@ -24,29 +24,30 @@
 package com.roscopeco.moxy.matchers;
 
 import com.roscopeco.moxy.api.MoxyException;
+import com.roscopeco.moxy.api.MoxyMatcher;
 
 abstract class SimpleObjectMatcher<T> implements MoxyMatcher<T> {
-  private final T object;
+    private final T object;
 
-  public SimpleObjectMatcher(final T object, final boolean allowNull) {
-    if (!allowNull && object == null) {
-      throw new MoxyException("Null argument; see cause",
-          new IllegalArgumentException("Cannot match to null"));
+    SimpleObjectMatcher(final T object, final boolean allowNull) {
+        if (!allowNull && object == null) {
+            throw new MoxyException("Null argument; see cause",
+                    new IllegalArgumentException("Cannot match to null"));
+        }
+
+        this.object = object;
     }
 
-    this.object = object;
-  }
-
-  protected T getObject() {
-    return this.object;
-  }
-
-  @Override
-  public String toString() {
-    if (this.object == null) {
-      return ": null>";
-    } else {
-      return ": " + this.object.toString() + ">";
+    protected T getObject() {
+        return this.object;
     }
-  }
+
+    @Override
+    public String toString() {
+        if (this.object == null) {
+            return ": null>";
+        } else {
+            return ": " + this.object.toString() + ">";
+        }
+    }
 }

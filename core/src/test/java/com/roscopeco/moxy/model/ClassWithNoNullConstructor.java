@@ -24,29 +24,29 @@
 package com.roscopeco.moxy.model;
 
 public class ClassWithNoNullConstructor {
-  final String anything;
-  final int anyInt;
+    final String anything;
+    final int anyInt;
 
-  public ClassWithNoNullConstructor(final String anything) {
-    this.anything = anything;
-    this.anyInt = 42;
-  }
+    public ClassWithNoNullConstructor(final String anything) {
+        this.anything = anything;
+        this.anyInt = 42;
+    }
 
-  public ClassWithNoNullConstructor(final int anyInt) {
-    this.anything = "nothing";
-    this.anyInt = anyInt;
-  }
+    public ClassWithNoNullConstructor(final int anyInt) {
+        this.anything = "nothing";
+        this.anyInt = anyInt;
+    }
 
-  public ClassWithNoNullConstructor(final float f, final double d, final long l) {
-    this.anything = "nothing";
-    this.anyInt = 42;
-  }
+    public ClassWithNoNullConstructor(final float f, final double d, final long l) {
+        this.anything = "nothing";
+        this.anyInt = 42;
+    }
 
-  public String returnSomething() {
-    return this.anything;
-  }
+    public String returnSomething() {
+        return this.anything;
+    }
 
-  public int getAnyInt() {
-    return this.anyInt;
-  }
+    public int getAnyInt() {
+        return this.anyInt;
+    }
 }

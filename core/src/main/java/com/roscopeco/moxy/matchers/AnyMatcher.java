@@ -23,16 +23,19 @@
  */
 package com.roscopeco.moxy.matchers;
 
+import com.roscopeco.moxy.api.MoxyMatcher;
+
 class AnyMatcher<T> implements MoxyMatcher<T> {
-  AnyMatcher() { }
+    AnyMatcher() {
+    }
 
-  @Override
-  public boolean matches(final T arg) {
-    return true;
-  }
+    @Override
+    public boolean matches(final T arg) {
+        return true;
+    }
 
-  @Override
-  public String toString() {
-    return "<any>";
-  }
+    @Override
+    public String toString() {
+        return "<any>";
+    }
 }

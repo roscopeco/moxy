@@ -23,161 +23,156 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
+import com.roscopeco.moxy.api.MoxyException;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import com.roscopeco.moxy.api.MoxyException;
 
 /**
  * Represents a single invocation of a given method, on a given receiver,
  * with given arguments.
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
- *
  */
 final class Invocation {
-  private static final List<Object> EMPTY_OBJECT_LIST = Collections.emptyList();
+    private static final List<Object> EMPTY_OBJECT_LIST = Collections.emptyList();
 
-  private final Object receiver;
-  private final String methodName;
-  private final String methodDesc;
-  private final List<Object> args;
-  private Object returned;
-  private Throwable threw;
+    private final Object receiver;
+    private final String methodName;
+    private final String methodDesc;
+    private final List<Object> args;
+    private Object returned;
+    private Throwable threw;
 
-  /**
-   * Create a new Invocation with the specified receiver, method and arguments.
-   *
-   * @param receiver The receiver.
-   * @param methodName The method name.
-   * @param methodDesc The method descriptor.
-   * @param args The arguments.
-   */
-  Invocation(final Object receiver,
-                    final String methodName,
-                    final String methodDesc,
-                    final List<Object> args) {
-    if (receiver == null ||
-        methodName == null ||
-        methodName.isEmpty() ||
-        methodDesc == null ||
-        methodDesc.isEmpty()) {
-      throw new MoxyException("Illegal argument: Invocation.<init>(...). See cause.",
-          new IllegalArgumentException("Cannot create invocation: receiver and/or methodName/methodSig are null (or empty)"));
+    /**
+     * Create a new Invocation with the specified receiver, method and arguments.
+     *
+     * @param receiver   The receiver.
+     * @param methodName The method name.
+     * @param methodDesc The method descriptor.
+     * @param args       The arguments.
+     */
+    Invocation(final Object receiver,
+               final String methodName,
+               final String methodDesc,
+               final List<Object> args) {
+        if (receiver == null ||
+                methodName == null ||
+                methodName.isEmpty() ||
+                methodDesc == null ||
+                methodDesc.isEmpty()) {
+            throw new MoxyException("Illegal argument: Invocation.<init>(...). See cause.",
+                    new IllegalArgumentException("Cannot create invocation: receiver and/or methodName/methodSig are null (or empty)"));
+        }
+
+        this.receiver = receiver;
+        this.methodName = methodName;
+        this.methodDesc = methodDesc;
+        this.args = args;
     }
 
-    this.receiver = receiver;
-    this.methodName = methodName;
-    this.methodDesc = methodDesc;
-    this.args = args;
-  }
-
-  /**
-   * @return the receiver.
-   */
-  public Object getReceiver() {
-    return this.receiver;
-  }
-
-  /**
-   * @return the invoked method name.
-   */
-  public String getMethodName() {
-    return this.methodName;
-  }
-
-  /**
-   * @return the invoked method's descriptor;
-   */
-  public String getMethodDesc() {
-    return this.methodDesc;
-  }
-
-  /**
-   * @return the arguments the method was called with. Possibly empty, never null.
-   */
-  public List<Object> getArgs() {
-    return this.args == null ? EMPTY_OBJECT_LIST : this.args;
-  }
-
-  /**
-   * @return The object this method invocation returned (may be null).
-   */
-  Object getReturned() {
-    return this.returned;
-  }
-
-  void setReturned(final Object returned) {
-    this.returned = returned;
-  }
-
-  /*
-   * Returns a human-readble string representation of this invocation.
-   */
-  @Override
-  public String toString() {
-    return this.getMethodName() + "(" + TypeStringUtils.inspectArgs(this) + ")";
-  }
-
-  /**
-   *
-   * @return The exception this method invocation threw (may be null).
-   */
-  Throwable getThrew() {
-    return this.threw;
-  }
-
-  void setThrew(final Throwable threw) {
-    this.threw = threw;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(this.receiver, this.methodName, this.methodDesc, this.args);
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (this.getClass() != obj.getClass()) {
-      return false;
-    }
-    final Invocation other = (Invocation) obj;
-    if (this.args == null) {
-      if (other.args != null) {
-        return false;
-      }
-    } else if (!this.args.equals(other.args)) {
-      return false;
+    /**
+     * @return the receiver.
+     */
+    Object getReceiver() {
+        return this.receiver;
     }
 
-    if (this.methodDesc == null) {
-      if (other.methodDesc != null) {
-        return false;
-      }
-    } else if (!this.methodDesc.equals(other.methodDesc)) {
-      return false;
+    /**
+     * @return the invoked method name.
+     */
+    public String getMethodName() {
+        return this.methodName;
     }
-    if (this.methodName == null) {
-      if (other.methodName != null) {
-        return false;
-      }
-    } else if (!this.methodName.equals(other.methodName)) {
-      return false;
+
+    /**
+     * @return the invoked method's descriptor;
+     */
+    public String getMethodDesc() {
+        return this.methodDesc;
     }
-    if (this.receiver == null) {
-      if (other.receiver != null) {
-        return false;
-      }
-    } else if (!this.receiver.equals(other.receiver)) {
-      return false;
+
+    /**
+     * @return the arguments the method was called with. Possibly empty, never null.
+     */
+    public List<Object> getArgs() {
+        return this.args == null ? EMPTY_OBJECT_LIST : this.args;
     }
-    return true;
-  }
+
+    /**
+     * @return The object this method invocation returned (may be null).
+     */
+    Object getReturned() {
+        return this.returned;
+    }
+
+    void setReturned(final Object returned) {
+        this.returned = returned;
+    }
+
+    /*
+     * Returns a human-readble string representation of this invocation.
+     */
+    @Override
+    public String toString() {
+        return this.getMethodName() + "(" + TypeStringUtils.inspectArgs(this) + ")";
+    }
+
+    /**
+     * @return The exception this method invocation threw (may be null).
+     */
+    Throwable getThrew() {
+        return this.threw;
+    }
+
+    void setThrew(final Throwable threw) {
+        this.threw = threw;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.receiver, this.methodName, this.methodDesc, this.args);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+        final Invocation other = (Invocation) obj;
+        if (this.args == null) {
+            if (other.args != null) {
+                return false;
+            }
+        } else if (!this.args.equals(other.args)) {
+            return false;
+        }
+
+        if (this.methodDesc == null) {
+            if (other.methodDesc != null) {
+                return false;
+            }
+        } else if (!this.methodDesc.equals(other.methodDesc)) {
+            return false;
+        }
+        if (this.methodName == null) {
+            if (other.methodName != null) {
+                return false;
+            }
+        } else if (!this.methodName.equals(other.methodName)) {
+            return false;
+        }
+        if (this.receiver == null) {
+            return other.receiver == null;
+        } else {
+            return this.receiver.equals(other.receiver);
+        }
+    }
 }

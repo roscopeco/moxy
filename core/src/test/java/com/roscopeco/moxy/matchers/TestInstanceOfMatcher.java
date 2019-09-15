@@ -23,69 +23,75 @@
  */
 package com.roscopeco.moxy.matchers;
 
-import static com.roscopeco.moxy.Moxy.*;
-import static com.roscopeco.moxy.matchers.Matchers.*;
-import static com.roscopeco.moxy.matchers.TestMoxyMatchers.*;
-import static org.assertj.core.api.Assertions.*;
-
-import org.junit.jupiter.api.Test;
-
 import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
+import org.junit.jupiter.api.Test;
 
-public class TestInstanceOfMatcher {
-  static class Super { }
-  static final class SubOne extends Super { }
-  static final class SubTwo extends Super { }
+import static com.roscopeco.moxy.Moxy.*;
+import static com.roscopeco.moxy.matchers.Matchers.instanceOf;
+import static com.roscopeco.moxy.matchers.Matchers.startsWith;
+import static com.roscopeco.moxy.matchers.TestMoxyMatchers.PASSED;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-  @Test
-  public void testMoxyMockVerifyWithInstanceOfMatcherWorks() {
-    final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
+class TestInstanceOfMatcher {
+    static class Super {
+    }
 
-    mock.objectMethod(new Super());
-    mock.objectMethod(new SubOne());
-    mock.objectMethod(new SubTwo());
+    private static final class SubOne extends Super {
+    }
 
-    assertMock(() -> mock.objectMethod(instanceOf(Super.class))).wasCalled(3);
-    assertMock(() -> mock.objectMethod(instanceOf(SubOne.class))).wasCalled(1);
-    assertMock(() -> mock.objectMethod(instanceOf(SubTwo.class))).wasCalled(1);
+    private static final class SubTwo extends Super {
+    }
 
-    assertThatThrownBy(() ->
-        assertMock(() -> mock.objectMethod(startsWith(null))).wasNotCalled()
-    )
-        .isInstanceOf(MoxyException.class)
-        .hasMessage("Null argument; see cause")
-        .hasCauseInstanceOf(IllegalArgumentException.class);
-  }
+    @Test
+    void testMoxyMockVerifyWithInstanceOfMatcherWorks() {
+        final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
 
-  @Test
-  public void testMoxyMockWhenWithInstanceOfMatcherWorks() {
-    final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
+        mock.objectMethod(new Super());
+        mock.objectMethod(new SubOne());
+        mock.objectMethod(new SubTwo());
 
-    when(() -> mock.objectMethod(instanceOf(Super.class))).thenReturn(PASSED);
-    assertThat(mock.objectMethod(new Super())).isEqualTo(PASSED);
-    assertThat(mock.objectMethod(new SubOne())).isEqualTo(PASSED);
-    assertThat(mock.objectMethod(new SubTwo())).isEqualTo(PASSED);
+        assertMock(() -> mock.objectMethod(instanceOf(Super.class))).wasCalled(3);
+        assertMock(() -> mock.objectMethod(instanceOf(SubOne.class))).wasCalled(1);
+        assertMock(() -> mock.objectMethod(instanceOf(SubTwo.class))).wasCalled(1);
 
-    resetMock(mock);
+        assertThatThrownBy(() ->
+                assertMock(() -> mock.objectMethod(startsWith(null))).wasNotCalled()
+        )
+                .isInstanceOf(MoxyException.class)
+                .hasMessage("Null argument; see cause")
+                .hasCauseInstanceOf(IllegalArgumentException.class);
+    }
 
-    when(() -> mock.objectMethod(instanceOf(SubOne.class))).thenReturn(PASSED);
-    assertThat(mock.objectMethod(new Super())).isEqualTo(null);
-    assertThat(mock.objectMethod(new SubOne())).isEqualTo(PASSED);
-    assertThat(mock.objectMethod(new SubTwo())).isEqualTo(null);
+    @Test
+    void testMoxyMockWhenWithInstanceOfMatcherWorks() {
+        final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
 
-    resetMock(mock);
+        when(() -> mock.objectMethod(instanceOf(Super.class))).thenReturn(PASSED);
+        assertThat(mock.objectMethod(new Super())).isEqualTo(PASSED);
+        assertThat(mock.objectMethod(new SubOne())).isEqualTo(PASSED);
+        assertThat(mock.objectMethod(new SubTwo())).isEqualTo(PASSED);
 
-    when(() -> mock.objectMethod(instanceOf(SubTwo.class))).thenReturn(PASSED);
-    assertThat(mock.objectMethod(new Super())).isEqualTo(null);
-    assertThat(mock.objectMethod(new SubOne())).isEqualTo(null);
-    assertThat(mock.objectMethod(new SubTwo())).isEqualTo(PASSED);
+        resetMock(mock);
 
-    assertThatThrownBy(() ->
-        when(() -> mock.sayHelloTo(startsWith(null))).thenReturn(PASSED)
-    )
-        .isInstanceOf(MoxyException.class)
-        .hasMessage("Null argument; see cause")
-        .hasCauseInstanceOf(IllegalArgumentException.class);
-  }
+        when(() -> mock.objectMethod(instanceOf(SubOne.class))).thenReturn(PASSED);
+        assertThat(mock.objectMethod(new Super())).isEqualTo(null);
+        assertThat(mock.objectMethod(new SubOne())).isEqualTo(PASSED);
+        assertThat(mock.objectMethod(new SubTwo())).isEqualTo(null);
+
+        resetMock(mock);
+
+        when(() -> mock.objectMethod(instanceOf(SubTwo.class))).thenReturn(PASSED);
+        assertThat(mock.objectMethod(new Super())).isEqualTo(null);
+        assertThat(mock.objectMethod(new SubOne())).isEqualTo(null);
+        assertThat(mock.objectMethod(new SubTwo())).isEqualTo(PASSED);
+
+        assertThatThrownBy(() ->
+                when(() -> mock.sayHelloTo(startsWith(null))).thenReturn(PASSED)
+        )
+                .isInstanceOf(MoxyException.class)
+                .hasMessage("Null argument; see cause")
+                .hasCauseInstanceOf(IllegalArgumentException.class);
+    }
 }

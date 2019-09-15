@@ -23,234 +23,233 @@
  */
 package com.roscopeco.moxy.matchers;
 
-import static com.roscopeco.moxy.Moxy.*;
-import static com.roscopeco.moxy.matchers.Matchers.*;
-import static com.roscopeco.moxy.matchers.TestMoxyMatchers.*;
-import static org.assertj.core.api.Assertions.*;
-
-import org.junit.jupiter.api.Test;
-
 import com.roscopeco.moxy.model.MatcherTestClass;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
+import org.junit.jupiter.api.Test;
 
-public class TestGreaterThanMatcher {
-  @Test
-  public void testMoxyMockVerifyWithGreaterThanByteMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+import static com.roscopeco.moxy.Moxy.*;
+import static com.roscopeco.moxy.matchers.Matchers.*;
+import static com.roscopeco.moxy.matchers.TestMoxyMatchers.PASSED;
+import static org.assertj.core.api.Assertions.assertThat;
 
-    mock.testByte((byte) 0);
-    mock.testByte((byte) 64);
-    mock.testByte((byte) 127);
+class TestGreaterThanMatcher {
+    @Test
+    void testMoxyMockVerifyWithGreaterThanByteMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertMock(() -> mock.testByte(gtByte((byte)64))).wasCalledOnce();
-  }
+        mock.testByte((byte) 0);
+        mock.testByte((byte) 64);
+        mock.testByte((byte) 127);
 
-  @Test
-  public void testMoxyMockWhenWithGreaterThanByteMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertMock(() -> mock.testByte(gtByte((byte) 64))).wasCalledOnce();
+    }
 
-    when(() -> mock.testByte(gtByte((byte)8))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithGreaterThanByteMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertThat(mock.testByte((byte) 0)).isEqualTo(null);
-    assertThat(mock.testByte((byte) 1)).isEqualTo(null);
-    assertThat(mock.testByte((byte) 8)).isEqualTo(null);
-    assertThat(mock.testByte((byte) 32)).isEqualTo(PASSED);
-    assertThat(mock.testByte(Byte.MAX_VALUE)).isEqualTo(PASSED);
-  }
+        when(() -> mock.testByte(gtByte((byte) 8))).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockVerifyWithGreaterThanCharMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertThat(mock.testByte((byte) 0)).isEqualTo(null);
+        assertThat(mock.testByte((byte) 1)).isEqualTo(null);
+        assertThat(mock.testByte((byte) 8)).isEqualTo(null);
+        assertThat(mock.testByte((byte) 32)).isEqualTo(PASSED);
+        assertThat(mock.testByte(Byte.MAX_VALUE)).isEqualTo(PASSED);
+    }
 
-    mock.testChar('a');
-    mock.testChar('b');
-    mock.testChar('c');
+    @Test
+    void testMoxyMockVerifyWithGreaterThanCharMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertMock(() -> mock.testChar(gtChar('b'))).wasCalledOnce();
-  }
+        mock.testChar('a');
+        mock.testChar('b');
+        mock.testChar('c');
 
-  @Test
-  public void testMoxyMockWhenWithGreaterThanCharMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertMock(() -> mock.testChar(gtChar('b'))).wasCalledOnce();
+    }
 
-    when(() -> mock.testChar(gtChar('c'))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithGreaterThanCharMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertThat(mock.testChar('a')).isEqualTo(null);
-    assertThat(mock.testChar('b')).isEqualTo(null);
-    assertThat(mock.testChar('c')).isEqualTo(null);
-    assertThat(mock.testChar('x')).isEqualTo(PASSED);
-    assertThat(mock.testChar('y')).isEqualTo(PASSED);
-    assertThat(mock.testChar('z')).isEqualTo(PASSED);
-  }
+        when(() -> mock.testChar(gtChar('c'))).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockVerifyWithGreaterThanShortMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertThat(mock.testChar('a')).isEqualTo(null);
+        assertThat(mock.testChar('b')).isEqualTo(null);
+        assertThat(mock.testChar('c')).isEqualTo(null);
+        assertThat(mock.testChar('x')).isEqualTo(PASSED);
+        assertThat(mock.testChar('y')).isEqualTo(PASSED);
+        assertThat(mock.testChar('z')).isEqualTo(PASSED);
+    }
 
-    mock.testShort((short) 0);
-    mock.testShort((short) 256);
-    mock.testShort((short) 257);
-    mock.testShort(Short.MAX_VALUE);
+    @Test
+    void testMoxyMockVerifyWithGreaterThanShortMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertMock(() -> mock.testShort(gtShort((short)256))).wasCalledTwice();
-  }
+        mock.testShort((short) 0);
+        mock.testShort((short) 256);
+        mock.testShort((short) 257);
+        mock.testShort(Short.MAX_VALUE);
 
-  @Test
-  public void testMoxyMockWhenWithGreaterThanShortMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertMock(() -> mock.testShort(gtShort((short) 256))).wasCalledTwice();
+    }
 
-    when(() -> mock.testShort(gtShort((short)128))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithGreaterThanShortMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertThat(mock.testShort((short) 0)).isEqualTo(null);
-    assertThat(mock.testShort((short) 1)).isEqualTo(null);
-    assertThat(mock.testShort((short) 128)).isEqualTo(null);
-    assertThat(mock.testShort((short) 256)).isEqualTo(PASSED);
-    assertThat(mock.testShort((short) 129)).isEqualTo(PASSED);
-    assertThat(mock.testShort((short) 32767)).isEqualTo(PASSED);
-  }
+        when(() -> mock.testShort(gtShort((short) 128))).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockVerifyWithGreaterThanIntMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertThat(mock.testShort((short) 0)).isEqualTo(null);
+        assertThat(mock.testShort((short) 1)).isEqualTo(null);
+        assertThat(mock.testShort((short) 128)).isEqualTo(null);
+        assertThat(mock.testShort((short) 256)).isEqualTo(PASSED);
+        assertThat(mock.testShort((short) 129)).isEqualTo(PASSED);
+        assertThat(mock.testShort((short) 32767)).isEqualTo(PASSED);
+    }
 
-    mock.testInt(0);
-    mock.testInt(1);
-    mock.testInt(2);
-    mock.testInt(Integer.MAX_VALUE);
+    @Test
+    void testMoxyMockVerifyWithGreaterThanIntMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertMock(() -> mock.testInt(gtInt(1))).wasCalledTwice();
-  }
+        mock.testInt(0);
+        mock.testInt(1);
+        mock.testInt(2);
+        mock.testInt(Integer.MAX_VALUE);
 
-  @Test
-  public void testMoxyMockWhenWithGreaterThanIntMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertMock(() -> mock.testInt(gtInt(1))).wasCalledTwice();
+    }
 
-    when(() -> mock.testInt(gtInt(128))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithGreaterThanIntMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertThat(mock.testInt(0)).isEqualTo(null);
-    assertThat(mock.testInt(1)).isEqualTo(null);
-    assertThat(mock.testInt(128)).isEqualTo(null);
-    assertThat(mock.testInt(256)).isEqualTo(PASSED);
-    assertThat(mock.testInt(Integer.MAX_VALUE - 1)).isEqualTo(PASSED);
-    assertThat(mock.testInt(Integer.MAX_VALUE)).isEqualTo(PASSED);
-  }
+        when(() -> mock.testInt(gtInt(128))).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockVerifyWithGreaterThanLongMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertThat(mock.testInt(0)).isEqualTo(null);
+        assertThat(mock.testInt(1)).isEqualTo(null);
+        assertThat(mock.testInt(128)).isEqualTo(null);
+        assertThat(mock.testInt(256)).isEqualTo(PASSED);
+        assertThat(mock.testInt(Integer.MAX_VALUE - 1)).isEqualTo(PASSED);
+        assertThat(mock.testInt(Integer.MAX_VALUE)).isEqualTo(PASSED);
+    }
 
-    mock.testLong(10);
-    mock.testLong(1001);
-    mock.testLong(Long.MAX_VALUE);
+    @Test
+    void testMoxyMockVerifyWithGreaterThanLongMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertMock(() -> mock.testLong(gtLong(1000))).wasCalledTwice();
-  }
+        mock.testLong(10);
+        mock.testLong(1001);
+        mock.testLong(Long.MAX_VALUE);
 
-  @Test
-  public void testMoxyMockWhenWithGreaterThanLongMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertMock(() -> mock.testLong(gtLong(1000))).wasCalledTwice();
+    }
 
-    when(() -> mock.testLong(gtLong(256))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithGreaterThanLongMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertThat(mock.testLong(0)).isEqualTo(null);
-    assertThat(mock.testLong(1)).isEqualTo(null);
-    assertThat(mock.testLong(256)).isEqualTo(null);
-    assertThat(mock.testLong(257)).isEqualTo(PASSED);
-    assertThat(mock.testLong(Long.MIN_VALUE)).isEqualTo(null);
-    assertThat(mock.testLong(Long.MAX_VALUE - 1)).isEqualTo(PASSED);
-    assertThat(mock.testLong(Long.MAX_VALUE)).isEqualTo(PASSED);
-  }
+        when(() -> mock.testLong(gtLong(256))).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockVerifyWithGreaterThanFloatMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertThat(mock.testLong(0)).isEqualTo(null);
+        assertThat(mock.testLong(1)).isEqualTo(null);
+        assertThat(mock.testLong(256)).isEqualTo(null);
+        assertThat(mock.testLong(257)).isEqualTo(PASSED);
+        assertThat(mock.testLong(Long.MIN_VALUE)).isEqualTo(null);
+        assertThat(mock.testLong(Long.MAX_VALUE - 1)).isEqualTo(PASSED);
+        assertThat(mock.testLong(Long.MAX_VALUE)).isEqualTo(PASSED);
+    }
 
-    mock.testFloat(0.0f);
-    mock.testFloat(1.4f);
-    mock.testFloat(Float.MAX_VALUE);
+    @Test
+    void testMoxyMockVerifyWithGreaterThanFloatMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertMock(() -> mock.testFloat(gtFloat(1.0f))).wasCalledTwice();
-  }
+        mock.testFloat(0.0f);
+        mock.testFloat(1.4f);
+        mock.testFloat(Float.MAX_VALUE);
 
-  @Test
-  public void testMoxyMockWhenWithGreaterThanFloatMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertMock(() -> mock.testFloat(gtFloat(1.0f))).wasCalledTwice();
+    }
 
-    when(() -> mock.testFloat(gtFloat(1.0f))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithGreaterThanFloatMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertThat(mock.testFloat(0.0f)).isEqualTo(null);
-    assertThat(mock.testFloat(0.1f)).isEqualTo(null);
-    assertThat(mock.testFloat(256.7f)).isEqualTo(PASSED);
-    assertThat(mock.testFloat(Float.MIN_VALUE)).isEqualTo(null);
-    assertThat(mock.testFloat(Float.MAX_VALUE)).isEqualTo(PASSED);
-  }
+        when(() -> mock.testFloat(gtFloat(1.0f))).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockVerifyWithGreaterThanDoubleMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertThat(mock.testFloat(0.0f)).isEqualTo(null);
+        assertThat(mock.testFloat(0.1f)).isEqualTo(null);
+        assertThat(mock.testFloat(256.7f)).isEqualTo(PASSED);
+        assertThat(mock.testFloat(Float.MIN_VALUE)).isEqualTo(null);
+        assertThat(mock.testFloat(Float.MAX_VALUE)).isEqualTo(PASSED);
+    }
 
-    mock.testDouble(0.0d);
-    mock.testDouble(1.4d);
-    mock.testDouble(Double.MAX_VALUE);
+    @Test
+    void testMoxyMockVerifyWithGreaterThanDoubleMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertMock(() -> mock.testDouble(gtDouble(1.0d))).wasCalledTwice();
-  }
+        mock.testDouble(0.0d);
+        mock.testDouble(1.4d);
+        mock.testDouble(Double.MAX_VALUE);
 
-  @Test
-  public void testMoxyMockWhenWithGreaterThanDoubleMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertMock(() -> mock.testDouble(gtDouble(1.0d))).wasCalledTwice();
+    }
 
-    when(() -> mock.testDouble(gtDouble(1.0d))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithGreaterThanDoubleMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertThat(mock.testDouble(0.0d)).isEqualTo(null);
-    assertThat(mock.testDouble(0.1d)).isEqualTo(null);
-    assertThat(mock.testDouble(256.7d)).isEqualTo(PASSED);
-    assertThat(mock.testDouble(Double.MIN_VALUE)).isEqualTo(null);
-    assertThat(mock.testDouble(Double.MAX_VALUE)).isEqualTo(PASSED);
-  }
+        when(() -> mock.testDouble(gtDouble(1.0d))).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockVerifyWithGreaterThanBoolMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertThat(mock.testDouble(0.0d)).isEqualTo(null);
+        assertThat(mock.testDouble(0.1d)).isEqualTo(null);
+        assertThat(mock.testDouble(256.7d)).isEqualTo(PASSED);
+        assertThat(mock.testDouble(Double.MIN_VALUE)).isEqualTo(null);
+        assertThat(mock.testDouble(Double.MAX_VALUE)).isEqualTo(PASSED);
+    }
 
-    mock.testBoolean(Boolean.TRUE);
-    mock.testBoolean(Boolean.FALSE);
-    mock.testBoolean(Boolean.TRUE);
+    @Test
+    void testMoxyMockVerifyWithGreaterThanBoolMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertMock(() -> mock.testBoolean(gtBool(Boolean.FALSE))).wasCalledTwice();
-  }
+        mock.testBoolean(Boolean.TRUE);
+        mock.testBoolean(Boolean.FALSE);
+        mock.testBoolean(Boolean.TRUE);
 
-  @Test
-  public void testMoxyMockWhenWithGreaterThanBoolMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertMock(() -> mock.testBoolean(gtBool(Boolean.FALSE))).wasCalledTwice();
+    }
 
-    when(() -> mock.testBoolean(gtBool(Boolean.FALSE))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithGreaterThanBoolMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertThat(mock.testBoolean(Boolean.TRUE)).isEqualTo(PASSED);
-    assertThat(mock.testBoolean(Boolean.FALSE)).isEqualTo(null);
-  }
+        when(() -> mock.testBoolean(gtBool(Boolean.FALSE))).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockVerifyWithGreaterThanObjectMatcherWorks() {
-    final MethodWithArguments mock = mock(MethodWithArguments.class);
+        assertThat(mock.testBoolean(Boolean.TRUE)).isEqualTo(PASSED);
+        assertThat(mock.testBoolean(Boolean.FALSE)).isEqualTo(null);
+    }
 
-    mock.hasArgs("aaaa", "bbbb");
-    mock.hasArgs("cccc", "dddd");
-    mock.hasArgs("eeee", "ffff");
+    @Test
+    void testMoxyMockVerifyWithGreaterThanObjectMatcherWorks() {
+        final MethodWithArguments mock = mock(MethodWithArguments.class);
 
-    assertMock(() -> mock.hasArgs(gt("cccc"), gt("dddd"))).wasCalledOnce();
-    assertMock(() -> mock.hasArgs(gt("aaaa"), gt("bbbb"))).wasCalledTwice();
-  }
+        mock.hasArgs("aaaa", "bbbb");
+        mock.hasArgs("cccc", "dddd");
+        mock.hasArgs("eeee", "ffff");
 
-  @Test
-  public void testMoxyMockWhenWithGreaterThanObjectMatcherWorks() {
-    final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
+        assertMock(() -> mock.hasArgs(gt("cccc"), gt("dddd"))).wasCalledOnce();
+        assertMock(() -> mock.hasArgs(gt("aaaa"), gt("bbbb"))).wasCalledTwice();
+    }
 
-    when(() -> mock.sayHelloTo(gt("BBBB"))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithGreaterThanObjectMatcherWorks() {
+        final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
 
-    assertThat(mock.sayHelloTo("AAAA")).isEqualTo(null);
-    assertThat(mock.sayHelloTo("BBBB")).isEqualTo(null);
-    assertThat(mock.sayHelloTo("CCCC")).isEqualTo(PASSED);
-  }
+        when(() -> mock.sayHelloTo(gt("BBBB"))).thenReturn(PASSED);
+
+        assertThat(mock.sayHelloTo("AAAA")).isEqualTo(null);
+        assertThat(mock.sayHelloTo("BBBB")).isEqualTo(null);
+        assertThat(mock.sayHelloTo("CCCC")).isEqualTo(PASSED);
+    }
 }

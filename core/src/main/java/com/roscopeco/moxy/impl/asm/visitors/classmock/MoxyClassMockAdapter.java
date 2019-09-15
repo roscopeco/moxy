@@ -24,13 +24,12 @@
 
 package com.roscopeco.moxy.impl.asm.visitors.classmock;
 
-import static org.objectweb.asm.Opcodes.*;
-
+import com.roscopeco.moxy.api.MoxyMock;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
-import com.roscopeco.moxy.api.MoxyMock;
+import static org.objectweb.asm.Opcodes.*;
 
 /**
  * Class visitor that is used as an adapter to generate
@@ -39,47 +38,47 @@ import com.roscopeco.moxy.api.MoxyMock;
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public class MoxyClassMockAdapter extends ClassVisitor {
-  private final Class<?> thisClz;
-  private final String delegateClzInternal;
+    private final Class<?> thisClz;
+    private final String delegateClzInternal;
 
-  public MoxyClassMockAdapter(final ClassVisitor delegate, final Class<?> thisClz, final Class<?> delegateClz) {
-    super(ASM7, delegate);
-    this.thisClz = thisClz;
-    this.delegateClzInternal = Type.getInternalName(delegateClz);
-  }
-
-  @Override
-  public void visit(final int version, final int access, final String name, final String signature, final String superName, final String[] interfaces) {
-    super.visit(version, access, name, signature, superName, interfaces);
-
-    this.visitAnnotation(Type.getDescriptor(MoxyMock.class), true).visitEnd();
-  }
-
-  @Override
-  public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
-    final boolean isAbstract = (access & ACC_ABSTRACT) != 0;
-    final boolean isSynthetic = (access & ACC_SYNTHETIC) != 0;
-    final boolean isStatic = (access & ACC_STATIC) != 0;
-
-    if (isAbstract || isSynthetic) {
-      return super.visitMethod(access, name, desc, signature, exceptions);
-    } else if ("<init>".equals(name)) {
-      return new MoxyClassMockConstructorVisitor(super.visitMethod(access, name, desc, signature, exceptions),
-                                                 this.thisClz,
-                                                 this.delegateClzInternal,
-                                                 name,
-                                                 desc,
-                                                 Type.getReturnType(desc),
-                                                 Type.getArgumentTypes(desc));
-    } else {
-      return new MoxyClassMockingMethodVisitor(super.visitMethod(access, name, desc, signature, exceptions),
-                                               this.thisClz,
-                                               this.delegateClzInternal,
-                                               name,
-                                               desc,
-                                               Type.getReturnType(desc),
-                                               Type.getArgumentTypes(desc),
-                                               isStatic);
+    public MoxyClassMockAdapter(final ClassVisitor delegate, final Class<?> thisClz, final Class<?> delegateClz) {
+        super(ASM7, delegate);
+        this.thisClz = thisClz;
+        this.delegateClzInternal = Type.getInternalName(delegateClz);
     }
-  }
+
+    @Override
+    public void visit(final int version, final int access, final String name, final String signature, final String superName, final String[] interfaces) {
+        super.visit(version, access, name, signature, superName, interfaces);
+
+        this.visitAnnotation(Type.getDescriptor(MoxyMock.class), true).visitEnd();
+    }
+
+    @Override
+    public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
+        final boolean isAbstract = (access & ACC_ABSTRACT) != 0;
+        final boolean isSynthetic = (access & ACC_SYNTHETIC) != 0;
+        final boolean isStatic = (access & ACC_STATIC) != 0;
+
+        if (isAbstract || isSynthetic) {
+            return super.visitMethod(access, name, desc, signature, exceptions);
+        } else if ("<init>".equals(name)) {
+            return new MoxyClassMockConstructorVisitor(super.visitMethod(access, name, desc, signature, exceptions),
+                    this.thisClz,
+                    this.delegateClzInternal,
+                    name,
+                    desc,
+                    Type.getReturnType(desc),
+                    Type.getArgumentTypes(desc));
+        } else {
+            return new MoxyClassMockingMethodVisitor(super.visitMethod(access, name, desc, signature, exceptions),
+                    this.thisClz,
+                    this.delegateClzInternal,
+                    name,
+                    desc,
+                    Type.getReturnType(desc),
+                    Type.getArgumentTypes(desc),
+                    isStatic);
+        }
+    }
 }

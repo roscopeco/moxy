@@ -28,20 +28,20 @@ import com.roscopeco.moxy.impl.asm.ASMMockInstanceVars;
 import com.roscopeco.moxy.impl.asm.ASMMockSupport;
 import com.roscopeco.moxy.impl.asm.ASMMoxyEngine;
 
-/*
+/**
  * Simple mock support to act as delegate for static methods.
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 class StaticDelegate implements ASMMockSupport {
-  private final ASMMockInstanceVars ivars;
+    private final ASMMockInstanceVars ivars;
 
-  StaticDelegate(final ASMMoxyEngine engine) {
-    this.ivars = new ASMMockInstanceVars(engine);
-  }
+    StaticDelegate(final ASMMoxyEngine engine) {
+        this.ivars = new ASMMockInstanceVars(engine);
+    }
 
-  @Override
-  public ASMMockInstanceVars __moxy_asm_ivars() {
-    return this.ivars;
-  }
+    @Override
+    public ASMMockInstanceVars __moxy_asm_ivars() {
+        return this.ivars;
+    }
 }

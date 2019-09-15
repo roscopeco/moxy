@@ -24,65 +24,64 @@
 
 package com.roscopeco.moxy.annotations;
 
-import static org.assertj.core.api.Assertions.*;
-
+import com.roscopeco.moxy.Moxy;
+import com.roscopeco.moxy.annotations.model.TesterClass;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.roscopeco.moxy.Moxy;
-import com.roscopeco.moxy.annotations.model.TesterClass;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestMockAnnotation {
-  @BeforeEach
-  public void beforeEach() {
-    MoxyAnnotations.initMocks(this);
-  }
+class TestMockAnnotation {
+    @BeforeEach
+    void beforeEach() {
+        MoxyAnnotations.initMocks(this);
+    }
 
-  @Mock
-  public TesterClass publicMock;
+    @Mock
+    private TesterClass publicMock;
 
-  @Mock
-  protected TesterClass protectedMock;
+    @Mock
+    private TesterClass protectedMock;
 
-  @Mock
-  protected TesterClass packageMock;
+    @Mock
+    private TesterClass packageMock;
 
-  @Mock
-  private TesterClass privateMock;
+    @Mock
+    private TesterClass privateMock;
 
-  @Test
-  public void testSetsPublicMock() {
-    assertThat(this.publicMock).isNotNull();
-    assertThat(Moxy.isMock(this.publicMock)).isTrue();
+    @Test
+    void testSetsPublicMock() {
+        assertThat(this.publicMock).isNotNull();
+        assertThat(Moxy.isMock(this.publicMock)).isTrue();
 
-    // Make sure it's actually a mock...
-    assertThat(this.publicMock.test()).isNull();
-  }
+        // Make sure it's actually a mock...
+        assertThat(this.publicMock.test()).isNull();
+    }
 
-  @Test
-  public void testSetsProtectedMock() {
-    assertThat(this.protectedMock).isNotNull();
-    assertThat(Moxy.isMock(this.protectedMock)).isTrue();
+    @Test
+    void testSetsProtectedMock() {
+        assertThat(this.protectedMock).isNotNull();
+        assertThat(Moxy.isMock(this.protectedMock)).isTrue();
 
-    // Make sure it's actually a mock...
-    assertThat(this.protectedMock.test()).isNull();
-  }
+        // Make sure it's actually a mock...
+        assertThat(this.protectedMock.test()).isNull();
+    }
 
-  @Test
-  public void testSetsPackageMock() {
-    assertThat(this.packageMock).isNotNull();
-    assertThat(Moxy.isMock(this.packageMock)).isTrue();
+    @Test
+    void testSetsPackageMock() {
+        assertThat(this.packageMock).isNotNull();
+        assertThat(Moxy.isMock(this.packageMock)).isTrue();
 
-    // Make sure it's actually a mock...
-    assertThat(this.packageMock.test()).isNull();
-  }
+        // Make sure it's actually a mock...
+        assertThat(this.packageMock.test()).isNull();
+    }
 
-  @Test
-  public void testSetsPrivateMock() {
-    assertThat(this.privateMock).isNotNull();
-    assertThat(Moxy.isMock(this.privateMock)).isTrue();
+    @Test
+    void testSetsPrivateMock() {
+        assertThat(this.privateMock).isNotNull();
+        assertThat(Moxy.isMock(this.privateMock)).isTrue();
 
-    // Make sure it's actually a mock...
-    assertThat(this.privateMock.test()).isNull();
-  }
+        // Make sure it's actually a mock...
+        assertThat(this.privateMock.test()).isNull();
+    }
 }

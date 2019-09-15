@@ -24,23 +24,23 @@
 
 package com.roscopeco.moxy;
 
-import static org.assertj.core.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * TODO Document TestMoxyNestedAndInnerClasses
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
-public class RegressionMoxyClassicDoesntMockStatics {
-  // This fails on Java9+ if classic mocking isn't excluding statics...
-  @Test
-  public void testMoxyCanMockMap() {
-    final Map<?,?> map = Moxy.mock(Map.class);
+class RegressionMoxyClassicDoesntMockStatics {
+    // This fails on Java9+ if classic mocking isn't excluding statics...
+    @Test
+    void testMoxyCanMockMap() {
+        final Map<?, ?> map = Moxy.mock(Map.class);
 
-    assertThat(map.get("Anything")).isNull();
-  }
+        assertThat(map.get("Anything")).isNull();
+    }
 }

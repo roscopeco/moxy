@@ -25,7 +25,7 @@
 package com.roscopeco.moxy.model.classmock;
 
 public class ClassWithStatic {
-  public static String returnHello() {
-    return "Hello";
-  }
+    public static String returnHello() {
+        return "Hello";
+    }
 }

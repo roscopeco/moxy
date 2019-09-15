@@ -32,10 +32,11 @@ package com.roscopeco.moxy.api;
  */
 @FunctionalInterface
 public interface InvocationRunnable {
-  /**
-   * Run the invocation. The framework will swallow most types of exception.
-   *
-   * @throws Exception Should never be thrown, just here to make the API more friendly.
-   */
-  public void run() throws Exception;
+    /**
+     * Run the invocation. The framework will swallow most types of exception.
+     *
+     * @throws Exception Should never be thrown, just here to make the API more friendly.
+     */
+    @SuppressWarnings("squid:S00112" /* This has to be a generic exception type as user code could throw anything */)
+    void run() throws Exception;
 }

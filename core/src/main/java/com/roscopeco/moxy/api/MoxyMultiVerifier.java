@@ -49,193 +49,193 @@ import org.opentest4j.MultipleFailuresError;
  * @since 1.0
  */
 public interface MoxyMultiVerifier {
-  /**
-   * <p>Verify that none of the mock methods were called at all.</p>
-   *
-   * <p>Throws {@link AssertionFailedError} if a single invocation was
-   * matched, or {@link MultipleFailuresError} if multiple calls were
-   * matched. In the latter case, the individual calls that matched
-   * will each have a nested {@link AssertionFailedError}.</p>
-   *
-   * @since 1.0
-   */
-  public void wereNotCalled();
+    /**
+     * <p>Verify that none of the mock methods were called at all.</p>
+     *
+     * <p>Throws {@link AssertionFailedError} if a single invocation was
+     * matched, or {@link MultipleFailuresError} if multiple calls were
+     * matched. In the latter case, the individual calls that matched
+     * will each have a nested {@link AssertionFailedError}.</p>
+     *
+     * @since 1.0
+     */
+    void wereNotCalled();
 
-  /**
-   * <p>Verify that all the mock methods were called <em>at least</em> once,
-   * with the arguments specified in the call.</p>
-   *
-   * <p>Note the subtle difference from {@link #wereAllCalledExactly(int)}, which
-   * expects an <em>exact number</em> of calls.</p>
-   *
-   * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
-   * matched, or {@link MultipleFailuresError} if multiple calls weren't
-   * matched. In the latter case, the individual calls that didn't match
-   * will each have a nested {@link AssertionFailedError}.</p>
-   *
-   * @return <code>this</code>.
-   * @since 1.0
-   */
-  public MoxyMultiVerifier wereAllCalled();
+    /**
+     * <p>Verify that all the mock methods were called <em>at least</em> once,
+     * with the arguments specified in the call.</p>
+     *
+     * <p>Note the subtle difference from {@link #wereAllCalledExactly(int)}, which
+     * expects an <em>exact number</em> of calls.</p>
+     *
+     * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
+     * matched, or {@link MultipleFailuresError} if multiple calls weren't
+     * matched. In the latter case, the individual calls that didn't match
+     * will each have a nested {@link AssertionFailedError}.</p>
+     *
+     * @return <code>this</code>.
+     * @since 1.0
+     */
+    MoxyMultiVerifier wereAllCalled();
 
-  /**
-   * <p>Verify that all the mock methods were called exactly <code>expectedTimes</code>
-   * with the arguments specified in the call.</p>
-   *
-   * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
-   * matched, or {@link MultipleFailuresError} if multiple calls weren't
-   * matched. In the latter case, the individual calls that didn't match
-   * will each have a nested {@link AssertionFailedError}.</p>
-   *
-   * @since 1.0
-   * @param expectedTimes The expected number of invocations for each method.
-   * @return <code>this</code>.
-   */
-  public MoxyMultiVerifier wereAllCalledExactly(int expectedTimes);
+    /**
+     * <p>Verify that all the mock methods were called exactly <code>expectedTimes</code>
+     * with the arguments specified in the call.</p>
+     *
+     * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
+     * matched, or {@link MultipleFailuresError} if multiple calls weren't
+     * matched. In the latter case, the individual calls that didn't match
+     * will each have a nested {@link AssertionFailedError}.</p>
+     *
+     * @param expectedTimes The expected number of invocations for each method.
+     * @return <code>this</code>.
+     * @since 1.0
+     */
+    MoxyMultiVerifier wereAllCalledExactly(int expectedTimes);
 
-  /**
-   * <p>Verify that all the mock methods were called exactly once
-   * with the arguments specified in the call.</p>
-   *
-   * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
-   * matched, or {@link MultipleFailuresError} if multiple calls weren't
-   * matched. In the latter case, the individual calls that didn't match
-   * will each have a nested {@link AssertionFailedError}.</p>
-   *
-   * @since 1.0
-   * @return <code>this</code>.
-   */
-  public MoxyMultiVerifier wereAllCalledOnce();
+    /**
+     * <p>Verify that all the mock methods were called exactly once
+     * with the arguments specified in the call.</p>
+     *
+     * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
+     * matched, or {@link MultipleFailuresError} if multiple calls weren't
+     * matched. In the latter case, the individual calls that didn't match
+     * will each have a nested {@link AssertionFailedError}.</p>
+     *
+     * @return <code>this</code>.
+     * @since 1.0
+     */
+    MoxyMultiVerifier wereAllCalledOnce();
 
-  /**
-   * <p>Verify that all the mock methods were called exactly twice
-   * with the arguments specified in the call.</p>
-   *
-   * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
-   * matched, or {@link MultipleFailuresError} if multiple calls weren't
-   * matched. In the latter case, the individual calls that didn't match
-   * will each have a nested {@link AssertionFailedError}.</p>
-   *
-   * @since 1.0
-   * @return <code>this</code>.
-   */
-  public MoxyMultiVerifier wereAllCalledTwice();
+    /**
+     * <p>Verify that all the mock methods were called exactly twice
+     * with the arguments specified in the call.</p>
+     *
+     * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
+     * matched, or {@link MultipleFailuresError} if multiple calls weren't
+     * matched. In the latter case, the individual calls that didn't match
+     * will each have a nested {@link AssertionFailedError}.</p>
+     *
+     * @return <code>this</code>.
+     * @since 1.0
+     */
+    MoxyMultiVerifier wereAllCalledTwice();
 
-  /**
-   * <p>Verify that all the mock methods were called at least <code>expectedTimes</code>
-   * with the arguments specified in the call.</p>
-   *
-   * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
-   * matched, or {@link MultipleFailuresError} if multiple calls weren't
-   * matched. In the latter case, the individual calls that didn't match
-   * will each have a nested {@link AssertionFailedError}.</p>
-   *
-   * @since 1.0
-   * @param expectedTimes The expected number of invocations.
-   * @return <code>this</code>.
-   */
-  public MoxyMultiVerifier wereAllCalledAtLeast(int expectedTimes);
+    /**
+     * <p>Verify that all the mock methods were called at least <code>expectedTimes</code>
+     * with the arguments specified in the call.</p>
+     *
+     * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
+     * matched, or {@link MultipleFailuresError} if multiple calls weren't
+     * matched. In the latter case, the individual calls that didn't match
+     * will each have a nested {@link AssertionFailedError}.</p>
+     *
+     * @param expectedTimes The expected number of invocations.
+     * @return <code>this</code>.
+     * @since 1.0
+     */
+    MoxyMultiVerifier wereAllCalledAtLeast(int expectedTimes);
 
-  /**
-   * <p>Verify that all the mock methods were called at least twice
-   * with the arguments specified in the call.</p>
-   *
-   * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
-   * matched, or {@link MultipleFailuresError} if multiple calls weren't
-   * matched. In the latter case, the individual calls that didn't match
-   * will each have a nested {@link AssertionFailedError}.</p>
-   *
-   * @since 1.0
-   * @return <code>this</code>.
-   */
-  public MoxyMultiVerifier wereAllCalledAtLeastTwice();
+    /**
+     * <p>Verify that all the mock methods were called at least twice
+     * with the arguments specified in the call.</p>
+     *
+     * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
+     * matched, or {@link MultipleFailuresError} if multiple calls weren't
+     * matched. In the latter case, the individual calls that didn't match
+     * will each have a nested {@link AssertionFailedError}.</p>
+     *
+     * @return <code>this</code>.
+     * @since 1.0
+     */
+    MoxyMultiVerifier wereAllCalledAtLeastTwice();
 
-  /**
-   * <p>Verify that all the mock methods were called at most <code>expectedTimes</code>
-   * with the arguments specified in the call.</p>
-   *
-   * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
-   * matched, or {@link MultipleFailuresError} if multiple calls weren't
-   * matched. In the latter case, the individual calls that didn't match
-   * will each have a nested {@link AssertionFailedError}.</p>
-   *
-   * @since 1.0
-   * @param expectedTimes The expected number of invocations.
-   * @return <code>this</code>.
-   */
-  public MoxyMultiVerifier wereAllCalledAtMost(int expectedTimes);
+    /**
+     * <p>Verify that all the mock methods were called at most <code>expectedTimes</code>
+     * with the arguments specified in the call.</p>
+     *
+     * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
+     * matched, or {@link MultipleFailuresError} if multiple calls weren't
+     * matched. In the latter case, the individual calls that didn't match
+     * will each have a nested {@link AssertionFailedError}.</p>
+     *
+     * @param expectedTimes The expected number of invocations.
+     * @return <code>this</code>.
+     * @since 1.0
+     */
+    MoxyMultiVerifier wereAllCalledAtMost(int expectedTimes);
 
-  /**
-   * <p>Verify that all the mock methods were called at most twice
-   * with the arguments specified in the call.</p>
-   *
-   * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
-   * matched, or {@link MultipleFailuresError} if multiple calls weren't
-   * matched. In the latter case, the individual calls that didn't match
-   * will each have a nested {@link AssertionFailedError}.</p>
-   *
-   * @since 1.0
-   * @return <code>this</code>.
-   */
-  public MoxyMultiVerifier wereAllCalledAtMostTwice();
+    /**
+     * <p>Verify that all the mock methods were called at most twice
+     * with the arguments specified in the call.</p>
+     *
+     * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
+     * matched, or {@link MultipleFailuresError} if multiple calls weren't
+     * matched. In the latter case, the individual calls that didn't match
+     * will each have a nested {@link AssertionFailedError}.</p>
+     *
+     * @return <code>this</code>.
+     * @since 1.0
+     */
+    MoxyMultiVerifier wereAllCalledAtMostTwice();
 
-  /**
-   * <p>Verifies that the mock methods were called (with matching
-   * arguments) in the order they were called within the lambda
-   * passed to assertMocks.</p>
-   *
-   * <p>This method is tolerant of other mock invocations in between
-   * the matched calls.</p>
-   *
-   * <p>Note that this <strong>does not</strong> directly verify
-   * that all methods were called (although it does have that side-effect).
-   * You may find it more readable (and will give better failure messages)
-   * to chain this with one of the {@link #wereAllCalled()} family
-   * of methods.</p>
-   *
-   * <p>Throws {@link AssertionFailedError} if the methods were not called
-   * in the order given.</p>
-   *
-   * @since 1.0
-   */
-  public void inThatOrder();
+    /**
+     * <p>Verifies that the mock methods were called (with matching
+     * arguments) in the order they were called within the lambda
+     * passed to assertMocks.</p>
+     *
+     * <p>This method is tolerant of other mock invocations in between
+     * the matched calls.</p>
+     *
+     * <p>Note that this <strong>does not</strong> directly verify
+     * that all methods were called (although it does have that side-effect).
+     * You may find it more readable (and will give better failure messages)
+     * to chain this with one of the {@link #wereAllCalled()} family
+     * of methods.</p>
+     *
+     * <p>Throws {@link AssertionFailedError} if the methods were not called
+     * in the order given.</p>
+     *
+     * @since 1.0
+     */
+    void inThatOrder();
 
-  /**
-   * <p>Verifies that the mock methods were called (with matching
-   * arguments) in the order they were called within the lambda
-   * passed to assertMocks.</p>
-   *
-   * <p>This method is not tolerant of other mock invocations in between
-   * the matched calls - it requires them to have been exclusively
-   * called, in the given order.</p>
-   *
-   * <p>Note that this <strong>does not</strong> directly verify
-   * that all methods were called (although it does have that side-effect).
-   * You may find it more readable (and will give better failure messages)
-   * to chain this with one of the {@link #wereAllCalled()} family
-   * of methods.</p>
-   *
-   * Throws {@link AssertionFailedError} if the methods were not called
-   * in the order given.
-   *
-   * @since 1.0
-   */
-  public void exclusivelyInThatOrder();
+    /**
+     * <p>Verifies that the mock methods were called (with matching
+     * arguments) in the order they were called within the lambda
+     * passed to assertMocks.</p>
+     *
+     * <p>This method is not tolerant of other mock invocations in between
+     * the matched calls - it requires them to have been exclusively
+     * called, in the given order.</p>
+     *
+     * <p>Note that this <strong>does not</strong> directly verify
+     * that all methods were called (although it does have that side-effect).
+     * You may find it more readable (and will give better failure messages)
+     * to chain this with one of the {@link #wereAllCalled()} family
+     * of methods.</p>
+     * <p>
+     * Throws {@link AssertionFailedError} if the methods were not called
+     * in the order given.
+     *
+     * @since 1.0
+     */
+    void exclusivelyInThatOrder();
 
-  /**
-   * <p>Verifies that the mock methods were called (with matching
-   * arguments) in any order. In the default implementation, this is
-   * a synonym for {@link #wereAllCalled()}. </p>
-   *
-   * <p>This method is tolerant of other mock invocations in between
-   * the matched calls.</p>
-   *
-   * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
-   * matched, or {@link MultipleFailuresError} if multiple calls weren't
-   * matched. In the latter case, the individual calls that didn't match
-   * will each have a nested {@link AssertionFailedError}.</p>
-   *
-   * @since 1.0
-   */
-  public void inAnyOrder();
+    /**
+     * <p>Verifies that the mock methods were called (with matching
+     * arguments) in any order. In the default implementation, this is
+     * a synonym for {@link #wereAllCalled()}. </p>
+     *
+     * <p>This method is tolerant of other mock invocations in between
+     * the matched calls.</p>
+     *
+     * <p>Throws {@link AssertionFailedError} if a single invocation wasn't
+     * matched, or {@link MultipleFailuresError} if multiple calls weren't
+     * matched. In the latter case, the individual calls that didn't match
+     * will each have a nested {@link AssertionFailedError}.</p>
+     *
+     * @since 1.0
+     */
+    void inAnyOrder();
 }

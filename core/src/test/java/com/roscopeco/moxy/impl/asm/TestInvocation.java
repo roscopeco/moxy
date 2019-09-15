@@ -23,103 +23,102 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
-import static org.assertj.core.api.Assertions.*;
+import com.roscopeco.moxy.api.MoxyException;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.roscopeco.moxy.api.MoxyException;
+class TestInvocation {
+    private static final Object RECEIVER = new Object();
+    private static final String METHODNAME = "testMethod";
+    private static final String METHODDESC = "(Ljava/lang/String;Ljava/lang/String)V";
+    private static final List<Object> ARGS = Arrays.asList("one", "two");
+    private static final Object RETURNED = new Object();
+    private static final Throwable THREW = new Throwable();
 
-import nl.jqno.equalsverifier.EqualsVerifier;
+    @Test
+    void testConstructor() {
+        final Invocation invocation = new Invocation(RECEIVER, METHODNAME, METHODDESC, ARGS);
 
-public class TestInvocation {
-  public static final Object RECEIVER = new Object();
-  public static final String METHODNAME = "testMethod";
-  public static final String METHODDESC = "(Ljava/lang/String;Ljava/lang/String)V";
-  public static final List<Object> ARGS = Arrays.asList("one", "two");
-  public static final Object RETURNED = new Object();
-  public static final Throwable THREW = new Throwable();
+        assertThat(invocation.getReceiver()).isEqualTo(RECEIVER);
+        assertThat(invocation.getMethodName()).isEqualTo(METHODNAME);
+        assertThat(invocation.getMethodDesc()).isEqualTo(METHODDESC);
+        assertThat(invocation.getArgs()).isEqualTo(ARGS);
+    }
 
-  @Test
-  public void testConstructor() {
-    final Invocation invocation = new Invocation(RECEIVER, METHODNAME, METHODDESC, ARGS);
+    @Test
+    void testConstructorNullReceiver() {
+        assertThatThrownBy(() ->
+                new Invocation(null, METHODNAME, METHODDESC, ARGS)
+        )
+                .isInstanceOf(MoxyException.class)
+                .hasCauseExactlyInstanceOf(IllegalArgumentException.class);
+    }
 
-    assertThat(invocation.getReceiver()).isEqualTo(RECEIVER);
-    assertThat(invocation.getMethodName()).isEqualTo(METHODNAME);
-    assertThat(invocation.getMethodDesc()).isEqualTo(METHODDESC);
-    assertThat(invocation.getArgs()).isEqualTo(ARGS);
-  }
+    @Test
+    void testConstructorNullMethodName() {
+        assertThatThrownBy(() ->
+                new Invocation(RECEIVER, null, METHODDESC, ARGS)
+        )
+                .isInstanceOf(MoxyException.class)
+                .hasCauseExactlyInstanceOf(IllegalArgumentException.class);
+    }
 
-  @Test
-  public void testConstructorNullReceiver() {
-    assertThatThrownBy(() ->
-        new Invocation(null, METHODNAME, METHODDESC, ARGS)
-    )
-        .isInstanceOf(MoxyException.class)
-        .hasCauseExactlyInstanceOf(IllegalArgumentException.class);
-  }
+    @Test
+    void testConstructorNullMethodDesc() {
+        assertThatThrownBy(() ->
+                new Invocation(RECEIVER, METHODNAME, null, ARGS)
+        )
+                .isInstanceOf(MoxyException.class)
+                .hasCauseExactlyInstanceOf(IllegalArgumentException.class);
+    }
 
-  @Test
-  public void testConstructorNullMethodName() {
-    assertThatThrownBy(() ->
-        new Invocation(RECEIVER, null, METHODDESC, ARGS)
-    )
-        .isInstanceOf(MoxyException.class)
-        .hasCauseExactlyInstanceOf(IllegalArgumentException.class);
-  }
+    @Test
+    void testConstructorNullArgs() {
+        final Invocation invocation = new Invocation(RECEIVER, METHODNAME, METHODDESC, null);
 
-  @Test
-  public void testConstructorNullMethodDesc() {
-    assertThatThrownBy(() ->
-        new Invocation(RECEIVER, METHODNAME, null, ARGS)
-    )
-        .isInstanceOf(MoxyException.class)
-        .hasCauseExactlyInstanceOf(IllegalArgumentException.class);
-  }
+        assertThat(invocation.getReceiver()).isEqualTo(RECEIVER);
+        assertThat(invocation.getMethodName()).isEqualTo(METHODNAME);
+        assertThat(invocation.getMethodDesc()).isEqualTo(METHODDESC);
+        assertThat(invocation.getArgs())
+                .isNotNull()
+                .hasSize(0);
+    }
 
-  @Test
-  public void testConstructorNullArgs() {
-    final Invocation invocation = new Invocation(RECEIVER, METHODNAME, METHODDESC, null);
+    void testGetSetReturn() {
+        final Invocation invocation = new Invocation(RECEIVER, METHODNAME, METHODDESC, ARGS);
 
-    assertThat(invocation.getReceiver()).isEqualTo(RECEIVER);
-    assertThat(invocation.getMethodName()).isEqualTo(METHODNAME);
-    assertThat(invocation.getMethodDesc()).isEqualTo(METHODDESC);
-    assertThat(invocation.getArgs())
-        .isNotNull()
-        .hasSize(0);
-  }
+        assertThat(invocation.getReturned()).isNull();
 
-  public void testGetSetReturn() {
-    final Invocation invocation = new Invocation(RECEIVER, METHODNAME, METHODDESC, ARGS);
+        invocation.setReturned(RETURNED);
 
-    assertThat(invocation.getReturned()).isNull();
+        assertThat(invocation.getReturned())
+                .isNotNull()
+                .isEqualTo(RETURNED);
+    }
 
-    invocation.setReturned(RETURNED);
+    void testGetSetThrew() {
+        final Invocation invocation = new Invocation(RECEIVER, METHODNAME, METHODDESC, ARGS);
 
-    assertThat(invocation.getReturned())
-        .isNotNull()
-        .isEqualTo(RETURNED);
-  }
+        assertThat(invocation.getThrew()).isNull();
 
-  public void testGetSetThrew() {
-    final Invocation invocation = new Invocation(RECEIVER, METHODNAME, METHODDESC, ARGS);
+        invocation.setThrew(THREW);
 
-    assertThat(invocation.getThrew()).isNull();
+        assertThat(invocation.getReturned())
+                .isNotNull()
+                .isEqualTo(THREW);
+    }
 
-    invocation.setThrew(THREW);
-
-    assertThat(invocation.getReturned())
-        .isNotNull()
-        .isEqualTo(THREW);
-  }
-
-  @Test
-  public void testEqualsHashcode() {
-    EqualsVerifier
-        .forClass(Invocation.class)
-        .withIgnoredFields("returned", "threw")  // ignore mutable fields
-        .verify();
-  }
+    @Test
+    void testEqualsHashcode() {
+        EqualsVerifier
+                .forClass(Invocation.class)
+                .withIgnoredFields("returned", "threw")  // ignore mutable fields
+                .verify();
+    }
 }

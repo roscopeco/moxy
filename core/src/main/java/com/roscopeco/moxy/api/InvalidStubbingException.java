@@ -30,17 +30,18 @@ package com.roscopeco.moxy.api;
  * @since 1.0
  */
 public class InvalidStubbingException extends MoxyException {
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public InvalidStubbingException(final String message) {
-    super(message);
-  }
+    /* Don't believe IntelliJ's lies - all these need to be public as they're accessed from generated code! */
+    public InvalidStubbingException(final String message) {
+        super(message);
+    }
 
-  public InvalidStubbingException(final String message, final String method) {
-    super(String.format(message, method));
-  }
+    public InvalidStubbingException(final String message, final String method) {
+        super(String.format(message, method));
+    }
 
-  public InvalidStubbingException(final String message, final Throwable cause) {
-    super(message, cause);
-  }
+    public InvalidStubbingException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 }

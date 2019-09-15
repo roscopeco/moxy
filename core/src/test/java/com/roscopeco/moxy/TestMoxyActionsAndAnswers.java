@@ -23,102 +23,101 @@
  */
 package com.roscopeco.moxy;
 
-import static org.assertj.core.api.Assertions.*;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import com.roscopeco.moxy.matchers.Matchers;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class TestMoxyActionsAndAnswers {
-  @BeforeEach
-  public void setUp() {
-    Moxy.getMoxyEngine().reset();
-  }
+import static org.assertj.core.api.Assertions.assertThat;
 
-  @Test
-  public void testMoxyMockThenAnswerWorksCorrectly() {
-    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+class TestMoxyActionsAndAnswers {
+    @BeforeEach
+    void setUp() {
+        Moxy.getMoxyEngine().reset();
+    }
 
-    Moxy.when(() -> mock.sayHelloTo("Steve")).thenAnswer(args -> "Bonjour, " + args.get(0));
+    @Test
+    void testMoxyMockThenAnswerWorksCorrectly() {
+        final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
 
-    assertThat(mock.sayHelloTo("Steve")).isEqualTo("Bonjour, Steve");
-  }
+        Moxy.when(() -> mock.sayHelloTo("Steve")).thenAnswer(args -> "Bonjour, " + args.get(0));
 
-  @Test
-  public void testMoxyMockThenDoWorksCorrectly() {
-    final MethodWithArguments mock = Moxy.mock(MethodWithArguments.class);
+        assertThat(mock.sayHelloTo("Steve")).isEqualTo("Bonjour, Steve");
+    }
 
-    final String[] string = new String[1];
+    @Test
+    void testMoxyMockThenDoWorksCorrectly() {
+        final MethodWithArguments mock = Moxy.mock(MethodWithArguments.class);
 
-    assertThat(string[0]).isNull();
+        final String[] string = new String[1];
 
-    Moxy.when(() -> mock.hasArgs("one", "two")).thenDo(args -> string[0] = args.get(0).toString());
+        assertThat(string[0]).isNull();
 
-    mock.hasArgs("one", "two");
+        Moxy.when(() -> mock.hasArgs("one", "two")).thenDo(args -> string[0] = args.get(0).toString());
 
-    assertThat(string[0]).isEqualTo("one");
-  }
+        mock.hasArgs("one", "two");
 
-  @Test
-  public void testMoxyMockThenDoThenAnswerWorksCorrectly() {
-    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+        assertThat(string[0]).isEqualTo("one");
+    }
 
-    final String[] string = new String[1];
+    @Test
+    void testMoxyMockThenDoThenAnswerWorksCorrectly() {
+        final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
 
-    assertThat(string[0]).isNull();
+        final String[] string = new String[1];
 
-    Moxy.when(() -> mock.sayHelloTo(Matchers.any()))
-        .thenDo(args -> string[0] = args.get(0).toString())
-        .thenAnswer(args -> "Hallo, " + args.get(0));
+        assertThat(string[0]).isNull();
 
-    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hallo, Bill");
+        Moxy.when(() -> mock.sayHelloTo(Matchers.any()))
+                .thenDo(args -> string[0] = args.get(0).toString())
+                .thenAnswer(args -> "Hallo, " + args.get(0));
 
-    assertThat(string[0]).isEqualTo("Bill");
-  }
+        assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hallo, Bill");
 
-  @Test
-  public void testMoxyMockThenDoMultipleThenAnswerWorksCorrectly() {
-    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+        assertThat(string[0]).isEqualTo("Bill");
+    }
 
-    final String[] string = new String[3];
+    @Test
+    void testMoxyMockThenDoMultipleThenAnswerWorksCorrectly() {
+        final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
 
-    assertThat(string[0]).isNull();
+        final String[] string = new String[3];
 
-    Moxy.when(() -> mock.sayHelloTo(Matchers.any()))
-        .thenDo(args -> string[0] = args.get(0).toString())
-        .thenDo(args -> string[1] = args.get(0).toString().toLowerCase())
-        .thenDo(args -> string[2] = args.get(0).toString().toUpperCase())
-        .thenAnswer(args -> "Hallo, " + args.get(0));
+        assertThat(string[0]).isNull();
 
-    assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hallo, Bill");
+        Moxy.when(() -> mock.sayHelloTo(Matchers.any()))
+                .thenDo(args -> string[0] = args.get(0).toString())
+                .thenDo(args -> string[1] = args.get(0).toString().toLowerCase())
+                .thenDo(args -> string[2] = args.get(0).toString().toUpperCase())
+                .thenAnswer(args -> "Hallo, " + args.get(0));
 
-    assertThat(string[0]).isEqualTo("Bill");
-    assertThat(string[1]).isEqualTo("bill");
-    assertThat(string[2]).isEqualTo("BILL");
-  }
+        assertThat(mock.sayHelloTo("Bill")).isEqualTo("Hallo, Bill");
 
-  @Test
-  public void testMoxyMockThenDoMultipleMatchesAllAreExecuted_whichMaySeemOdd_butIsDocumented() {
-    final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
+        assertThat(string[0]).isEqualTo("Bill");
+        assertThat(string[1]).isEqualTo("bill");
+        assertThat(string[2]).isEqualTo("BILL");
+    }
 
-    final String[] string = new String[2];
+    @Test
+    void testMoxyMockThenDoMultipleMatchesAllAreExecuted_whichMaySeemOdd_butIsDocumented() {
+        final MethodWithArgAndReturn mock = Moxy.mock(MethodWithArgAndReturn.class);
 
-    assertThat(string[0]).isNull();
+        final String[] string = new String[2];
 
-    Moxy.when(() -> mock.hasTwoArgs(Matchers.any(), Matchers.eqInt(5)))
-      .thenDo(args -> string[0] = args.get(0).toString())
-      .thenAnswer(args -> "Yo, " + args.get(0));
+        assertThat(string[0]).isNull();
 
-    Moxy.when(() -> mock.hasTwoArgs(Matchers.eq("Bill"), Matchers.anyInt()))
-      .thenDo(args -> string[1] = args.get(1).toString())
-      .thenAnswer(args -> "Yo, " + args.get(0));
+        Moxy.when(() -> mock.hasTwoArgs(Matchers.any(), Matchers.eqInt(5)))
+                .thenDo(args -> string[0] = args.get(0).toString())
+                .thenAnswer(args -> "Yo, " + args.get(0));
 
-    assertThat(mock.hasTwoArgs("Bill", 5)).isEqualTo("Yo, Bill");
+        Moxy.when(() -> mock.hasTwoArgs(Matchers.eq("Bill"), Matchers.anyInt()))
+                .thenDo(args -> string[1] = args.get(1).toString())
+                .thenAnswer(args -> "Yo, " + args.get(0));
 
-    assertThat(string[0]).isEqualTo("Bill");
-    assertThat(string[1]).isEqualTo("5");
-  }
+        assertThat(mock.hasTwoArgs("Bill", 5)).isEqualTo("Yo, Bill");
+
+        assertThat(string[0]).isEqualTo("Bill");
+        assertThat(string[1]).isEqualTo("5");
+    }
 }

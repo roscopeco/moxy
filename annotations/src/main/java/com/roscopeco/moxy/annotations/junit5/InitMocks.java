@@ -24,10 +24,9 @@
 
 package com.roscopeco.moxy.annotations.junit5;
 
+import com.roscopeco.moxy.annotations.MoxyAnnotations;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-
-import com.roscopeco.moxy.annotations.MoxyAnnotations;
 
 /**
  * JUnit 5 extension to initialise mocks on a test.
@@ -47,8 +46,8 @@ import com.roscopeco.moxy.annotations.MoxyAnnotations;
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public class InitMocks implements BeforeEachCallback {
-  @Override
-  public void beforeEach(final ExtensionContext context) throws Exception {
-    context.getTestInstance().ifPresent(MoxyAnnotations::initMocks);
-  }
+    @Override
+    public void beforeEach(final ExtensionContext context) {
+        context.getTestInstance().ifPresent(MoxyAnnotations::initMocks);
+    }
 }

@@ -24,41 +24,40 @@
 
 package com.roscopeco.moxy.annotations.junit5;
 
-import static org.assertj.core.api.Assertions.*;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import com.roscopeco.moxy.Moxy;
 import com.roscopeco.moxy.annotations.Mock;
 import com.roscopeco.moxy.annotations.Spy;
 import com.roscopeco.moxy.annotations.model.TesterClass;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(InitMocks.class)
-public class TestInitMocksExtension {
-  @Mock
-  public TesterClass mock;
+class TestInitMocksExtension {
+    @Mock
+    private TesterClass mock;
 
-  @Spy
-  public TesterClass spy;
+    @Spy
+    private TesterClass spy;
 
-  @Test
-  public void testSetsMocks() {
-    // Mock
-    assertThat(this.mock).isNotNull();
-    assertThat(Moxy.isMock(this.mock)).isTrue();
+    @Test
+    void testSetsMocks() {
+        // Mock
+        assertThat(this.mock).isNotNull();
+        assertThat(Moxy.isMock(this.mock)).isTrue();
 
-    // Make sure it's actually a mock...
-    assertThat(this.mock.test()).isNull();
-  }
+        // Make sure it's actually a mock...
+        assertThat(this.mock.test()).isNull();
+    }
 
-  @Test
-  public void testSetsSpies() {
-    // Spy
-    assertThat(this.spy).isNotNull();
-    assertThat(Moxy.isMock(this.spy)).isTrue();
+    @Test
+    void testSetsSpies() {
+        // Spy
+        assertThat(this.spy).isNotNull();
+        assertThat(Moxy.isMock(this.spy)).isTrue();
 
-    // Make sure it's actually a mock...
-    assertThat(this.spy.test()).isEqualTo(TesterClass.PASSED);
-  }
+        // Make sure it's actually a mock...
+        assertThat(this.spy.test()).isEqualTo(TesterClass.PASSED);
+    }
 }

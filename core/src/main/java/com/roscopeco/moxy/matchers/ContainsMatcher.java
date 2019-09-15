@@ -24,21 +24,21 @@
 package com.roscopeco.moxy.matchers;
 
 class ContainsMatcher extends SimpleObjectMatcher<String> {
-  public ContainsMatcher(final String string) {
-    super(string, false);
-  }
-
-  @Override
-  public boolean matches(final String arg) {
-    if (arg == null) {
-      return false;
-    } else {
-      return arg.contains(this.getObject());
+    ContainsMatcher(final String string) {
+        super(string, false);
     }
-  }
 
-  @Override
-  public String toString() {
-    return "<contains" + super.toString();
-  }
+    @Override
+    public boolean matches(final String arg) {
+        if (arg == null) {
+            return false;
+        } else {
+            return arg.contains(this.getObject());
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "<contains" + super.toString();
+    }
 }

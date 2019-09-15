@@ -23,46 +23,46 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
-import java.util.List;
-
 import com.roscopeco.moxy.api.InvalidMockInvocationException;
+
+import java.util.List;
 
 /*
  * Base-class for stubbers and verifiers.
  */
 class AbstractASMMoxyInvocationListProcessor {
-  protected final ASMMoxyEngine engine;
-  protected final List<Invocation> invocations;
+    protected final ASMMoxyEngine engine;
+    protected final List<Invocation> invocations;
 
-  public AbstractASMMoxyInvocationListProcessor(final ASMMoxyEngine engine,
-                                 final List<Invocation> monitoredInvocations) {
-    this.engine = engine;
-    this.invocations = monitoredInvocations;
+    AbstractASMMoxyInvocationListProcessor(final ASMMoxyEngine engine,
+                                           final List<Invocation> monitoredInvocations) {
+        this.engine = engine;
+        this.invocations = monitoredInvocations;
 
-    if (this.engine == null) {
-      throw new IllegalArgumentException("Cannot construct with null engine");
+        if (this.engine == null) {
+            throw new IllegalArgumentException("Cannot construct with null engine");
+        }
+
+        if (this.invocations == null ||
+                this.invocations.isEmpty() ||
+                this.invocations.stream().anyMatch(i -> i.getReceiver() == null)) {
+            throw new InvalidMockInvocationException("No mock invocation found");
+        }
     }
 
-    if (this.invocations == null ||
-        this.invocations.isEmpty() ||
-        this.invocations.stream().anyMatch(i -> i.getReceiver() == null)) {
-      throw new InvalidMockInvocationException("No mock invocation found");
+    ASMMoxyEngine getEngine() {
+        return this.engine;
     }
-  }
 
-  protected ASMMoxyEngine getEngine() {
-    return this.engine;
-  }
+    InvocationRecorder getRecorder() {
+        return this.engine.getRecorder();
+    }
 
-  protected InvocationRecorder getRecorder() {
-    return this.engine.getRecorder();
-  }
+    Invocation getLastMonitoredInvocation() {
+        return this.invocations.get(this.invocations.size() - 1);
+    }
 
-  protected Invocation getLastMonitoredInvocation() {
-    return this.invocations.get(this.invocations.size() - 1);
-  }
-
-  protected List<Invocation> getMonitoredInvocations() {
-    return this.invocations;
-  }
+    List<Invocation> getMonitoredInvocations() {
+        return this.invocations;
+    }
 }

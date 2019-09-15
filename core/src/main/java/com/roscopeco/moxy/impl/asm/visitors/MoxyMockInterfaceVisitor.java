@@ -23,16 +23,17 @@
  */
 package com.roscopeco.moxy.impl.asm.visitors;
 
-import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
-import static org.objectweb.asm.Opcodes.*;
-
-import java.lang.reflect.Method;
-import java.util.*;
-
+import com.roscopeco.moxy.api.MoxyMock;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
-import com.roscopeco.moxy.api.MoxyMock;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+
+import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
+import static org.objectweb.asm.Opcodes.*;
 
 /**
  * Creates mocks from interfaces.
@@ -40,85 +41,84 @@ import com.roscopeco.moxy.api.MoxyMock;
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public class MoxyMockInterfaceVisitor extends AbstractMoxyTypeVisitor {
-  private final String interfaceInternalName;
-  private final Class<?> originalIface;
+    private final String interfaceInternalName;
+    private final Class<?> originalIface;
 
-  public MoxyMockInterfaceVisitor(final Class<?> iface, final Map<String, Method> methods) {
-    super(AbstractMoxyTypeVisitor.makeMockName(iface), methods);
+    public MoxyMockInterfaceVisitor(final Class<?> iface, final Map<String, Method> methods) {
+        super(AbstractMoxyTypeVisitor.makeMockName(iface), methods);
 
-    this.originalIface = iface;
-    this.interfaceInternalName = Type.getInternalName(iface);
-  }
+        this.originalIface = iface;
+        this.interfaceInternalName = Type.getInternalName(iface);
+    }
 
-  @Override
-  public void visit(final int version, final int access, final String name, final String signature, final String superName,
-      final String[] originalInterfaces) {
-    final ArrayList<String> newInterfaces = new ArrayList<>(originalInterfaces.length + 2);
-    newInterfaces.add(this.interfaceInternalName);
-    newInterfaces.add(MOXY_SUPPORT_INTERFACE_INTERNAL_NAME);
-    newInterfaces.addAll(Arrays.asList(originalInterfaces));
+    @Override
+    public void visit(final int version, final int access, final String name, final String signature, final String superName,
+                      final String[] originalInterfaces) {
+        final ArrayList<String> newInterfaces = new ArrayList<>(originalInterfaces.length + 2);
+        newInterfaces.add(this.interfaceInternalName);
+        newInterfaces.add(MOXY_SUPPORT_INTERFACE_INTERNAL_NAME);
+        newInterfaces.addAll(Arrays.asList(originalInterfaces));
 
-    // Start the class visit
-    super.visit(version,
+        // Start the class visit
+        super.visit(version,
                 access & ~ACC_ABSTRACT & ~ACC_INTERFACE | ACC_SUPER,
                 this.getNewClassInternalName(),
                 signature,
                 OBJECT_INTERNAL_NAME,
                 newInterfaces.toArray(new String[0]));
 
-    // Add the IsMock annotation
-    this.visitAnnotation(Type.getDescriptor(MoxyMock.class), true).visitEnd();
-  }
-
-  @Override
-  public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
-    // Do the mocking
-    final boolean isStatic = (access & ACC_STATIC) != 0;
-
-    if (!isStatic) {
-      // mark as mocked
-      this.markMethodAsMocked(name, desc);
-
-      // Do mocking
-      return new MoxyMockingMethodVisitor(this.cv.visitMethod(
-                                              access & ~ACC_ABSTRACT | ACC_SYNTHETIC,
-                                              name, desc, signature, exceptions),
-                                          this.originalIface,
-                                          name,
-                                          desc,
-                                          Type.getReturnType(desc),
-                                          Type.getArgumentTypes(desc),
-                                          true,
-                                          false);
-    } else {
-      // Don't mock
-      return null;
+        // Add the IsMock annotation
+        this.visitAnnotation(Type.getDescriptor(MoxyMock.class), true).visitEnd();
     }
-  }
 
-  private void generateConstructor() {
-    final MoxyPassThroughConstructorVisitor mv =
-        new MoxyPassThroughConstructorVisitor(this.cv.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC,
-            INIT_NAME,
-            MOCK_CONSTRUCTOR_DESCRIPTOR,
-            null,
-            null),
-            OBJECT_INTERNAL_NAME,
-            this.getNewClassInternalName(),
-            VOID_VOID_DESCRIPTOR,
-            EMPTY_TYPE_ARRAY);
+    @Override
+    public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
+        // Do the mocking
+        final boolean isStatic = (access & ACC_STATIC) != 0;
 
-    mv.visitCode();
-    mv.visitEnd();
-  }
+        if (!isStatic) {
+            // mark as mocked
+            this.markMethodAsMocked(name, desc);
 
-  @Override
-  public void visitEnd() {
-    // Manually generate a constructor in case user wants to manually instantiate,
-    // like they do for partial mocks...
-    generateConstructor();
+            // Do mocking
+            return new MoxyMockingMethodVisitor(this.cv.visitMethod(
+                    access & ~ACC_ABSTRACT | ACC_SYNTHETIC,
+                    name, desc, signature, exceptions),
+                    this.originalIface,
+                    name,
+                    desc,
+                    Type.getReturnType(desc),
+                    Type.getArgumentTypes(desc),
+                    true,
+                    false);
+        } else {
+            // Don't mock
+            return null;
+        }
+    }
 
+    private void generateConstructor() {
+        final MoxyPassThroughConstructorVisitor mv =
+                new MoxyPassThroughConstructorVisitor(this.cv.visitMethod(ACC_PUBLIC | ACC_SYNTHETIC,
+                        INIT_NAME,
+                        MOCK_CONSTRUCTOR_DESCRIPTOR,
+                        null,
+                        null),
+                        OBJECT_INTERNAL_NAME,
+                        this.getNewClassInternalName(),
+                        VOID_VOID_DESCRIPTOR,
+                        EMPTY_TYPE_ARRAY);
 
-    super.visitEnd();
-  }
+        mv.visitCode();
+        mv.visitEnd();
+    }
+
+    @Override
+    public void visitEnd() {
+        // Manually generate a constructor in case user wants to manually instantiate,
+        // like they do for partial mocks...
+        generateConstructor();
+
+        super.visitEnd();
+    }
 }

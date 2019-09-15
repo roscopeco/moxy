@@ -24,21 +24,21 @@
 package com.roscopeco.moxy.matchers;
 
 class StartsWithMatcher extends SimpleObjectMatcher<String> {
-  public StartsWithMatcher(final String string) {
-    super(string, false);
-  }
-
-  @Override
-  public boolean matches(final String arg) {
-    if (arg == null) {
-      return false;
-    } else {
-      return arg.startsWith(this.getObject());
+    StartsWithMatcher(final String string) {
+        super(string, false);
     }
-  }
 
-  @Override
-  public String toString() {
-    return "<startsWith" + super.toString();
-  }
+    @Override
+    public boolean matches(final String arg) {
+        if (arg == null) {
+            return false;
+        } else {
+            return arg.startsWith(this.getObject());
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "<startsWith" + super.toString();
+    }
 }

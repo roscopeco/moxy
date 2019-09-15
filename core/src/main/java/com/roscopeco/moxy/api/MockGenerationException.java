@@ -31,20 +31,20 @@ package com.roscopeco.moxy.api;
  * @since 1.0
  */
 public class MockGenerationException extends MoxyException {
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public MockGenerationException() {
-  }
+    public MockGenerationException() {
+    }
 
-  public MockGenerationException(final String message) {
-    super(message);
-  }
+    public MockGenerationException(final String message) {
+        super(message);
+    }
 
-  public MockGenerationException(final Throwable cause) {
-    super(cause);
-  }
+    MockGenerationException(final Throwable cause) {
+        super(cause);
+    }
 
-  public MockGenerationException(final String message, final Throwable cause) {
-    super(message, cause);
-  }
+    public MockGenerationException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 }

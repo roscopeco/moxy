@@ -30,26 +30,26 @@ import java.util.function.Function;
  * Stub that calls a Function for its value.
  */
 public final class StubAnswer implements Stub {
-  final Function<List<? extends Object>, ? extends Object> function;
-  final boolean retain;
+    private final Function<List<?>, ?> function;
+    private final boolean retain;
 
-  public StubAnswer(final Function<List<? extends Object>, ? extends Object> function, final boolean retain) {
-    this.function = function;
-    this.retain = retain;
-  }
+    public StubAnswer(final Function<List<?>, ?> function, final boolean retain) {
+        this.function = function;
+        this.retain = retain;
+    }
 
-  @Override
-  public StubType getType() {
-    return StubType.RETURN_OBJECT;
-  }
+    @Override
+    public StubType getType() {
+        return StubType.RETURN_OBJECT;
+    }
 
-  @Override
-  public boolean isRetained() {
-    return this.retain;
-  }
+    @Override
+    public boolean isRetained() {
+        return this.retain;
+    }
 
-  @Override
-  public Object getObject(final List<Object> actualArgs) {
-    return this.function.apply(actualArgs);
-  }
+    @Override
+    public Object getObject(final List<Object> actualArgs) {
+        return this.function.apply(actualArgs);
+    }
 }

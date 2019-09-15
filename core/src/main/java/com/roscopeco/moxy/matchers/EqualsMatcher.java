@@ -24,22 +24,22 @@
 package com.roscopeco.moxy.matchers;
 
 class EqualsMatcher<T> extends SimpleObjectMatcher<T> {
-  EqualsMatcher(final T object) {
-    super(object, true);
-  }
-
-  @Override
-  public boolean matches(final T arg) {
-    final T object = this.getObject();
-    if (arg == null) {
-      return (object == null);
-    } else {
-      return arg.equals(object);
+    EqualsMatcher(final T object) {
+        super(object, true);
     }
-  }
 
-  @Override
-  public String toString() {
-    return "<eq" + super.toString();
-  }
+    @Override
+    public boolean matches(final T arg) {
+        final T object = this.getObject();
+        if (arg == null) {
+            return (object == null);
+        } else {
+            return arg.equals(object);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "<eq" + super.toString();
+    }
 }

@@ -23,45 +23,43 @@
  */
 package com.roscopeco.moxy.api;
 
-import static org.assertj.core.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
 
-public class TestMockGenerationException {
-  public static final String MARKER = "MARKER";
-  public static final Exception CAUSE = new Exception("CAUSE");
+import static org.assertj.core.api.Assertions.assertThat;
 
-  @Test
-  public void testNullConstructor() {
-    final MockGenerationException ex = new MockGenerationException();
+class TestMockGenerationException {
+    public static final String MARKER = "MARKER";
+    private static final Exception CAUSE = new Exception("CAUSE");
 
-    assertThat(ex.getMessage()).isNull();
-    assertThat(ex.getCause()).isNull();
-  }
+    @Test
+    void testNullConstructor() {
+        final MockGenerationException ex = new MockGenerationException();
 
-  @Test
-  public void TestStringConstructor() {
-    final MockGenerationException ex = new MockGenerationException(MARKER);
+        assertThat(ex.getMessage()).isNull();
+        assertThat(ex.getCause()).isNull();
+    }
 
-    assertThat(ex.getMessage()).isEqualTo(MARKER);
-    assertThat(ex.getCause()).isNull();
-  }
+    @Test
+    void testStringConstructor() {
+        final MockGenerationException ex = new MockGenerationException(MARKER);
 
-  @Test
-  public void TestStringThrowableConstructor() {
-    final MockGenerationException ex = new MockGenerationException(MARKER, CAUSE);
+        assertThat(ex.getMessage()).isEqualTo(MARKER);
+        assertThat(ex.getCause()).isNull();
+    }
 
-    assertThat(ex.getMessage()).isEqualTo(MARKER);
-    assertThat(ex.getCause()).isEqualTo(CAUSE);
-  }
+    @Test
+    void testStringThrowableConstructor() {
+        final MockGenerationException ex = new MockGenerationException(MARKER, CAUSE);
 
-  @Test
-  public void TestThrowableConstructor() {
-    final MockGenerationException ex = new MockGenerationException(CAUSE);
+        assertThat(ex.getMessage()).isEqualTo(MARKER);
+        assertThat(ex.getCause()).isEqualTo(CAUSE);
+    }
 
-    assertThat(ex.getMessage()).isEqualTo("java.lang.Exception: CAUSE");
-    assertThat(ex.getCause()).isEqualTo(CAUSE);
-  }
+    @Test
+    void testThrowableConstructor() {
+        final MockGenerationException ex = new MockGenerationException(CAUSE);
 
-
+        assertThat(ex.getMessage()).isEqualTo("java.lang.Exception: CAUSE");
+        assertThat(ex.getCause()).isEqualTo(CAUSE);
+    }
 }

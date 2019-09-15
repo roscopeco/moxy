@@ -23,50 +23,51 @@
  */
 package com.roscopeco.moxy.impl.asm.visitors;
 
-import static org.objectweb.asm.Opcodes.*;
-
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
+import static org.objectweb.asm.Opcodes.ALOAD;
+import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
+
 class MoxyMockingMethodVisitor extends AbstractMoxyMockMethodVisitor {
-  MoxyMockingMethodVisitor(final MethodVisitor delegate,
-                           final Class<?> originalClass,
-                           final String methodName,
-                           final String methodDescriptor,
-                           final Type returnType,
-                           final Type[] argTypes,
-                           final boolean wasAbstract,
-                           final boolean wasNative) {
-    super(delegate, originalClass, methodName, methodDescriptor, returnType, argTypes, wasAbstract, wasNative);
-  }
+    MoxyMockingMethodVisitor(final MethodVisitor delegate,
+                             final Class<?> originalClass,
+                             final String methodName,
+                             final String methodDescriptor,
+                             final Type returnType,
+                             final Type[] argTypes,
+                             final boolean wasAbstract,
+                             final boolean wasNative) {
+        super(delegate, originalClass, methodName, methodDescriptor, returnType, argTypes, wasAbstract, wasNative);
+    }
 
-  @Override
-  protected int getFirstArgumentLocalSlot() {
-    return 1;
-  }
+    @Override
+    protected int getFirstArgumentLocalSlot() {
+        return 1;
+    }
 
-  @Override
-  protected void generateLoadMockSupport() {
-    this.delegate.visitVarInsn(ALOAD, 0);
-  }
+    @Override
+    protected void generateLoadMockSupport() {
+        this.delegate.visitVarInsn(ALOAD, 0);
+    }
 
-  @Override
-  protected void generateRealMethodCall() {
-    // load support
-    this.generateLoadMockSupport();
+    @Override
+    protected void generateRealMethodCall() {
+        // load support
+        this.generateLoadMockSupport();
 
-    // load arguments
-    this.generateLoadMethodArguments();
+        // load arguments
+        this.generateLoadMethodArguments();
 
-    this.delegate.visitMethodInsn(INVOKESPECIAL,
-        this.originalClassInternalName,
-        this.methodName,
-        this.methodDescriptor, false);
-  }
+        this.delegate.visitMethodInsn(INVOKESPECIAL,
+                this.originalClassInternalName,
+                this.methodName,
+                this.methodDescriptor, false);
+    }
 
-  @Override
-  public void visitCode() {
-    super.generatePreamble();
-    super.generateReturn();
-  }
+    @Override
+    public void visitCode() {
+        super.generatePreamble();
+        super.generateReturn();
+    }
 }

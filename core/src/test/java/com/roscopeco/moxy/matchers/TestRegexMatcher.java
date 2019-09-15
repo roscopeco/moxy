@@ -23,57 +23,57 @@
  */
 package com.roscopeco.moxy.matchers;
 
-import static com.roscopeco.moxy.Moxy.*;
-import static com.roscopeco.moxy.matchers.Matchers.*;
-import static com.roscopeco.moxy.matchers.TestMoxyMatchers.*;
-import static org.assertj.core.api.Assertions.*;
-
-import org.junit.jupiter.api.Test;
-
 import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
+import org.junit.jupiter.api.Test;
 
-public class TestRegexMatcher {
-  @Test
-  public void testMoxyMockVerifyWithRegexWithObjectMatcherWorks() {
-    final MethodWithArguments mock = mock(MethodWithArguments.class);
+import static com.roscopeco.moxy.Moxy.*;
+import static com.roscopeco.moxy.matchers.Matchers.regexMatch;
+import static com.roscopeco.moxy.matchers.TestMoxyMatchers.PASSED;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-    mock.hasArgs("one", "two");
-    mock.hasArgs("three", "four");
-    mock.hasArgs("five", "six");
+class TestRegexMatcher {
+    @Test
+    void testMoxyMockVerifyWithRegexWithObjectMatcherWorks() {
+        final MethodWithArguments mock = mock(MethodWithArguments.class);
 
-    assertMock(
-        () -> mock.hasArgs(regexMatch("[ot][nh][er]e?e?"), regexMatch("(two|four)")))
-      .wasCalledTwice();
+        mock.hasArgs("one", "two");
+        mock.hasArgs("three", "four");
+        mock.hasArgs("five", "six");
 
-    assertMock(() -> mock.hasArgs(regexMatch("e$"), regexMatch("o$"))).wasCalledOnce();
-    assertMock(() -> mock.hasArgs(regexMatch("ne$"), regexMatch("ur$"))).wasNotCalled();
+        assertMock(
+                () -> mock.hasArgs(regexMatch("[ot][nh][er]e?e?"), regexMatch("(two|four)")))
+                .wasCalledTwice();
 
-    assertThatThrownBy(() ->
-        assertMock(() -> mock.hasArgs(regexMatch(null), regexMatch(null))).wasNotCalled()
-    )
-        .isInstanceOf(MoxyException.class)
-        .hasMessage("Null argument; see cause")
-        .hasCauseInstanceOf(IllegalArgumentException.class);
-  }
+        assertMock(() -> mock.hasArgs(regexMatch("e$"), regexMatch("o$"))).wasCalledOnce();
+        assertMock(() -> mock.hasArgs(regexMatch("ne$"), regexMatch("ur$"))).wasNotCalled();
 
-  @Test
-  public void testMoxyMockWhenWithRegexWithObjectMatcherWorks() {
-    final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
+        assertThatThrownBy(() ->
+                assertMock(() -> mock.hasArgs(regexMatch(null), regexMatch(null))).wasNotCalled()
+        )
+                .isInstanceOf(MoxyException.class)
+                .hasMessage("Null argument; see cause")
+                .hasCauseInstanceOf(IllegalArgumentException.class);
+    }
 
-    when(() -> mock.sayHelloTo(regexMatch("t[eo]ve$"))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithRegexWithObjectMatcherWorks() {
+        final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
 
-    assertThat(mock.sayHelloTo("Steve")).isEqualTo(PASSED);
-    assertThat(mock.sayHelloTo("Stove")).isEqualTo(PASSED);
-    assertThat(mock.sayHelloTo("Bill")).isEqualTo(null);
-    assertThat(mock.sayHelloTo(null)).isEqualTo(null);
+        when(() -> mock.sayHelloTo(regexMatch("t[eo]ve$"))).thenReturn(PASSED);
 
-    assertThatThrownBy(() ->
-        when(() -> mock.sayHelloTo(regexMatch(null))).thenReturn(PASSED)
-    )
-        .isInstanceOf(MoxyException.class)
-        .hasMessage("Null argument; see cause")
-        .hasCauseInstanceOf(IllegalArgumentException.class);
-  }
+        assertThat(mock.sayHelloTo("Steve")).isEqualTo(PASSED);
+        assertThat(mock.sayHelloTo("Stove")).isEqualTo(PASSED);
+        assertThat(mock.sayHelloTo("Bill")).isEqualTo(null);
+        assertThat(mock.sayHelloTo(null)).isEqualTo(null);
+
+        assertThatThrownBy(() ->
+                when(() -> mock.sayHelloTo(regexMatch(null))).thenReturn(PASSED)
+        )
+                .isInstanceOf(MoxyException.class)
+                .hasMessage("Null argument; see cause")
+                .hasCauseInstanceOf(IllegalArgumentException.class);
+    }
 }

@@ -24,65 +24,64 @@
 
 package com.roscopeco.moxy.annotations;
 
-import static org.assertj.core.api.Assertions.*;
-
+import com.roscopeco.moxy.Moxy;
+import com.roscopeco.moxy.annotations.model.TesterClass;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.roscopeco.moxy.Moxy;
-import com.roscopeco.moxy.annotations.model.TesterClass;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestSpyAnnotation {
-  @BeforeEach
-  public void beforeEach() {
-    MoxyAnnotations.initMocks(this);
-  }
+    @BeforeEach
+    public void beforeEach() {
+        MoxyAnnotations.initMocks(this);
+    }
 
-  @Spy
-  public TesterClass publicSpy;
+    @Spy
+    public TesterClass publicSpy;
 
-  @Spy
-  protected TesterClass protectedSpy;
+    @Spy
+    protected TesterClass protectedSpy;
 
-  @Spy
-  protected TesterClass packageSpy;
+    @Spy
+    protected TesterClass packageSpy;
 
-  @Spy
-  private TesterClass privateSpy;
+    @Spy
+    private TesterClass privateSpy;
 
-  @Test
-  public void testSetsPublicSpy() {
-    assertThat(this.publicSpy).isNotNull();
-    assertThat(Moxy.isMock(this.publicSpy)).isTrue();
+    @Test
+    public void testSetsPublicSpy() {
+        assertThat(this.publicSpy).isNotNull();
+        assertThat(Moxy.isMock(this.publicSpy)).isTrue();
 
-    // Make sure it's actually a spy...
-    assertThat(this.publicSpy.test()).isEqualTo(TesterClass.PASSED);
-  }
+        // Make sure it's actually a spy...
+        assertThat(this.publicSpy.test()).isEqualTo(TesterClass.PASSED);
+    }
 
-  @Test
-  public void testSetsProtectedMock() {
-    assertThat(this.protectedSpy).isNotNull();
-    assertThat(Moxy.isMock(this.protectedSpy)).isTrue();
+    @Test
+    public void testSetsProtectedMock() {
+        assertThat(this.protectedSpy).isNotNull();
+        assertThat(Moxy.isMock(this.protectedSpy)).isTrue();
 
-    // Make sure it's actually a spy...
-    assertThat(this.publicSpy.test()).isEqualTo(TesterClass.PASSED);
-  }
+        // Make sure it's actually a spy...
+        assertThat(this.publicSpy.test()).isEqualTo(TesterClass.PASSED);
+    }
 
-  @Test
-  public void testSetsPackageMock() {
-    assertThat(this.packageSpy).isNotNull();
-    assertThat(Moxy.isMock(this.packageSpy)).isTrue();
+    @Test
+    public void testSetsPackageMock() {
+        assertThat(this.packageSpy).isNotNull();
+        assertThat(Moxy.isMock(this.packageSpy)).isTrue();
 
-    // Make sure it's actually a spy...
-    assertThat(this.publicSpy.test()).isEqualTo(TesterClass.PASSED);
-  }
+        // Make sure it's actually a spy...
+        assertThat(this.publicSpy.test()).isEqualTo(TesterClass.PASSED);
+    }
 
-  @Test
-  public void testSetsPrivateMock() {
-    assertThat(this.privateSpy).isNotNull();
-    assertThat(Moxy.isMock(this.privateSpy)).isTrue();
+    @Test
+    public void testSetsPrivateMock() {
+        assertThat(this.privateSpy).isNotNull();
+        assertThat(Moxy.isMock(this.privateSpy)).isTrue();
 
-    // Make sure it's actually a spy...
-    assertThat(this.publicSpy.test()).isEqualTo(TesterClass.PASSED);
-  }
+        // Make sure it's actually a spy...
+        assertThat(this.publicSpy.test()).isEqualTo(TesterClass.PASSED);
+    }
 }

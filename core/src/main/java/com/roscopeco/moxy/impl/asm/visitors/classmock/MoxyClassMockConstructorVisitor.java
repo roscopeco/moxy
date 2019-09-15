@@ -24,14 +24,13 @@
 
 package com.roscopeco.moxy.impl.asm.visitors.classmock;
 
-import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
-import static com.roscopeco.moxy.impl.asm.classmock.TypesAndDescriptors.*;
-import static org.objectweb.asm.Opcodes.*;
-
+import com.roscopeco.moxy.impl.asm.visitors.AbstractMoxyMockMethodVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
-import com.roscopeco.moxy.impl.asm.visitors.AbstractMoxyMockMethodVisitor;
+import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
+import static com.roscopeco.moxy.impl.asm.classmock.TypesAndDescriptors.*;
+import static org.objectweb.asm.Opcodes.*;
 
 /**
  * Method adapter that generates class-mock constructors.
@@ -39,118 +38,116 @@ import com.roscopeco.moxy.impl.asm.visitors.AbstractMoxyMockMethodVisitor;
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public class MoxyClassMockConstructorVisitor extends AbstractMoxyMockMethodVisitor {
-  private final String delegateClassInternalName;
-  private final String superClassInternalName;
+    private final String delegateClassInternalName;
+    private final String superClassInternalName;
 
-  MoxyClassMockConstructorVisitor(final MethodVisitor delegate,
-                                  final Class<?> thisClass,
-                                  final String delegateClassInternal,
-                                  final String name,
-                                  final String descriptor,
-                                  final Type returnType,
-                                  final Type[] argTypes) {
-    super(delegate, thisClass, name, descriptor, returnType, argTypes, false, false);
-    this.delegateClassInternalName = delegateClassInternal;
-    this.superClassInternalName = Type.getInternalName(thisClass.getSuperclass());
-  }
-
-  /*
-   * Generated immediately after the original call to a super constructor.
-   * Potentially leads to bloated bytecode where multiple calls can happen
-   * in a given constructor, but that isn't the end of the world...
-   */
-  private void generatePostConstructor() {
-    this.delegate.visitVarInsn(ALOAD, 0);
-    this.delegate.visitTypeInsn(NEW, this.delegateClassInternalName);
-    this.delegate.visitInsn(DUP);
-    this.delegate.visitInsn(DUP);
-    this.generateLoadMethodArguments();
-    this.delegate.visitMethodInsn(INVOKESPECIAL,
-                                  this.delegateClassInternalName,
-                                  INIT_NAME,
-                                  this.methodDescriptor,
-                                  false);
-
-    this.delegate.visitTypeInsn(NEW, MOXY_SUPPORT_IVARS_INTERNAL_NAME);
-    this.delegate.visitInsn(DUP);
-    this.delegate.visitMethodInsn(INVOKESTATIC,
-                                  MOXY_INTERNAL_NAME,
-                                  MOXY_GETENGINE_METHOD_NAME,
-                                  MOXY_GETENGINE_DESCRIPTOR,
-                                  false);
-
-    this.delegate.visitTypeInsn(CHECKCAST, MOXY_ASM_ENGINE_INTERNAL_NAME);
-
-    this.delegate.visitMethodInsn(INVOKESPECIAL,
-                                  MOXY_SUPPORT_IVARS_INTERNAL_NAME,
-                                  INIT_NAME,
-                                  VOID_MOXYENGINE_DESCRIPTOR,
-                                  false);
-
-    this.delegate.visitFieldInsn(PUTFIELD,
-                                 this.delegateClassInternalName,
-                                 SUPPORT_IVARS_FIELD_NAME,
-                                 MOXY_SUPPORT_IVARS_DESCRIPTOR);
-
-    this.delegate.visitMethodInsn(INVOKESTATIC,
-                                  INSTANCE_REGISTRY_INTERNAL_NAME,
-                                  REGISTRY_REGISTER_DELEGATE_METHOD_NAME,
-                                  REGISTRY_REGISTER_DELEGATE_DESCRIPTOR,
-                                  false);
-  }
-
-
-
-  @Override
-  public void visitMethodInsn(final int opcode, final String owner, final String name, final String descriptor, final boolean isInterface) {
-    super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
-
-    if (owner.equals(this.superClassInternalName) && name.equals(INIT_NAME)) {
-      this.generatePostConstructor();
+    MoxyClassMockConstructorVisitor(final MethodVisitor delegate,
+                                    final Class<?> thisClass,
+                                    final String delegateClassInternal,
+                                    final String name,
+                                    final String descriptor,
+                                    final Type returnType,
+                                    final Type[] argTypes) {
+        super(delegate, thisClass, name, descriptor, returnType, argTypes, false, false);
+        this.delegateClassInternalName = delegateClassInternal;
+        this.superClassInternalName = Type.getInternalName(thisClass.getSuperclass());
     }
-  }
 
-  /**
-   * Generates the standard mock bahviour logic instead of
-   * any standard RETURN or ATHROW instructions.
-   *
-   * Again, potentially a bit wasteful...
-   */
-  @Override
-  public void visitInsn(final int insn) {
-    if (insn == ATHROW || insn == RETURN) {
-      super.generatePreamble();
-      super.generateReturn();
-    } else {
-      super.visitInsn(insn);
+    /*
+     * Generated immediately after the original call to a super constructor.
+     * Potentially leads to bloated bytecode where multiple calls can happen
+     * in a given constructor, but that isn't the end of the world...
+     */
+    private void generatePostConstructor() {
+        this.delegate.visitVarInsn(ALOAD, 0);
+        this.delegate.visitTypeInsn(NEW, this.delegateClassInternalName);
+        this.delegate.visitInsn(DUP);
+        this.delegate.visitInsn(DUP);
+        this.generateLoadMethodArguments();
+        this.delegate.visitMethodInsn(INVOKESPECIAL,
+                this.delegateClassInternalName,
+                INIT_NAME,
+                this.methodDescriptor,
+                false);
+
+        this.delegate.visitTypeInsn(NEW, MOXY_SUPPORT_IVARS_INTERNAL_NAME);
+        this.delegate.visitInsn(DUP);
+        this.delegate.visitMethodInsn(INVOKESTATIC,
+                MOXY_INTERNAL_NAME,
+                MOXY_GETENGINE_METHOD_NAME,
+                MOXY_GETENGINE_DESCRIPTOR,
+                false);
+
+        this.delegate.visitTypeInsn(CHECKCAST, MOXY_ASM_ENGINE_INTERNAL_NAME);
+
+        this.delegate.visitMethodInsn(INVOKESPECIAL,
+                MOXY_SUPPORT_IVARS_INTERNAL_NAME,
+                INIT_NAME,
+                VOID_MOXYENGINE_DESCRIPTOR,
+                false);
+
+        this.delegate.visitFieldInsn(PUTFIELD,
+                this.delegateClassInternalName,
+                SUPPORT_IVARS_FIELD_NAME,
+                MOXY_SUPPORT_IVARS_DESCRIPTOR);
+
+        this.delegate.visitMethodInsn(INVOKESTATIC,
+                INSTANCE_REGISTRY_INTERNAL_NAME,
+                REGISTRY_REGISTER_DELEGATE_METHOD_NAME,
+                REGISTRY_REGISTER_DELEGATE_DESCRIPTOR,
+                false);
     }
-  }
 
-  /**
-   * Although constructors are not strictly static, they act as static
-   * for the purposes of the framework. This allows stubbing/verifying
-   * etc.
-   */
-  @Override
-  protected void generateLoadMockSupport() {
-    this.delegate.visitLdcInsn(Type.getType(this.originalClass));
+    @Override
+    public void visitMethodInsn(final int opcode, final String owner, final String name, final String descriptor, final boolean isInterface) {
+        super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
 
-    this.delegate.visitMethodInsn(INVOKESTATIC,
-                                  INSTANCE_REGISTRY_INTERNAL_NAME,
-                                  REGISTRY_GET_STATIC_DELEGATE_METHOD_NAME,
-                                  REGISTRY_GET_STATIC_DELEGATE_DESCRIPTOR,
-                                  false);
+        if (owner.equals(this.superClassInternalName) && name.equals(INIT_NAME)) {
+            this.generatePostConstructor();
+        }
+    }
 
-    this.delegate.visitTypeInsn(CHECKCAST, MOXY_SUPPORT_INTERFACE_INTERNAL_NAME);
-  }
+    /**
+     * Generates the standard mock bahviour logic instead of
+     * any standard RETURN or ATHROW instructions.
+     * <p>
+     * Again, potentially a bit wasteful...
+     */
+    @Override
+    public void visitInsn(final int insn) {
+        if (insn == ATHROW || insn == RETURN) {
+            super.generatePreamble();
+            super.generateReturn();
+        } else {
+            super.visitInsn(insn);
+        }
+    }
 
-  @Override
-  protected void generateRealMethodCall() {
-    super.generateThrowInvalidStubbing("constructors are not compatible with thenCallRealMethod");
-  }
+    /**
+     * Although constructors are not strictly static, they act as static
+     * for the purposes of the framework. This allows stubbing/verifying
+     * etc.
+     */
+    @Override
+    protected void generateLoadMockSupport() {
+        this.delegate.visitLdcInsn(Type.getType(this.originalClass));
 
-  @Override
-  protected int getFirstArgumentLocalSlot() {
-    return 1;
-  }
+        this.delegate.visitMethodInsn(INVOKESTATIC,
+                INSTANCE_REGISTRY_INTERNAL_NAME,
+                REGISTRY_GET_STATIC_DELEGATE_METHOD_NAME,
+                REGISTRY_GET_STATIC_DELEGATE_DESCRIPTOR,
+                false);
+
+        this.delegate.visitTypeInsn(CHECKCAST, MOXY_SUPPORT_INTERFACE_INTERNAL_NAME);
+    }
+
+    @Override
+    protected void generateRealMethodCall() {
+        super.generateThrowInvalidStubbing("constructors are not compatible with thenCallRealMethod");
+    }
+
+    @Override
+    protected int getFirstArgumentLocalSlot() {
+        return 1;
+    }
 }

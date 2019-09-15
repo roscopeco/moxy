@@ -24,13 +24,21 @@
 package com.roscopeco.moxy.model;
 
 public interface MatcherTestClass {
-  public String testByte(byte b);
-  public String testChar(char c);
-  public String testShort(short s);
-  public String testInt(int i);
-  public String testLong(long l);
-  public String testFloat(float f);
-  public String testDouble(double d);
-  public String testBoolean(boolean b);
-  public String testObject(Object o);
+    String testByte(byte b);
+
+    String testChar(char c);
+
+    String testShort(short s);
+
+    String testInt(int i);
+
+    String testLong(long l);
+
+    String testFloat(float f);
+
+    String testDouble(double d);
+
+    String testBoolean(boolean b);
+
+    String testObject(Object o);
 }

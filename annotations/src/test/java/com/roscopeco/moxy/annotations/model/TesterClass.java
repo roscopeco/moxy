@@ -25,9 +25,9 @@
 package com.roscopeco.moxy.annotations.model;
 
 public class TesterClass {
-  public static final String PASSED = "PASSED";
+    public static final String PASSED = "PASSED";
 
-  public String test() {
-    return PASSED;
-  }
+    public String test() {
+        return PASSED;
+    }
 }

@@ -23,51 +23,51 @@
  */
 package com.roscopeco.moxy.matchers;
 
-import static com.roscopeco.moxy.Moxy.*;
-import static com.roscopeco.moxy.matchers.Matchers.*;
-import static com.roscopeco.moxy.matchers.TestMoxyMatchers.*;
-import static org.assertj.core.api.Assertions.*;
-
-import org.junit.jupiter.api.Test;
-
 import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
+import org.junit.jupiter.api.Test;
 
-public class TestStartsWithMatcher {
-  @Test
-  public void testMoxyMockVerifyWithStartsWithObjectMatcherWorks() {
-    final MethodWithArguments mock = mock(MethodWithArguments.class);
+import static com.roscopeco.moxy.Moxy.*;
+import static com.roscopeco.moxy.matchers.Matchers.startsWith;
+import static com.roscopeco.moxy.matchers.TestMoxyMatchers.PASSED;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-    mock.hasArgs("one", "two");
-    mock.hasArgs("three", "four");
-    mock.hasArgs("five", "six");
+class TestStartsWithMatcher {
+    @Test
+    void testMoxyMockVerifyWithStartsWithObjectMatcherWorks() {
+        final MethodWithArguments mock = mock(MethodWithArguments.class);
 
-    assertMock(() -> mock.hasArgs(startsWith("t"), startsWith("f"))).wasCalledOnce();
-    assertMock(() -> mock.hasArgs(startsWith("on"), startsWith("fo"))).wasNotCalled();
+        mock.hasArgs("one", "two");
+        mock.hasArgs("three", "four");
+        mock.hasArgs("five", "six");
 
-    assertThatThrownBy(() ->
-        assertMock(() -> mock.hasArgs(startsWith(null), startsWith(null))).wasNotCalled()
-    )
-        .isInstanceOf(MoxyException.class)
-        .hasMessage("Null argument; see cause")
-        .hasCauseInstanceOf(IllegalArgumentException.class);
-  }
+        assertMock(() -> mock.hasArgs(startsWith("t"), startsWith("f"))).wasCalledOnce();
+        assertMock(() -> mock.hasArgs(startsWith("on"), startsWith("fo"))).wasNotCalled();
 
-  @Test
-  public void testMoxyMockWhenWithStartsWithObjectMatcherWorks() {
-    final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
+        assertThatThrownBy(() ->
+                assertMock(() -> mock.hasArgs(startsWith(null), startsWith(null))).wasNotCalled()
+        )
+                .isInstanceOf(MoxyException.class)
+                .hasMessage("Null argument; see cause")
+                .hasCauseInstanceOf(IllegalArgumentException.class);
+    }
 
-    when(() -> mock.sayHelloTo(startsWith("St"))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithStartsWithObjectMatcherWorks() {
+        final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
 
-    assertThat(mock.sayHelloTo("Steve")).isEqualTo(PASSED);
-    assertThat(mock.sayHelloTo("Bill")).isEqualTo(null);
+        when(() -> mock.sayHelloTo(startsWith("St"))).thenReturn(PASSED);
 
-    assertThatThrownBy(() ->
-        when(() -> mock.sayHelloTo(startsWith(null))).thenReturn(PASSED)
-    )
-        .isInstanceOf(MoxyException.class)
-        .hasMessage("Null argument; see cause")
-        .hasCauseInstanceOf(IllegalArgumentException.class);
-  }
+        assertThat(mock.sayHelloTo("Steve")).isEqualTo(PASSED);
+        assertThat(mock.sayHelloTo("Bill")).isEqualTo(null);
+
+        assertThatThrownBy(() ->
+                when(() -> mock.sayHelloTo(startsWith(null))).thenReturn(PASSED)
+        )
+                .isInstanceOf(MoxyException.class)
+                .hasMessage("Null argument; see cause")
+                .hasCauseInstanceOf(IllegalArgumentException.class);
+    }
 }

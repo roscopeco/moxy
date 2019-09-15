@@ -26,27 +26,27 @@ package com.roscopeco.moxy.impl.asm.stubs;
 
 import java.util.List;
 
-/*
+/**
  * Interface implemented by all specific types of stubbing.
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public interface Stub {
-  /*
-   * Get the type of this stub.
-   */
-  public StubType getType();
+    /*
+     * Get the type of this stub.
+     */
+    StubType getType();
 
-  /*
-   * If true, this stub should be retained for future calls.
-   */
-  public boolean isRetained();
+    /*
+     * If true, this stub should be retained for future calls.
+     */
+    boolean isRetained();
 
-  /*
-   * Get the object this stub provides, which the framework
-   * will handle according to the type of this stub.
-   *
-   * Not all stub types have an object (e.g. call super stub).
-   */
-  public Object getObject(List<Object> actualArgs);
+    /*
+     * Get the object this stub provides, which the framework
+     * will handle according to the type of this stub.
+     *
+     * Not all stub types have an object (e.g. call super stub).
+     */
+    Object getObject(List<Object> actualArgs);
 }

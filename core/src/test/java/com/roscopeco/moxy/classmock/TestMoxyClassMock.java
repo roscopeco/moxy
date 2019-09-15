@@ -24,11 +24,6 @@
 
 package com.roscopeco.moxy.classmock;
 
-import static org.assertj.core.api.Assertions.*;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import com.roscopeco.moxy.Moxy;
 import com.roscopeco.moxy.api.InvalidMockInvocationException;
 import com.roscopeco.moxy.api.InvalidStubbingException;
@@ -37,262 +32,273 @@ import com.roscopeco.moxy.model.SimpleClass;
 import com.roscopeco.moxy.model.classmock.ClassWithConstructorArgs;
 import com.roscopeco.moxy.model.classmock.ClassWithStatic;
 import com.roscopeco.moxy.model.classmock.SubclassWithConstructorArgs;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class TestMoxyClassMock {
-  public static class Delegate {
-    public String returnHello() {
-      return "Delegated";
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+class TestMoxyClassMock {
+
+    private static final String HELLO = "Hello";
+    private static final String GOODBYE = "Goodbye";
+    private static final String ANSWERED = "Answered";
+    private static final String DELEGATED = "Delegated";
+    private static final String THROWN = "THROWN";
+
+    public static class Delegate {
+        public String returnHello() {
+            return DELEGATED;
+        }
     }
-  }
 
-  @BeforeEach
-  public void resetMocks() {
-    Moxy.resetAllClassMocks();
-  }
+    @BeforeEach
+    void resetMocks() {
+        Moxy.resetAllClassMocks();
+    }
 
-  @Test
-  public void testMoxyClassMockCanMockSimpleClass() throws Exception {
-    Moxy.mockClasses(SimpleClass.class);
+    @Test
+    void testMoxyClassMockCanMockSimpleClass() {
+        Moxy.mockClasses(SimpleClass.class);
 
-    final SimpleClass sc = new SimpleClass();
+        final SimpleClass sc = new SimpleClass();
 
-    assertThat(sc.returnHello()).isNull();
-  }
+        assertThat(sc.returnHello()).isNull();
+    }
 
-  @Test
-  public void testMoxyClassMockCanResetMockedClass() throws Exception {
-    Moxy.mockClasses(SimpleClass.class);
+    @Test
+    void testMoxyClassMockCanResetMockedClass() {
+        Moxy.mockClasses(SimpleClass.class);
 
-    final SimpleClass sc = new SimpleClass();
+        final SimpleClass sc = new SimpleClass();
 
-    assertThat(sc.returnHello()).isNull();
+        assertThat(sc.returnHello()).isNull();
 
-    Moxy.resetClassMocks(SimpleClass.class);
+        Moxy.resetClassMocks(SimpleClass.class);
 
-    // Existing instances are reverted...
-    assertThat(sc.returnHello()).isEqualTo("Hello");
+        // Existing instances are reverted...
+        assertThat(sc.returnHello()).isEqualTo(HELLO);
 
-    // ... as are new ones.
-    assertThat(new SimpleClass().returnHello()).isEqualTo("Hello");
-  }
+        // ... as are new ones.
+        assertThat(new SimpleClass().returnHello()).isEqualTo(HELLO);
+    }
 
-  @Test
-  public void testMoxyClassMockCanMockFinalClass() throws Exception {
-    Moxy.mockClasses(FinalClass.class);
+    @Test
+    void testMoxyClassMockCanMockFinalClass() {
+        Moxy.mockClasses(FinalClass.class);
 
-    final FinalClass sc = new FinalClass();
+        final FinalClass sc = new FinalClass();
 
-    assertThat(sc.returnHello()).isNull();
-  }
+        assertThat(sc.returnHello()).isNull();
+    }
 
-  @Test
-  public void testMoxyClassMockCanStubMockedClass() throws Exception {
-    Moxy.mockClasses(FinalClass.class);
+    @Test
+    void testMoxyClassMockCanStubMockedClass() {
+        Moxy.mockClasses(FinalClass.class);
 
-    final FinalClass sc = new FinalClass();
+        final FinalClass sc = new FinalClass();
 
-    assertThat(sc.returnHello()).isNull();
+        assertThat(sc.returnHello()).isNull();
 
-    Moxy.when(() -> sc.returnHello()).thenReturn("Goodbye");
+        Moxy.when(sc::returnHello).thenReturn(GOODBYE);
 
-    assertThat(sc.returnHello()).isEqualTo("Goodbye");
-  }
+        assertThat(sc.returnHello()).isEqualTo(GOODBYE);
+    }
 
-  @Test
-  public void testMoxyClassMockCanStubWithAllStubs() throws Exception {
-    Moxy.mockClasses(FinalClass.class);
+    @Test
+    void testMoxyClassMockCanStubWithAllStubs() {
+        Moxy.mockClasses(FinalClass.class);
 
-    final FinalClass sc = new FinalClass();
+        final FinalClass sc = new FinalClass();
 
-    assertThat(sc.returnHello()).isNull();
+        assertThat(sc.returnHello()).isNull();
 
-    // thenReturn
-    Moxy.when(() -> sc.returnHello()).thenReturn("Goodbye");
-    assertThat(sc.returnHello()).isEqualTo("Goodbye");
+        // thenReturn
+        Moxy.when(sc::returnHello).thenReturn(GOODBYE);
+        assertThat(sc.returnHello()).isEqualTo(GOODBYE);
 
-    // thenCallRealMethod
-    Moxy.when(() -> sc.returnHello()).thenCallRealMethod();
-    assertThat(sc.returnHello()).isEqualTo("Hello");
+        // thenCallRealMethod
+        Moxy.when(sc::returnHello).thenCallRealMethod();
+        assertThat(sc.returnHello()).isEqualTo(HELLO);
 
-    // thenDelegate
-    Moxy.when(() -> sc.returnHello()).thenDelegateTo(new Delegate());
-    assertThat(sc.returnHello()).isEqualTo("Delegated");
+        // thenDelegate
+        Moxy.when(sc::returnHello).thenDelegateTo(new Delegate());
+        assertThat(sc.returnHello()).isEqualTo(DELEGATED);
 
-    // thenAnswer
-    Moxy.when(() -> sc.returnHello()).thenAnswer(args -> "Answered");
-    assertThat(sc.returnHello()).isEqualTo("Answered");
+        // thenAnswer
+        Moxy.when(sc::returnHello).thenAnswer(args -> ANSWERED);
+        assertThat(sc.returnHello()).isEqualTo(ANSWERED);
 
-    // thenThrow
-    final RuntimeException rte = new RuntimeException("THROWN");
-    Moxy.when(() -> sc.returnHello()).thenThrow(rte);
+        // thenThrow
+        final RuntimeException rte = new RuntimeException(THROWN);
+        Moxy.when(sc::returnHello).thenThrow(rte);
 
-    assertThatThrownBy(() -> sc.returnHello())
-        .isSameAs(rte);
-  }
+        assertThatThrownBy(sc::returnHello)
+                .isSameAs(rte);
+    }
 
-  @Test
-  public void testMoxyClassMockCanChainStubsAsNormal() throws Exception {
-    Moxy.mockClasses(FinalClass.class);
+    @Test
+    void testMoxyClassMockCanChainStubsAsNormal() {
+        Moxy.mockClasses(FinalClass.class);
 
-    final FinalClass sc = new FinalClass();
+        final FinalClass sc = new FinalClass();
 
-    assertThat(sc.returnHello()).isNull();
+        assertThat(sc.returnHello()).isNull();
 
-    final RuntimeException rte = new RuntimeException("THROWN");
+        final RuntimeException rte = new RuntimeException(THROWN);
 
-    Moxy.when(() -> sc.returnHello())
-        .thenReturn("Goodbye")
-        .thenCallRealMethod()
-        .thenDelegateTo(new Delegate())
-        .thenAnswer(args -> "Answered")
-        .thenThrow(rte);
+        Moxy.when(sc::returnHello)
+                .thenReturn(GOODBYE)
+                .thenCallRealMethod()
+                .thenDelegateTo(new Delegate())
+                .thenAnswer(args -> ANSWERED)
+                .thenThrow(rte);
 
-    assertThat(sc.returnHello()).isEqualTo("Goodbye");
-    assertThat(sc.returnHello()).isEqualTo("Hello");
-    assertThat(sc.returnHello()).isEqualTo("Delegated");
-    assertThat(sc.returnHello()).isEqualTo("Answered");
+        assertThat(sc.returnHello()).isEqualTo(GOODBYE);
+        assertThat(sc.returnHello()).isEqualTo(HELLO);
+        assertThat(sc.returnHello()).isEqualTo(DELEGATED);
+        assertThat(sc.returnHello()).isEqualTo(ANSWERED);
 
-    assertThatThrownBy(() -> sc.returnHello())
-        .isSameAs(rte);
-  }
+        assertThatThrownBy(sc::returnHello)
+                .isSameAs(rte);
+    }
 
-  @Test
-  public void testMoxyClassMockCanAssertMockedClass() throws Exception {
-    Moxy.mockClasses(FinalClass.class);
+    @Test
+    void testMoxyClassMockCanAssertMockedClass() {
+        Moxy.mockClasses(FinalClass.class);
 
-    final FinalClass sc = new FinalClass();
+        final FinalClass sc = new FinalClass();
 
-    assertThat(sc.returnHello()).isNull();
+        assertThat(sc.returnHello()).isNull();
 
-    Moxy.assertMock(() -> sc.returnHello()).wasCalledOnce();
+        Moxy.assertMock(sc::returnHello).wasCalledOnce();
 
-    Moxy.when(() -> sc.returnHello()).thenReturn("Goodbye");
+        Moxy.when(sc::returnHello).thenReturn(GOODBYE);
 
-    assertThat(sc.returnHello()).isEqualTo("Goodbye");
+        assertThat(sc.returnHello()).isEqualTo(GOODBYE);
 
-    Moxy.assertMock(() -> sc.returnHello()).wasCalledTwice();
-  }
+        Moxy.assertMock(sc::returnHello).wasCalledTwice();
+    }
 
-  @Test
-  public void testMoxyClassMockCanMockWithConstructorArguments() {
-    Moxy.mockClasses(ClassWithConstructorArgs.class);
+    @Test
+    void testMoxyClassMockCanMockWithConstructorArguments() {
+        Moxy.mockClasses(ClassWithConstructorArgs.class);
 
-    final ClassWithConstructorArgs mock = new ClassWithConstructorArgs("Hello Constructor");
+        final ClassWithConstructorArgs mock = new ClassWithConstructorArgs("Hello Constructor");
 
-    assertThat(mock.getStr()).isNull();
+        assertThat(mock.getStr()).isNull();
 
-    Moxy.when(() -> mock.getStr()).thenCallRealMethod();
+        Moxy.when(mock::getStr).thenCallRealMethod();
 
-    assertThat(mock.getStr()).isEqualTo("Hello Constructor");
-  }
+        assertThat(mock.getStr()).isEqualTo("Hello Constructor");
+    }
 
-  @Test
-  public void testMoxyClassMockCanMockSubclassWithConstructorArguments() {
-    Moxy.mockClasses(SubclassWithConstructorArgs.class);
+    @Test
+    void testMoxyClassMockCanMockSubclassWithConstructorArguments() {
+        Moxy.mockClasses(SubclassWithConstructorArgs.class);
 
-    final SubclassWithConstructorArgs mock = new SubclassWithConstructorArgs("Hello Subclass Constructor");
+        final SubclassWithConstructorArgs mock = new SubclassWithConstructorArgs("Hello Subclass Constructor");
 
-    assertThat(mock.getStr()).isNull();
+        assertThat(mock.getStr()).isNull();
 
-    Moxy.when(() -> mock.getStr()).thenCallRealMethod();
+        Moxy.when(mock::getStr).thenCallRealMethod();
 
-    assertThat(mock.getStr()).isEqualTo("Hello Subclass Constructor");
-  }
+        assertThat(mock.getStr()).isEqualTo("Hello Subclass Constructor");
+    }
 
-  @Test
-  public void testMoxyClassMockCanMockStaticMethods() {
-    Moxy.mockClasses(ClassWithStatic.class);
+    @Test
+    void testMoxyClassMockCanMockStaticMethods() {
+        Moxy.mockClasses(ClassWithStatic.class);
 
-    assertThat(ClassWithStatic.returnHello()).isNull();
+        assertThat(ClassWithStatic.returnHello()).isNull();
 
-    Moxy.when(() -> ClassWithStatic.returnHello()).thenReturn("Goodbye");
+        Moxy.when(ClassWithStatic::returnHello).thenReturn(GOODBYE);
 
-    assertThat(ClassWithStatic.returnHello()).isEqualTo("Goodbye");
-  }
+        assertThat(ClassWithStatic.returnHello()).isEqualTo(GOODBYE);
+    }
 
-  @Test
-  public void testMoxyClassMockCanResetMockedClassStatics() throws Exception {
-    Moxy.mockClasses(ClassWithStatic.class);
+    @Test
+    void testMoxyClassMockCanResetMockedClassStatics() {
+        Moxy.mockClasses(ClassWithStatic.class);
 
-    assertThat(ClassWithStatic.returnHello()).isNull();
+        assertThat(ClassWithStatic.returnHello()).isNull();
 
-    Moxy.assertMock(() -> ClassWithStatic.returnHello()).wasCalledOnce();
+        Moxy.assertMock(ClassWithStatic::returnHello).wasCalledOnce();
 
-    Moxy.when(() -> ClassWithStatic.returnHello()).thenReturn("Goodbye");
+        Moxy.when(ClassWithStatic::returnHello).thenReturn(GOODBYE);
 
-    assertThat(ClassWithStatic.returnHello()).isEqualTo("Goodbye");
+        assertThat(ClassWithStatic.returnHello()).isEqualTo(GOODBYE);
 
-    Moxy.resetClassMocks(ClassWithStatic.class);
+        Moxy.resetClassMocks(ClassWithStatic.class);
 
-    // Static are reverted
-    assertThat(ClassWithStatic.returnHello()).isEqualTo("Hello");
-  }
+        // Static are reverted
+        assertThat(ClassWithStatic.returnHello()).isEqualTo(HELLO);
+    }
 
-  @Test
-  public void testMoxyClassMockCanAssertMockedStaticMethods() {
-    Moxy.mockClasses(ClassWithStatic.class);
+    @Test
+    void testMoxyClassMockCanAssertMockedStaticMethods() {
+        Moxy.mockClasses(ClassWithStatic.class);
 
-    assertThat(ClassWithStatic.returnHello()).isNull();
+        assertThat(ClassWithStatic.returnHello()).isNull();
 
-    Moxy.assertMock(() -> ClassWithStatic.returnHello()).wasCalledOnce();
+        Moxy.assertMock(ClassWithStatic::returnHello).wasCalledOnce();
 
-    Moxy.when(() -> ClassWithStatic.returnHello()).thenReturn("Goodbye");
+        Moxy.when(ClassWithStatic::returnHello).thenReturn(GOODBYE);
 
-    assertThat(ClassWithStatic.returnHello()).isEqualTo("Goodbye");
+        assertThat(ClassWithStatic.returnHello()).isEqualTo(GOODBYE);
 
-    Moxy.assertMock(() -> ClassWithStatic.returnHello()).wasCalledTwice();
-  }
+        Moxy.assertMock(ClassWithStatic::returnHello).wasCalledTwice();
+    }
 
-  @Test
-  public void testMoxyClassMockCanAssertConstructors() {
-    Moxy.mockClasses(FinalClass.class);
+    @Test
+    void testMoxyClassMockCanAssertConstructors() {
+        Moxy.mockClasses(FinalClass.class);
 
-    Moxy.assertMock(() -> new FinalClass()).wasNotCalled();
+        Moxy.assertMock(FinalClass::new).wasNotCalled();
 
-    @SuppressWarnings("unused")
-    final FinalClass fc = new FinalClass();
+        @SuppressWarnings("unused") final FinalClass fc = new FinalClass();
 
-    Moxy.assertMock(() -> new FinalClass()).wasCalledOnce();
-  }
+        Moxy.assertMock(FinalClass::new).wasCalledOnce();
+    }
 
-  @Test
-  public void testMoxyClassMockCanStubConstructors() {
-    final RuntimeException rte = new RuntimeException("MARKER");
+    @Test
+    void testMoxyClassMockCanStubConstructors() {
+        final RuntimeException rte = new RuntimeException("MARKER");
 
-    Moxy.mockClasses(FinalClass.class);
+        Moxy.mockClasses(FinalClass.class);
 
-    Moxy.when(() -> new FinalClass()).thenThrow(rte);
+        Moxy.when(FinalClass::new).thenThrow(rte);
 
-    assertThatThrownBy(() -> new FinalClass()).isSameAs(rte);
-  }
+        assertThatThrownBy(FinalClass::new).isSameAs(rte);
+    }
 
-  @Test
-  public void testMoxyClassMockCanStubConstructorsThrowsWithInvalidStubbing() {
-    Moxy.mockClasses(FinalClass.class);
+    @Test
+    void testMoxyClassMockCanStubConstructorsThrowsWithInvalidStubbing() {
+        Moxy.mockClasses(FinalClass.class);
 
-    Moxy.when(() -> new FinalClass()).thenCallRealMethod();
+        Moxy.when(FinalClass::new).thenCallRealMethod();
 
-    assertThatThrownBy(() -> new FinalClass())
-        .isInstanceOf(InvalidStubbingException.class)
-        .hasMessage("Cannot call real method 'void <init>()' (constructors are not compatible with thenCallRealMethod)");
-  }
+        assertThatThrownBy(FinalClass::new)
+                .isInstanceOf(InvalidStubbingException.class)
+                .hasMessage("Cannot call real method 'void <init>()' (constructors are not compatible with thenCallRealMethod)");
+    }
 
-  @Test
-  public void testMoxyClassMockExistingInstanceAreAutomaticallyConvertedToSpies() {
-    final FinalClass preExisting = new FinalClass();
+    @Test
+    void testMoxyClassMockExistingInstanceAreAutomaticallyConvertedToSpies() {
+        final FinalClass preExisting = new FinalClass();
 
-    assertThat(preExisting.returnHello()).isEqualTo("Hello");
+        assertThat(preExisting.returnHello()).isEqualTo(HELLO);
 
-    assertThatThrownBy(() -> Moxy.when(() -> preExisting.returnHello()).thenReturn(""))
-        .isInstanceOf(InvalidMockInvocationException.class)
-        .hasMessage("No mock invocation found");
+        assertThatThrownBy(() -> Moxy.when(preExisting::returnHello).thenReturn(""))
+                .isInstanceOf(InvalidMockInvocationException.class)
+                .hasMessage("No mock invocation found");
 
-    Moxy.mockClasses(FinalClass.class);
+        Moxy.mockClasses(FinalClass.class);
 
-    // pre-existing still behaves normally
-    assertThat(preExisting.returnHello()).isEqualTo("Hello");
+        // pre-existing still behaves normally
+        assertThat(preExisting.returnHello()).isEqualTo(HELLO);
 
-    // but new instances are normal mocks
-    assertThat(new FinalClass().returnHello()).isNull();
-  }
+        // but new instances are normal mocks
+        assertThat(new FinalClass().returnHello()).isNull();
+    }
 }

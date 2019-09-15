@@ -30,24 +30,24 @@ import java.util.List;
  * on the mocks.
  */
 public final class StubSuper implements Stub {
-  final boolean retain;
+    private final boolean retain;
 
-  public StubSuper(final boolean retain) {
-    this.retain = retain;
-  }
+    public StubSuper(final boolean retain) {
+        this.retain = retain;
+    }
 
-  @Override
-  public StubType getType() {
-    return StubType.CALL_SUPER;
-  }
+    @Override
+    public StubType getType() {
+        return StubType.CALL_SUPER;
+    }
 
-  @Override
-  public boolean isRetained() {
-    return this.retain;
-  }
+    @Override
+    public boolean isRetained() {
+        return this.retain;
+    }
 
-  @Override
-  public Object getObject(final List<Object> actualArgs) {
-    return null;
-  }
+    @Override
+    public Object getObject(final List<Object> actualArgs) {
+        return null;
+    }
 }

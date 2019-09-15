@@ -24,30 +24,30 @@
 
 package com.roscopeco.moxy;
 
-import static com.roscopeco.moxy.Moxy.*;
-import static com.roscopeco.moxy.matchers.Matchers.*;
-import static org.assertj.core.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
 
-class TestClass {
-  public String sayHelloTo(final String who) {
-    return "Hello, " + who;
-  }
+import static com.roscopeco.moxy.Moxy.*;
+import static com.roscopeco.moxy.matchers.Matchers.any;
+import static org.assertj.core.api.Assertions.assertThat;
 
-  public String hasTwoArgs(final String arg1, final int arg2) {
-    return "" + arg1 + arg2;
-  }
+class TestClass {
+    public String sayHelloTo(final String who) {
+        return "Hello, " + who;
+    }
+
+    String hasTwoArgs(final String arg1, final int arg2) {
+        return "" + arg1 + arg2;
+    }
 }
 
 final class HardToMockClass {
-  public static final String staticSayHello(final String who) {
-    return "Hello, " + who;
-  }
+    static String staticSayHello(final String who) {
+        return "Hello, " + who;
+    }
 
-  public final String finalSayHello(final String who) {
-    return "Goodbye, " + who;
-  }
+    final String finalSayHello(final String who) {
+        return "Goodbye, " + who;
+    }
 }
 
 /**
@@ -55,45 +55,45 @@ final class HardToMockClass {
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
-public class ReadmeSSCCE {
-  @Test
-  public void testClassMockVerifying() {
-    mockClasses(HardToMockClass.class);
+class ReadmeSSCCE {
+    @Test
+    void testClassMockVerifying() {
+        mockClasses(HardToMockClass.class);
 
-    when(() -> HardToMockClass.staticSayHello("Bill")).thenCallRealMethod();
-    when(() -> HardToMockClass.staticSayHello("Steve")).thenReturn("Hi there, Steve!");
+        when(() -> HardToMockClass.staticSayHello("Bill")).thenCallRealMethod();
+        when(() -> HardToMockClass.staticSayHello("Steve")).thenReturn("Hi there, Steve!");
 
-    assertThat(HardToMockClass.staticSayHello("Steve")).isEqualTo("Hi there, Steve!");
-    assertThat(HardToMockClass.staticSayHello("Bill")).isEqualTo("Hello, Bill");
+        assertThat(HardToMockClass.staticSayHello("Steve")).isEqualTo("Hi there, Steve!");
+        assertThat(HardToMockClass.staticSayHello("Bill")).isEqualTo("Hello, Bill");
 
-    final HardToMockClass mock = new HardToMockClass();
+        final HardToMockClass mock = new HardToMockClass();
 
-    when(() -> mock.finalSayHello("Jim")).thenAnswer(args -> "He's dead, Jim");
+        when(() -> mock.finalSayHello("Jim")).thenAnswer(args -> "He's dead, Jim");
 
-    assertThat(mock.finalSayHello("Jim")).isEqualTo("He's dead, Jim");
+        assertThat(mock.finalSayHello("Jim")).isEqualTo("He's dead, Jim");
 
-    assertMock(() -> HardToMockClass.staticSayHello(any())).wasCalledTwice();
-    assertMock(() -> mock.finalSayHello(any())).wasCalledOnce();
-  }
+        assertMock(() -> HardToMockClass.staticSayHello(any())).wasCalledTwice();
+        assertMock(() -> mock.finalSayHello(any())).wasCalledOnce();
+    }
 
-  @Test
-  public void testClassicMockVerifying() {
-    final TestClass mock = mock(TestClass.class);
+    @Test
+    void testClassicMockVerifying() {
+        final TestClass mock = mock(TestClass.class);
 
-    mock.sayHelloTo("Bill");
-    mock.hasTwoArgs("one", 1);
+        mock.sayHelloTo("Bill");
+        mock.hasTwoArgs("one", 1);
 
-    assertMocks(() -> {
-      mock.sayHelloTo("Steve");
-      mock.hasTwoArgs("two", 2);
-    })
-        .wereNotCalled();
+        assertMocks(() -> {
+            mock.sayHelloTo("Steve");
+            mock.hasTwoArgs("two", 2);
+        })
+                .wereNotCalled();
 
-    assertMocks(() -> {
-      mock.sayHelloTo("Bill");
-      mock.hasTwoArgs("one", 1);
-    })
-        .wereAllCalledOnce()
-        .inThatOrder();
-  }
+        assertMocks(() -> {
+            mock.sayHelloTo("Bill");
+            mock.hasTwoArgs("one", 1);
+        })
+                .wereAllCalledOnce()
+                .inThatOrder();
+    }
 }

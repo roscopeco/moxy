@@ -23,50 +23,50 @@
  */
 package com.roscopeco.moxy.matchers;
 
-import static com.roscopeco.moxy.Moxy.*;
-import static com.roscopeco.moxy.matchers.Matchers.*;
-import static com.roscopeco.moxy.matchers.TestMoxyMatchers.*;
-import static org.assertj.core.api.Assertions.*;
-
-import org.junit.jupiter.api.Test;
-
 import com.roscopeco.moxy.api.MoxyException;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
+import org.junit.jupiter.api.Test;
 
-public class TestContainsMatcher {
-  @Test
-  public void testMoxyMockVerifyWithEndsWithObjectMatcherWorks() {
-    final MethodWithArguments mock = mock(MethodWithArguments.class);
+import static com.roscopeco.moxy.Moxy.*;
+import static com.roscopeco.moxy.matchers.Matchers.contains;
+import static com.roscopeco.moxy.matchers.TestMoxyMatchers.PASSED;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-    mock.hasArgs("one", "two");
-    mock.hasArgs("three", "four");
-    mock.hasArgs("five", "six");
+class TestContainsMatcher {
+    @Test
+    void testMoxyMockVerifyWithEndsWithObjectMatcherWorks() {
+        final MethodWithArguments mock = mock(MethodWithArguments.class);
 
-    assertMock(() -> mock.hasArgs(contains("ne"), contains("tw"))).wasCalledOnce();
-    assertMock(() -> mock.hasArgs(contains("n"), contains("w"))).wasCalledOnce();
-    assertMock(() -> mock.hasArgs(contains("hre"), contains("ou"))).wasCalledOnce();
-    assertMock(() -> mock.hasArgs(contains("iv"), contains("w"))).wasNotCalled();
-    assertThatThrownBy(() ->
-        assertMock(() -> mock.hasArgs(contains(null), contains(null))).wasNotCalled())
-            .isInstanceOf(MoxyException.class)
-            .hasMessage("Null argument; see cause")
-            .hasCauseInstanceOf(IllegalArgumentException.class);
-  }
+        mock.hasArgs("one", "two");
+        mock.hasArgs("three", "four");
+        mock.hasArgs("five", "six");
 
-  @Test
-  public void testMoxyMockWhenWithEndsWithObjectMatcherWorks() {
-    final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
+        assertMock(() -> mock.hasArgs(contains("ne"), contains("tw"))).wasCalledOnce();
+        assertMock(() -> mock.hasArgs(contains("n"), contains("w"))).wasCalledOnce();
+        assertMock(() -> mock.hasArgs(contains("hre"), contains("ou"))).wasCalledOnce();
+        assertMock(() -> mock.hasArgs(contains("iv"), contains("w"))).wasNotCalled();
+        assertThatThrownBy(() ->
+                assertMock(() -> mock.hasArgs(contains(null), contains(null))).wasNotCalled())
+                .isInstanceOf(MoxyException.class)
+                .hasMessage("Null argument; see cause")
+                .hasCauseInstanceOf(IllegalArgumentException.class);
+    }
 
-    when(() -> mock.sayHelloTo(contains("tev"))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithEndsWithObjectMatcherWorks() {
+        final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
 
-    assertThat(mock.sayHelloTo("Steve")).isEqualTo(PASSED);
-    assertThat(mock.sayHelloTo("Bill")).isEqualTo(null);
+        when(() -> mock.sayHelloTo(contains("tev"))).thenReturn(PASSED);
 
-    assertThatThrownBy(() ->
-        when(() -> mock.sayHelloTo(contains(null))).thenReturn(PASSED))
-            .isInstanceOf(MoxyException.class)
-            .hasMessage("Null argument; see cause")
-            .hasCauseInstanceOf(IllegalArgumentException.class);
-  }
+        assertThat(mock.sayHelloTo("Steve")).isEqualTo(PASSED);
+        assertThat(mock.sayHelloTo("Bill")).isEqualTo(null);
+
+        assertThatThrownBy(() ->
+                when(() -> mock.sayHelloTo(contains(null))).thenReturn(PASSED))
+                .isInstanceOf(MoxyException.class)
+                .hasMessage("Null argument; see cause")
+                .hasCauseInstanceOf(IllegalArgumentException.class);
+    }
 }

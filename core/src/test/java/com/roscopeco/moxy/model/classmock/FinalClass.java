@@ -28,5 +28,7 @@ package com.roscopeco.moxy.model.classmock;
  * model to stop class mocking interfering with normal mock tests.
  */
 public final class FinalClass {
-  public String returnHello() { return "Hello"; }
+    public String returnHello() {
+        return "Hello";
+    }
 }

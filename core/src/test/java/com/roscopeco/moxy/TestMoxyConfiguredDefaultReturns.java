@@ -24,54 +24,53 @@
 
 package com.roscopeco.moxy;
 
-import static org.assertj.core.api.Assertions.*;
+import com.roscopeco.moxy.model.ClassWithDefaultConfiguredReturnTypes;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.roscopeco.moxy.model.ClassWithDefaultConfiguredReturnTypes;
+class TestMoxyConfiguredDefaultReturns {
+    @Test
+    void testMoxyMockDefaultConfiguredReturnTypeOptional() {
+        final ClassWithDefaultConfiguredReturnTypes mock = Moxy.mock(ClassWithDefaultConfiguredReturnTypes.class);
 
-public class TestMoxyConfiguredDefaultReturns {
-  @Test
-  public void testMoxyMockDefaultConfiguredReturnTypeOptional() {
-    final ClassWithDefaultConfiguredReturnTypes mock = Moxy.mock(ClassWithDefaultConfiguredReturnTypes.class);
+        // returns empty optional by default
+        assertThat(mock.returnOptionalString())
+                .isNotNull()
+                .isNotPresent()
+                .isEmpty();
 
-    // returns empty optional by default
-    assertThat(mock.returnOptionalString())
-        .isNotNull()
-        .isNotPresent()
-        .isEmpty();
+        // and can still be stubbed
+        Moxy.when(mock::returnOptionalString).thenReturn(Optional.of("Hello there!"));
 
-    // and can still be stubbed
-    Moxy.when(() -> mock.returnOptionalString()).thenReturn(Optional.of("Hello there!"));
+        assertThat(mock.returnOptionalString())
+                .isNotNull()
+                .isPresent()
+                .contains("Hello there!");
 
-    assertThat(mock.returnOptionalString())
-        .isNotNull()
-        .isPresent()
-        .contains("Hello there!");
+        // etc.
+        Moxy.when(mock::returnOptionalString).thenCallRealMethod();
 
-    // etc.
-    Moxy.when(() -> mock.returnOptionalString()).thenCallRealMethod();
+        assertThat(mock.returnOptionalString())
+                .isNotNull()
+                .isPresent()
+                .contains("Hello, World");
+    }
 
-    assertThat(mock.returnOptionalString())
-        .isNotNull()
-        .isPresent()
-        .contains("Hello, World");
-  }
+    @Test
+    void testMoxyMockDefaultConfiguredReturnTypeReconfiguration() {
+        Moxy.getMoxyEngine().registerDefaultReturnForType(Optional.class.getName(), () -> Optional.of("Goodbye"));
 
-  @Test
-  public void testMoxyMockDefaultConfiguredReturnTypeReconfiguration() {
-    Moxy.getMoxyEngine().registerDefaultReturnForType(Optional.class.getName(), () -> Optional.of("Goodbye"));
+        final ClassWithDefaultConfiguredReturnTypes mock = Moxy.mock(ClassWithDefaultConfiguredReturnTypes.class);
 
-    final ClassWithDefaultConfiguredReturnTypes mock = Moxy.mock(ClassWithDefaultConfiguredReturnTypes.class);
+        // returns configured default
+        assertThat(mock.returnOptionalString())
+                .isNotNull()
+                .isNotEmpty()
+                .contains("Goodbye");
 
-    // returns configured default
-    assertThat(mock.returnOptionalString())
-        .isNotNull()
-        .isNotEmpty()
-        .contains("Goodbye");
-
-    Moxy.getMoxyEngine().resetDefaultReturnTypes();
-  }
+        Moxy.getMoxyEngine().resetDefaultReturnTypes();
+    }
 }

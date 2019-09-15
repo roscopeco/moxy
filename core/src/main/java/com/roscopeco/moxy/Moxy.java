@@ -37,13 +37,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
- * <p>Moxy is a type-safe mocking/spying framework for Java with a fluent API.</p>
- *
- * <p>It takes inspiration from a number of other popular mocking frameworks,
- * notably Mockito. It aims to be lean, fast, and as far as possible to lack
- * the "surprises" one finds in other mocking frameworks (e.g. it should not
- * give weird failures in unrelated tests, but instead should fail fast when
- * used improperly).</p>
+ * <p>Top-level static-imports for convenient Moxy use.</p>
  *
  * <p>This class, along with the {@link Matchers} class, are the main top-level
  * classes most users will need to interact with when using Moxy. They are

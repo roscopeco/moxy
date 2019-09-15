@@ -959,6 +959,9 @@ public interface MoxyEngine {
 
     /**
      * <p>Obtain the default {@link com.roscopeco.moxy.api.ClassDefinitionStrategy} used by this engine.</p>
+     *
+     * @return The default class definition strategy.
+     * @since 1.0
      */
     ClassDefinitionStrategy getDefaultClassDefinitionStrategy();
 }

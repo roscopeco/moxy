@@ -1,7 +1,9 @@
 /**
- * <p>API for Moxy. By implementing the interfaces in this package,
+ * <p>Moxy's public API</p>
+ *
+ * <p>By implementing the interfaces in this package,
  * new Moxy backends can be created which use different generation,
- * stubbing, verifying and matching implementations to the default.</p>
+ * stubbing, verifying and matching implementations.</p>
  *
  * <p>Most users won't use this API directly - usage will be via
  * the static methods on the {@link com.roscopeco.moxy.Moxy} and

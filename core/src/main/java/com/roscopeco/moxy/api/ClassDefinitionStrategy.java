@@ -4,7 +4,7 @@ package com.roscopeco.moxy.api;
  * <p>A class definition strategy is used to actually define a mock class.</p>
  *
  * <p>The default implementation of this class uses reflective access to the
- * <code>defineClass(String, byte[], int, int, ProtectionDomain</code> method
+ * <code>defineClass(String, byte[], int, int, ProtectionDomain)</code> method
  * on <code>java.lang.ClassLoader</code>.</p>
  *
  * <p>There is an alternative implementation that uses a client-supplied <code>MethodHandles.Lookup</code>

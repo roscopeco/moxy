@@ -744,10 +744,6 @@ class TestASMMoxyEngine extends AbstractImplTest {
         ));
 
         assertThat(mwac.getAnnotation(MoxyMock.class)).isNotNull();
-
-        // We only mocked a subset, check that...
-        assertThat(MethodWithArgAndReturn.class.getDeclaredMethods().length).isGreaterThan(1);
-        assertThat(mwac.getDeclaredMethods()).hasSize(2); /* one mocked, one for __moxy_asm_ivars... */
     }
 
     @Test
@@ -779,10 +775,6 @@ class TestASMMoxyEngine extends AbstractImplTest {
         ), this.fakeOut);
 
         assertThat(mwac.getAnnotation(MoxyMock.class)).isNotNull();
-
-        // We only mocked a subset, check that...
-        assertThat(MethodWithArgAndReturn.class.getDeclaredMethods().length).isGreaterThan(1);
-        assertThat(mwac.getDeclaredMethods()).hasSize(2); /* one mocked, one for __moxy_asm_ivars... */
     }
 
     @Test
@@ -797,10 +789,6 @@ class TestASMMoxyEngine extends AbstractImplTest {
         );
 
         assertThat(mwac.getAnnotation(MoxyMock.class)).isNotNull();
-
-        // We only mocked a subset, check that...
-        assertThat(MethodWithArgAndReturn.class.getDeclaredMethods().length).isGreaterThan(1);
-        assertThat(mwac.getDeclaredMethods()).hasSize(2); /* one mocked, one for __moxy_asm_ivars... */
     }
 
     @Test
@@ -816,9 +804,5 @@ class TestASMMoxyEngine extends AbstractImplTest {
         );
 
         assertThat(mwac.getAnnotation(MoxyMock.class)).isNotNull();
-
-        // We only mocked a subset, check that...
-        assertThat(MethodWithArgAndReturn.class.getDeclaredMethods().length).isGreaterThan(1);
-        assertThat(mwac.getDeclaredMethods()).hasSize(2); /* one mocked, one for __moxy_asm_ivars... */
     }
 }

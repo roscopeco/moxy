@@ -21,32 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.roscopeco.moxy.api;
+package com.roscopeco.moxy.matchers;
+
+import java.util.function.LongPredicate;
 
 /**
- * Thrown to indicate the framework was expecting to see a mock
- * invocation (e.g. in a when(...) or assertMock(...) call) but
- * no such invocation was found.
+ * Matcher that passes the argument to a long predicate to determine whether
+ * or not it matches.
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  * @since 1.0
  */
-public class InvalidMockInvocationException extends MoxyException {
-    private static final long serialVersionUID = 1L;
-
-    public InvalidMockInvocationException() {
-        super();
-    }
-
-    InvalidMockInvocationException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
-
-    public InvalidMockInvocationException(final String message) {
-        super(message);
-    }
-
-    InvalidMockInvocationException(final Throwable cause) {
-        super(cause);
+class LongPredicateMatcher extends PredicateMatcher<Long> {
+    LongPredicateMatcher(final LongPredicate predicate) {
+        super(predicate::test);
     }
 }

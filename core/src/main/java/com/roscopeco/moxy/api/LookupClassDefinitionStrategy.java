@@ -7,6 +7,9 @@ import java.lang.invoke.MethodHandles;
  * in order to define classes.</p>
  *
  * <p>This strategy ignores the <code>loader</code> parameter to the <code>defineClass</code> method.</p>
+ *
+ * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
+ * @since 1.0
  */
 public class LookupClassDefinitionStrategy implements ClassDefinitionStrategy {
     private final MethodHandles.Lookup lookup;
@@ -18,11 +21,9 @@ public class LookupClassDefinitionStrategy implements ClassDefinitionStrategy {
     @Override
     public <T> Class<T> defineClass(final ClassLoader loader, final Class<T> originalClass, final byte[] code) {
         try {
-            @SuppressWarnings("unchecked")
-            final var clz = (Class<T>) MethodHandles.privateLookupIn(originalClass, this.lookup).defineClass(code);
+            @SuppressWarnings("unchecked") final var clz = (Class<T>) MethodHandles.privateLookupIn(originalClass, this.lookup).defineClass(code);
             return clz;
-        }
-        catch (final IllegalAccessException e) {
+        } catch (final IllegalAccessException e) {
             throw new MockGenerationException("Unable to define mock class", e);
         }
     }

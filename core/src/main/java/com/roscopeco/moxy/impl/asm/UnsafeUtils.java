@@ -29,184 +29,174 @@ import java.lang.reflect.Modifier;
 
 /**
  * 'Safer' wrapper around sun.misc.Unsafe.
- *
+ * <p>
  * For some value of 'Safer', at least...
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public class UnsafeUtils {
-  private UnsafeUtils() {
-    throw new UnsupportedOperationException(
-        "com.roscopeco.moxy.impl.as.UnsafeUtils is not designed for instantiation");
-  }
-
-  @SuppressWarnings("restriction")
-  private static final sun.misc.Unsafe UNSAFE = initUnsafe();
-
-  @SuppressWarnings("restriction")
-  private static sun.misc.Unsafe initUnsafe() {
-    try {
-      final Field unsafeField = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
-      unsafeField.setAccessible(true);
-      return (sun.misc.Unsafe) unsafeField.get(null);
-    } catch (final NoSuchFieldException e) {
-      throw new IllegalStateException("Unrecoverable Error: NoSuchFieldException 'theUnsafe' on sun.misc.Unsafe.\n"
-          + "This is most likely an environment issue.", e);
-    } catch (final IllegalAccessException e) {
-      throw new IllegalStateException(
-          "Unrecoverable Error: IllegalAccessException when accessing 'theUnsafe' on sun.misc.Unsafe.\n"
-              + "This is most likely an environment issue.",
-          e);
-    }
-  }
-
-
-  /**
-   * Wraps sun.misc.Unsafe.putObjectField.
-   *
-   * @param receiver
-   *          The object with the field to set.
-   * @param fieldOffset
-   *          The field offset.
-   * @param value
-   *          The value
-   *
-   * @see #objectFieldOffset(Field)
-   */
-  @SuppressWarnings({ "restriction" })
-  public static void putObject(final Object receiver, final long fieldOffset, final Object value) {
-    UNSAFE.putObject(receiver, fieldOffset, value);
-  }
-
-  /**
-   * Wraps sun.misc.Unsafe.objectFieldOffset.
-   *
-   * @param field
-   *          Field to get offset for.
-   *
-   * @return The field offset.
-   */
-  @SuppressWarnings({ "restriction" })
-  public static long objectFieldOffset(final Field field) {
-    return UNSAFE.objectFieldOffset(field);
-  }
-
-  /**
-   * Allocate an instance of the given class without calling a constructor.
-   *
-   * @param clz The class to instantiate.
-   *
-   * @return A new instance.
-   *
-   * @throws InstantiationException if an error occurs during allocation.
-   * @param <T> The type of instance being allocated.
-   */
-  @SuppressWarnings({ "restriction", "unchecked" })
-  public static <T> T allocateInstance(final Class<T> clz) throws InstantiationException {
-    return (T)UNSAFE.allocateInstance(clz);
-  }
-
-  static Field findDeclaredField(final Class<?> clz, final String name, final Class<?> type) {
-    try {
-      final Field f = clz.getDeclaredField(name);
-
-      if (f.getType().isAssignableFrom(type)) {
-        return f;
-      }
-    } catch (final Exception ex) {
-      /* do nothing */
+    private UnsafeUtils() {
+        throw new UnsupportedOperationException(
+                "com.roscopeco.moxy.impl.as.UnsafeUtils is not designed for instantiation");
     }
 
-    if (clz.getSuperclass() == null) {
-      return null;
-    } else {
-      return findDeclaredField(clz.getSuperclass(), name, type);
-    }
-  }
+    @SuppressWarnings("restriction")
+    private static final sun.misc.Unsafe UNSAFE = initUnsafe();
 
-  static long unsigned(final int value) {
-    if (value >= 0) {
-      return value;
-    }
-    return (~0L >>> 32) & value;
-  }
-
-  /**
-   * Returns the address of the given object.
-   *
-   * @param obj The object
-   * @return the address of the object
-   */
-  @SuppressWarnings({ "restriction" })
-  public static long toAddress(final Object obj) {
-    final Object[] array = new Object[] {obj};
-    final long baseOffset = UNSAFE.arrayBaseOffset(Object[].class);
-    return unsigned(UNSAFE.getInt(array, baseOffset));
-  }
-
-  /**
-   * <p>Copy the given object's fields to the destination object.</p>
-   *
-   * <p>If the two objects are of the same class, this will copy all
-   * fields. If not, copying will be on a 'best-effort' basis,
-   * with only fields of matching name and type being copied.</p>
-   *
-   * @param src The source object
-   * @param dest The destination object
-   *
-   * @return The destination, for convenience.
-   * @param <T> The destination type.
-   */
-  @SuppressWarnings({ "restriction" })
-  public static <T> T objectCopy(final Object src, final T dest) {
-    final sun.misc.Unsafe unsafe = UnsafeUtils.UNSAFE;
-
-    Class<?> srcClz = src.getClass();
-    final Class<?> destClz = dest.getClass();
-
-    while (srcClz != Object.class) {
-      for (final Field srcField : srcClz.getDeclaredFields()) {
-        if ((srcField.getModifiers() & Modifier.STATIC) == 0) {
-          final Class<?> type = srcField.getType();
-          Field destField;
-
-          if (destClz.equals(srcClz)) {
-            // copying same type
-            destField = srcField;
-          } else {
-            // types are different
-            destField = findDeclaredField(destClz, srcField.getName(), srcField.getType());
-          }
-
-          if (destField != null) {
-            final long srcOffset = unsafe.objectFieldOffset(srcField);
-            final long destOffset = unsafe.objectFieldOffset(destField);
-
-            if (type == byte.class) {
-              unsafe.putByte(dest, destOffset, unsafe.getByte(src, srcOffset));
-            } else if (type == char.class) {
-              unsafe.putChar(dest, destOffset, unsafe.getChar(src, srcOffset));
-            } else if (type == short.class) {
-              unsafe.putShort(dest, destOffset, unsafe.getShort(src, srcOffset));
-            } else if (type == int.class) {
-              unsafe.putInt(dest, destOffset, unsafe.getInt(src, srcOffset));
-            } else if (type == long.class) {
-              unsafe.putLong(dest, destOffset, unsafe.getLong(src, srcOffset));
-            } else if (type == float.class) {
-              unsafe.putFloat(dest, destOffset, unsafe.getFloat(src, srcOffset));
-            } else if (type == double.class) {
-              unsafe.putDouble(dest, destOffset, unsafe.getDouble(src, srcOffset));
-            } else if (type == boolean.class) {
-              unsafe.putBoolean(dest, destOffset, unsafe.getBoolean(src, srcOffset));
-            } else {
-              unsafe.putObject(dest, destOffset, unsafe.getObject(src, srcOffset));
-            }
-          }
+    @SuppressWarnings("restriction")
+    private static sun.misc.Unsafe initUnsafe() {
+        try {
+            final Field unsafeField = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
+            unsafeField.setAccessible(true);
+            return (sun.misc.Unsafe) unsafeField.get(null);
+        } catch (final NoSuchFieldException e) {
+            throw new IllegalStateException("Unrecoverable Error: NoSuchFieldException 'theUnsafe' on sun.misc.Unsafe.\n"
+                    + "This is most likely an environment issue.", e);
+        } catch (final IllegalAccessException e) {
+            throw new IllegalStateException(
+                    "Unrecoverable Error: IllegalAccessException when accessing 'theUnsafe' on sun.misc.Unsafe.\n"
+                            + "This is most likely an environment issue.",
+                    e);
         }
-      }
-      srcClz = srcClz.getSuperclass();
     }
 
-    return dest;
-  }
+    /**
+     * Wraps sun.misc.Unsafe.putObjectField.
+     *
+     * @param receiver    The object with the field to set.
+     * @param fieldOffset The field offset.
+     * @param value       The value
+     * @see #objectFieldOffset(Field)
+     */
+    @SuppressWarnings({"restriction"})
+    static void putObject(final Object receiver, final long fieldOffset, final Object value) {
+        UNSAFE.putObject(receiver, fieldOffset, value);
+    }
+
+    /**
+     * Wraps sun.misc.Unsafe.objectFieldOffset.
+     *
+     * @param field Field to get offset for.
+     * @return The field offset.
+     */
+    @SuppressWarnings({"restriction"})
+    static long objectFieldOffset(final Field field) {
+        return UNSAFE.objectFieldOffset(field);
+    }
+
+    /**
+     * Allocate an instance of the given class without calling a constructor.
+     *
+     * @param clz The class to instantiate.
+     * @param <T> The type of instance being allocated.
+     * @return A new instance.
+     * @throws InstantiationException if an error occurs during allocation.
+     */
+    @SuppressWarnings({"restriction", "unchecked"})
+    public static <T> T allocateInstance(final Class<T> clz) throws InstantiationException {
+        return (T) UNSAFE.allocateInstance(clz);
+    }
+
+    static Field findDeclaredField(final Class<?> clz, final String name, final Class<?> type) {
+        try {
+            final Field f = clz.getDeclaredField(name);
+
+            if (f.getType().isAssignableFrom(type)) {
+                return f;
+            }
+        } catch (final Exception ex) {
+            /* do nothing */
+        }
+
+        if (clz.getSuperclass() == null) {
+            return null;
+        } else {
+            return findDeclaredField(clz.getSuperclass(), name, type);
+        }
+    }
+
+    static long unsigned(final int value) {
+        if (value >= 0) {
+            return value;
+        }
+        return (~0L >>> 32) & value;
+    }
+
+    /**
+     * Returns the address of the given object.
+     *
+     * @param obj The object
+     * @return the address of the object
+     */
+    @SuppressWarnings({"restriction"})
+    public static long toAddress(final Object obj) {
+        final Object[] array = new Object[]{obj};
+        final long baseOffset = UNSAFE.arrayBaseOffset(Object[].class);
+        return unsigned(UNSAFE.getInt(array, baseOffset));
+    }
+
+    /**
+     * <p>Copy the given object's fields to the destination object.</p>
+     *
+     * <p>If the two objects are of the same class, this will copy all
+     * fields. If not, copying will be on a 'best-effort' basis,
+     * with only fields of matching name and type being copied.</p>
+     *
+     * @param src  The source object
+     * @param dest The destination object
+     * @param <T>  The destination type.
+     * @return The destination, for convenience.
+     */
+    @SuppressWarnings({"restriction"})
+    public static <T> T objectCopy(final Object src, final T dest) {
+        final sun.misc.Unsafe unsafe = UnsafeUtils.UNSAFE;
+
+        Class<?> srcClz = src.getClass();
+        final Class<?> destClz = dest.getClass();
+
+        while (srcClz != Object.class) {
+            for (final Field srcField : srcClz.getDeclaredFields()) {
+                if ((srcField.getModifiers() & Modifier.STATIC) == 0) {
+                    final Class<?> type = srcField.getType();
+                    Field destField;
+
+                    if (destClz.equals(srcClz)) {
+                        // copying same type
+                        destField = srcField;
+                    } else {
+                        // types are different
+                        destField = findDeclaredField(destClz, srcField.getName(), srcField.getType());
+                    }
+
+                    if (destField != null) {
+                        final long srcOffset = unsafe.objectFieldOffset(srcField);
+                        final long destOffset = unsafe.objectFieldOffset(destField);
+
+                        if (type == byte.class) {
+                            unsafe.putByte(dest, destOffset, unsafe.getByte(src, srcOffset));
+                        } else if (type == char.class) {
+                            unsafe.putChar(dest, destOffset, unsafe.getChar(src, srcOffset));
+                        } else if (type == short.class) {
+                            unsafe.putShort(dest, destOffset, unsafe.getShort(src, srcOffset));
+                        } else if (type == int.class) {
+                            unsafe.putInt(dest, destOffset, unsafe.getInt(src, srcOffset));
+                        } else if (type == long.class) {
+                            unsafe.putLong(dest, destOffset, unsafe.getLong(src, srcOffset));
+                        } else if (type == float.class) {
+                            unsafe.putFloat(dest, destOffset, unsafe.getFloat(src, srcOffset));
+                        } else if (type == double.class) {
+                            unsafe.putDouble(dest, destOffset, unsafe.getDouble(src, srcOffset));
+                        } else if (type == boolean.class) {
+                            unsafe.putBoolean(dest, destOffset, unsafe.getBoolean(src, srcOffset));
+                        } else {
+                            unsafe.putObject(dest, destOffset, unsafe.getObject(src, srcOffset));
+                        }
+                    }
+                }
+            }
+            srcClz = srcClz.getSuperclass();
+        }
+
+        return dest;
+    }
 }

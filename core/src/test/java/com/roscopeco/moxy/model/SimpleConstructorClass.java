@@ -24,25 +24,26 @@
 package com.roscopeco.moxy.model;
 
 public class SimpleConstructorClass {
-  private final String str;
+    private final String str;
 
-  public SimpleConstructorClass() {
-    this("Hello");
-  }
+    public SimpleConstructorClass() {
+        this("Hello");
+    }
 
-  public SimpleConstructorClass(final String str) {
-    this.str = str;
-  }
+    /* Don't believe intelliJ's lies, this cannot be private... */
+    public SimpleConstructorClass(final String str) {
+        this.str = str;
+    }
 
-  public SimpleConstructorClass(final String str1, final String str2) {
-    this.str = str1 + str2;
-  }
+    public SimpleConstructorClass(final String str1, final String str2) {
+        this.str = str1 + str2;
+    }
 
-  public SimpleConstructorClass(final String str, final int i) {
-    this.str = str + i;
-  }
+    public SimpleConstructorClass(final String str, final int i) {
+        this.str = str + i;
+    }
 
-  public String returnString() {
-    return this.str;
-  }
+    public String returnString() {
+        return this.str;
+    }
 }

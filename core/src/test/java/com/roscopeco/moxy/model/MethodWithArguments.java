@@ -25,7 +25,7 @@ package com.roscopeco.moxy.model;
 
 public class MethodWithArguments {
 
-  public void hasArgs(final String arg1, final String arg2) {
-    // do nothing
-  }
+    public void hasArgs(final String arg1, final String arg2) {
+        // do nothing
+    }
 }

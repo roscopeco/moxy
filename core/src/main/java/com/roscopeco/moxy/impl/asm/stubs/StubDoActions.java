@@ -33,22 +33,22 @@ import java.util.function.Consumer;
  * on the mocks.
  */
 public final class StubDoActions {
-  final List<Object> matchArgs;
-  final List<Consumer<List<?extends Object>>> actions;
+    private final List<Object> matchArgs;
+    private final List<Consumer<List<?>>> actions;
 
-  @SafeVarargs
-  public StubDoActions(final List<Object> matchArgs, final Consumer<List<?extends Object>>... actions) {
-    this.matchArgs = matchArgs;
-    this.actions = new ArrayList<>();
+    @SafeVarargs
+    public StubDoActions(final List<Object> matchArgs, final Consumer<List<?>>... actions) {
+        this.matchArgs = matchArgs;
+        this.actions = new ArrayList<>(actions.length);
 
-    Arrays.stream(actions).forEach(this.actions::add);
-  }
+        this.actions.addAll(Arrays.asList(actions));
+    }
 
-  public List<Object> getMatchArgs() {
-    return this.matchArgs;
-  }
+    public List<Object> getMatchArgs() {
+        return this.matchArgs;
+    }
 
-  public List<Consumer<List<? extends Object>>> getActions() {
-    return this.actions;
-  }
+    public List<Consumer<List<?>>> getActions() {
+        return this.actions;
+    }
 }

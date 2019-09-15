@@ -24,21 +24,21 @@
 package com.roscopeco.moxy.matchers;
 
 class EndsWithMatcher extends SimpleObjectMatcher<String> {
-  public EndsWithMatcher(final String string) {
-    super(string, false);
-  }
-
-  @Override
-  public boolean matches(final String arg) {
-    if (arg == null) {
-      return false;
-    } else {
-      return arg.endsWith(this.getObject());
+    EndsWithMatcher(final String string) {
+        super(string, false);
     }
-  }
 
-  @Override
-  public String toString() {
-    return "<endsWith" + super.toString();
-  }
+    @Override
+    public boolean matches(final String arg) {
+        if (arg == null) {
+            return false;
+        } else {
+            return arg.endsWith(this.getObject());
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "<endsWith" + super.toString();
+    }
 }

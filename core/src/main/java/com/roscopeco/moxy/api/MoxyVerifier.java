@@ -39,121 +39,116 @@ import org.opentest4j.AssertionFailedError;
  * @since 1.0
  */
 public interface MoxyVerifier {
-  /**
-   * Verify that the mock method was called <em>at least</em> once,
-   * with the arguments specified in the call.
-   *
-   * Note the subtle difference from {@link #wasCalled(int)}, which
-   * expects an <em>exact number</em> of calls.
-   *
-   * Throws {@link AssertionFailedError} if the assertion fails.
-   *
-   * @return <code>this</code>.
-   * @since 1.0
-   */
-  public MoxyVerifier wasCalled();
+    /**
+     * Verify that the mock method was called <em>at least</em> once,
+     * with the arguments specified in the call.
+     * <p>
+     * Note the subtle difference from {@link #wasCalled(int)}, which
+     * expects an <em>exact number</em> of calls.
+     * <p>
+     * Throws {@link AssertionFailedError} if the assertion fails.
+     *
+     * @return <code>this</code>.
+     * @since 1.0
+     */
+    MoxyVerifier wasCalled();
 
-  /**
-   * Verify that the mock method was called <em>exactly</em> <code>times</code>,
-   * with the arguments specified in the call.
-   *
-   * Note the subtle difference from {@link #wasCalled()}, which
-   * expects an <em>at least one</em> call.
-   *
-   * Throws {@link AssertionFailedError} if the assertion fails.
-   *
-   * @param times The number of expected invocations.
-   *
-   * @return <code>this</code>.
-   * @since 1.0
-   */
-  public MoxyVerifier wasCalled(int times);
+    /**
+     * Verify that the mock method was called <em>exactly</em> <code>times</code>,
+     * with the arguments specified in the call.
+     * <p>
+     * Note the subtle difference from {@link #wasCalled()}, which
+     * expects an <em>at least one</em> call.
+     * <p>
+     * Throws {@link AssertionFailedError} if the assertion fails.
+     *
+     * @param times The number of expected invocations.
+     * @return <code>this</code>.
+     * @since 1.0
+     */
+    MoxyVerifier wasCalled(int times);
 
-  /**
-   * Verify that the mock method was not called.
-   *
-   * Throws {@link AssertionFailedError} if the assertion fails.
-   *
-   * @return <code>this</code>
-   * @since 1.0
-   */
-  public MoxyVerifier wasNotCalled();
+    /**
+     * Verify that the mock method was not called.
+     * <p>
+     * Throws {@link AssertionFailedError} if the assertion fails.
+     *
+     * @return <code>this</code>
+     * @since 1.0
+     */
+    MoxyVerifier wasNotCalled();
 
-  /**
-   * Verify the mock method was called exactly once.
-   *
-   * Throws {@link AssertionFailedError} if the assertion fails.
-   *
-   * @return <code>this</code>
-   * @since 1.0
-   */
-  public MoxyVerifier wasCalledOnce();
+    /**
+     * Verify the mock method was called exactly once.
+     * <p>
+     * Throws {@link AssertionFailedError} if the assertion fails.
+     *
+     * @return <code>this</code>
+     * @since 1.0
+     */
+    MoxyVerifier wasCalledOnce();
 
-  /**
-   * Verify the mock method called exactly twice.
-   *
-   * Throws {@link AssertionFailedError} if the assertion fails.
-   *
-   * @return <code>this</code>
-   * @since 1.0
-   */
-  public MoxyVerifier wasCalledTwice();
+    /**
+     * Verify the mock method called exactly twice.
+     * <p>
+     * Throws {@link AssertionFailedError} if the assertion fails.
+     *
+     * @return <code>this</code>
+     * @since 1.0
+     */
+    MoxyVerifier wasCalledTwice();
 
-  /**
-   * Verify the mock method was called at least <code>times</code>.
-   *
-   * Throws {@link AssertionFailedError} if the assertion fails.
-   *
-   * @param times The number of expected invocations.
-   *
-   * @return <code>this</code>
-   * @since 1.0
-   */
-  public MoxyVerifier wasCalledAtLeast(int times);
+    /**
+     * Verify the mock method was called at least <code>times</code>.
+     * <p>
+     * Throws {@link AssertionFailedError} if the assertion fails.
+     *
+     * @param times The number of expected invocations.
+     * @return <code>this</code>
+     * @since 1.0
+     */
+    MoxyVerifier wasCalledAtLeast(int times);
 
-  /**
-   * Verify the mock method was called at most <code>times</code>.
-   *
-   * Throws {@link AssertionFailedError} if the assertion fails.
-   *
-   * @param times The number of expected invocations.
-   *
-   * @return <code>this</code>
-   * @since 1.0
-   */
-  public MoxyVerifier wasCalledAtMost(int times);
+    /**
+     * Verify the mock method was called at most <code>times</code>.
+     * <p>
+     * Throws {@link AssertionFailedError} if the assertion fails.
+     *
+     * @param times The number of expected invocations.
+     * @return <code>this</code>
+     * @since 1.0
+     */
+    MoxyVerifier wasCalledAtMost(int times);
 
-  /**
-   * Verify the mocked method didn't throw an exception of type <code>throwable</code>.
-   *
-   * Throws {@link AssertionFailedError} if the assertion fails.
-   *
-   * @param throwable The exception type to check.
-   *
-   * @return <code>this</code>
-   * @since 1.0
-   */
-  public MoxyVerifier didntThrow(Class<? extends Throwable> throwable);
+    /**
+     * Verify the mocked method didn't throw an exception of type <code>throwable</code>.
+     * <p>
+     * Throws {@link AssertionFailedError} if the assertion fails.
+     *
+     * @param throwable The exception type to check.
+     * @return <code>this</code>
+     * @since 1.0
+     */
+    MoxyVerifier didntThrow(Class<? extends Throwable> throwable);
 
-  /**
-   * Verify the mocked method didn't throw the given <code>throwable</code> instance.
-   *
-   * Throws {@link AssertionFailedError} if the assertion fails.
-   *
-   * @param throwable The exception instance to check.
-   *
-   * @return <code>this</code>
-   * @since 1.0
-   */
-  public MoxyVerifier didntThrow(Throwable throwable);
+    /**
+     * Verify the mocked method didn't throw the given <code>throwable</code> instance.
+     * <p>
+     * Throws {@link AssertionFailedError} if the assertion fails.
+     *
+     * @param throwable The exception instance to check.
+     * @return <code>this</code>
+     * @since 1.0
+     */
+    MoxyVerifier didntThrow(Throwable throwable);
 
-  /**
-   * Verify the mocked method didn't throw any exceptions.
-   *
-   * Throws {@link AssertionFailedError} if the assertion fails.
-   *
-   * @return <code>this</code>
-   * @since 1.0
-   */
-  public MoxyVerifier didntThrowAnyException();
+    /**
+     * Verify the mocked method didn't throw any exceptions.
+     * <p>
+     * Throws {@link AssertionFailedError} if the assertion fails.
+     *
+     * @return <code>this</code>
+     * @since 1.0
+     */
+    MoxyVerifier didntThrowAnyException();
 }

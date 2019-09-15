@@ -30,13 +30,13 @@ package com.roscopeco.moxy.model.classmock;
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public class SubclassWithConstructorArgs extends ClassWithConstructorArgs {
-  public SubclassWithConstructorArgs(final String str) {
-    super(str);
-  }
+    public SubclassWithConstructorArgs(final String str) {
+        super(str);
+    }
 
-  // Moxy class mocks only define declared methods...
-  @Override
-  public String getStr() {
-    return super.getStr();
-  }
+    // Moxy class mocks only define declared methods...
+    @Override
+    public String getStr() {
+        return super.getStr();
+    }
 }

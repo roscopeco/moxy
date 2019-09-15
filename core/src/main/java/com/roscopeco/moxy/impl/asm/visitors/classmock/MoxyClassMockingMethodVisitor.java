@@ -23,86 +23,86 @@
  */
 package com.roscopeco.moxy.impl.asm.visitors.classmock;
 
-import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.*;
-import static com.roscopeco.moxy.impl.asm.classmock.TypesAndDescriptors.*;
-import static org.objectweb.asm.Opcodes.*;
-
+import com.roscopeco.moxy.impl.asm.visitors.AbstractMoxyMockMethodVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
-import com.roscopeco.moxy.impl.asm.visitors.AbstractMoxyMockMethodVisitor;
+import static com.roscopeco.moxy.impl.asm.TypesAndDescriptors.MOXY_SUPPORT_INTERFACE_INTERNAL_NAME;
+import static com.roscopeco.moxy.impl.asm.classmock.TypesAndDescriptors.*;
+import static org.objectweb.asm.Opcodes.*;
 
 /*
  * Generates the mock methods in-place on the original class.
  */
 class MoxyClassMockingMethodVisitor extends AbstractMoxyMockMethodVisitor {
-  private final String delegateClass;
-  private final boolean isStatic;
+    private final String delegateClass;
+    private final boolean isStatic;
 
-  MoxyClassMockingMethodVisitor(final MethodVisitor delegate,
-                                final Class<?> originalClass,
-                                final String delegateClass,
-                                final String methodName,
-                                final String methodDescriptor,
-                                final Type returnType,
-                                final Type[] argTypes,
-                                final boolean isStatic) {
-    super(delegate, originalClass, methodName, methodDescriptor, returnType, argTypes, false, false);
-    this.delegateClass = delegateClass;
-    this.isStatic = isStatic;
-  }
-
-  @Override
-  protected int getFirstArgumentLocalSlot() {
-    return this.isStatic ? 0 : 1;
-  }
-
-  @Override
-  protected void generateLoadMockSupport() {
-    if (this.isStatic) {
-      this.delegate.visitLdcInsn(Type.getType(this.originalClass));
-
-      this.delegate.visitMethodInsn(INVOKESTATIC,
-                                    INSTANCE_REGISTRY_INTERNAL_NAME,
-                                    REGISTRY_GET_STATIC_DELEGATE_METHOD_NAME,
-                                    REGISTRY_GET_STATIC_DELEGATE_DESCRIPTOR,
-                                    false);
-
-      this.delegate.visitTypeInsn(CHECKCAST, MOXY_SUPPORT_INTERFACE_INTERNAL_NAME);
-    } else {
-      this.delegate.visitVarInsn(ALOAD, 0);
-
-      this.delegate.visitMethodInsn(INVOKESTATIC,
-                                    INSTANCE_REGISTRY_INTERNAL_NAME,
-                                    REGISTRY_GET_DELEGATE_METHOD_NAME,
-                                    REGISTRY_GET_DELEGATE_DESCRIPTOR,
-                                    false);
-
-      this.delegate.visitTypeInsn(CHECKCAST, this.delegateClass);
-    }
-  }
-
-  @Override
-  protected void generateRealMethodCall() {
-    if (!this.isStatic) {
-      // load support
-      this.generateLoadMockSupport();
+    @SuppressWarnings("squid:S00107" /* This internal class requires these parameters */)
+    MoxyClassMockingMethodVisitor(final MethodVisitor delegate,
+                                  final Class<?> originalClass,
+                                  final String delegateClass,
+                                  final String methodName,
+                                  final String methodDescriptor,
+                                  final Type returnType,
+                                  final Type[] argTypes,
+                                  final boolean isStatic) {
+        super(delegate, originalClass, methodName, methodDescriptor, returnType, argTypes, false, false);
+        this.delegateClass = delegateClass;
+        this.isStatic = isStatic;
     }
 
-    // load arguments
-    this.generateLoadMethodArguments();
+    @Override
+    protected int getFirstArgumentLocalSlot() {
+        return this.isStatic ? 0 : 1;
+    }
 
-    this.delegate.visitMethodInsn(
-        this.isStatic ? INVOKESTATIC : INVOKEVIRTUAL,
-        this.delegateClass,
-        this.methodName,
-        this.methodDescriptor,
-        false);
-  }
+    @Override
+    protected void generateLoadMockSupport() {
+        if (this.isStatic) {
+            this.delegate.visitLdcInsn(Type.getType(this.originalClass));
 
-  @Override
-  public void visitCode() {
-    super.generatePreamble();
-    super.generateReturn();
-  }
+            this.delegate.visitMethodInsn(INVOKESTATIC,
+                    INSTANCE_REGISTRY_INTERNAL_NAME,
+                    REGISTRY_GET_STATIC_DELEGATE_METHOD_NAME,
+                    REGISTRY_GET_STATIC_DELEGATE_DESCRIPTOR,
+                    false);
+
+            this.delegate.visitTypeInsn(CHECKCAST, MOXY_SUPPORT_INTERFACE_INTERNAL_NAME);
+        } else {
+            this.delegate.visitVarInsn(ALOAD, 0);
+
+            this.delegate.visitMethodInsn(INVOKESTATIC,
+                    INSTANCE_REGISTRY_INTERNAL_NAME,
+                    REGISTRY_GET_DELEGATE_METHOD_NAME,
+                    REGISTRY_GET_DELEGATE_DESCRIPTOR,
+                    false);
+
+            this.delegate.visitTypeInsn(CHECKCAST, this.delegateClass);
+        }
+    }
+
+    @Override
+    protected void generateRealMethodCall() {
+        if (!this.isStatic) {
+            // load support
+            this.generateLoadMockSupport();
+        }
+
+        // load arguments
+        this.generateLoadMethodArguments();
+
+        this.delegate.visitMethodInsn(
+                this.isStatic ? INVOKESTATIC : INVOKEVIRTUAL,
+                this.delegateClass,
+                this.methodName,
+                this.methodDescriptor,
+                false);
+    }
+
+    @Override
+    public void visitCode() {
+        super.generatePreamble();
+        super.generateReturn();
+    }
 }

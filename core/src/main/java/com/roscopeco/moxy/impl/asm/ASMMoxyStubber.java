@@ -23,104 +23,100 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
+import com.roscopeco.moxy.api.MoxyStubber;
+import com.roscopeco.moxy.impl.asm.stubs.*;
+
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import com.roscopeco.moxy.api.MoxyStubber;
-import com.roscopeco.moxy.impl.asm.stubs.StubAnswer;
-import com.roscopeco.moxy.impl.asm.stubs.StubDelegate;
-import com.roscopeco.moxy.impl.asm.stubs.StubReturn;
-import com.roscopeco.moxy.impl.asm.stubs.StubSuper;
-import com.roscopeco.moxy.impl.asm.stubs.StubThrow;
-
 class ASMMoxyStubber<T> extends AbstractASMMoxyInvocationListProcessor implements MoxyStubber<T> {
-  public ASMMoxyStubber(final ASMMoxyEngine engine, final List<Invocation> invocations) {
-    super(engine, Collections.unmodifiableList(invocations));
+    ASMMoxyStubber(final ASMMoxyEngine engine, final List<Invocation> invocations) {
+        super(engine, Collections.unmodifiableList(invocations));
 
-    // Reset when starting new stubbing...
-    final Invocation invocation = this.getLastMonitoredInvocation();
-    final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
-    receiver.__moxy_asm_removePriorStubbing(invocation);
-  }
-
-  @Override
-  public MoxyStubber<T> thenReturn(final T object) {
-    final Invocation invocation = this.getLastMonitoredInvocation();
-    final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
-
-    receiver.__moxy_asm_setStubbing(invocation, new StubReturn(object, false));
-
-    return this;
-  }
-
-  @Override
-  public MoxyStubber<T> thenThrow(final Throwable throwable) {
-    final Invocation invocation = this.getLastMonitoredInvocation();
-    final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
-
-    receiver.__moxy_asm_setStubbing(invocation, new StubThrow(throwable, false));
-
-    return this;
-  }
-
-  @Override
-  public MoxyStubber<T> thenCallRealMethod() {
-    final Invocation invocation = this.getLastMonitoredInvocation();
-    final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
-
-    receiver.__moxy_asm_setStubbing(invocation, new StubSuper(false));
-
-    return this;
-  }
-
-  @Override
-  public MoxyStubber<T> thenAnswer(final Function<List<? extends Object>, T> provider) {
-    final Invocation invocation = this.getLastMonitoredInvocation();
-    final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
-
-    receiver.__moxy_asm_setStubbing(invocation, new StubAnswer(provider, false));
-
-    return this;
-  }
-
-  @Override
-  public MoxyStubber<T> thenDelegateTo(final Object delegate) {
-    if (delegate == null) {
-      throw new IllegalArgumentException("Cannot delegate to null");
+        // Reset when starting new stubbing...
+        final Invocation invocation = this.getLastMonitoredInvocation();
+        final ASMMockSupport receiver = (ASMMockSupport) invocation.getReceiver();
+        receiver.__moxy_asm_removePriorStubbing(invocation);
     }
 
-    final Invocation invocation = this.getLastMonitoredInvocation();
-    final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
-    final Class<?> delegateClass = delegate.getClass();
+    @Override
+    public MoxyStubber<T> thenReturn(final T object) {
+        final Invocation invocation = this.getLastMonitoredInvocation();
+        final ASMMockSupport receiver = (ASMMockSupport) invocation.getReceiver();
 
-    final Method method = StubberHelpers.findCompatibleMethod(delegateClass,
-                                              invocation.getMethodName(),
-                                              invocation.getMethodDesc());
+        receiver.__moxy_asm_setStubbing(invocation, new StubReturn(object, false));
 
-    if (method != null) {
-      receiver.__moxy_asm_setStubbing(invocation, new StubDelegate(method, delegate, false));
-    } else {
-      throw new IllegalArgumentException(
-          "Cannot delegate invocation of "
-        + TypeStringUtils.javaMethodSignature(invocation)
-        + " to object of "
-        + delegate.getClass().toString()
-        + " - no compatible method found");
+        return this;
     }
 
-    return this;
-  }
+    @Override
+    public MoxyStubber<T> thenThrow(final Throwable throwable) {
+        final Invocation invocation = this.getLastMonitoredInvocation();
+        final ASMMockSupport receiver = (ASMMockSupport) invocation.getReceiver();
 
-  @Override
-  public MoxyStubber<T> thenDo(final Consumer<List<? extends Object>> action) {
-    final Invocation invocation = this.getLastMonitoredInvocation();
-    final ASMMockSupport receiver = (ASMMockSupport)invocation.getReceiver();
+        receiver.__moxy_asm_setStubbing(invocation, new StubThrow(throwable, false));
 
-    receiver.__moxy_asm_addDoAction(invocation, action);
+        return this;
+    }
 
-    return this;
-  }
+    @Override
+    public MoxyStubber<T> thenCallRealMethod() {
+        final Invocation invocation = this.getLastMonitoredInvocation();
+        final ASMMockSupport receiver = (ASMMockSupport) invocation.getReceiver();
+
+        receiver.__moxy_asm_setStubbing(invocation, new StubSuper(false));
+
+        return this;
+    }
+
+    @Override
+    public MoxyStubber<T> thenAnswer(final Function<List<?>, T> provider) {
+        final Invocation invocation = this.getLastMonitoredInvocation();
+        final ASMMockSupport receiver = (ASMMockSupport) invocation.getReceiver();
+
+        receiver.__moxy_asm_setStubbing(invocation, new StubAnswer(provider, false));
+
+        return this;
+    }
+
+    @Override
+    public MoxyStubber<T> thenDelegateTo(final Object delegate) {
+        if (delegate == null) {
+            throw new IllegalArgumentException("Cannot delegate to null");
+        }
+
+        final Invocation invocation = this.getLastMonitoredInvocation();
+        final ASMMockSupport receiver = (ASMMockSupport) invocation.getReceiver();
+        final Class<?> delegateClass = delegate.getClass();
+
+        final Method method = StubberHelpers.findCompatibleMethod(delegateClass,
+                invocation.getMethodName(),
+                invocation.getMethodDesc());
+
+        if (method != null) {
+            receiver.__moxy_asm_setStubbing(invocation, new StubDelegate(method, delegate, false));
+        } else {
+            throw new IllegalArgumentException(
+                    "Cannot delegate invocation of "
+                            + TypeStringUtils.javaMethodSignature(invocation)
+                            + " to object of "
+                            + delegate.getClass().toString()
+                            + " - no compatible method found");
+        }
+
+        return this;
+    }
+
+    @Override
+    public MoxyStubber<T> thenDo(final Consumer<List<?>> action) {
+        final Invocation invocation = this.getLastMonitoredInvocation();
+        final ASMMockSupport receiver = (ASMMockSupport) invocation.getReceiver();
+
+        receiver.__moxy_asm_addDoAction(invocation, action);
+
+        return this;
+    }
 }

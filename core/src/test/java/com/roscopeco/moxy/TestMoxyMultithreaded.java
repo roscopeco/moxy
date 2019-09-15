@@ -24,39 +24,38 @@
 
 package com.roscopeco.moxy;
 
-import static org.assertj.core.api.Assertions.*;
-
+import com.roscopeco.moxy.model.classmock.SimpleClass;
 import org.junit.jupiter.api.Test;
 
-import com.roscopeco.moxy.model.classmock.SimpleClass;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestMoxyMultithreaded {
-  @Test
-  public void testMoxyMockWhenThenReturnDifferentThreads() throws InterruptedException {
-    final SimpleClass mock = Moxy.mock(SimpleClass.class);
-    Moxy.when(() -> mock.returnHello()).thenReturn("MARKER");
+class TestMoxyMultithreaded {
+    @Test
+    void testMoxyMockWhenThenReturnDifferentThreads() throws InterruptedException {
+        final SimpleClass mock = Moxy.mock(SimpleClass.class);
+        Moxy.when(mock::returnHello).thenReturn("MARKER");
 
-    final String[] r = new String[] { "NOTSET" };
-    final Thread t = new Thread(() -> r[0] = mock.returnHello());
-    t.start();
-    t.join();
+        final String[] r = new String[]{"NOTSET"};
+        final Thread t = new Thread(() -> r[0] = mock.returnHello());
+        t.start();
+        t.join();
 
-    assertThat(r[0]).isEqualTo("MARKER");
-  }
+        assertThat(r[0]).isEqualTo("MARKER");
+    }
 
-  @Test
-  public void testMoxyMockWhenThenVerifyDifferentThreads() throws InterruptedException {
-    final SimpleClass mock = Moxy.mock(SimpleClass.class);
+    @Test
+    void testMoxyMockWhenThenVerifyDifferentThreads() throws InterruptedException {
+        final SimpleClass mock = Moxy.mock(SimpleClass.class);
 
-    final Thread t1 = new Thread(() -> mock.returnHello());
-    final Thread t2 = new Thread(() -> mock.returnHello());
+        final Thread t1 = new Thread(mock::returnHello);
+        final Thread t2 = new Thread(mock::returnHello);
 
-    t1.start();
-    t2.start();
+        t1.start();
+        t2.start();
 
-    t1.join();
-    t2.join();
+        t1.join();
+        t2.join();
 
-    Moxy.assertMock(() -> mock.returnHello()).wasCalledTwice();
-  }
+        Moxy.assertMock(mock::returnHello).wasCalledTwice();
+    }
 }

@@ -27,49 +27,47 @@ package com.roscopeco.moxy.impl.asm.stubs;
  * on the mocks.
  */
 public final class StubMethod {
-  final String methodName;
-  final String methodDesc;
+    private final String methodName;
+    private final String methodDesc;
 
-  public StubMethod(final String methodName, final String methodDesc) {
-    super();
-    this.methodName = methodName;
-    this.methodDesc = methodDesc;
-  }
+    public StubMethod(final String methodName, final String methodDesc) {
+        super();
+        this.methodName = methodName;
+        this.methodDesc = methodDesc;
+    }
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((this.methodDesc == null) ? 0 : this.methodDesc.hashCode());
-    result = prime * result + ((this.methodName == null) ? 0 : this.methodName.hashCode());
-    return result;
-  }
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((this.methodDesc == null) ? 0 : this.methodDesc.hashCode());
+        result = prime * result + ((this.methodName == null) ? 0 : this.methodName.hashCode());
+        return result;
     }
-    if (obj == null) {
-      return false;
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+        final StubMethod other = (StubMethod) obj;
+        if (this.methodDesc == null) {
+            if (other.methodDesc != null) {
+                return false;
+            }
+        } else if (!this.methodDesc.equals(other.methodDesc)) {
+            return false;
+        }
+        if (this.methodName == null) {
+            return other.methodName == null;
+        } else {
+            return this.methodName.equals(other.methodName);
+        }
     }
-    if (this.getClass() != obj.getClass()) {
-      return false;
-    }
-    final StubMethod other = (StubMethod) obj;
-    if (this.methodDesc == null) {
-      if (other.methodDesc != null) {
-        return false;
-      }
-    } else if (!this.methodDesc.equals(other.methodDesc)) {
-      return false;
-    }
-    if (this.methodName == null) {
-      if (other.methodName != null) {
-        return false;
-      }
-    } else if (!this.methodName.equals(other.methodName)) {
-      return false;
-    }
-    return true;
-  }
 }

@@ -34,13 +34,13 @@ import com.roscopeco.moxy.api.MoxyException;
  * @since 1.0
  */
 public class InitializationException extends MoxyException {
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public InitializationException(final String message, final Throwable cause) {
-    super(message, cause);
-  }
+    private InitializationException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 
-  public InitializationException(final Throwable cause) {
-    this("Error while initializing Moxy annotations; See cause", cause);
-  }
+    InitializationException(final Throwable cause) {
+        this("Error while initializing Moxy annotations; See cause", cause);
+    }
 }

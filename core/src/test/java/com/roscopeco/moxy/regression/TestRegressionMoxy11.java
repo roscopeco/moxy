@@ -16,7 +16,6 @@ class TestRegressionMoxy11 {
             inner.theField = 5;
             return inner;
         }
-
     }
 
     @Test

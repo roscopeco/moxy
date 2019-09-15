@@ -38,9 +38,9 @@ import com.roscopeco.moxy.api.MoxyException;
  * @since 1.0
  */
 public class PossibleMatcherUsageError extends MoxyException {
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public PossibleMatcherUsageError(final String message, final Throwable cause) {
-    super(message, cause);
-  }
+    public PossibleMatcherUsageError(final String message, final Throwable cause) {
+        super(message, cause);
+    }
 }

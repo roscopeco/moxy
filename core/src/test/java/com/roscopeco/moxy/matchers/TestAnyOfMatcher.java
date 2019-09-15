@@ -23,235 +23,233 @@
  */
 package com.roscopeco.moxy.matchers;
 
-import static com.roscopeco.moxy.Moxy.*;
-import static com.roscopeco.moxy.matchers.Matchers.*;
-import static com.roscopeco.moxy.matchers.Matchers.anyOf;
-import static com.roscopeco.moxy.matchers.TestMoxyMatchers.*;
-import static org.assertj.core.api.Assertions.*;
-
-import org.junit.jupiter.api.Test;
-
 import com.roscopeco.moxy.model.MatcherTestClass;
 import com.roscopeco.moxy.model.MethodWithArgAndReturn;
 import com.roscopeco.moxy.model.MethodWithArguments;
+import org.junit.jupiter.api.Test;
 
-public class TestAnyOfMatcher {
-  @Test
-  public void testMoxyMockVerifyWithAnyOfByteMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+import static com.roscopeco.moxy.Moxy.*;
+import static com.roscopeco.moxy.matchers.Matchers.*;
+import static com.roscopeco.moxy.matchers.TestMoxyMatchers.PASSED;
+import static org.assertj.core.api.Assertions.assertThat;
 
-    mock.testByte((byte) 0);
-    mock.testByte((byte) 128);
-    mock.testByte((byte) 255);
+class TestAnyOfMatcher {
+    @Test
+    void testMoxyMockVerifyWithAnyOfByteMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertMock(() -> mock.testByte(anyOfByte((byte)0, (byte)128, (byte)129))).wasCalledTwice();
-    assertMock(() -> mock.testByte(anyOfByte((byte)1, (byte)129, (byte)42))).wasNotCalled();
-  }
+        mock.testByte((byte) 0);
+        mock.testByte((byte) 128);
+        mock.testByte((byte) 255);
 
-  @Test
-  public void testMoxyMockWhenWithAnyOfByteMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertMock(() -> mock.testByte(anyOfByte((byte) 0, (byte) 128, (byte) 129))).wasCalledTwice();
+        assertMock(() -> mock.testByte(anyOfByte((byte) 1, (byte) 129, (byte) 42))).wasNotCalled();
+    }
 
-    when(() -> mock.testByte(anyOfByte((byte)1, (byte)8, Byte.MAX_VALUE))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithAnyOfByteMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertThat(mock.testByte((byte) 0)).isEqualTo(null);
-    assertThat(mock.testByte((byte) 1)).isEqualTo(PASSED);
-    assertThat(mock.testByte((byte) 8)).isEqualTo(PASSED);
-    assertThat(mock.testByte((byte) 32)).isEqualTo(null);
-    assertThat(mock.testByte(Byte.MAX_VALUE)).isEqualTo(PASSED);
-  }
+        when(() -> mock.testByte(anyOfByte((byte) 1, (byte) 8, Byte.MAX_VALUE))).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockVerifyWithAnyOfCharMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertThat(mock.testByte((byte) 0)).isEqualTo(null);
+        assertThat(mock.testByte((byte) 1)).isEqualTo(PASSED);
+        assertThat(mock.testByte((byte) 8)).isEqualTo(PASSED);
+        assertThat(mock.testByte((byte) 32)).isEqualTo(null);
+        assertThat(mock.testByte(Byte.MAX_VALUE)).isEqualTo(PASSED);
+    }
 
-    mock.testChar('a');
-    mock.testChar('b');
-    mock.testChar('c');
+    @Test
+    void testMoxyMockVerifyWithAnyOfCharMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertMock(() -> mock.testChar(anyOfChar('a', 'c'))).wasCalledTwice();
-  }
+        mock.testChar('a');
+        mock.testChar('b');
+        mock.testChar('c');
 
-  @Test
-  public void testMoxyMockWhenWithAnyOfCharMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertMock(() -> mock.testChar(anyOfChar('a', 'c'))).wasCalledTwice();
+    }
 
-    when(() -> mock.testChar(anyOfChar('a', 'x', 'z'))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithAnyOfCharMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertThat(mock.testChar('a')).isEqualTo(PASSED);
-    assertThat(mock.testChar('b')).isEqualTo(null);
-    assertThat(mock.testChar('c')).isEqualTo(null);
-    assertThat(mock.testChar('x')).isEqualTo(PASSED);
-    assertThat(mock.testChar('y')).isEqualTo(null);
-    assertThat(mock.testChar('z')).isEqualTo(PASSED);
-  }
+        when(() -> mock.testChar(anyOfChar('a', 'x', 'z'))).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockVerifyWithAnyOfShortMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertThat(mock.testChar('a')).isEqualTo(PASSED);
+        assertThat(mock.testChar('b')).isEqualTo(null);
+        assertThat(mock.testChar('c')).isEqualTo(null);
+        assertThat(mock.testChar('x')).isEqualTo(PASSED);
+        assertThat(mock.testChar('y')).isEqualTo(null);
+        assertThat(mock.testChar('z')).isEqualTo(PASSED);
+    }
 
-    mock.testShort((short) 0);
-    mock.testShort((short) 256);
-    mock.testShort(Short.MAX_VALUE);
+    @Test
+    void testMoxyMockVerifyWithAnyOfShortMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertMock(() -> mock.testShort(anyOfShort((short)0, (short)127, Short.MAX_VALUE))).wasCalledTwice();
-  }
+        mock.testShort((short) 0);
+        mock.testShort((short) 256);
+        mock.testShort(Short.MAX_VALUE);
 
-  @Test
-  public void testMoxyMockWhenWithAnyOfShortMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertMock(() -> mock.testShort(anyOfShort((short) 0, (short) 127, Short.MAX_VALUE))).wasCalledTwice();
+    }
 
-    when(() -> mock.testShort(anyOfShort((short)0, (short)1, Short.MAX_VALUE))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithAnyOfShortMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertThat(mock.testShort((short) 0)).isEqualTo(PASSED);
-    assertThat(mock.testShort((short) 1)).isEqualTo(PASSED);
-    assertThat(mock.testShort((short) 128)).isEqualTo(null);
-    assertThat(mock.testShort((short) 256)).isEqualTo(null);
-    assertThat(mock.testShort((short) 32767)).isEqualTo(PASSED);
-  }
+        when(() -> mock.testShort(anyOfShort((short) 0, (short) 1, Short.MAX_VALUE))).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockVerifyWithAnyOfIntMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertThat(mock.testShort((short) 0)).isEqualTo(PASSED);
+        assertThat(mock.testShort((short) 1)).isEqualTo(PASSED);
+        assertThat(mock.testShort((short) 128)).isEqualTo(null);
+        assertThat(mock.testShort((short) 256)).isEqualTo(null);
+        assertThat(mock.testShort((short) 32767)).isEqualTo(PASSED);
+    }
 
-    mock.testInt(0);
-    mock.testInt(1);
-    mock.testInt(Integer.MAX_VALUE);
+    @Test
+    void testMoxyMockVerifyWithAnyOfIntMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertMock(() -> mock.testInt(anyOfInt(0, 42, 256, Integer.MAX_VALUE))).wasCalledTwice();
-    assertMock(() -> mock.testInt(anyOfInt(42, 256))).wasNotCalled();
-  }
+        mock.testInt(0);
+        mock.testInt(1);
+        mock.testInt(Integer.MAX_VALUE);
 
-  @Test
-  public void testMoxyMockWhenWithAnyOfIntMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertMock(() -> mock.testInt(anyOfInt(0, 42, 256, Integer.MAX_VALUE))).wasCalledTwice();
+        assertMock(() -> mock.testInt(anyOfInt(42, 256))).wasNotCalled();
+    }
 
-    when(() -> mock.testInt(anyOfInt(0, 256, Integer.MAX_VALUE))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithAnyOfIntMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertThat(mock.testInt(0)).isEqualTo(PASSED);
-    assertThat(mock.testInt(1)).isEqualTo(null);
-    assertThat(mock.testInt(256)).isEqualTo(PASSED);
-    assertThat(mock.testInt(Integer.MIN_VALUE)).isEqualTo(null);
-    assertThat(mock.testInt(Integer.MAX_VALUE - 1)).isEqualTo(null);
-    assertThat(mock.testInt(Integer.MAX_VALUE)).isEqualTo(PASSED);
-  }
+        when(() -> mock.testInt(anyOfInt(0, 256, Integer.MAX_VALUE))).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockVerifyWithAnyOfLongMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertThat(mock.testInt(0)).isEqualTo(PASSED);
+        assertThat(mock.testInt(1)).isEqualTo(null);
+        assertThat(mock.testInt(256)).isEqualTo(PASSED);
+        assertThat(mock.testInt(Integer.MIN_VALUE)).isEqualTo(null);
+        assertThat(mock.testInt(Integer.MAX_VALUE - 1)).isEqualTo(null);
+        assertThat(mock.testInt(Integer.MAX_VALUE)).isEqualTo(PASSED);
+    }
 
-    mock.testLong(0);
-    mock.testLong(1);
-    mock.testLong(Long.MAX_VALUE);
+    @Test
+    void testMoxyMockVerifyWithAnyOfLongMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertMock(() -> mock.testLong(anyOfLong(0l, Long.MAX_VALUE))).wasCalledTwice();
-    assertMock(() -> mock.testLong(anyOfLong(2l, Long.MIN_VALUE))).wasNotCalled();
-  }
+        mock.testLong(0);
+        mock.testLong(1);
+        mock.testLong(Long.MAX_VALUE);
 
-  @Test
-  public void testMoxyMockWhenWithAnyOfLongMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertMock(() -> mock.testLong(anyOfLong(0L, Long.MAX_VALUE))).wasCalledTwice();
+        assertMock(() -> mock.testLong(anyOfLong(2L, Long.MIN_VALUE))).wasNotCalled();
+    }
 
-    when(() -> mock.testLong(anyOfLong(0l, 256l, Long.MAX_VALUE))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithAnyOfLongMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertThat(mock.testLong(0)).isEqualTo(PASSED);
-    assertThat(mock.testLong(1)).isEqualTo(null);
-    assertThat(mock.testLong(256)).isEqualTo(PASSED);
-    assertThat(mock.testLong(Long.MIN_VALUE)).isEqualTo(null);
-    assertThat(mock.testLong(Long.MAX_VALUE - 1)).isEqualTo(null);
-    assertThat(mock.testLong(Long.MAX_VALUE)).isEqualTo(PASSED);
-  }
+        when(() -> mock.testLong(anyOfLong(0L, 256L, Long.MAX_VALUE))).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockVerifyWithAnyOfFloatMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertThat(mock.testLong(0)).isEqualTo(PASSED);
+        assertThat(mock.testLong(1)).isEqualTo(null);
+        assertThat(mock.testLong(256)).isEqualTo(PASSED);
+        assertThat(mock.testLong(Long.MIN_VALUE)).isEqualTo(null);
+        assertThat(mock.testLong(Long.MAX_VALUE - 1)).isEqualTo(null);
+        assertThat(mock.testLong(Long.MAX_VALUE)).isEqualTo(PASSED);
+    }
 
-    mock.testFloat(0.0f);
-    mock.testFloat(1.4f);
-    mock.testFloat(Float.MAX_VALUE);
+    @Test
+    void testMoxyMockVerifyWithAnyOfFloatMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertMock(() -> mock.testFloat(anyOfFloat(1.4f, Float.MAX_VALUE))).wasCalledTwice();
-  }
+        mock.testFloat(0.0f);
+        mock.testFloat(1.4f);
+        mock.testFloat(Float.MAX_VALUE);
 
-  @Test
-  public void testMoxyMockWhenWithAnyOfFloatMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertMock(() -> mock.testFloat(anyOfFloat(1.4f, Float.MAX_VALUE))).wasCalledTwice();
+    }
 
-    when(() -> mock.testFloat(anyOfFloat(0.0f, Float.MAX_VALUE))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithAnyOfFloatMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertThat(mock.testFloat(0.0f)).isEqualTo(PASSED);
-    assertThat(mock.testFloat(0.1f)).isEqualTo(null);
-    assertThat(mock.testFloat(256.7f)).isEqualTo(null);
-    assertThat(mock.testFloat(Float.MIN_VALUE)).isEqualTo(null);
-    assertThat(mock.testFloat(Float.MAX_VALUE)).isEqualTo(PASSED);
-  }
+        when(() -> mock.testFloat(anyOfFloat(0.0f, Float.MAX_VALUE))).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockVerifyWithAnyOfDoubleMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertThat(mock.testFloat(0.0f)).isEqualTo(PASSED);
+        assertThat(mock.testFloat(0.1f)).isEqualTo(null);
+        assertThat(mock.testFloat(256.7f)).isEqualTo(null);
+        assertThat(mock.testFloat(Float.MIN_VALUE)).isEqualTo(null);
+        assertThat(mock.testFloat(Float.MAX_VALUE)).isEqualTo(PASSED);
+    }
 
-    mock.testDouble(0.0d);
-    mock.testDouble(1.4d);
-    mock.testDouble(Double.MAX_VALUE);
+    @Test
+    void testMoxyMockVerifyWithAnyOfDoubleMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertMock(() -> mock.testDouble(anyOfDouble(0.0d, Double.MAX_VALUE))).wasCalledTwice();
-  }
+        mock.testDouble(0.0d);
+        mock.testDouble(1.4d);
+        mock.testDouble(Double.MAX_VALUE);
 
-  @Test
-  public void testMoxyMockWhenWithAnyOfDoubleMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertMock(() -> mock.testDouble(anyOfDouble(0.0d, Double.MAX_VALUE))).wasCalledTwice();
+    }
 
-    when(() -> mock.testDouble(anyOfDouble(0.0d, Double.MAX_VALUE))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithAnyOfDoubleMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertThat(mock.testDouble(0.0d)).isEqualTo(PASSED);
-    assertThat(mock.testDouble(0.1d)).isEqualTo(null);
-    assertThat(mock.testDouble(256.7d)).isEqualTo(null);
-    assertThat(mock.testDouble(Double.MIN_VALUE)).isEqualTo(null);
-    assertThat(mock.testDouble(Double.MAX_VALUE)).isEqualTo(PASSED);
-  }
+        when(() -> mock.testDouble(anyOfDouble(0.0d, Double.MAX_VALUE))).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockVerifyWithAnyOfBoolMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertThat(mock.testDouble(0.0d)).isEqualTo(PASSED);
+        assertThat(mock.testDouble(0.1d)).isEqualTo(null);
+        assertThat(mock.testDouble(256.7d)).isEqualTo(null);
+        assertThat(mock.testDouble(Double.MIN_VALUE)).isEqualTo(null);
+        assertThat(mock.testDouble(Double.MAX_VALUE)).isEqualTo(PASSED);
+    }
 
-    mock.testBoolean(Boolean.TRUE);
-    mock.testBoolean(Boolean.FALSE);
-    mock.testBoolean(Boolean.TRUE);
+    @Test
+    void testMoxyMockVerifyWithAnyOfBoolMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertMock(() -> mock.testBoolean(anyOfBool(true, false))).wasCalled(3);
-    assertMock(() -> mock.testBoolean(anyOfBool(true))).wasCalled(2);
-  }
+        mock.testBoolean(Boolean.TRUE);
+        mock.testBoolean(Boolean.FALSE);
+        mock.testBoolean(Boolean.TRUE);
 
-  @Test
-  public void testMoxyMockWhenWithAnyOfBoolMatcherWorks() {
-    final MatcherTestClass mock = mock(MatcherTestClass.class);
+        assertMock(() -> mock.testBoolean(anyOfBool(true, false))).wasCalled(3);
+        assertMock(() -> mock.testBoolean(anyOfBool(true))).wasCalled(2);
+    }
 
-    when(() -> mock.testBoolean(anyOfBool(true, false))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithAnyOfBoolMatcherWorks() {
+        final MatcherTestClass mock = mock(MatcherTestClass.class);
 
-    assertThat(mock.testBoolean(Boolean.FALSE)).isEqualTo(PASSED);
-    assertThat(mock.testBoolean(Boolean.TRUE)).isEqualTo(PASSED);
-  }
+        when(() -> mock.testBoolean(anyOfBool(true, false))).thenReturn(PASSED);
 
-  @Test
-  public void testMoxyMockVerifyWithAnyOfObjectMatcherWorks() {
-    final MethodWithArguments mock = mock(MethodWithArguments.class);
+        assertThat(mock.testBoolean(Boolean.FALSE)).isEqualTo(PASSED);
+        assertThat(mock.testBoolean(Boolean.TRUE)).isEqualTo(PASSED);
+    }
 
-    mock.hasArgs("one", "two");
-    mock.hasArgs("three", "four");
-    mock.hasArgs("five", "six");
+    @Test
+    void testMoxyMockVerifyWithAnyOfObjectMatcherWorks() {
+        final MethodWithArguments mock = mock(MethodWithArguments.class);
 
-    assertMock(() -> mock.hasArgs(anyOf("one", "five"), anyOf("two", "six"))).wasCalledTwice();
-    assertMock(() -> mock.hasArgs(anyOf("ten", "eleven"), anyOf("twelve", "fourteen"))).wasNotCalled();
-  }
+        mock.hasArgs("one", "two");
+        mock.hasArgs("three", "four");
+        mock.hasArgs("five", "six");
 
-  @Test
-  public void testMoxyMockWhenWithAnyOfObjectMatcherWorks() {
-    final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
+        assertMock(() -> mock.hasArgs(anyOf("one", "five"), anyOf("two", "six"))).wasCalledTwice();
+        assertMock(() -> mock.hasArgs(anyOf("ten", "eleven"), anyOf("twelve", "fourteen"))).wasNotCalled();
+    }
 
-    when(() -> mock.sayHelloTo(anyOf("Steve", "Bill"))).thenReturn(PASSED);
+    @Test
+    void testMoxyMockWhenWithAnyOfObjectMatcherWorks() {
+        final MethodWithArgAndReturn mock = mock(MethodWithArgAndReturn.class);
 
-    assertThat(mock.sayHelloTo("Steve")).isEqualTo(PASSED);
-    assertThat(mock.sayHelloTo("Bill")).isEqualTo(PASSED);
-    assertThat(mock.sayHelloTo("Sam")).isEqualTo(null);
-  }
+        when(() -> mock.sayHelloTo(anyOf("Steve", "Bill"))).thenReturn(PASSED);
+
+        assertThat(mock.sayHelloTo("Steve")).isEqualTo(PASSED);
+        assertThat(mock.sayHelloTo("Bill")).isEqualTo(PASSED);
+        assertThat(mock.sayHelloTo("Sam")).isEqualTo(null);
+    }
 }

@@ -23,214 +23,211 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
+import com.roscopeco.moxy.api.MoxyVerifier;
+import org.opentest4j.AssertionFailedError;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import org.opentest4j.AssertionFailedError;
-
-import com.roscopeco.moxy.api.MoxyVerifier;
 
 class ASMMoxyVerifier extends AbstractASMMoxyInvocationListProcessor implements MoxyVerifier {
-  public ASMMoxyVerifier(final ASMMoxyEngine engine, final List<Invocation> invocations) {
-    super(engine, Collections.unmodifiableList(invocations));
-  }
-
-  @Override
-  public MoxyVerifier wasCalled() {
-    final Invocation invocation = this.getLastMonitoredInvocation();
-    final String methodName = invocation.getMethodName();
-    final String methodDesc = invocation.getMethodDesc();
-
-    if (this.getEngine()
-            .getRecorder()
-            .getInvocationList(invocation.getReceiver().getClass(),
-                               methodName,
-                               methodDesc)
-        .stream()
-        .anyMatch(e -> this.getEngine()
-                             .getMatcherEngine()
-                             .argsMatch(e.getArgs(), invocation.getArgs())
-    )) {
-      return this;
-    } else {
-      throw new AssertionFailedError(
-          new StringBuilder()
-            .append(StringConsts.EXPECTED_MOCK)
-            .append(invocation.toString())
-            .append(StringConsts.TO_BE_CALLED)
-            .append(StringConsts.AT_LEAST_ONCE_BUT_WASNT_AT_ALL)
-                .toString());
+    ASMMoxyVerifier(final ASMMoxyEngine engine, final List<Invocation> invocations) {
+        super(engine, Collections.unmodifiableList(invocations));
     }
-  }
 
-  int getCallCount(final Invocation invocation) {
-    return VerifierHelpers.getCallCount(
-        this.getEngine().getMatcherEngine(),
-        invocation,
-        this.getEngine()
-          .getRecorder()
-          .getInvocationList(invocation.getReceiver().getClass(),
-                             invocation.getMethodName(),
-                             invocation.getMethodDesc()));
-  }
+    @Override
+    public MoxyVerifier wasCalled() {
+        final Invocation invocation = this.getLastMonitoredInvocation();
+        final String methodName = invocation.getMethodName();
+        final String methodDesc = invocation.getMethodDesc();
 
-  @Override
-  public MoxyVerifier wasCalled(final int times) {
-    final Invocation invocation = this.getLastMonitoredInvocation();
-    final int actual = this.getCallCount(invocation);
-
-    if (actual == times) {
-      return this;
-    } else {
-      throw new AssertionFailedError(
-          VerifierHelpers.makeExpectedCountMismatchMessage(invocation,
-                                                           times,
-                                                           actual,
-                                                           StringConsts.EXACTLY));
+        if (this.getEngine()
+                .getRecorder()
+                .getInvocationList(invocation.getReceiver().getClass(),
+                        methodName,
+                        methodDesc)
+                .stream()
+                .anyMatch(e -> this.getEngine()
+                        .getMatcherEngine()
+                        .argsMatch(e.getArgs(), invocation.getArgs())
+                )) {
+            return this;
+        } else {
+            throw new AssertionFailedError(
+                    new StringBuilder()
+                            .append(StringConsts.EXPECTED_MOCK)
+                            .append(invocation.toString())
+                            .append(StringConsts.TO_BE_CALLED)
+                            .append(StringConsts.AT_LEAST_ONCE_BUT_WASNT_AT_ALL)
+                            .toString());
+        }
     }
-  }
 
-  @Override
-  public MoxyVerifier wasNotCalled() {
-    return this.wasCalled(0);
-  }
-
-  @Override
-  public MoxyVerifier wasCalledOnce() {
-    return this.wasCalled(1);
-  }
-
-  @Override
-  public MoxyVerifier wasCalledTwice() {
-    return this.wasCalled(2);
-  }
-
-  @Override
-  public MoxyVerifier wasCalledAtLeast(final int times) {
-    final Invocation invocation = this.getLastMonitoredInvocation();
-    final int actual = this.getCallCount(invocation);
-
-    if (actual >= times) {
-      return this;
-    } else {
-      throw new AssertionFailedError(
-          VerifierHelpers.makeExpectedCountMismatchMessage(invocation,
-                                                           times,
-                                                           actual,
-                                                           StringConsts.AT_LEAST));
+    private long getCallCount(final Invocation invocation) {
+        return VerifierHelpers.getCallCount(
+                this.getEngine().getMatcherEngine(),
+                invocation,
+                this.getEngine()
+                        .getRecorder()
+                        .getInvocationList(invocation.getReceiver().getClass(),
+                                invocation.getMethodName(),
+                                invocation.getMethodDesc()));
     }
-  }
 
-  @Override
-  public MoxyVerifier wasCalledAtMost(final int times) {
-    final Invocation invocation = this.getLastMonitoredInvocation();
-    final int actual = this.getCallCount(invocation);
+    @Override
+    public MoxyVerifier wasCalled(final int times) {
+        final Invocation invocation = this.getLastMonitoredInvocation();
+        final long actual = this.getCallCount(invocation);
 
-    if (actual <= times) {
-      return this;
-    } else {
-      throw new AssertionFailedError(
-          VerifierHelpers.makeExpectedCountMismatchMessage(invocation,
-              times,
-              actual,
-              StringConsts.AT_MOST));
+        if (actual == times) {
+            return this;
+        } else {
+            throw new AssertionFailedError(
+                    VerifierHelpers.makeExpectedCountMismatchMessage(invocation,
+                            times,
+                            actual,
+                            StringConsts.EXACTLY));
+        }
     }
-  }
 
-  int countExceptionsThrown(final Invocation invocation,
-                            final String methodName,
-                            final String methodDesc,
-                            final Predicate<? super Invocation> filterPredicate) {
-    return this.getEngine()
-        .getRecorder()
-        .getInvocationList(invocation.getReceiver().getClass(),
-                           methodName,
-                           methodDesc)
-      .stream()
-      .filter( e -> this.getEngine()
-                      .getMatcherEngine()
-                      .argsMatch(e.getArgs(), invocation.getArgs()) )
-      .filter(filterPredicate)
-      .collect(Collectors.toList())
-      .size();
-  }
-
-  @Override
-  public MoxyVerifier didntThrow(final Class<? extends Throwable> throwableClass) {
-    final Invocation invocation = this.getLastMonitoredInvocation();
-
-    final int actual = (this.countExceptionsThrown(invocation,
-                                        invocation.getMethodName(),
-                                        invocation.getMethodDesc(),
-        e -> e.getThrew() != null && e.getThrew().getClass().equals(throwableClass))
-    );
-
-    if (actual > 0) {
-      throw new AssertionFailedError(
-          new StringBuilder()
-            .append(StringConsts.EXPECTED_MOCK)
-            .append(invocation.toString())
-            .append(StringConsts.SPACE)
-            .append(StringConsts.NEVER_TO_THROW_EXCEPTION)
-            .append("class ")
-            .append(throwableClass.getName())
-            .append(StringConsts.BUT_IT_WAS_THROWN)
-            .append(TypeStringUtils.readableTimes(actual))
-                .toString());
-    } else {
-      return this;
+    @Override
+    public MoxyVerifier wasNotCalled() {
+        return this.wasCalled(0);
     }
-  }
 
-  @Override
-  public MoxyVerifier didntThrow(final Throwable throwable) {
-    final Invocation invocation = this.getLastMonitoredInvocation();
-
-    final int actual = (this.countExceptionsThrown(invocation,
-                                        invocation.getMethodName(),
-                                        invocation.getMethodDesc(),
-        e -> e.getThrew() != null && e.getThrew().equals(throwable))
-    );
-
-    if (actual > 0) {
-      throw new AssertionFailedError(
-          new StringBuilder()
-            .append(StringConsts.EXPECTED_MOCK)
-            .append(invocation.toString())
-            .append(StringConsts.SPACE)
-            .append(StringConsts.NEVER_TO_THROW_EXCEPTION)
-            .append(throwable)
-            .append(StringConsts.BUT_IT_WAS_THROWN)
-            .append(TypeStringUtils.readableTimes(actual))
-                .toString());
-    } else {
-      return this;
+    @Override
+    public MoxyVerifier wasCalledOnce() {
+        return this.wasCalled(1);
     }
-  }
 
-  @Override
-  public MoxyVerifier didntThrowAnyException() {
-    final Invocation invocation = this.getLastMonitoredInvocation();
-
-    final int actual = (this.countExceptionsThrown(invocation,
-                                        invocation.getMethodName(),
-                                        invocation.getMethodDesc(),
-        e -> e.getThrew() != null)
-    );
-
-    if (actual > 0) {
-      throw new AssertionFailedError(
-          new StringBuilder()
-            .append(StringConsts.EXPECTED_MOCK)
-            .append(invocation.toString())
-            .append(StringConsts.SPACE)
-            .append(StringConsts.NEVER_THROW_ANY_BUT_EXCEPTIONS_THROWN)
-            .append(TypeStringUtils.readableTimes(actual))
-                .toString());
-    } else {
-      return this;
+    @Override
+    public MoxyVerifier wasCalledTwice() {
+        return this.wasCalled(2);
     }
-  }
+
+    @Override
+    public MoxyVerifier wasCalledAtLeast(final int times) {
+        final Invocation invocation = this.getLastMonitoredInvocation();
+        final long actual = this.getCallCount(invocation);
+
+        if (actual >= times) {
+            return this;
+        } else {
+            throw new AssertionFailedError(
+                    VerifierHelpers.makeExpectedCountMismatchMessage(invocation,
+                            times,
+                            actual,
+                            StringConsts.AT_LEAST));
+        }
+    }
+
+    @Override
+    public MoxyVerifier wasCalledAtMost(final int times) {
+        final Invocation invocation = this.getLastMonitoredInvocation();
+        final long actual = this.getCallCount(invocation);
+
+        if (actual <= times) {
+            return this;
+        } else {
+            throw new AssertionFailedError(
+                    VerifierHelpers.makeExpectedCountMismatchMessage(invocation,
+                            times,
+                            actual,
+                            StringConsts.AT_MOST));
+        }
+    }
+
+    private long countExceptionsThrown(final Invocation invocation,
+                                      final String methodName,
+                                      final String methodDesc,
+                                      final Predicate<? super Invocation> filterPredicate) {
+        return this.getEngine()
+                .getRecorder()
+                .getInvocationList(invocation.getReceiver().getClass(),
+                        methodName,
+                        methodDesc)
+                .stream()
+                .filter(e -> this.getEngine()
+                        .getMatcherEngine()
+                        .argsMatch(e.getArgs(), invocation.getArgs()))
+                .filter(filterPredicate)
+                .count();
+    }
+
+    @Override
+    public MoxyVerifier didntThrow(final Class<? extends Throwable> throwableClass) {
+        final Invocation invocation = this.getLastMonitoredInvocation();
+
+        final long actual = (this.countExceptionsThrown(invocation,
+                invocation.getMethodName(),
+                invocation.getMethodDesc(),
+                e -> e.getThrew() != null && e.getThrew().getClass().equals(throwableClass))
+        );
+
+        if (actual > 0) {
+            throw new AssertionFailedError(
+                    new StringBuilder()
+                            .append(StringConsts.EXPECTED_MOCK)
+                            .append(invocation.toString())
+                            .append(StringConsts.SPACE)
+                            .append(StringConsts.NEVER_TO_THROW_EXCEPTION)
+                            .append("class ")
+                            .append(throwableClass.getName())
+                            .append(StringConsts.BUT_IT_WAS_THROWN)
+                            .append(TypeStringUtils.readableTimes(actual))
+                            .toString());
+        } else {
+            return this;
+        }
+    }
+
+    @Override
+    public MoxyVerifier didntThrow(final Throwable throwable) {
+        final Invocation invocation = this.getLastMonitoredInvocation();
+
+        final long actual = (this.countExceptionsThrown(invocation,
+                invocation.getMethodName(),
+                invocation.getMethodDesc(),
+                e -> e.getThrew() != null && e.getThrew().equals(throwable))
+        );
+
+        if (actual > 0) {
+            throw new AssertionFailedError(
+                    new StringBuilder()
+                            .append(StringConsts.EXPECTED_MOCK)
+                            .append(invocation.toString())
+                            .append(StringConsts.SPACE)
+                            .append(StringConsts.NEVER_TO_THROW_EXCEPTION)
+                            .append(throwable)
+                            .append(StringConsts.BUT_IT_WAS_THROWN)
+                            .append(TypeStringUtils.readableTimes(actual))
+                            .toString());
+        } else {
+            return this;
+        }
+    }
+
+    @Override
+    public MoxyVerifier didntThrowAnyException() {
+        final Invocation invocation = this.getLastMonitoredInvocation();
+
+        final long actual = (this.countExceptionsThrown(invocation,
+                invocation.getMethodName(),
+                invocation.getMethodDesc(),
+                e -> e.getThrew() != null)
+        );
+
+        if (actual > 0) {
+            throw new AssertionFailedError(
+                    new StringBuilder()
+                            .append(StringConsts.EXPECTED_MOCK)
+                            .append(invocation.toString())
+                            .append(StringConsts.SPACE)
+                            .append(StringConsts.NEVER_THROW_ANY_BUT_EXCEPTIONS_THROWN)
+                            .append(TypeStringUtils.readableTimes(actual))
+                            .toString());
+        } else {
+            return this;
+        }
+    }
 }

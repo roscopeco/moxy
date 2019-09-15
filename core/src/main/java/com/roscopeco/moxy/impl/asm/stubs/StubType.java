@@ -24,16 +24,16 @@
 
 package com.roscopeco.moxy.impl.asm.stubs;
 
-/*
+/**
  * Types of stubbing. Each type is treated differently in
  * generated code.
  *
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public enum StubType {
-  CALL_SUPER,
-  THROW_EXCEPTION,
-  RETURN_OBJECT,
-  DELEGATE,       // this is a special case of return. It's separate
-                  // to allow mock to set up exception handling etc.
+    CALL_SUPER,
+    THROW_EXCEPTION,
+    RETURN_OBJECT,
+    DELEGATE,       // this is a special case of return. It's separate
+    // to allow mock to set up exception handling etc.
 }

@@ -30,27 +30,26 @@ import java.util.List;
  * on the mocks.
  */
 public final class StubThrow implements Stub {
-  Throwable toThrow;
-  boolean retain;
+    private Throwable toThrow;
+    private boolean retain;
 
-  public StubThrow(final Throwable toThrow, final boolean retain) {
-    this.toThrow = toThrow;
-    this.retain = retain;
-  }
+    public StubThrow(final Throwable toThrow, final boolean retain) {
+        this.toThrow = toThrow;
+        this.retain = retain;
+    }
 
-  @Override
-  public StubType getType() {
-    return StubType.THROW_EXCEPTION;
-  }
+    @Override
+    public StubType getType() {
+        return StubType.THROW_EXCEPTION;
+    }
 
-  @Override
-  public boolean isRetained() {
-    return this.retain;
-  }
+    @Override
+    public boolean isRetained() {
+        return this.retain;
+    }
 
-  @Override
-  public Object getObject(final List<Object> actualArgs) {
-    return this.toThrow;
-  }
-
+    @Override
+    public Object getObject(final List<Object> actualArgs) {
+        return this.toThrow;
+    }
 }

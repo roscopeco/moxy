@@ -23,86 +23,88 @@
  */
 package com.roscopeco.moxy;
 
-import static org.assertj.core.api.Assertions.*;
-
+import com.roscopeco.moxy.model.SimpleConstructorClass;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.roscopeco.moxy.model.SimpleConstructorClass;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestMoxyConstructMocksAndSpies {
-  @BeforeEach
-  public void setUp() {
-    Moxy.getMoxyEngine().reset();
-  }
+class TestMoxyConstructMocksAndSpies {
 
-  @Test
-  public void testMoxyConstructMockWorksWithNullConstructor() {
-    final SimpleConstructorClass mock = Moxy.constructMock(SimpleConstructorClass.class);
+    private static final String GOODBYE = "Goodbye";
 
-    Moxy.when(() -> mock.returnString()).thenCallRealMethod();
+    @BeforeEach
+    void setUp() {
+        Moxy.getMoxyEngine().reset();
+    }
 
-    assertThat(mock.returnString()).isEqualTo("Hello");
-  }
+    @Test
+    void testMoxyConstructMockWorksWithNullConstructor() {
+        final SimpleConstructorClass mock = Moxy.constructMock(SimpleConstructorClass.class);
 
-  @Test
-  public void testMoxyConstructMockWorksWithOneArgConstructor() {
-    final SimpleConstructorClass mock =
-        Moxy.constructMock(SimpleConstructorClass.class, "Goodbye");
+        Moxy.when(mock::returnString).thenCallRealMethod();
 
-    Moxy.when(() -> mock.returnString()).thenCallRealMethod();
+        assertThat(mock.returnString()).isEqualTo("Hello");
+    }
 
-    assertThat(mock.returnString()).isEqualTo("Goodbye");
-  }
+    @Test
+    void testMoxyConstructMockWorksWithOneArgConstructor() {
+        final SimpleConstructorClass mock =
+                Moxy.constructMock(SimpleConstructorClass.class, GOODBYE);
 
-  @Test
-  public void testMoxyConstructMockWorksWithTwoArgConstructor() {
-    final SimpleConstructorClass mock =
-        Moxy.constructMock(SimpleConstructorClass.class, "Good", "bye");
+        Moxy.when(mock::returnString).thenCallRealMethod();
 
-    Moxy.when(() -> mock.returnString()).thenCallRealMethod();
+        assertThat(mock.returnString()).isEqualTo(GOODBYE);
+    }
 
-    assertThat(mock.returnString()).isEqualTo("Goodbye");
-  }
+    @Test
+    void testMoxyConstructMockWorksWithTwoArgConstructor() {
+        final SimpleConstructorClass mock =
+                Moxy.constructMock(SimpleConstructorClass.class, "Good", "bye");
 
-  @Test
-  public void testMoxyConstructMockWorksWithPrimitiveArgConstructor() {
-    final SimpleConstructorClass mock =
-        Moxy.constructMock(SimpleConstructorClass.class, "Level", 42);
+        Moxy.when(mock::returnString).thenCallRealMethod();
 
-    Moxy.when(() -> mock.returnString()).thenCallRealMethod();
+        assertThat(mock.returnString()).isEqualTo(GOODBYE);
+    }
 
-    assertThat(mock.returnString()).isEqualTo("Level42");
-  }
+    @Test
+    void testMoxyConstructMockWorksWithPrimitiveArgConstructor() {
+        final SimpleConstructorClass mock =
+                Moxy.constructMock(SimpleConstructorClass.class, "Level", 42);
 
-  @Test
-  public void testMoxyConstructSpyWorksWithNullConstructor() {
-    final SimpleConstructorClass mock = Moxy.constructSpy(SimpleConstructorClass.class);
+        Moxy.when(mock::returnString).thenCallRealMethod();
 
-    assertThat(mock.returnString()).isEqualTo("Hello");
-  }
+        assertThat(mock.returnString()).isEqualTo("Level42");
+    }
 
-  @Test
-  public void testMoxyConstructSpyWorksWithOneArgConstructor() {
-    final SimpleConstructorClass mock =
-        Moxy.constructSpy(SimpleConstructorClass.class, "Goodbye");
+    @Test
+    void testMoxyConstructSpyWorksWithNullConstructor() {
+        final SimpleConstructorClass mock = Moxy.constructSpy(SimpleConstructorClass.class);
 
-    assertThat(mock.returnString()).isEqualTo("Goodbye");
-  }
+        assertThat(mock.returnString()).isEqualTo("Hello");
+    }
 
-  @Test
-  public void testMoxyConstructSpyWorksWithTwoArgConstructor() {
-    final SimpleConstructorClass mock =
-        Moxy.constructSpy(SimpleConstructorClass.class, "Good", "bye");
+    @Test
+    void testMoxyConstructSpyWorksWithOneArgConstructor() {
+        final SimpleConstructorClass mock =
+                Moxy.constructSpy(SimpleConstructorClass.class, GOODBYE);
 
-    assertThat(mock.returnString()).isEqualTo("Goodbye");
-  }
+        assertThat(mock.returnString()).isEqualTo(GOODBYE);
+    }
 
-  @Test
-  public void testMoxyConstructSpyWorksWithPrimitiveArgConstructor() {
-    final SimpleConstructorClass mock =
-        Moxy.constructSpy(SimpleConstructorClass.class, "Level", 42);
+    @Test
+    void testMoxyConstructSpyWorksWithTwoArgConstructor() {
+        final SimpleConstructorClass mock =
+                Moxy.constructSpy(SimpleConstructorClass.class, "Good", "bye");
 
-    assertThat(mock.returnString()).isEqualTo("Level42");
-  }
+        assertThat(mock.returnString()).isEqualTo(GOODBYE);
+    }
+
+    @Test
+    void testMoxyConstructSpyWorksWithPrimitiveArgConstructor() {
+        final SimpleConstructorClass mock =
+                Moxy.constructSpy(SimpleConstructorClass.class, "Level", 42);
+
+        assertThat(mock.returnString()).isEqualTo("Level42");
+    }
 }

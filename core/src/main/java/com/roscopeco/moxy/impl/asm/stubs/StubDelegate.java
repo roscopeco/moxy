@@ -23,48 +23,48 @@
  */
 package com.roscopeco.moxy.impl.asm.stubs;
 
+import com.roscopeco.moxy.api.MoxyException;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
-
-import com.roscopeco.moxy.api.MoxyException;
 
 /*
  * This is used as the value in the stubbed delegateTo
  * on the mocks.
  */
 public final class StubDelegate implements Stub {
-  Method method;
-  final Object delegate;
-  final boolean retain;
+    private Method method;
+    private final Object delegate;
+    private final boolean retain;
 
-  public StubDelegate(final Method method,
-                      final Object delegate,
-                      final boolean retain) {
-    this.method = method;
-    this.delegate = delegate;
-    this.retain = retain;
-  }
-
-  @Override
-  public StubType getType() {
-    return StubType.DELEGATE;
-  }
-
-  @Override
-  public boolean isRetained() {
-    return this.retain;
-  }
-
-  @Override
-  public Object getObject(final List<Object> actualArgs) {
-    try {
-      this.method.setAccessible(true);
-      return this.method.invoke(this.delegate, actualArgs.toArray(new Object[actualArgs.size()]));
-    } catch (final InvocationTargetException e) {
-      throw new MoxyException("Exception invoking delegate: " + e.getCause());
-    } catch (final IllegalAccessException e) {
-      throw new MoxyException("IllegalAccessException while calling delegate", e);
+    public StubDelegate(final Method method,
+                        final Object delegate,
+                        final boolean retain) {
+        this.method = method;
+        this.delegate = delegate;
+        this.retain = retain;
     }
-  }
+
+    @Override
+    public StubType getType() {
+        return StubType.DELEGATE;
+    }
+
+    @Override
+    public boolean isRetained() {
+        return this.retain;
+    }
+
+    @Override
+    public Object getObject(final List<Object> actualArgs) {
+        try {
+            this.method.setAccessible(true);
+            return this.method.invoke(this.delegate, actualArgs.toArray(new Object[0]));
+        } catch (final InvocationTargetException e) {
+            throw new MoxyException("Exception invoking delegate: " + e.getCause());
+        } catch (final IllegalAccessException e) {
+            throw new MoxyException("IllegalAccessException while calling delegate", e);
+        }
+    }
 }

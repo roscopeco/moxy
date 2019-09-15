@@ -23,16 +23,17 @@
  */
 package com.roscopeco.moxy.impl.asm;
 
-import static com.roscopeco.moxy.Moxy.*;
+import com.roscopeco.moxy.Moxy;
+import com.roscopeco.moxy.api.MoxyEngine;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.roscopeco.moxy.Moxy;
-import com.roscopeco.moxy.api.MoxyEngine;
+import static com.roscopeco.moxy.Moxy.mock;
 
 /*
  * NOTE: When using this to mock ASMMoxyEngine, take care that you do the
@@ -50,34 +51,33 @@ import com.roscopeco.moxy.api.MoxyEngine;
  * periods of pointless debugging, and ultimately death (of your computer from
  * blunt-force trauma).
  */
-public abstract class AbstractImplTest {
-  protected ASMMoxyEngine makePartialMock(final boolean injectMocks, final Method... mockMethods)
-  throws Exception {
-    return this.makePartialMock(injectMocks, Arrays.stream(mockMethods).collect(Collectors.toSet()));
-  }
-
-  protected ASMMoxyEngine makePartialMock(final boolean injectMocks, final Set<Method> mockMethods)
-  throws Exception {
-    final MoxyEngine realEngine = Moxy.getMoxyEngine();
-
-    final Class<? extends ASMMoxyEngine> mockClass = realEngine.getMockClass(
-        ASMMoxyEngine.class, mockMethods);
-
-
-    if (injectMocks) {
-      final Constructor<? extends ASMMoxyEngine> ctor =
-          mockClass.getDeclaredConstructor(MoxyEngine.class,
-                                           InvocationRecorder.class,
-                                           ASMMoxyMatcherEngine.class);
-
-      return ctor.newInstance(realEngine,
-                              mock(InvocationRecorder.class),
-                              mock(ASMMoxyMatcherEngine.class));
-    } else {
-      final Constructor<? extends ASMMoxyEngine> ctor =
-          mockClass.getDeclaredConstructor(MoxyEngine.class);
-
-      return ctor.newInstance(realEngine);
+abstract class AbstractImplTest {
+    ASMMoxyEngine makePartialMock(final boolean injectMocks, final Method... mockMethods)
+            throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        return this.makePartialMock(injectMocks, Arrays.stream(mockMethods).collect(Collectors.toSet()));
     }
-  }
+
+    ASMMoxyEngine makePartialMock(final boolean injectMocks, final Set<Method> mockMethods)
+            throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        final MoxyEngine realEngine = Moxy.getMoxyEngine();
+
+        final Class<? extends ASMMoxyEngine> mockClass = realEngine.getMockClass(
+                ASMMoxyEngine.class, mockMethods);
+
+        if (injectMocks) {
+            final Constructor<? extends ASMMoxyEngine> ctor =
+                    mockClass.getDeclaredConstructor(MoxyEngine.class,
+                            InvocationRecorder.class,
+                            ASMMoxyMatcherEngine.class);
+
+            return ctor.newInstance(realEngine,
+                    mock(InvocationRecorder.class),
+                    mock(ASMMoxyMatcherEngine.class));
+        } else {
+            final Constructor<? extends ASMMoxyEngine> ctor =
+                    mockClass.getDeclaredConstructor(MoxyEngine.class);
+
+            return ctor.newInstance(realEngine);
+        }
+    }
 }

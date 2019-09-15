@@ -24,11 +24,7 @@
 
 package com.roscopeco.moxy.model;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * TODO Document ClassWithDefaultConfiguredReturnTypes
@@ -36,19 +32,19 @@ import java.util.Set;
  * @author Ross Bamford &lt;roscopeco AT gmail DOT com&gt;
  */
 public class ClassWithDefaultConfiguredReturnTypes {
-  public Optional<String> returnOptionalString() {
-    return Optional.of("Hello, World");
-  }
+    public Optional<String> returnOptionalString() {
+        return Optional.of("Hello, World");
+    }
 
-  public List<String> returnListOfString() {
-    return Collections.singletonList("Hello, World");
-  }
+    public List<String> returnListOfString() {
+        return Collections.singletonList("Hello, World");
+    }
 
-  public Map<String, String> returnMapStringToString() {
-    return Collections.singletonMap("Hello", "World");
-  }
+    public Map<String, String> returnMapStringToString() {
+        return Collections.singletonMap("Hello", "World");
+    }
 
-  public Set<String> returnSetOfString() {
-    return Collections.singleton("Hello, World");
-  }
+    public Set<String> returnSetOfString() {
+        return Collections.singleton("Hello, World");
+    }
 }

@@ -11,9 +11,8 @@ These changes are currently considered experimental and are not yet ready
 to merge to `develop`. They are in various branches and are slated to
 make it in before 1.0.0.
   
-- Java 9 Jigsaw (module) support.
-  See: https://github.com/roscopeco/moxy/tree/modular-java9
-  
+- No experimental features at this time
+
 ## [Unreleased]
 
 These changes are currently in the `develop` branch, and are slated
@@ -21,7 +20,39 @@ to make it into a release soon.
 
 - Nothing to show
 
-## [0.92.2] - 2019-06-02
+## [0.94.0] - 2019-09-15
+
+This is a large release with breaking changes as a result of changing the minimum 
+supported Java version to version 11. 
+
+I expect this to be the last breaking-change release before 1.0. 
+
+### Fixed
+
+- Major code cleanup and minor bugfix
+
+### Added
+
+- Support modern versions of Java
+
+### Dropped
+
+- Support for legacy versions of Java
+
+### Changed
+
+- **BREAKING CHANGE** - Moxy 0.94 onward no longer support older Java versions.
+  Moxy is now modular, and the minimum version Moxy is tested against is now Java 11.
+  It _may_ work with Java 10, but this is not officially supported.
+
+- **BREAKING CHANGE** - Numeric matchers now use specific predicate types
+  (e.g. `IntPredicate`, `LongPredicate`) instead of generic predicates.
+
+- **BREAKING CHANGE** - The was classes are defined in the JVM has changed to
+  be compatible with newer Java versions. This won't affect most code, and 
+  you'll only really notice it if you were using custom configurations.
+
+## [0.92.2] - 2019-07-02
 
 ### Fixed
 
@@ -183,7 +214,8 @@ First public release, and the first version pushed to Maven Central.
 - Add project documentation
 - Setup for CI with Travis and Sonarcloud
 
-[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.92.2...develop
+[Unreleased]: https://github.com/roscopeco/moxy/compare/v0.94.0...develop
+[0.94.0]:  https://github.com/roscopeco/moxy/compare/v0.92.2...v0.94.0
 [0.92.2]:  https://github.com/roscopeco/moxy/compare/v0.92.1...v0.92.2
 [0.92.1]:  https://github.com/roscopeco/moxy/compare/v0.92...v0.92.1
 [0.92.0]:  https://github.com/roscopeco/moxy/compare/v0.90.1...v0.92

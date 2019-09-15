@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"com.roscopeco.moxy"},{"l":"com.roscopeco.moxy.api"},{"l":"com.roscopeco.moxy.matchers"}]
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"m":"com.roscopeco.moxy.core","l":"com.roscopeco.moxy"},{"m":"com.roscopeco.moxy.core","l":"com.roscopeco.moxy.api"},{"m":"com.roscopeco.moxy.core","l":"com.roscopeco.moxy.matchers"}]

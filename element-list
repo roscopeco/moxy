@@ -1,0 +1,4 @@
+module:com.roscopeco.moxy.core
+com.roscopeco.moxy
+com.roscopeco.moxy.api
+com.roscopeco.moxy.matchers

@@ -21,6 +21,19 @@ If it helps, think of it like a hammer. Or an elephant gun. Or something...
 
 ### How do I use it?
 
+#### Note for use with modern Java versions
+
+If using the `DefaultClassGenerationStrategy` (the obviously-named default), you'll need to add the 
+following to the JVM arguments when running your tests in your IDE:
+
+```
+--add-opens java.base/java.lang=com.roscopeco.moxy.core
+```
+
+(For example, in IntelliJ this can be added to the _VM Arguments_ in your run configuration).
+
+#### General usage
+
 There's full documentation on [the wiki](https://github.com/roscopeco/moxy/wiki),
 which took quite a while to write, and which I try to keep as up-to-date as 
 possible.
@@ -46,7 +59,7 @@ class TestClass {
 }
 
 final class HardToMockClass {
-  public static final String staticSayHello(final String who) {
+  public static String staticSayHello(final String who) {
     return "Hello, " + who;
   }
 
